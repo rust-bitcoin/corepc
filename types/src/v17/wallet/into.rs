@@ -159,11 +159,8 @@ impl GetAddressInfo {
                     .map_err(E::Pubkeys)
             })
             .transpose()?;
-        let sigs_required = self
-            .sigs_required
-            .map(|s| crate::to_u32(s, "sigs_required"))
-            .transpose()
-            .map_err(E::Numeric)?;
+        let sigs_required =
+            self.sigs_required.map(|s| crate::to_u32(s, "sigs_required")).transpose()?;
         let pubkey = self.pubkey.map(|s| s.parse::<PublicKey>()).transpose().map_err(E::Pubkey)?;
         let embedded =
             self.embedded.map(|embedded| embedded.into_model()).transpose().map_err(E::Embedded)?;
@@ -254,11 +251,8 @@ impl GetAddressInfoEmbedded {
             .map(|s| s.parse::<PublicKey>())
             .collect::<Result<Vec<_>, _>>()
             .map_err(E::Pubkeys)?;
-        let sigs_required = self
-            .sigs_required
-            .map(|s| crate::to_u32(s, "sigs_required"))
-            .transpose()
-            .map_err(E::Numeric)?;
+        let sigs_required =
+            self.sigs_required.map(|s| crate::to_u32(s, "sigs_required")).transpose()?;
         let pubkey = self.pubkey.map(|s| s.parse::<PublicKey>()).transpose().map_err(E::Pubkey)?;
         let labels = self.labels.into_iter().map(|label| label.into_model()).collect();
 
