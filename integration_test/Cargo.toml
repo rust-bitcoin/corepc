@@ -14,6 +14,7 @@ edition = "2021"
 # Enable the same feature in `node` and the version feature here.
 # All minor releases (but only the latest patch release).
 28_0 = ["v28", "node/28_0"]
+27_2 = ["v27", "node/27_2"]
 27_1 = ["v27", "node/27_1"]
 27_0 = ["v27", "node/27_0"]
 26_2 = ["v26", "node/26_2"]

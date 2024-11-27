@@ -45,7 +45,8 @@ default = ["28_0"]
 download = ["bitcoin_hashes", "flate2", "tar", "minreq", "zip"]
 
 # We support all minor releases (but only the latest patch release).
-28_0 = ["download", "27_1"]
+28_0 = ["download", "27_2"]
+27_2 = ["download", "27_1"]
 27_1 = ["download", "27_0"]
 27_0 = ["download", "26_2"]
 26_2 = ["download", "26_1"]

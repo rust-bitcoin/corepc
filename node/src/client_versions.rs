@@ -10,7 +10,11 @@
 #[allow(unused_imports)] // Not all users need the json types.
 pub use corepc_client::{client_sync::v28::{Client, AddressType}, types::v28 as types};
 
-#[cfg(all(feature = "27_1", not(feature = "28_0")))]
+#[cfg(all(feature = "27_2", not(feature = "28_0")))]
+#[allow(unused_imports)] // Not all users need the json types.
+pub use corepc_client::{client_sync::v27::{Client, AddressType}, types::v27 as types};
+
+#[cfg(all(feature = "27_1", not(feature = "27_2")))]
 #[allow(unused_imports)] // Not all users need the json types.
 pub use corepc_client::{client_sync::v27::{Client, AddressType}, types::v27 as types};
 
