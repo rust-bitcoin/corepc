@@ -47,6 +47,18 @@ pub trait NodeExt {
 
     /// Generates [`NBLOCKS`] to an address controlled by the loaded wallet.
     fn fund_wallet(&self);
+
+    /// Mine a block.
+    ///
+    /// Should send mining reward to a new address for the loaded wallet.
+    fn mine_a_block(&self);
+
+    /// Create a transaction and mine it.
+    ///
+    /// # Returns
+    ///
+    /// The receive address and the transaction.
+    fn create_mined_transaction(&self) -> (bitcoin::Address, bitcoin::Transaction);
 }
 
 impl NodeExt for Node {
@@ -56,14 +68,34 @@ impl NodeExt for Node {
         if let Some(wallet) = wallet {
             conf.wallet = Some(wallet);
         }
-        
+
         Node::with_conf(exe, &conf).expect("failed to create node")
     }
 
     fn fund_wallet(&self) {
-        // TODO: Consider returning the error.
         let address = self.client.new_address().expect("failed to get new address");
         self.client.generate_to_address(NBLOCKS, &address).expect("failed to generate to address");
+    }
+
+    fn create_mined_transaction(&self) -> (bitcoin::Address, bitcoin::Transaction) {
+        const MILLION_SATS: bitcoin::Amount = bitcoin::Amount::from_sat(1000000);
+
+        let address = self.client.new_address().expect("failed to get new address");
+
+        let _ = self.client.send_to_address(&address, MILLION_SATS);
+        self.mine_a_block();
+
+        let best_block_hash = self.client.best_block_hash().expect("best_block_hash");
+        let best_block = self.client.get_block(best_block_hash).expect("best_block");
+        let tx = best_block.txdata[1].clone();
+
+        (address, tx)
+    }
+
+    fn mine_a_block(&self) {
+        // TODO: Consider returning the error.
+        let address = self.client.new_address().expect("failed to get new address");
+        self.client.generate_to_address(1, &address).expect("failed to generate to address");
     }
 }
 

@@ -4,6 +4,8 @@
 //!
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
+pub mod raw_transactions;
+
 use bitcoin::address::{Address, NetworkChecked};
 use bitcoin::{Amount, Block, BlockHash, Txid};
 
@@ -33,6 +35,7 @@ crate::impl_client_check_expected_server_version!({ [280000] });
 
 // == Rawtransactions ==
 crate::impl_client_v17__sendrawtransaction!();
+crate::impl_client_v28__submitpackage!();
 
 // == Wallet ==
 crate::impl_client_v17__createwallet!();
