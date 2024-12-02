@@ -41,7 +41,7 @@ impl GetBlockVerbosityOne {
         let tx = self
             .tx
             .iter()
-            .map(|t| encode::deserialize_hex::<Txid>(t).map_err(E::Tx))
+            .map(|t| t.parse::<Txid>().map_err(E::Hash))
             .collect::<Result<Vec<_>, _>>()?;
         let median_time = self.median_time.map(|t| crate::to_u32(t, "median_time")).transpose()?;
         let bits = CompactTarget::from_unprefixed_hex(&self.bits).map_err(E::Bits)?;
@@ -328,12 +328,8 @@ impl GetDifficulty {
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, encode::FromHexError> {
-        let v = self
-            .0
-            .iter()
-            .map(|t| encode::deserialize_hex::<Txid>(t))
-            .collect::<Result<Vec<_>, _>>()?;
+    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+        let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
 }
@@ -355,12 +351,8 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, encode::FromHexError> {
-        let v = self
-            .0
-            .iter()
-            .map(|t| encode::deserialize_hex::<Txid>(t))
-            .collect::<Result<Vec<_>, _>>()?;
+    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+        let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
 }
@@ -460,12 +452,8 @@ impl GetMempoolInfo {
 
 impl GetRawMempool {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempool, encode::FromHexError> {
-        let v = self
-            .0
-            .iter()
-            .map(|t| encode::deserialize_hex::<Txid>(t))
-            .collect::<Result<Vec<_>, _>>()?;
+    pub fn into_model(self) -> Result<model::GetRawMempool, hex::HexToArrayError> {
+        let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempool(v))
     }
 }
@@ -551,12 +539,8 @@ impl GetTxOutSetInfo {
 
 impl VerifyTxOutProof {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::VerifyTxOutProof, encode::FromHexError> {
-        let proofs = self
-            .0
-            .iter()
-            .map(|t| encode::deserialize_hex::<Txid>(t))
-            .collect::<Result<Vec<_>, _>>()?;
+    pub fn into_model(self) -> Result<model::VerifyTxOutProof, hex::HexToArrayError> {
+        let proofs = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::VerifyTxOutProof(proofs))
     }
 }
