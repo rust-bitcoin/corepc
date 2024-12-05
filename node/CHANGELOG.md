@@ -1,3 +1,8 @@
+# 0.5.0 - 2024-12-06
+
+- Rename `BitcoinD` to `Node`
+- Add support for Bitcoin Core v27.2
+
 # 0.4.0 - 2024-11-14
 
 - Add support for Bitcoin Core v28
