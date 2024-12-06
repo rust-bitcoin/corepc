@@ -1,3 +1,9 @@
+# 0.5.0 - 2024-12-06
+
+- Add support for Bitcoin Core v27.2
+- Add a bunch more methods to the `Client`
+- Flesh out v18
+
 # 0.4.0 - 2024-11-14
 
 - Add support for Bitcoin Core v28
