@@ -1,7 +1,7 @@
-# Unreleased
+# 0.5.0 - 2024-12-06
 
-- Flesh out v17 and v18.
-- Rename `corepc-node::BitcoinD` to `Node`.
+- Flesh out v17 and v18
+- Re-write docs and verify correctness of status claims
 
 # 0.4.0 - 2024-11-14
 
