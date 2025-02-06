@@ -220,6 +220,8 @@ pub struct Conf<'a> {
     /// directory with different/esoteric networks
     pub network: &'a str,
 
+    /// Temporary directory path.
+    ///
     /// Optionally specify a temporary or persistent working directory for the node.
     /// The following two parameters can be configured to simulate desired working directory configuration.
     ///
@@ -231,8 +233,6 @@ pub struct Conf<'a> {
     /// It may be useful for example to set to a ramdisk via `TEMPDIR_ROOT` env option so that
     /// bitcoin nodes spawn very fast because their datadirs are in RAM. Should not be enabled with persistent
     /// mode, as it cause memory overflows.
-
-    /// Temporary directory path
     pub tmpdir: Option<PathBuf>,
 
     /// Persistent directory path
