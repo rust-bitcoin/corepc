@@ -220,6 +220,8 @@ pub struct Conf<'a> {
     /// directory with different/esoteric networks
     pub network: &'a str,
 
+    /// Temporary directory path.
+    ///
     /// Optionally specify a temporary or persistent working directory for the node.
     /// The following two parameters can be configured to simulate desired working directory configuration.
     ///
@@ -231,8 +233,6 @@ pub struct Conf<'a> {
     /// It may be useful for example to set to a ramdisk via `TEMPDIR_ROOT` env option so that
     /// bitcoin nodes spawn very fast because their datadirs are in RAM. Should not be enabled with persistent
     /// mode, as it cause memory overflows.
-
-    /// Temporary directory path
     pub tmpdir: Option<PathBuf>,
 
     /// Persistent directory path
@@ -577,8 +577,7 @@ mod test {
     use tempfile::TempDir;
 
     use super::*;
-    use crate::P2P;
-    use crate::{exe_path, get_available_port, Conf, Node, LOCAL_IP};
+    use crate::{exe_path, get_available_port, Conf, Node, LOCAL_IP, P2P};
 
     #[test]
     fn test_local_ip() {
@@ -701,7 +700,7 @@ mod test {
         assert_eq!(node3_peers, 1, "listen false but more than 1 peer");
     }
 
-    #[cfg(any(feature = "0_19_1", not(feature = "download")))]
+    #[cfg(feature = "0_19_1")]
     #[test]
     fn test_multi_wallet() {
         use corepc_client::bitcoin::Amount;

@@ -1,6 +1,6 @@
 [package]
 name = "corepc-node"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Riccardo Casatta <riccardo@casatta.it>", "Tobin C. Harding <me@tobin.cc>"]
 license = "MIT"
 repository = "https://github.com/rust-bitcoin/corepc"
@@ -13,7 +13,7 @@ rust-version = "1.63.0"
 exclude = ["tests", "contrib"]
 
 [dependencies]
-corepc-client = { version = "0.5.0", features = ["client-sync"] }
+corepc-client = { version = "0.6.0", features = ["client-sync"] }
 log = "0.4"
 which = "4.2.5"
 anyhow = "1.0.66"
@@ -31,11 +31,13 @@ tar = { version = "0.4", optional = true }
 minreq = { version = "2.9.1", default-features = false, features = ["https"], optional = true }
 zip = { version = "0.6", optional = true }
 
-# Please note, in this crate the version features are mutally exclusive.
+# Please note, it is expected that a single version feature will be enabled however if you enable
+# multiple the highest version number will take precedence.
 #
 # - `cargo test --features=27_2,download` to download Bitcoin Core binary v27.
-# - `cargo test --all-features` is the same as `cargo test --features=download,v28_0`
-# - `cargo test --features=28_0` to use `bitcoind`.
+# - `cargo test --features=28_0` to use `bitcoind` from the host environment.
+# - `cargo test`: Does not work, you MUST enable a version feature.
+# - `cargo test --all-features`: Same as using latest version e.g., `cargo test --features=20_0,download`
 #
 # If you do not enable `download` then you must configure the bitcoind binary by `bitcoind` in your
 # path or using `BITCOIND_EXE=/path/to/bitcoind`. Note also that the feature enabled should match
