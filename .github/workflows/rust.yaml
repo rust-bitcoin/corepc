@@ -119,7 +119,7 @@ jobs:
       - name: "Set dependencies"
         run: cp Cargo-${{ matrix.dep }}.lock Cargo.lock
       - name: "Run test script"
-        run: ./maintainer-tools/ci/run_task.sh lint
+        run: contrib/lint.sh
 
   Docs:
     name: Docs - stable toolchain
@@ -232,4 +232,4 @@ jobs:
       - name: "Select toolchain"
         uses: dtolnay/rust-toolchain@stable
       - name: "Run integration tests"
-        run: cd integration_test && cargo test --features=${{ matrix.feature }}
+        run: ./contrib/version_specific_tests.sh ${{ matrix.feature }}
