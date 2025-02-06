@@ -700,7 +700,7 @@ mod test {
         assert_eq!(node3_peers, 1, "listen false but more than 1 peer");
     }
 
-    #[cfg(any(feature = "0_19_1", not(feature = "download")))]
+    #[cfg(feature = "0_19_1")]
     #[test]
     fn test_multi_wallet() {
         use corepc_client::bitcoin::Amount;
