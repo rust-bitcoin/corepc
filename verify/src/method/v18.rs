@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! Provides the list of v17 methods.
+//! JSON RPC methods provided by Bitcoin Core v18.
 
 use super::Method;
 
+/// Data for the JSON RPC methods provided by Bitcoin Core v18.
 pub const METHODS: &[Method] = &[
     Method::new_modeled("getbestblockhash", "GetBestBlockHash", "get_best_block_hash"),
     Method::new_modeled("getblock", "GetBlock", "get_block"),
