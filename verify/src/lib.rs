@@ -27,6 +27,8 @@ pub enum Version {
     V19,
     /// Bitcoin Core v20.
     V20,
+    /// Bitcoin Core v21.
+    V21,
 }
 
 impl Version {
@@ -37,6 +39,7 @@ impl Version {
             "v18" | "18" => Ok(Version::V18),
             "v19" | "19" => Ok(Version::V19),
             "v20" | "20" => Ok(Version::V20),
+            "v21" | "21" => Ok(Version::V21),
             other => Err(anyhow::Error::msg(format!("unknown version: '{}'", other))),
         }
     }
@@ -50,6 +53,7 @@ impl fmt::Display for Version {
             V18 => "v18",
             V19 => "v19",
             V20 => "v20",
+            V21 => "v21",
         };
         fmt::Display::fmt(&s, f)
     }

@@ -20,7 +20,7 @@ use verify::{method, model, ssot, Version};
 // TODO: Enable running from any directory, currently errors if run from `src/`.
 // TODO: Add a --quiet option.
 
-const VERSIONS: [Version; 4] = [Version::V17, Version::V18, Version::V19, Version::V20];
+const VERSIONS: [Version; 5] = [Version::V17, Version::V18, Version::V19, Version::V20, Version::V21];
 
 fn main() -> Result<()> {
     let cmd = Command::new("verify")
@@ -95,9 +95,7 @@ fn close(correct: bool) {
 fn verify_correct_methods(version: Version, methods: Vec<String>, msg: &str) -> Result<bool> {
     let ssot = ssot::all_methods(version)?;
     let want = ssot.iter().map(|s| s.as_str()).collect::<Vec<&str>>();
-
     let got = methods.iter().map(|s| s.as_str()).collect::<Vec<&str>>();
-
     Ok(verify::correct_methods(&got, &want, msg))
 }
 
