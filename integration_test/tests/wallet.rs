@@ -74,13 +74,25 @@ pub fn get_addresses_by_label() {
 }
 
 #[test]
-// TODO: Consider testing a few different address types.
 #[cfg(feature = "TODO")]
+// TODO: We are getting an error for missing `pubkeys` field but the field is optional?
+//
+// Also consider adding tests for different address types.
 pub fn get_address_info() {
     let node = Node::new_with_default_wallet();
     let address = node.client.new_address().expect("failed to create new address");
-    let json = node.client.get_address_info(&address).expect("getaddressinfo");
+    let json = node.client.get_address_info(&address).expect("getaddressinfo for new address");
     assert!(json.into_model().is_ok());
+
+    // node.fund_wallet();
+    // let _ = node
+    //     .client
+    //     .send_to_address(&address, Amount::from_sat(10_000))
+    //     .expect("sendtoaddress");
+    // node.mine_a_block();
+
+    // let json = node.client.get_address_info(&address).expect("getaddressinfo");
+    // assert!(json.into_model().is_ok());
 }
 
 #[test]
