@@ -1,181 +1,265 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! Structs with standard types.
+//! # JSON-RPC types for Bitcoin Core `v0.23`
 //!
-//! These structs model the types returned by the JSON-RPC API and use stdlib types (or custom
-//! types) and are specific to a specific to Bitcoin Core `v23`.
+//! These structs are shaped for the JSON data returned by the JSON-RPC API. They use stdlib types
+//! (or custom types) and where necessary implement an `into_model` function to convert the type to
+//! a [`crate::model`] type of the same name. The types in this module are version specific. The
+//! types in the `model` module are version nonspecific and are strongly typed using `rust-bitcoin`.
 //!
-//! **== Blockchain ==**
-//! - [x] `getbestblockhash`
-//! - [x] `getblock "blockhash" ( verbosity )`
-//! - [x] `getblockchaininfo`
-//! - [ ] `getblockcount`
-//! - [ ] `getblockfilter "blockhash" ( "filtertype" )`
-//! - [ ] `getblockfrompeer "blockhash" peer_id`
-//! - [ ] `getblockhash height`
-//! - [ ] `getblockheader "blockhash" ( verbose )`
-//! - [ ] `getblockstats hash_or_height ( stats )`
-//! - [ ] `getchaintips`
-//! - [ ] `getchaintxstats ( nblocks "blockhash" )`
-//! - [ ] `getdeploymentinfo ( "blockhash" )`
-//! - [ ] `getdifficulty`
-//! - [ ] `getmempoolancestors "txid" ( verbose )`
-//! - [ ] `getmempooldescendants "txid" ( verbose )`
-//! - [ ] `getmempoolentry "txid"`
-//! - [ ] `getmempoolinfo`
-//! - [ ] `getrawmempool ( verbose mempool_sequence )`
-//! - [ ] `gettxout "txid" n ( include_mempool )`
-//! - [ ] `gettxoutproof ["txid",...] ( "blockhash" )`
-//! - [ ] `gettxoutsetinfo ( "hash_type" hash_or_height use_index )`
-//! - [ ] `preciousblock "blockhash"`
-//! - [ ] `pruneblockchain height`
-//! - [ ] `savemempool`
-//! - [ ] `scantxoutset "action" ( [scanobjects,...] )`
-//! - [ ] `verifychain ( checklevel nblocks )`
-//! - [ ] `verifytxoutproof "proof"`
+//! ### Method name and implementation status
 //!
-//! **== Control ==**
-//! - [ ] `getmemoryinfo ( "mode" )`
-//! - [ ] `getrpcinfo`
-//! - [ ] `help ( "command" )`
-//! - [ ] `logging ( ["include_category",...] ["exclude_category",...] )`
-//! - [x] `stop`
-//! - [ ] `uptime`
+//! Every JSON-RPC method supported by this version of Bitcoin Core is listed below along with its
+//! current implementation status.
 //!
-//! **== Mining ==**
-//! - [ ] `getblocktemplate ( "template_request" )`
-//! - [ ] `getmininginfo`
-//! - [ ] `getnetworkhashps ( nblocks height )`
-//! - [ ] `prioritisetransaction "txid" ( dummy ) fee_delta`
-//! - [ ] `submitblock "hexdata" ( "dummy" )`
-//! - [ ] `submitheader "hexdata"`
+//! <details>
+//! <summary> Methods from the == Blockchain == section </summary>
 //!
-//! **== Network ==**
-//! - [ ] `addnode "node" "command"`
-//! - [ ] `clearbanned`
-//! - [ ] `disconnectnode ( "address" nodeid )`
-//! - [ ] `getaddednodeinfo ( "node" )`
-//! - [ ] `getconnectioncount`
-//! - [ ] `getnettotals`
-//! - [ ] `getnetworkinfo`
-//! - [ ] `getnodeaddresses ( count "network" )`
-//! - [ ] `getpeerinfo`
-//! - [ ] `listbanned`
-//! - [ ] `ping`
-//! - [ ] `setban "subnet" "command" ( bantime absolute )`
-//! - [ ] `setnetworkactive state`
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | getbestblockhash                   | done            |
+//! | getblock                           | done            |
+//! | getblockchaininfo                  | done            |
+//! | getblockcount                      | done            |
+//! | getblockfilter                     | todo            |
+//! | getblockfrompeer                   | todo            |
+//! | getblockhash                       | done            |
+//! | getblockheader                     | done            |
+//! | getblockstats                      | done (untested) |
+//! | getchaintips                       | done            |
+//! | getchaintxstats                    | done            |
+//! | getdeploymentinfo                  | todo            |
+//! | getdifficulty                      | done            |
+//! | getmempoolancestors                | done (untested) |
+//! | getmempooldescendants              | done (untested) |
+//! | getmempoolentry                    | done            |
+//! | getmempoolinfo                     | done            |
+//! | getrawmempool                      | done            |
+//! | gettxout                           | done            |
+//! | gettxoutproof                      | omitted         |
+//! | gettxoutsetinfo                    | done            |
+//! | preciousblock                      | omitted         |
+//! | pruneblockchain                    | omitted         |
+//! | savemempool                        | omitted         |
+//! | scantxoutset                       | omitted         |
+//! | verifychain                        | omitted         |
+//! | verifytxoutproof                   | done            |
 //!
-//! **== Rawtransactions ==**
-//! - [ ] `analyzepsbt "psbt"`
-//! - [ ] `combinepsbt ["psbt",...]`
-//! - [ ] `combinerawtransaction ["hexstring",...]`
-//! - [ ] `converttopsbt "hexstring" ( permitsigdata iswitness )`
-//! - [ ] `createpsbt [{"txid":"hex","vout":n,"sequence":n},...] [{"address":amount,...},{"data":"hex"},...] ( locktime replaceable )`
-//! - [ ] `createrawtransaction [{"txid":"hex","vout":n,"sequence":n},...] [{"address":amount,...},{"data":"hex"},...] ( locktime replaceable )`
-//! - [ ] `decodepsbt "psbt"`
-//! - [ ] `decoderawtransaction "hexstring" ( iswitness )`
-//! - [ ] `decodescript "hexstring"`
-//! - [ ] `finalizepsbt "psbt" ( extract )`
-//! - [ ] `fundrawtransaction "hexstring" ( options iswitness )`
-//! - [ ] `getrawtransaction "txid" ( verbose "blockhash" )`
-//! - [ ] `joinpsbts ["psbt",...]`
-//! - [ ] `sendrawtransaction "hexstring" ( maxfeerate )`
-//! - [ ] `signrawtransactionwithkey "hexstring" ["privatekey",...] ( [{"txid":"hex","vout":n,"scriptPubKey":"hex","redeemScript":"hex","witnessScript":"hex","amount":amount},...] "sighashtype" )`
-//! - [ ] `testmempoolaccept ["rawtx",...] ( maxfeerate )`
-//! - [ ] `utxoupdatepsbt "psbt" ( ["",{"desc":"str","range":n or [n,n]},...] )`
+//! </details>
 //!
-//! **== Signer ==**
-//! - [ ] `enumeratesigners`
+//! <details>
+//! <summary> Methods from the == Control == section </summary>
 //!
-//! **== Util ==**
-//! - [ ] `createmultisig nrequired ["key",...] ( "address_type" )`
-//! - [ ] `deriveaddresses "descriptor" ( range )`
-//! - [ ] `estimatesmartfee conf_target ( "estimate_mode" )`
-//! - [ ] `getdescriptorinfo "descriptor"`
-//! - [ ] `getindexinfo ( "index_name" )`
-//! - [ ] `signmessagewithprivkey "privkey" "message"`
-//! - [ ] `validateaddress "address"`
-//! - [ ] `verifymessage "address" "signature" "message"`
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | getmemoryinfo                      | done            |
+//! | getrpcinfo                         | todo            |
+//! | help                               | omitted         |
+//! | logging                            | done            |
+//! | stop                               | omitted         |
+//! | uptime                             | omitted         |
 //!
-//! **== Wallet ==**
-//! - [ ] `abandontransaction "txid"`
-//! - [ ] `abortrescan`
-//! - [ ] `addmultisigaddress nrequired ["key",...] ( "label" "address_type" )`
-//! - [ ] `backupwallet "destination"`
-//! - [ ] `bumpfee "txid" ( options )`
-//! - [x] `createwallet "wallet_name" ( disable_private_keys blank "passphrase" avoid_reuse descriptors load_on_startup external_signer )`
-//! - [ ] `dumpprivkey "address"`
-//! - [ ] `dumpwallet "filename"`
-//! - [ ] `encryptwallet "passphrase"`
-//! - [ ] `getaddressesbylabel "label"`
-//! - [ ] `getaddressinfo "address"`
-//! - [x] `getbalance ( "dummy" minconf include_watchonly avoid_reuse )`
-//! - [x] `getbalances`
-//! - [x] `getnewaddress ( "label" "address_type" )`
-//! - [ ] `getrawchangeaddress ( "address_type" )`
-//! - [ ] `getreceivedbyaddress "address" ( minconf include_immature_coinbase )`
-//! - [ ] `getreceivedbylabel "label" ( minconf include_immature_coinbase )`
-//! - [x] `gettransaction "txid" ( include_watchonly verbose )`
-//! - [ ] `getunconfirmedbalance`
-//! - [ ] `getwalletinfo`
-//! - [ ] `importaddress "address" ( "label" rescan p2sh )`
-//! - [ ] `importdescriptors "requests"`
-//! - [ ] `importmulti "requests" ( "options" )`
-//! - [ ] `importprivkey "privkey" ( "label" rescan )`
-//! - [ ] `importprunedfunds "rawtransaction" "txoutproof"`
-//! - [ ] `importpubkey "pubkey" ( "label" rescan )`
-//! - [ ] `importwallet "filename"`
-//! - [ ] `keypoolrefill ( newsize )`
-//! - [ ] `listaddressgroupings`
-//! - [ ] `listdescriptors ( private )`
-//! - [ ] `listlabels ( "purpose" )`
-//! - [ ] `listlockunspent`
-//! - [ ] `listreceivedbyaddress ( minconf include_empty include_watchonly "address_filter" include_immature_coinbase )`
-//! - [ ] `listreceivedbylabel ( minconf include_empty include_watchonly include_immature_coinbase )`
-//! - [ ] `listsinceblock ( "blockhash" target_confirmations include_watchonly include_removed )`
-//! - [ ] `listtransactions ( "label" count skip include_watchonly )`
-//! - [ ] `listunspent ( minconf maxconf ["address",...] include_unsafe query_options )`
-//! - [ ] `listwalletdir`
-//! - [ ] `listwallets`
-//! - [x] `loadwallet "filename" ( load_on_startup )`
-//! - [ ] `lockunspent unlock ( [{"txid":"hex","vout":n},...] persistent )`
-//! - [ ] `newkeypool`
-//! - [ ] `psbtbumpfee "txid" ( options )`
-//! - [ ] `removeprunedfunds "txid"`
-//! - [ ] `rescanblockchain ( start_height stop_height )`
-//! - [ ] `restorewallet "wallet_name" "backup_file" ( load_on_startup )`
-//! - [ ] `send [{"address":amount,...},{"data":"hex"},...] ( conf_target "estimate_mode" fee_rate options )`
-//! - [ ] `sendmany "" {"address":amount,...} ( minconf "comment" ["address",...] replaceable conf_target "estimate_mode" fee_rate verbose )`
-//! - [x] `sendtoaddress "address" amount ( "comment" "comment_to" subtractfeefromamount replaceable conf_target "estimate_mode" avoid_reuse fee_rate verbose )`
-//! - [ ] `sethdseed ( newkeypool "seed" )`
-//! - [ ] `setlabel "address" "label"`
-//! - [ ] `settxfee amount`
-//! - [ ] `setwalletflag "flag" ( value )`
-//! - [ ] `signmessage "address" "message"`
-//! - [ ] `signrawtransactionwithwallet "hexstring" ( [{"txid":"hex","vout":n,"scriptPubKey":"hex","redeemScript":"hex","witnessScript":"hex","amount":amount},...] "sighashtype" )`
-//! - [ ] `unloadwallet ( "wallet_name" load_on_startup )`
-//! - [ ] `upgradewallet ( version )`
-//! - [ ] `walletcreatefundedpsbt ( [{"txid":"hex","vout":n,"sequence":n,"weight":n},...] ) [{"address":amount,...},{"data":"hex"},...] ( locktime options bip32derivs )`
-//! - [ ] `walletdisplayaddress "address"`
-//! - [ ] `walletlock`
-//! - [ ] `walletpassphrase "passphrase" timeout`
-//! - [ ] `walletpassphrasechange "oldpassphrase" "newpassphrase"`
-//! - [ ] `walletprocesspsbt "psbt" ( sign "sighashtype" bip32derivs finalize )`
+//! </details>
 //!
-//! **== Zmq ==**
-//! - [ ] `getzmqnotifications`
+//! <details>
+//! <summary> Methods from the == Mining == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | getblocktemplate                   | todo            |
+//! | getmininginfo                      | todo            |
+//! | getnetworkhashps                   | todo            |
+//! | prioritisetransaction              | todo            |
+//! | submitblock                        | todo            |
+//! | submitheader                       | todo            |
+//!
+//! </details>
+//!
+//! <details>
+//! <summary> Methods from the == Network == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | addnode                            | omitted         |
+//! | clearbanned                        | omitted         |
+//! | disconnectnode                     | omitted         |
+//! | getaddednodeinfo                   | done            |
+//! | getconnectioncount                 | omitted         |
+//! | getnettotals                       | done            |
+//! | getnetworkinfo                     | done            |
+//! | getnodeaddresses                   | todo            |
+//! | getpeerinfo                        | done            |
+//! | listbanned                         | omitted         |
+//! | ping                               | omitted         |
+//! | setban                             | omitted         |
+//! | setnetworkactive                   | omitted         |
+//!
+//! </details>
+//!
+//! <details>
+//! <summary> Methods from the == Rawtransactions == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | analyzepsbt                        | todo            |
+//! | combinepsbt                        | todo            |
+//! | combinerawtransaction              | todo            |
+//! | converttopsbt                      | todo            |
+//! | createpsbt                         | todo            |
+//! | createrawtransaction               | todo            |
+//! | decodepsbt                         | todo            |
+//! | decoderawtransaction               | todo            |
+//! | decodescript                       | todo            |
+//! | finalizepsbt                       | todo            |
+//! | fundrawtransaction                 | todo            |
+//! | getrawtransaction                  | todo            |
+//! | joinpsbts                          | todo            |
+//! | sendrawtransaction                 | done (untested) |
+//! | signrawtransactionwithkey          | todo            |
+//! | testmempoolaccept                  | todo            |
+//! | utxoupdatepsbt                     | todo            |
+//!
+//! </details>
+//!
+//! <details>
+//! <summary> Methods from the == Signer == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | enumeratesigners                   | todo            |
+//!
+//! </details>
+//!
+//! <details>
+//! <summary> Methods from the == Util == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | createmultisig                     | omitted         |
+//! | deriveaddresses                    | todo            |
+//! | estimatesmartfee                   | omitted         |
+//! | getdescriptorinfo                  | todo            |
+//! | getindexinfo                       | todo            |
+//! | signmessagewithprivkey             | omitted         |
+//! | validateaddress                    | omitted         |
+//! | verifymessage                      | omitted         |
+//!
+//! </details>
+//!
+//! <details>
+//! <summary> Methods from the == Wallet == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | abandontransaction                 | omitted         |
+//! | abortrescan                        | omitted         |
+//! | addmultisigaddress                 | done (untested) |
+//! | backupwallet                       | omitted         |
+//! | bumpfee                            | done            |
+//! | createwallet                       | done            |
+//! | dumpprivkey                        | done            |
+//! | dumpwallet                         | done            |
+//! | encryptwallet                      | omitted         |
+//! | getaddressesbylabel                | done            |
+//! | getaddressinfo                     | done (untested) |
+//! | getbalance                         | done            |
+//! | getbalances                        | done            |
+//! | getnewaddress                      | done            |
+//! | getrawchangeaddress                | done            |
+//! | getreceivedbyaddress               | done            |
+//! | getreceivedbylabel                 | todo            |
+//! | gettransaction                     | done            |
+//! | getunconfirmedbalance              | done (untested) |
+//! | getwalletinfo                      | done (untested) |
+//! | importaddress                      | omitted         |
+//! | importdescriptors                  | todo            |
+//! | importmulti                        | omitted         |
+//! | importprivkey                      | omitted         |
+//! | importprunedfunds                  | omitted         |
+//! | importpubkey                       | omitted         |
+//! | importwallet                       | omitted         |
+//! | keypoolrefill                      | omitted         |
+//! | listaddressgroupings               | done (untested) |
+//! | listdescriptors                    | todo            |
+//! | listlabels                         | done (untested) |
+//! | listlockunspent                    | done (untested) |
+//! | newkeypool                         | todo            |
+//! | psbtbumpfee                        | todo            |
+//! | listreceivedbyaddress              | done (untested) |
+//! | listreceivedbylabel                | todo            |
+//! | listsinceblock                     | done (untested) |
+//! | listtransactions                   | done (untested) |
+//! | listunspent                        | done (untested) |
+//! | listwalletdir                      | todo            |
+//! | listwallets                        | done (untested) |
+//! | loadwallet                         | done            |
+//! | lockunspent                        | omitted         |
+//! | removeprunedfunds                  | omitted         |
+//! | rescanblockchain                   | done (untested) |
+//! | restorewallet                      | todo            |
+//! | send                               | todo            |
+//! | sendmany                           | done (untested) |
+//! | sendtoaddress                      | done            |
+//! | sethdseed                          | omitted         |
+//! | setlabel                           | todo            |
+//! | settxfee                           | omitted         |
+//! | setwalletflag                      | todo            |
+//! | signmessage                        | done (untested) |
+//! | signrawtransactionwithwallet       | done (untested) |
+//! | unloadwallet                       | omitted         |
+//! | upgradewallet                      | todo            |
+//! | walletcreatefundedpsbt             | done (untested) |
+//! | walletdisplayaddress               | todo            |
+//! | walletlock                         | omitted         |
+//! | walletpassphrase                   | omitted         |
+//! | walletpassphrasechange             | omitted         |
+//! | walletprocesspsbt                  | done (untested) |
+//!
+//! </details>
+//!
+//! <details>
+//! <summary> Methods from the == Zmq == section </summary>
+//!
+//! | JSON-PRC Method Name               | Status          |
+//! |:-----------------------------------|:---------------:|
+//! | getzmqnotifications                | done (untested) |
+//!
+//! </details>
+//!
+//!
+//! **Items marked omitted were omitted because:**
+//!
+//! - Method does not return anything.
+//! - Method returns a simple type (e.g. bool or integer).
+//! - Method is deprecated.
 
 #[doc(inline)]
 pub use crate::{
     v17::{
-        CreateWallet, GenerateToAddress, GetBalance, GetBestBlockHash, GetBlockVerbosityOne,
-        GetBlockVerbosityZero, GetNetworkInfo, GetNetworkInfoAddress, GetNetworkInfoNetwork,
-        GetNewAddress, GetTransaction, GetTransactionDetail, GetTxOut, LoadWallet,
-        SendRawTransaction, TransactionCategory,
+        AddMultisigAddress, AddedNode, AddedNodeAddress, AddressInformation, Banned, BumpFee,
+        ChainTips, ChainTipsStatus, CreateWallet, DumpPrivKey, DumpWallet, Generate,
+        GenerateToAddress, GetAddedNodeInfo, GetAddressInfo, GetAddressInfoEmbedded,
+        GetAddressInfoLabel, GetAddressesByLabel, GetBalance, GetBestBlockHash, GetBlockCount,
+        GetBlockHash, GetBlockHeader, GetBlockHeaderVerbose, GetBlockStats, GetBlockVerbosityOne,
+        GetBlockVerbosityZero, GetChainTips, GetChainTxStats, GetDifficulty, GetMemoryInfoStats,
+        GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
+        GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, GetNetTotals,
+        GetNetworkInfo, GetNetworkInfoAddress, GetNetworkInfoError, GetNetworkInfoNetwork,
+        GetNewAddress, GetPeerInfo, GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose,
+        GetReceivedByAddress, GetTransaction, GetTransactionDetail, GetTxOut, GetTxOutSetInfo,
+        GetUnconfirmedBalance, GetWalletInfo, GetZmqNotifications, ListAddressGroupings,
+        ListAddressGroupingsItem, ListBanned, ListLabels, ListLockUnspent, ListLockUnspentItem,
+        ListReceivedByAddress, ListReceivedByAddressItem, ListSinceBlock,
+        ListSinceBlockTransaction, ListTransactions, ListTransactionsItem, ListUnspent,
+        ListUnspentItem, ListWallets, LoadWallet, Locked, Logging, MempoolEntry, MempoolEntryFees,
+        PeerInfo, RescanBlockchain, ScriptPubkey, SendMany, SendRawTransaction, SendToAddress,
+        SignErrorData, SignMessage, SignRawTransactionWithWallet, SoftforkReject,
+        TransactionCategory, UploadTarget, Uptime, VerifyTxOutProof, WalletCreateFundedPsbt,
+        WalletProcessPsbt,
     },
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalances, GetBalancesMine,
         GetBalancesWatchOnly, GetBlockchainInfo, Softfork, SoftforkType,
     },
-    v22::{SendToAddress, UnloadWallet},
+    v21::UnloadWallet,
 };

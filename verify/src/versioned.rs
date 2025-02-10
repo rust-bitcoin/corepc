@@ -64,7 +64,7 @@ pub fn return_type_exists(version: Version, method_name: &str) -> Result<bool> {
             ))),
     };
     if let Some(Return::Type(s)) = method.ret {
-        return crate::grep_for_string(&path, s);
+        return crate::grep_for_re_export(&path, s);
     }
     Ok(false)
 }

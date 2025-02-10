@@ -23,6 +23,20 @@ pub enum Version {
     V17,
     /// Bitcoin Core v18.
     V18,
+    /// Bitcoin Core v19.
+    V19,
+    /// Bitcoin Core v20.
+    V20,
+    /// Bitcoin Core v21.
+    V21,
+    /// Bitcoin Core v22.
+    V22,
+    /// Bitcoin Core v23.
+    V23,
+    /// Bitcoin Core v24.
+    V24,
+    /// Bitcoin Core v25.
+    V25,
 }
 
 impl Version {
@@ -31,6 +45,13 @@ impl Version {
         match v {
             "v17" | "17" => Ok(Version::V17),
             "v18" | "18" => Ok(Version::V18),
+            "v19" | "19" => Ok(Version::V19),
+            "v20" | "20" => Ok(Version::V20),
+            "v21" | "21" => Ok(Version::V21),
+            "v22" | "22" => Ok(Version::V22),
+            "v23" | "23" => Ok(Version::V23),
+            "v24" | "24" => Ok(Version::V24),
+            "v25" | "25" => Ok(Version::V25),
             other => Err(anyhow::Error::msg(format!("unknown version: '{}'", other))),
         }
     }
@@ -42,6 +63,13 @@ impl fmt::Display for Version {
         let s = match *self {
             V17 => "v17",
             V18 => "v18",
+            V19 => "v19",
+            V20 => "v20",
+            V21 => "v21",
+            V22 => "v22",
+            V23 => "v23",
+            V24 => "v24",
+            V25 => "v25",
         };
         fmt::Display::fmt(&s, f)
     }
@@ -119,6 +147,28 @@ pub fn grep_for_string(path: &Path, s: &str) -> Result<bool> {
     let reader = io::BufReader::new(file);
 
     let re = Regex::new(s)?;
+
+    for line in reader.lines() {
+        let line = line?;
+
+        if re.is_match(&line) {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+/// Opens file at `path` and greps for `s,`.
+///
+/// Note the `,` appended to `s`. This is to stop false positives `grep_for_string(Foo)`
+/// will match `FooBar`. Re-exports always have a comma after them.
+pub fn grep_for_re_export(path: &Path, s: &str) -> Result<bool> {
+    let file = File::open(path)
+        .with_context(|| format!("Failed to grep for string in {}", path.display()))?;
+    let reader = io::BufReader::new(file);
+
+    let s = format!("{}[,}}]", &s);
+    let re = Regex::new(&s)?;
 
     for line in reader.lines() {
         let line = line?;

@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! JSON RPC methods provided by Bitcoin Core v18.
+//! JSON RPC methods provided by Bitcoin Core v20.
 
 use super::Method;
 
-/// Data for the JSON RPC methods provided by Bitcoin Core v18.
+/// Data for the JSON RPC methods provided by Bitcoin Core v20.
 pub const METHODS: &[Method] = &[
     Method::new_modeled("getbestblockhash", "GetBestBlockHash", "get_best_block_hash"),
     Method::new_modeled("getblock", "GetBlockVerbosityZero", "get_block"), // We only check one of the types.
     Method::new_modeled("getblockchaininfo", "GetBlockchainInfo", "get_blockchain_info"),
     Method::new_modeled("getblockcount", "GetBlockCount", "get_block_count"),
+    Method::new_modeled("getblockfilter", "GetBlockFilter", "get_block_filter"),
     Method::new_modeled("getblockhash", "GetBlockHash", "get_block_hash"),
     Method::new_modeled("getblockheader", "GetBlockHeader", "get_block_header"),
     Method::new_modeled("getblockstats", "GetBlockStats", "get_block_stats"),
@@ -40,8 +41,8 @@ pub const METHODS: &[Method] = &[
     Method::new_no_model("logging", "Logging", "logging"),
     Method::new_nothing("stop", "stop"),
     Method::new_numeric("uptime", "uptime"),
-    Method::new_modeled("generate", "Generate", "generate"),
     Method::new_modeled("generatetoaddress", "GenerateToAddress", "generate_to_address"),
+    Method::new_modeled("generatetodescriptor", "GenerateToDescriptor", "generate_to_descriptor"),
     Method::new_none("getblocktemplate", "get_block_template"),
     Method::new_none("getmininginfo", "get_mining_info"),
     Method::new_none("getnetworkhashps", "get_network_hashes_per_second"),
@@ -97,6 +98,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modeled("getaddressesbylabel", "GetAddressesByLabel", "get_addresses_by_label"),
     Method::new_modeled("getaddressinfo", "GetAddressInfo", "get_address_info"),
     Method::new_modeled("getbalance", "GetBalance", "get_balance"),
+    Method::new_modeled("getbalances", "GetBalances", "get_balances"),
     Method::new_modeled("getnewaddress", "GetNewAddress", "get_new_address"),
     Method::new_modeled("getrawchangeaddress", "GetRawChangeAddress", "get_raw_change_address"),
     Method::new_modeled("getreceivedbyaddress", "GetReceivedByAddress", "get_received_by_address"),
@@ -138,6 +140,7 @@ pub const METHODS: &[Method] = &[
     Method::new_nothing("sethdseed", "set_hd_seed"),
     Method::new_nothing("setlabel", "set_label"),
     Method::new_bool("settxfee", "set_tx_fee"),
+    Method::new_modeled("setwalletflag", "SetWalletFlag", "set_wallet_flag"),
     Method::new_modeled("signmessage", "SignMessage", "sign_message"),
     Method::new_modeled(
         "signrawtransactionwithwallet",

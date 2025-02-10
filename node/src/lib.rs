@@ -577,8 +577,7 @@ mod test {
     use tempfile::TempDir;
 
     use super::*;
-    use crate::P2P;
-    use crate::{exe_path, get_available_port, Conf, Node, LOCAL_IP};
+    use crate::{exe_path, get_available_port, Conf, Node, LOCAL_IP, P2P};
 
     #[test]
     fn test_local_ip() {

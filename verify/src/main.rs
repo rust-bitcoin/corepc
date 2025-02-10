@@ -20,7 +20,7 @@ use verify::{method, model, ssot, Version};
 // TODO: Enable running from any directory, currently errors if run from `src/`.
 // TODO: Add a --quiet option.
 
-const VERSIONS: [Version; 2] = [Version::V17, Version::V18];
+const VERSIONS: [Version; 5] = [Version::V17, Version::V18, Version::V19, Version::V20, Version::V21];
 
 fn main() -> Result<()> {
     let cmd = Command::new("verify")
@@ -69,7 +69,7 @@ fn verify_version(version: Version, test_output: Option<&String>) -> Result<()> 
     let s = "rustdoc version specific rustdocs";
     let msg = format!("Checking that the {} list is correct", s);
     check(&msg);
-    let correct = verify_correct_methods(version, method::all_methods(version), s)?;
+    let correct = verify_correct_methods(version, versioned::all_methods(version)?, s)?;
     close(correct);
     if !correct {
         process::exit(1);
@@ -95,9 +95,7 @@ fn close(correct: bool) {
 fn verify_correct_methods(version: Version, methods: Vec<String>, msg: &str) -> Result<bool> {
     let ssot = ssot::all_methods(version)?;
     let want = ssot.iter().map(|s| s.as_str()).collect::<Vec<&str>>();
-
     let got = methods.iter().map(|s| s.as_str()).collect::<Vec<&str>>();
-
     Ok(verify::correct_methods(&got, &want, msg))
 }
 
@@ -135,7 +133,11 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
                     }
                 }
             }
-            Status::Omitted | Status::Todo => { /* Nothing to verify */ }
+            Status::Omitted | Status::Todo => {
+                if versioned::return_type_exists(version, &method.name)? {
+                    eprintln!("return type found but method is omitted or TODO: {}", output_method(out));
+                }
+            }
         }
     }
 

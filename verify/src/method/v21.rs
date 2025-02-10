@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! JSON RPC methods provided by Bitcoin Core v18.
+//! JSON RPC methods provided by Bitcoin Core v21.
 
 use super::Method;
 
-/// Data for the JSON RPC methods provided by Bitcoin Core v18.
+/// Data for the JSON RPC methods provided by Bitcoin Core v21.
 pub const METHODS: &[Method] = &[
     Method::new_modeled("getbestblockhash", "GetBestBlockHash", "get_best_block_hash"),
     Method::new_modeled("getblock", "GetBlockVerbosityZero", "get_block"), // We only check one of the types.
     Method::new_modeled("getblockchaininfo", "GetBlockchainInfo", "get_blockchain_info"),
     Method::new_modeled("getblockcount", "GetBlockCount", "get_block_count"),
+    Method::new_modeled("getblockfilter", "GetBlockFilter", "get_block_filter"),
     Method::new_modeled("getblockhash", "GetBlockHash", "get_block_hash"),
     Method::new_modeled("getblockheader", "GetBlockHeader", "get_block_header"),
     Method::new_modeled("getblockstats", "GetBlockStats", "get_block_stats"),
@@ -40,8 +41,9 @@ pub const METHODS: &[Method] = &[
     Method::new_no_model("logging", "Logging", "logging"),
     Method::new_nothing("stop", "stop"),
     Method::new_numeric("uptime", "uptime"),
-    Method::new_modeled("generate", "Generate", "generate"),
+    Method::new_modeled("generateblock", "GenerateBlock", "generate_block"),
     Method::new_modeled("generatetoaddress", "GenerateToAddress", "generate_to_address"),
+    Method::new_modeled("generatetodescriptor", "GenerateToDescriptor", "generate_to_descriptor"),
     Method::new_none("getblocktemplate", "get_block_template"),
     Method::new_none("getmininginfo", "get_mining_info"),
     Method::new_none("getnetworkhashps", "get_network_hashes_per_second"),
@@ -82,6 +84,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modeled("deriveaddresses", "DeriveAddresses", "derive_addresses"),
     Method::new_nothing("estimatesmartfee", "estimate_smart_fee"),
     Method::new_no_model("getdescriptorinfo", "GetDescriptorInfo", "get_descriptor_info"),
+    Method::new_no_model("getindexinfo", "GetIndexInfo", "get_index_info"),
     Method::new_string("signmessagewithprivkey", "sign_message_with_priv_key"),
     Method::new_modeled("validateaddress", "ValidateAddress", "validate_address"),
     Method::new_bool("verifymessage", "verify_message"),
@@ -97,6 +100,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modeled("getaddressesbylabel", "GetAddressesByLabel", "get_addresses_by_label"),
     Method::new_modeled("getaddressinfo", "GetAddressInfo", "get_address_info"),
     Method::new_modeled("getbalance", "GetBalance", "get_balance"),
+    Method::new_modeled("getbalances", "GetBalances", "get_balances"),
     Method::new_modeled("getnewaddress", "GetNewAddress", "get_new_address"),
     Method::new_modeled("getrawchangeaddress", "GetRawChangeAddress", "get_raw_change_address"),
     Method::new_modeled("getreceivedbyaddress", "GetReceivedByAddress", "get_received_by_address"),
@@ -108,7 +112,8 @@ pub const METHODS: &[Method] = &[
         "get_unconfirmed_balance",
     ),
     Method::new_modeled("getwalletinfo", "GetWalletInfo", "get_wallet_info"),
-    Method::new_nothing("importaddress", "import_addressss"),
+    Method::new_nothing("importaddress", "import_address"),
+    Method::new_no_model("importdescriptors", "ImportDescriptors", "import_descriptors"),
     Method::new_nothing("importmulti", "import_multi"),
     Method::new_nothing("importprivkey", "import_priv_key"),
     Method::new_nothing("importprunedfunds", "import_pruned_funds"),
@@ -118,6 +123,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modeled("listaddressgroupings", "ListAddressGroupings", "list_address_groupings"),
     Method::new_modeled("listlabels", "ListLabels", "list_labels"),
     Method::new_modeled("listlockunspent", "ListLockUnspent", "list_lock_unspent"),
+    Method::new_modeled("psbtbumpfee", "PsbtBumpFee", "psbt_bump_fee"),
     Method::new_modeled(
         "listreceivedbyaddress",
         "ListReceivedByAddress",
@@ -133,11 +139,13 @@ pub const METHODS: &[Method] = &[
     Method::new_bool("lockunspent", "lock_unspent"),
     Method::new_nothing("removeprunedfunds", "remove_pruned_funds"),
     Method::new_modeled("rescanblockchain", "RescanBlockchain", "rescan_blockchain"),
+    Method::new_modeled("send", "Send", "send"),
     Method::new_modeled("sendmany", "SendMany", "send_many"),
     Method::new_modeled("sendtoaddress", "SendToAddress", "send_to_address"),
     Method::new_nothing("sethdseed", "set_hd_seed"),
     Method::new_nothing("setlabel", "set_label"),
     Method::new_bool("settxfee", "set_tx_fee"),
+    Method::new_modeled("setwalletflag", "SetWalletFlag", "set_wallet_flag"),
     Method::new_modeled("signmessage", "SignMessage", "sign_message"),
     Method::new_modeled(
         "signrawtransactionwithwallet",
@@ -145,6 +153,7 @@ pub const METHODS: &[Method] = &[
         "sign_raw_transaction_with_wallet",
     ),
     Method::new_nothing("unloadwallet", "unload_wallet"),
+    Method::new_no_model("upgradewallet", "UpgradeWalled", "upgrade_wallet"),
     Method::new_modeled(
         "walletcreatefundedpsbt",
         "WalletCreateFundedPsbt",
