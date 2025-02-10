@@ -34,7 +34,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modeled("scantxoutset", "ScanTxOutSet", "scan_tx_out_set"),
     Method::new_bool("verifychain", "verify_chain"),
     Method::new_modeled("verifytxoutproof", "VerifyTxOutProof", "verify_tx_out_proof"),
-    Method::new_no_model("getmemoryinfo", "GetMemoryInfo", "get_memory_info"),
+    Method::new_no_model("getmemoryinfo", "GetMemoryInfoStats", "get_memory_info"),
     Method::new_string("help", "help"),
     Method::new_no_model("logging", "Logging", "logging"),
     Method::new_nothing("stop", "stop"),
