@@ -23,6 +23,8 @@ pub enum Version {
     V17,
     /// Bitcoin Core v18.
     V18,
+    /// Bitcoin Core v19.
+    V19,
 }
 
 impl Version {
@@ -31,6 +33,7 @@ impl Version {
         match v {
             "v17" | "17" => Ok(Version::V17),
             "v18" | "18" => Ok(Version::V18),
+            "v19" | "19" => Ok(Version::V19),
             other => Err(anyhow::Error::msg(format!("unknown version: '{}'", other))),
         }
     }
@@ -42,6 +45,7 @@ impl fmt::Display for Version {
         let s = match *self {
             V17 => "v17",
             V18 => "v18",
+            V19 => "v19",
         };
         fmt::Display::fmt(&s, f)
     }
