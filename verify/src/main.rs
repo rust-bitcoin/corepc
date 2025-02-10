@@ -69,7 +69,7 @@ fn verify_version(version: Version, test_output: Option<&String>) -> Result<()> 
     let s = "rustdoc version specific rustdocs";
     let msg = format!("Checking that the {} list is correct", s);
     check(&msg);
-    let correct = verify_correct_methods(version, method::all_methods(version), s)?;
+    let correct = verify_correct_methods(version, versioned::all_methods(version)?, s)?;
     close(correct);
     if !correct {
         process::exit(1);
