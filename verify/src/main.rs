@@ -135,7 +135,11 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
                     }
                 }
             }
-            Status::Omitted | Status::Todo => { /* Nothing to verify */ }
+            Status::Omitted | Status::Todo => {
+                if versioned::return_type_exists(version, &method.name)? {
+                    eprintln!("return type found but method is omitted or TODO: {}", output_method(out));
+                }
+            }
         }
     }
 

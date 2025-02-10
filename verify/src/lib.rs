@@ -130,6 +130,28 @@ pub fn grep_for_string(path: &Path, s: &str) -> Result<bool> {
     Ok(false)
 }
 
+/// Opens file at `path` and greps for `s,`.
+///
+/// Note the `,` appended to `s`. This is to stop false positives `grep_for_string(Foo)`
+/// will match `FooBar`. Re-exports always have a comma after them.
+pub fn grep_for_re_export(path: &Path, s: &str) -> Result<bool> {
+    let file = File::open(path)
+        .with_context(|| format!("Failed to grep for string in {}", path.display()))?;
+    let reader = io::BufReader::new(file);
+
+    let s = format!("{}[,}}]", &s);
+    let re = Regex::new(&s)?;
+
+    for line in reader.lines() {
+        let line = line?;
+
+        if re.is_match(&line) {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
