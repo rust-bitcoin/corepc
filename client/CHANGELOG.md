@@ -1,3 +1,9 @@
+# 0.6.0 - 2025-02-13
+
+- Fix bugs in tx out proof methods
+- Improve docs
+- Reduce number of Core minor versions supported
+
 # 0.5.0 - 2024-12-16
 
 - Add support for Bitcoin Core v27.2
