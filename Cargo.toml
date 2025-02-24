@@ -3,6 +3,17 @@ members = ["client", "types", "jsonrpc"]
 exclude = ["integration_test", "node", "verify"]
 resolver = "2"
 
+[workspace.dependencies]
+base64 = "0.13.0"
+bitcoin = { version = "0.32.0", default-features = false }
+jsonrpc = "0.18.0"
+log = "0.4"
+minreq = "2.7.0"
+serde = { version = "1.0.103", default-features = false }
+serde_json = "1.0.117"
+socks = "0.3.4"
+types = { version = "0.5.0", default-features = false }
+
 [patch.crates-io.corepc-client]
 path = "client"
 

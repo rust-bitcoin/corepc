@@ -21,12 +21,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 client-sync = ["jsonrpc"]
 
 [dependencies]
-bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
+bitcoin = { workspace = true, features = ["std", "serde"] }
 types = { package = "corepc-types", version = "0.5.0", default-features = false, features = [] }
-log = "0.4"
-serde = { version = "1.0.103", default-features = false, features = [ "derive", "alloc" ] }
-serde_json = { version = "1.0.117" }
+log = { workspace = true }
+serde = { workspace = true, features = ["derive", "alloc"] }
+serde_json = { workspace = true }
 
-jsonrpc = { version = "0.18.0", features = ["minreq_http"], optional = true }
+jsonrpc = { workspace = true, features = ["minreq_http"], optional = true }
 
 [dev-dependencies]
