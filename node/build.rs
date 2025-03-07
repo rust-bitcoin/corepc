@@ -20,7 +20,7 @@ mod download {
 
     include!("src/versions.rs");
 
-    #[cfg(all(target_os = "macos", any(target_arch = "x86_64", target_arch = "aarch64"),))]
+    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
     fn download_filename() -> String {
         if cfg!(not(feature = "23_2")) {
             format!("bitcoin-{}-osx64.tar.gz", &VERSION)
@@ -28,6 +28,9 @@ mod download {
             format!("bitcoin-{}-x86_64-apple-darwin.tar.gz", &VERSION)
         }
     }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    fn download_filename() -> String { format!("bitcoin-{}-arm64-apple-darwin.tar.gz", &VERSION) }
 
     #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
     fn download_filename() -> String { format!("bitcoin-{}-x86_64-linux-gnu.tar.gz", &VERSION) }
@@ -151,6 +154,24 @@ mod download {
                         io::copy(&mut file, &mut outfile).unwrap();
                         break;
                     }
+                }
+            }
+
+            // Code signing for arm64 macOS:
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            {
+                use std::process::Command;
+                let status = Command::new("codesign")
+                    .arg("-s")
+                    .arg("-")
+                    .arg(existing_filename.to_str().unwrap())
+                    .status()
+                    .with_context(|| "failed to execute codesign")?;
+                if !status.success() {
+                    return Err(anyhow::anyhow!(
+                        "codesign failed with exit code {}",
+                        status.code().unwrap_or(-1)
+                    ));
                 }
             }
         }
