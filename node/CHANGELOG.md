@@ -1,3 +1,9 @@
+# 0.6.0 - 2025-03-07
+
+- Remove `default` feature [#45](https://github.com/rust-bitcoin/corepc/pull/45)
+- Reduce number of supported minor versions [#27](https://github.com/rust-bitcoin/corepc/pull/27)
+- Enable running multiple Core v28 nodes [#46](https://github.com/rust-bitcoin/corepc/pull/46)
+
 # 0.5.0 - 2024-12-16
 
 - Rename `BitcoinD` to `Node`

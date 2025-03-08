@@ -153,7 +153,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "corepc-client"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "bitcoin",
  "corepc-types",
@@ -165,7 +165,7 @@ dependencies = [
 
 [[package]]
 name = "corepc-node"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "bitcoin_hashes",
@@ -183,7 +183,7 @@ dependencies = [
 
 [[package]]
 name = "corepc-types"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "bitcoin",
  "serde",

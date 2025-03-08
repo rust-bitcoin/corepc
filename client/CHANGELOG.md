@@ -1,3 +1,10 @@
+# 0.6.0 - 2025-03-07
+
+- Expose all methods from `blockchain` section [#79](https://github.com/rust-bitcoin/corepc/pull/79)
+- Fix bugs in tx out proof methods
+- Improve docs
+- Reduce number of Core minor versions supported
+
 # 0.5.0 - 2024-12-16
 
 - Add support for Bitcoin Core v27.2

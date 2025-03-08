@@ -1,3 +1,11 @@
+# 0.6.0 - 2025-03-07
+
+- Add `std` feature [#44](https://github.com/rust-bitcoin/corepc/pull/44)
+- Reduce number of supported minor versions [#27](https://github.com/rust-bitcoin/corepc/pull/27)
+- Update the version specific docs for Core versions 19 - 28
+   - [#55](https://github.com/rust-bitcoin/corepc/pull/55)
+   - [#64](https://github.com/rust-bitcoin/corepc/pull/64)
+
 # 0.5.0 - 2024-12-16
 
 - Flesh out v17 and v18
