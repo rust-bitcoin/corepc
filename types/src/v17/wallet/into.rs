@@ -37,6 +37,9 @@ impl TransactionCategory {
         match self {
             V::Send => M::Send,
             V::Receive => M::Receive,
+            V::Generate => M::Generate,
+            V::Immature => M::Immature,
+            V::Orphan => M::Orphan,
         }
     }
 }

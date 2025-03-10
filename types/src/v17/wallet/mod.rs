@@ -38,10 +38,16 @@ pub enum AddressPurpose {
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum TransactionCategory {
-    /// Transaction is a send.
+    /// Transactions sent.
     Send,
-    /// Transactions is a receive.
+    /// Non-coinbase transactions received.
     Receive,
+    /// Coinbase transactions received with more than 100 confirmations.
+    Generate,
+    /// Coinbase transactions received with 100 or fewer confirmations.
+    Immature,
+    /// Orphaned coinbase transactions received.
+    Orphan,
 }
 
 /// Whether this transaction can be RBF'ed.
