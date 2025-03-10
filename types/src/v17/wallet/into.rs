@@ -325,7 +325,7 @@ impl GetTransaction {
     pub fn into_model(self) -> Result<model::GetTransaction, GetTransactionError> {
         use GetTransactionError as E;
 
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
         let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
 
         let block_hash =

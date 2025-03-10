@@ -21,7 +21,7 @@ pub use self::error::*;
 //
 // The following structs are very similar but have slightly different fields and docs.
 // - GetTransaction
-// - ListSinceLastBlockTransaction
+// - ListSinceBlockTransaction
 // - ListTransactionsItem
 
 /// Returned as part of `getaddressesbylabel` and `getaddressinfo`
