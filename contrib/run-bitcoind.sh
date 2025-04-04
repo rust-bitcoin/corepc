@@ -18,23 +18,23 @@ Usage:
     ./run-bitcoind.sh [COMMAND]
 
 COMMAND
-    - all                      Start all bitcoind versions defined in the config file.
-    - start [VERSION_ALIAS]    Start bitcoind nodes for the specified version alias (default: v22).
-    - stop                     Kill all bitcoind nodes and clean up test directories.
+   - all                      Start all bitcoind versions defined in the config file.
+   - start [VERSION_ALIAS]    Start bitcoind nodes for the specified version alias (default: v22).
+   - stop                     Kill all bitcoind nodes and clean up test directories.
 
 KNOWN_VERSION
-    - v28                Bitcoin Core v28.0
-    - v27                Bitcoin Core v27.1
-    - v26                Bitcoin Core v26.2
-    - v25                Bitcoin Core v25.2
-    - v24                Bitcoin Core v24.2
-    - v23                Bitcoin Core v23.2
-    - v22                Bitcoin Core v22.1
-    - v21                Bitcoin Core v0.21.2
-    - v20                Bitcoin Core v0.20.2
-    - v19                Bitcoin Core v0.19.1
-    - v18                Bitcoin Core v0.18.1
-    - v17                Bitcoin Core v0.17.1
+   - v28                Bitcoin Core v28.0
+   - v27                Bitcoin Core v27.1
+   - v26                Bitcoin Core v26.2
+   - v25                Bitcoin Core v25.2
+   - v24                Bitcoin Core v24.2
+   - v23                Bitcoin Core v23.2
+   - v22                Bitcoin Core v22.1
+   - v21                Bitcoin Core v0.21.2
+   - v20                Bitcoin Core v0.20.2
+   - v19                Bitcoin Core v0.19.1
+   - v18                Bitcoin Core v0.18.1
+   - v17                Bitcoin Core v0.17.1
 
 CONFIGURATION PRIORITY
     1. BITCOIND_VERSIONS_CONFIG environment variable
@@ -47,7 +47,6 @@ FORMAT
 VALUE(S)
     v28 28.1.0 281 /opt/bitcoin-28.0/bin/bitcoind
     v24 24.2 242 /opt/bitcoin-24.2/bin/bitcoind
-
 EOF
 }
 
@@ -65,11 +64,13 @@ main() {
         all|start)
             # Config loading logic
             local config_file=${BITCOIND_VERSIONS_CONFIG:-}
-            
+
             if [ -z "$config_file" ]; then
-                local script_dir=$(dirname "$0")
+                local script_dir
+
+                script_dir=$(dirname "$0")
                 local local_config="${script_dir}/bitcoind_versions.conf"
-                
+
                 if [ -f "$local_config" ]; then
                     config_file="$local_config"
                 else
@@ -80,7 +81,7 @@ main() {
             if [ ! -f "$config_file" ]; then
                 err "Config file $config_file not found. Please create it."
             fi
-            
+
             # Load config into parallel arrays
             VERSION_ALIASES=()
             VERSION_NUMBERS=()
@@ -136,10 +137,9 @@ main() {
             rm -rf /tmp/corepc-*/2/regtest/wallets > /dev/null 2>&1
             echo "Stopped all bitcoind instances and cleaned wallets."
             ;;
-
         *)
             usage
-            err "Error: unknown command '$cmd'"
+            say "Error: unknown command '$cmd'"
             ;;
     esac
 }
@@ -218,7 +218,7 @@ err() {
     exit 1
 }
 #
-#   Main script
+# Main script
 #
 main "$@"
 exit 0
