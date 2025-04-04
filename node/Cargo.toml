@@ -1,6 +1,6 @@
 [package]
 name = "corepc-node"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Riccardo Casatta <riccardo@casatta.it>", "Tobin C. Harding <me@tobin.cc>"]
 license = "MIT"
 repository = "https://github.com/rust-bitcoin/corepc"
@@ -13,7 +13,7 @@ rust-version = "1.63.0"
 exclude = ["tests", "contrib"]
 
 [dependencies]
-corepc-client = { version = "0.6.1", features = ["client-sync"] }
+corepc-client = { version = "0.7.0", features = ["client-sync"] }
 log = { version = "0.4", default-features = false }
 which = { version = "3.1.1", default-features = false }
 anyhow = { version = "1.0.66", default-features = false, features = ["std"] }

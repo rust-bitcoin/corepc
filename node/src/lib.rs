@@ -383,45 +383,61 @@ impl Node {
         thread::sleep(Duration::from_millis(1000));
         assert!(process.stderr.is_none());
 
-        let mut i = 0;
+        let mut tries = 0;
         let auth = Auth::CookieFile(cookie_file.clone());
-        let client_base =
-            Client::new_with_auth(&rpc_url, auth.clone()).expect("failed to create client");
 
         let client = loop {
+            tries += 1;
+
+            if tries > 10 {
+                error!("failed to get a response from bitcoind");
+                return Err(Error::NoBitcoindInstance.into());
+            }
+
+            let client_base = match Client::new_with_auth(&rpc_url, auth.clone()) {
+                Ok(client) => client,
+                Err(e) => {
+                    error!("failed to create client: {}. Retrying!", e);
+                    thread::sleep(Duration::from_millis(1000));
+                    continue;
+                }
+            };
+
             // Just use serde value because changes to the GetBlockchainInfo type make debugging hard.
             let client_result: Result<serde_json::Value, _> =
                 client_base.call("getblockchaininfo", &[]);
 
-            if client_result.is_ok() {
-                let url = match &conf.wallet {
-                    Some(wallet) => {
-                        debug!("trying to create/load wallet: {}", wallet);
-                        // Debugging logic here implicitly tests `into_model` for create/load wallet.
-                        match client_base.create_wallet(wallet) {
-                            Ok(json) => {
-                                debug!("created wallet: {}", json.name());
+            match client_result {
+                Ok(_) => {
+                    let url = match &conf.wallet {
+                        Some(wallet) => {
+                            debug!("trying to create/load wallet: {}", wallet);
+                            // Debugging logic here implicitly tests `into_model` for create/load wallet.
+                            match client_base.create_wallet(wallet) {
+                                Ok(json) => {
+                                    debug!("created wallet: {}", json.name());
+                                }
+                                Err(e) => {
+                                    debug!(
+                                        "initial create_wallet failed, try load instead: {:?}",
+                                        e
+                                    );
+                                    let wallet = client_base.load_wallet(wallet)?.name();
+                                    debug!("loaded wallet: {}", wallet);
+                                }
                             }
-                            Err(e) => {
-                                debug!("initial create_wallet failed, try load instead: {:?}", e);
-                                let wallet = client_base.load_wallet(wallet)?.name();
-                                debug!("loaded wallet: {}", wallet);
-                            }
+                            format!("{}/wallet/{}", rpc_url, wallet)
                         }
-                        format!("{}/wallet/{}", rpc_url, wallet)
-                    }
-                    None => rpc_url,
-                };
-                debug!("creating client with url: {}", url);
-                break Client::new_with_auth(&url, auth)?;
-            }
-
-            thread::sleep(Duration::from_millis(1000));
-
-            i += 1;
-            if i > 10 {
-                error!("failed to get a response from bitcoind");
-                return Err(Error::NoBitcoindInstance.into());
+                        None => rpc_url,
+                    };
+                    debug!("creating client with url: {}", url);
+                    break Client::new_with_auth(&url, auth)?;
+                }
+                Err(e) => {
+                    error!("failed to get a response from bitcoind: {}. Retrying!", e);
+                    thread::sleep(Duration::from_millis(1000));
+                    continue;
+                }
             }
         };
 

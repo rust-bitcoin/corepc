@@ -1,3 +1,8 @@
+# 0.7.0 2025-04-04
+
+- Fix unloadwallet method [#110](https://github.com/rust-bitcoin/corepc/pull/110)
+- Implement methods from the mining section [#106](https://github.com/rust-bitcoin/corepc/pull/106)
+
 # 0.6.1 - 2025-13-13
 
 - Enable `std` feature in `types` crate [#98](https://github.com/rust-bitcoin/corepc/pull/98)

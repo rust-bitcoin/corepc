@@ -1,3 +1,9 @@
+# 0.7.0 2025-04-04
+
+- Fix `{create,load}wallet` on `v25` [#108](https://github.com/rust-bitcoin/corepc/pull/108)
+- Fix unloadwallet method [#110](https://github.com/rust-bitcoin/corepc/pull/110)
+- Implement methods from the mining section [#106](https://github.com/rust-bitcoin/corepc/pull/106)
+
 # 0.6.1 - 2025-03-11
 
 - Add missing transaction categories [#91](https://github.com/rust-bitcoin/corepc/pull/91)
