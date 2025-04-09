@@ -110,23 +110,23 @@
 //! | JSON-PRC Method Name               | Status          |
 //! |:-----------------------------------|:---------------:|
 //! | analyzepsbt                        | todo            |
-//! | combinepsbt                        | todo            |
-//! | combinerawtransaction              | todo            |
-//! | converttopsbt                      | todo            |
-//! | createpsbt                         | todo            |
+//! | combinepsbt                        | done            |
+//! | combinerawtransaction              | done            |
+//! | converttopsbt                      | done            |
+//! | createpsbt                         | done            |
 //! | createrawtransaction               | done            |
-//! | decodepsbt                         | todo            |
-//! | decoderawtransaction               | todo            |
-//! | decodescript                       | todo            |
+//! | decodepsbt                         | done            |
+//! | decoderawtransaction               | done            |
+//! | decodescript                       | done            |
 //! | descriptorprocesspsbt              | todo            |
-//! | finalizepsbt                       | todo            |
+//! | finalizepsbt                       | done (untested) |
 //! | fundrawtransaction                 | done (untested) |
-//! | getrawtransaction                  | todo            |
+//! | getrawtransaction                  | done            |
 //! | joinpsbts                          | todo            |
 //! | sendrawtransaction                 | done            |
-//! | signrawtransactionwithkey          | todo            |
-//! | submitpackage                      | todo            |
-//! | testmempoolaccept                  | todo            |
+//! | signrawtransactionwithkey          | done (untested) |
+//! | submitpackage                      | done            |
+//! | testmempoolaccept                  | done (untested) |
 //! | utxoupdatepsbt                     | todo            |
 //!
 //! </details>
@@ -238,35 +238,32 @@
 //! | getzmqnotifications                | done (untested) |
 //!
 //! </details>
-//!
-//!
-//! **Items marked omitted were omitted because:**
-//!
-//! - Method does not return anything.
-//! - Method returns a simple type (e.g. bool or integer).
-//! - Method is deprecated.
 
 #[doc(inline)]
 pub use crate::{
     v17::{
         AddMultisigAddress, AddedNode, AddedNodeAddress, AddressInformation, Banned, BumpFee,
-        ChainTips, ChainTipsStatus, CreateRawTransaction, DumpPrivKey, DumpWallet,
-        FundRawTransaction, FundRawTransactionError, Generate, GenerateToAddress, GetAddedNodeInfo,
-        GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoLabel, GetAddressesByLabel,
-        GetBalance, GetBestBlockHash, GetBlockCount, GetBlockHash, GetBlockHeader,
-        GetBlockHeaderVerbose, GetBlockStats, GetBlockTemplate, GetBlockTemplateError,
-        GetBlockVerbosityOne, GetBlockVerbosityZero, GetChainTips, GetChainTxStats, GetDifficulty,
-        GetMemoryInfoStats, GetMempoolInfo, GetMiningInfo, GetNetTotals, GetNetworkInfo,
-        GetNetworkInfoAddress, GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress,
-        GetPeerInfo, GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose,
-        GetReceivedByAddress, GetTransaction, GetTransactionDetail, GetUnconfirmedBalance,
-        GetWalletInfo, GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsItem,
-        ListBanned, ListLabels, ListLockUnspent, ListLockUnspentItem, ListReceivedByAddress,
-        ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockTransaction, ListTransactions,
-        ListTransactionsItem, ListUnspent, ListUnspentItem, ListWallets, Locked, PeerInfo,
-        RescanBlockchain, SendMany, SendRawTransaction, SendToAddress, SignErrorData, SignMessage,
-        SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletProcessPsbt,
+        ChainTips, ChainTipsStatus, CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreatePsbt,
+        CreateRawTransaction, DecodePsbt, DecodeRawTransaction, DecodeScript, DecodeScriptError,
+        DumpPrivKey, DumpWallet, FinalizePsbt, FundRawTransaction, FundRawTransactionError,
+        Generate, GenerateToAddress, GetAddedNodeInfo, GetAddressInfo, GetAddressInfoEmbedded,
+        GetAddressInfoLabel, GetAddressesByLabel, GetBalance, GetBestBlockHash, GetBlockCount,
+        GetBlockHash, GetBlockHeader, GetBlockHeaderVerbose, GetBlockStats, GetBlockTemplate,
+        GetBlockTemplateError, GetBlockVerbosityOne, GetBlockVerbosityZero, GetChainTips,
+        GetChainTxStats, GetDifficulty, GetMemoryInfoStats, GetMempoolInfo, GetMiningInfo,
+        GetNetTotals, GetNetworkInfo, GetNetworkInfoAddress, GetNetworkInfoError,
+        GetNetworkInfoNetwork, GetNewAddress, GetPeerInfo, GetRawChangeAddress, GetRawMempool,
+        GetRawMempoolVerbose, GetRawTransaction, GetRawTransactionVerbose,
+        GetRawTransactionVerboseError, GetReceivedByAddress, GetTransaction, GetTransactionDetail,
+        GetUnconfirmedBalance, GetWalletInfo, GetZmqNotifications, ListAddressGroupings,
+        ListAddressGroupingsItem, ListBanned, ListLabels, ListLockUnspent, ListLockUnspentItem,
+        ListReceivedByAddress, ListReceivedByAddressItem, ListSinceBlock,
+        ListSinceBlockTransaction, ListTransactions, ListTransactionsItem, ListUnspent,
+        ListUnspentItem, ListWallets, Locked, PeerInfo, RawTransactionError, RawTransactionInput,
+        RawTransactionOutput, RescanBlockchain, SendMany, SendRawTransaction, SendToAddress,
+        SignMessage, SignRawTransaction, SignRawTransactionError, SoftforkReject,
+        TestMempoolAccept, TransactionCategory, UploadTarget, VerifyTxOutProof,
+        WalletCreateFundedPsbt, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{ActiveCommand, GetRpcInfo},
     v19::{
@@ -280,6 +277,8 @@ pub use crate::{
     v22::{GetTxOut, GetTxOutError, Logging, ScriptPubkey},
     v26::{
         CreateWallet, GetPrioritisedTransactions, GetTxOutSetInfo, GetTxOutSetInfoError,
-        LoadWallet, PrioritisedTransaction, UnloadWallet,
+        LoadWallet, PrioritisedTransaction, SubmitPackage, SubmitPackageError,
+        SubmitPackageTxResult, SubmitPackageTxResultError, SubmitPackageTxResultFees,
+        SubmitPackageTxResultFeesError, UnloadWallet,
     },
 };

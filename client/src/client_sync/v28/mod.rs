@@ -69,10 +69,22 @@ crate::impl_client_check_expected_server_version!({ [280000] });
 crate::impl_client_v17__getpeerinfo!();
 
 // == Rawtransactions ==
+crate::impl_client_v17__combinepsbt!();
+crate::impl_client_v17__combinerawtransaction!();
+crate::impl_client_v17__converttopsbt!();
+crate::impl_client_v17__createpsbt!();
 crate::impl_client_v17__createrawtransaction!();
+crate::impl_client_v17__decodepsbt!();
+crate::impl_client_v17__decoderawtransaction!();
+crate::impl_client_v17__decodescript!();
+crate::impl_client_v17__finalizepsbt!();
 crate::impl_client_v17__fundrawtransaction!();
+crate::impl_client_v17__getrawtransaction!();
 crate::impl_client_v17__sendrawtransaction!();
+crate::impl_client_v17__signrawtransaction!();
+crate::impl_client_v17__signrawtransactionwithkey!();
 crate::impl_client_v28__submitpackage!();
+crate::impl_client_v17__testmempoolaccept!();
 
 // == Wallet ==
 crate::impl_client_v17__addmultisigaddress!();

@@ -897,43 +897,6 @@ pub struct SignMessage(
     pub String,
 );
 
-/// Result of the JSON-RPC method `signrawtransactionwithwallet`.
-///
-/// > signrawtransactionwithwallet "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] sighashtype )
-/// >
-/// > Sign inputs for raw transaction (serialized, hex-encoded).
-/// > The second optional argument (may be null) is an array of previous transaction outputs that
-/// > this transaction depends on but may not yet be in the block chain.
-/// >
-/// >
-/// > Arguments:
-/// > 1. "hexstring"                      (string, required) The transaction hex string
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct SignRawTransactionWithWallet {
-    /// The hex-encoded raw transaction with signature(s).
-    pub hex: String,
-    /// If the transaction has a complete set of signatures.
-    pub complete: bool,
-    /// Script verification errors (if there are any).
-    pub errors: Option<Vec<SignErrorData>>, // 'Data' suffix to differentiate this from a normal error type.
-}
-
-/// Returned as part of `signrawtransactionwithwallet`.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct SignErrorData {
-    /// The hash of the referenced, previous transaction.
-    pub txid: String,
-    /// The index of the output to spent and used as input.
-    pub vout: i64,
-    /// The hex-encoded signature script.
-    #[serde(rename = "ScriptSig")]
-    pub script_sig: String,
-    /// Script sequence number.
-    pub sequence: u32,
-    /// Verification or signing error related to the input.
-    pub error: String,
-}
-
 /// Result of the JSON-RPC method `walletcreatefundedpsbt`.
 ///
 /// > walletcreatefundedpsbt [{"txid":"id","vout":n},...] [{"address":amount},{"data":"hex"},...] ( locktime ) ( replaceable ) ( options bip32derivs )

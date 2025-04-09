@@ -8,8 +8,8 @@ use bitcoin::hex::FromHex;
 use bitcoin::key::{self, PrivateKey, PublicKey};
 use bitcoin::psbt::PsbtParseError;
 use bitcoin::{
-    address, bip32, ecdsa, Address, Amount, BlockHash, Psbt, ScriptBuf, Sequence, SignedAmount,
-    Transaction, Txid, WitnessProgram, WitnessVersion,
+    address, bip32, ecdsa, Address, Amount, BlockHash, Psbt, ScriptBuf, SignedAmount, Transaction,
+    Txid, WitnessProgram, WitnessVersion,
 };
 
 // TODO: Use explicit imports?
@@ -703,45 +703,6 @@ impl SignMessage {
     pub fn into_model(self) -> Result<model::SignMessage, ecdsa::Error> {
         let sig = self.0.parse::<ecdsa::Signature>()?;
         Ok(model::SignMessage(sig))
-    }
-}
-
-impl SignRawTransactionWithWallet {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::SignRawTransactionWithWallet, SignRawTransactionWithWalletError> {
-        use SignRawTransactionWithWalletError as E;
-
-        let tx = encode::deserialize_hex::<Transaction>(&self.hex).map_err(E::Tx)?;
-        let errors = match self.errors {
-            None => Ok(vec![]),
-            Some(errors) => errors
-                .into_iter()
-                .map(|e| e.into_model())
-                .collect::<Result<Vec<_>, _>>()
-                .map_err(E::Errors),
-        };
-
-        Ok(model::SignRawTransactionWithWallet {
-            raw_transaction: tx,
-            complete: self.complete,
-            errors: errors?,
-        })
-    }
-}
-
-impl SignErrorData {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::SignErrorData, SignErrorDataError> {
-        use SignErrorDataError as E;
-
-        let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
-        let vout = crate::to_u32(self.vout, "vout")?;
-        let script_sig = ScriptBuf::from_hex(&self.script_sig).map_err(E::ScriptSig)?;
-        let sequence = Sequence(self.sequence);
-
-        Ok(model::SignErrorData { txid, vout, script_sig, sequence, error: self.error })
     }
 }
 

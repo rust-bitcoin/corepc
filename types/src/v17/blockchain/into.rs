@@ -493,13 +493,14 @@ impl GetTxOut {
             script_pubkey: ScriptBuf::from_hex(&self.script_pubkey.hex).map_err(E::ScriptPubkey)?,
         };
 
-        let addresses = self
-            .script_pubkey
-            .addresses
-            .into_iter()
-            .map(|address| address.parse::<Address<_>>())
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(E::Addresses)?;
+        let addresses = match self.script_pubkey.addresses {
+            Some(addresses) => addresses
+                .into_iter()
+                .map(|address| address.parse::<Address<_>>())
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(E::Addresses)?,
+            None => vec![],
+        };
 
         Ok(model::GetTxOut {
             best_block,

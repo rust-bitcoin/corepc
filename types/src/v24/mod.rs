@@ -103,21 +103,21 @@
 //! | JSON-PRC Method Name               | Status          |
 //! |:-----------------------------------|:---------------:|
 //! | analyzepsbt                        | todo            |
-//! | combinepsbt                        | todo            |
-//! | combinerawtransaction              | todo            |
-//! | converttopsbt                      | todo            |
-//! | createpsbt                         | todo            |
+//! | combinepsbt                        | done            |
+//! | combinerawtransaction              | done            |
+//! | converttopsbt                      | done            |
+//! | createpsbt                         | done            |
 //! | createrawtransaction               | done            |
-//! | decodepsbt                         | todo            |
-//! | decoderawtransaction               | todo            |
-//! | decodescript                       | todo            |
-//! | finalizepsbt                       | todo            |
+//! | decodepsbt                         | done            |
+//! | decoderawtransaction               | done            |
+//! | decodescript                       | done            |
+//! | finalizepsbt                       | done (untested) |
 //! | fundrawtransaction                 | done (untested) |
-//! | getrawtransaction                  | todo            |
+//! | getrawtransaction                  | done            |
 //! | joinpsbts                          | todo            |
 //! | sendrawtransaction                 | done            |
-//! | signrawtransactionwithkey          | todo            |
-//! | testmempoolaccept                  | todo            |
+//! | signrawtransactionwithkey          | done (untested) |
+//! | testmempoolaccept                  | done (untested) |
 //! | utxoupdatepsbt                     | todo            |
 //!
 //! </details>
@@ -241,24 +241,27 @@
 pub use crate::{
     v17::{
         AddMultisigAddress, AddedNode, AddedNodeAddress, AddressInformation, Banned, BumpFee,
-        ChainTips, ChainTipsStatus, CreateRawTransaction, CreateWallet, DumpPrivKey, DumpWallet,
-        FundRawTransaction, FundRawTransactionError, Generate, GenerateToAddress, GetAddedNodeInfo,
-        GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoLabel, GetAddressesByLabel,
-        GetBalance, GetBestBlockHash, GetBlockCount, GetBlockHash, GetBlockHeader,
-        GetBlockHeaderVerbose, GetBlockStats, GetBlockTemplate, GetBlockTemplateError,
-        GetBlockVerbosityOne, GetBlockVerbosityZero, GetChainTips, GetChainTxStats, GetDifficulty,
-        GetMemoryInfoStats, GetMempoolInfo, GetMiningInfo, GetNetTotals, GetNetworkInfo,
-        GetNetworkInfoAddress, GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress,
-        GetPeerInfo, GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose,
-        GetReceivedByAddress, GetTransaction, GetTransactionDetail, GetTxOutSetInfo,
-        GetUnconfirmedBalance, GetWalletInfo, GetZmqNotifications, ListAddressGroupings,
-        ListAddressGroupingsItem, ListBanned, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListReceivedByAddress, ListReceivedByAddressItem, ListSinceBlock,
-        ListSinceBlockTransaction, ListTransactions, ListTransactionsItem, ListUnspent,
-        ListUnspentItem, ListWallets, LoadWallet, Locked, PeerInfo, RescanBlockchain, SendMany,
-        SendRawTransaction, SendToAddress, SignErrorData, SignMessage,
-        SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletProcessPsbt,
+        ChainTips, ChainTipsStatus, CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreatePsbt,
+        CreateRawTransaction, CreateWallet, DecodePsbt, DecodeRawTransaction, DecodeScript,
+        DecodeScriptError, DumpPrivKey, DumpWallet, FinalizePsbt, FundRawTransaction,
+        FundRawTransactionError, Generate, GenerateToAddress, GetAddedNodeInfo, GetAddressInfo,
+        GetAddressInfoEmbedded, GetAddressInfoLabel, GetAddressesByLabel, GetBalance,
+        GetBestBlockHash, GetBlockCount, GetBlockHash, GetBlockHeader, GetBlockHeaderVerbose,
+        GetBlockStats, GetBlockTemplate, GetBlockTemplateError, GetBlockVerbosityOne,
+        GetBlockVerbosityZero, GetChainTips, GetChainTxStats, GetDifficulty, GetMemoryInfoStats,
+        GetMempoolInfo, GetMiningInfo, GetNetTotals, GetNetworkInfo, GetNetworkInfoAddress,
+        GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress, GetPeerInfo,
+        GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose, GetRawTransaction,
+        GetRawTransactionVerbose, GetRawTransactionVerboseError, GetReceivedByAddress,
+        GetTransaction, GetTransactionDetail, GetTxOutSetInfo, GetUnconfirmedBalance,
+        GetWalletInfo, GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsItem,
+        ListBanned, ListLabels, ListLockUnspent, ListLockUnspentItem, ListReceivedByAddress,
+        ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockTransaction, ListTransactions,
+        ListTransactionsItem, ListUnspent, ListUnspentItem, ListWallets, LoadWallet, Locked,
+        PeerInfo, RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain,
+        SendMany, SendRawTransaction, SendToAddress, SignMessage, SignRawTransaction,
+        SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,
+        UploadTarget, VerifyTxOutProof, WalletCreateFundedPsbt, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{ActiveCommand, GetRpcInfo},
     v19::{

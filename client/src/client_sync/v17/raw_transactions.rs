@@ -9,6 +9,67 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
+/// Implements Bitcoin Core JSON-RPC API method `combinepsbt`
+#[macro_export]
+macro_rules! impl_client_v17__combinepsbt {
+    () => {
+        impl Client {
+            pub fn combine_psbt(&self, txs: &[bitcoin::Psbt]) -> Result<CombinePsbt> {
+                let txs = txs.iter().map(|psbt| format!("{}", psbt)).collect::<Vec<String>>();
+                self.call("combinepsbt", &[txs.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `combinerawtransaction`
+#[macro_export]
+macro_rules! impl_client_v17__combinerawtransaction {
+    () => {
+        impl Client {
+            pub fn combine_raw_transaction(
+                &self,
+                txs: &[bitcoin::Transaction],
+            ) -> Result<CombineRawTransaction> {
+                let encoded = txs
+                    .iter()
+                    .map(|tx| bitcoin::consensus::encode::serialize_hex(tx))
+                    .collect::<Vec<String>>();
+                self.call("combinerawtransaction", &[into_json(encoded)?])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `converttopsbt`
+#[macro_export]
+macro_rules! impl_client_v17__converttopsbt {
+    () => {
+        impl Client {
+            pub fn convert_to_psbt(&self, tx: &bitcoin::Transaction) -> Result<ConvertToPsbt> {
+                let hex = bitcoin::consensus::encode::serialize_hex(tx);
+                self.call("converttopsbt", &[hex.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `createpsbt`
+#[macro_export]
+macro_rules! impl_client_v17__createpsbt {
+    () => {
+        impl Client {
+            pub fn create_psbt(
+                &self,
+                inputs: &[$crate::client_sync::Input],
+                outputs: &[$crate::client_sync::Output],
+            ) -> Result<CreatePsbt> {
+                self.call("createpsbt", &[into_json(inputs)?, into_json(outputs)?])
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `createrawtransaction`
 #[macro_export]
 macro_rules! impl_client_v17__createrawtransaction {
@@ -17,9 +78,63 @@ macro_rules! impl_client_v17__createrawtransaction {
             pub fn create_raw_transaction(
                 &self,
                 inputs: &[$crate::client_sync::Input],
-                outputs: &std::collections::BTreeMap<String, f64>, // Map of address to amount.
+                outputs: &[$crate::client_sync::Output],
             ) -> Result<CreateRawTransaction> {
                 self.call("createrawtransaction", &[into_json(inputs)?, into_json(outputs)?])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `decodepsbt`
+#[macro_export]
+macro_rules! impl_client_v17__decodepsbt {
+    () => {
+        impl Client {
+            pub fn decode_psbt(&self, psbt: &str) -> Result<DecodePsbt> {
+                self.call("decodepsbt", &[psbt.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `finalizepsbt`
+#[macro_export]
+macro_rules! impl_client_v17__finalizepsbt {
+    () => {
+        impl Client {
+            pub fn finalize_psbt(&self, psbt: &bitcoin::Psbt) -> Result<FinalizePsbt> {
+                let psbt = format!("{}", psbt);
+                self.call("finalizepsbt", &[psbt.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `decoderawtransaction`
+#[macro_export]
+macro_rules! impl_client_v17__decoderawtransaction {
+    () => {
+        impl Client {
+            pub fn decode_raw_transaction(
+                &self,
+                tx: &bitcoin::Transaction,
+            ) -> Result<DecodeRawTransaction> {
+                let hex = bitcoin::consensus::encode::serialize_hex(tx);
+                self.call("decoderawtransaction", &[hex.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `decodescript`
+#[macro_export]
+macro_rules! impl_client_v17__decodescript {
+    () => {
+        impl Client {
+            // Arg is the hex encoded script we want to decode.
+            pub fn decode_script(&self, script: &str) -> Result<DecodeScript> {
+                self.call("decodescript", &[script.into()])
             }
         }
     };
@@ -32,9 +147,29 @@ macro_rules! impl_client_v17__fundrawtransaction {
         impl Client {
             pub fn fund_raw_transaction(
                 &self,
-                hex: &str, // Hex encoded transaction.
+                tx: &bitcoin::Transaction,
             ) -> Result<FundRawTransaction> {
-                self.call("fundrawtransaction", &[into_json(hex)?])
+                let hex = bitcoin::consensus::encode::serialize_hex(tx);
+                self.call("fundrawtransaction", &[hex.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `getrawtransaction`
+#[macro_export]
+macro_rules! impl_client_v17__getrawtransaction {
+    () => {
+        impl Client {
+            pub fn get_raw_transaction(&self, txid: bitcoin::Txid) -> Result<GetRawTransaction> {
+                self.call("getrawtransaction", &[into_json(&txid)?, false.into()])
+            }
+
+            pub fn get_raw_transaction_verbose(
+                &self,
+                txid: Txid,
+            ) -> Result<GetRawTransactionVerbose> {
+                self.call("getrawtransaction", &[into_json(&txid)?, true.into()])
             }
         }
     };
@@ -51,6 +186,59 @@ macro_rules! impl_client_v17__sendrawtransaction {
             ) -> Result<SendRawTransaction> {
                 let hex = bitcoin::consensus::encode::serialize_hex(tx);
                 self.call("sendrawtransaction", &[hex.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `signrawtransaction`
+#[macro_export]
+macro_rules! impl_client_v17__signrawtransaction {
+    () => {
+        impl Client {
+            pub fn sign_raw_transaction(
+                &self,
+                tx: &bitcoin::Transaction,
+            ) -> Result<SignRawTransaction> {
+                let hex = bitcoin::consensus::encode::serialize_hex(tx);
+                self.call("signrawtransaction", &[hex.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `signrawtransactionwithkey`
+#[macro_export]
+macro_rules! impl_client_v17__signrawtransactionwithkey {
+    () => {
+        impl Client {
+            pub fn sign_raw_transaction_with_key(
+                &self,
+                tx: &bitcoin::Transaction,
+                keys: &[bitcoin::PrivateKey],
+            ) -> Result<SignRawTransaction> {
+                let hex = bitcoin::consensus::encode::serialize_hex(tx);
+                let keys = keys.iter().map(|k| format!("{}", k)).collect::<Vec<String>>();
+                self.call("signrawtransactionwithkey", &[hex.into(), into_json(keys)?])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `testmempoolaccept`
+#[macro_export]
+macro_rules! impl_client_v17__testmempoolaccept {
+    () => {
+        impl Client {
+            pub fn test_mempool_accept(
+                &self,
+                txs: &[bitcoin::Transaction],
+            ) -> Result<TestMempoolAccept> {
+                let encoded = txs
+                    .iter()
+                    .map(|tx| bitcoin::consensus::encode::serialize_hex(tx))
+                    .collect::<Vec<String>>();
+                self.call("testmempoolaccept", &[into_json(encoded)?])
             }
         }
     };

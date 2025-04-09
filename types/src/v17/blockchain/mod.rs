@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
 // TODO: Remove wildcard, use explicit types.
 pub use self::error::*;
 use crate::model;
+use crate::v17::ScriptPubkey;
 
 /// Result of JSON-RPC method `getbestblockhash`.
 ///
@@ -607,22 +608,6 @@ pub struct GetTxOut {
     pub script_pubkey: ScriptPubkey,
     /// Coinbase or not.
     pub coinbase: bool,
-}
-
-/// A script pubkey.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct ScriptPubkey {
-    /// Script assembly.
-    pub asm: String,
-    /// Script hex.
-    pub hex: String,
-    #[serde(rename = "reqSigs")]
-    pub req_sigs: i64,
-    /// The type, eg pubkeyhash.
-    #[serde(rename = "type")]
-    pub type_: String,
-    /// Array of bitcoin address.
-    pub addresses: Vec<String>,
 }
 
 /// Result of JSON-RPC method `gettxoutsetinfo`.

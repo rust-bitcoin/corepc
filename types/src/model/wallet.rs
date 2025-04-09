@@ -11,7 +11,7 @@ use bitcoin::address::NetworkUnchecked;
 use bitcoin::hashes::hash160;
 use bitcoin::{
     bip32, ecdsa, Address, Amount, BlockHash, FeeRate, PrivateKey, Psbt, PublicKey, ScriptBuf,
-    Sequence, SignedAmount, Transaction, Txid, WitnessProgram, WitnessVersion,
+    SignedAmount, Transaction, Txid, WitnessProgram, WitnessVersion,
 };
 use serde::{Deserialize, Serialize};
 
@@ -630,31 +630,6 @@ pub struct SendToAddress {
 /// Models the result of JSON-RPC method `signmessage`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct SignMessage(pub ecdsa::Signature);
-
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct SignRawTransactionWithWallet {
-    /// The raw transaction with signature(s).
-    pub raw_transaction: Transaction,
-    /// If the transaction has a complete set of signatures.
-    pub complete: bool,
-    /// Script verification errors (if there are any).
-    pub errors: Vec<SignErrorData>, // 'Data' suffix to differentiate this from a normal error type.
-}
-
-/// Returned as part of `signrawtransactionwithwallet`.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct SignErrorData {
-    /// The txid of the previous transaction.
-    pub txid: Txid,
-    /// The index of the output to spent and used as input.
-    pub vout: u32,
-    /// The signature script.
-    pub script_sig: ScriptBuf,
-    /// Script sequence number.
-    pub sequence: Sequence,
-    /// Verification or signing error related to the input.
-    pub error: String,
-}
 
 /// Models the result of JSON-RPC method `unloadwallet`.
 ///

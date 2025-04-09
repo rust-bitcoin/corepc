@@ -105,21 +105,21 @@
 //!
 //! | JSON-PRC Method Name               | Status          |
 //! |:-----------------------------------|:---------------:|
-//! | combinepsbt                        | todo            |
-//! | combinerawtransaction              | todo            |
-//! | converttopsbt                      | todo            |
-//! | createpsbt                         | todo            |
+//! | combinepsbt                        | done            |
+//! | combinerawtransaction              | done            |
+//! | converttopsbt                      | done            |
+//! | createpsbt                         | done            |
 //! | createrawtransaction               | done            |
-//! | decodepsbt                         | todo            |
-//! | decoderawtransaction               | todo            |
-//! | decodescript                       | todo            |
-//! | finalizepsbt                       | todo            |
-//! | fundrawtransaction                 | done (untested) |
-//! | getrawtransaction                  | todo            |
+//! | decodepsbt                         | done            |
+//! | decoderawtransaction               | done            |
+//! | decodescript                       | done            |
+//! | finalizepsbt                       | done (untested) |
+//! | fundrawtransaction                 | done            |
+//! | getrawtransaction                  | done            |
 //! | sendrawtransaction                 | done            |
-//! | signrawtransaction                 | todo            |
-//! | signrawtransactionwithkey          | todo            |
-//! | testmempoolaccept                  | todo            |
+//! | signrawtransaction                 | done            |
+//! | signrawtransactionwithkey          | done            |
+//! | testmempoolaccept                  | done (untested) |
 //!
 //! </details>
 //!
@@ -192,7 +192,7 @@
 //! | sethdseed                          | omitted         |
 //! | settxfee                           | omitted         |
 //! | signmessage                        | done (untested) |
-//! | signrawtransactionwithwallet       | done (untested) |
+//! | signrawtransactionwithwallet       | done            |
 //! | unloadwallet                       | done            |
 //! | walletcreatefundedpsbt             | done (untested) |
 //! | walletlock                         | omitted         |
@@ -222,6 +222,9 @@ mod util;
 mod wallet;
 mod zmq;
 
+use bitcoin::{hex, ScriptBuf};
+use serde::{Deserialize, Serialize};
+
 #[doc(inline)]
 pub use self::{
     blockchain::{
@@ -234,8 +237,7 @@ pub use self::{
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, GetMempoolInfoError,
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutError, GetTxOutSetInfo,
         GetTxOutSetInfoError, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
-        MempoolEntryFees, MempoolEntryFeesError, ScriptPubkey, Softfork, SoftforkReject,
-        VerifyTxOutProof,
+        MempoolEntryFees, MempoolEntryFeesError, Softfork, SoftforkReject, VerifyTxOutProof,
     },
     control::{GetMemoryInfoStats, Locked, Logging},
     generating::{Generate, GenerateToAddress},
@@ -249,7 +251,13 @@ pub use self::{
         PeerInfo, UploadTarget,
     },
     raw_transactions::{
-        CreateRawTransaction, FundRawTransaction, FundRawTransactionError, SendRawTransaction,
+        CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreatePsbt, CreateRawTransaction,
+        DecodePsbt, DecodeRawTransaction, DecodeScript, DecodeScriptError, FinalizePsbt,
+        FundRawTransaction, FundRawTransactionError, GetRawTransaction, GetRawTransactionVerbose,
+        GetRawTransactionVerboseError, InputBip32Deriv, MempoolAcceptance, OutputBip32Deriv,
+        PsbtInput, PsbtOutput, PsbtScript, RawTransaction, RawTransactionError,
+        RawTransactionInput, RawTransactionOutput, SendRawTransaction, SignFail, SignFailError,
+        SignRawTransaction, SignRawTransactionError, TestMempoolAccept, WitnessUtxo,
     },
     wallet::{
         AddMultisigAddress, AddMultisigAddressError, AddressInformation, BumpFee, BumpFeeError,
@@ -264,9 +272,46 @@ pub use self::{
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspent, ListUnspentItem,
         ListUnspentItemError, ListWallets, LoadWallet, RescanBlockchain, SendMany, SendToAddress,
-        SignErrorData, SignErrorDataError, SignMessage, SignRawTransactionWithWallet,
-        SignRawTransactionWithWalletError, TransactionCategory, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WalletProcessPsbt,
+        SignMessage, TransactionCategory, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WalletProcessPsbt,
     },
     zmq::GetZmqNotifications,
 };
+
+/// Represents a script pubkey.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ScriptPubkey {
+    /// Script assembly.
+    pub asm: String,
+    /// Script hex.
+    pub hex: String,
+    #[serde(rename = "reqSigs")]
+    pub req_sigs: Option<i64>,
+    /// The type, eg pubkeyhash.
+    #[serde(rename = "type")]
+    pub type_: String,
+    /// Array of bitcoin address.
+    pub addresses: Option<Vec<String>>,
+}
+
+impl ScriptPubkey {
+    fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
+        ScriptBuf::from_hex(&self.hex)
+    }
+}
+
+/// Represents a script signature.
+// The `model` just uses a `bitcoin::ScriptBuf`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScriptSig {
+    /// Assembly representation of the script.
+    pub asm: String,
+    /// Hex representation of the script.
+    pub hex: String,
+}
+
+impl ScriptSig {
+    fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
+        ScriptBuf::from_hex(&self.hex)
+    }
+}

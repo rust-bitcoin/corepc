@@ -16,11 +16,12 @@ pub mod v26;
 pub mod v27;
 pub mod v28;
 
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-use bitcoin::Txid;
+use bitcoin::{Address, Amount, Txid};
 use serde::{Deserialize, Serialize};
 
 pub use crate::client_sync::error::Error;
@@ -233,6 +234,23 @@ pub struct Input {
     pub vout: u64,
     /// Sequence number if needed.
     pub sequence: Option<bitcoin::Sequence>,
+}
+
+/// Output used as parameter to `create_raw_transaction`.
+// Abuse `HashMap` so we can derive serialize to get the correct JSON object.
+#[derive(Debug, Serialize)]
+pub struct Output(
+    /// Map of address to value. Always only has a single item in it.
+    HashMap<String, f64>,
+);
+
+impl Output {
+    /// Creates a single output that serializes as Core expects.
+    pub fn new(addr: Address, value: Amount) -> Self {
+        let mut map = HashMap::new();
+        map.insert(addr.to_string(), value.to_btc());
+        Output(map)
+    }
 }
 
 /// An element in the `inputs` argument of method `walletcreatefundedpsbt`.
