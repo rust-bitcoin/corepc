@@ -29,6 +29,7 @@ edition = "2021"
 0_20_2 = ["v20", "node/0_20_2"]
 0_19_1 = ["v19", "node/0_19_1"]
 0_18_1 = ["v18", "node/0_18_1"]
+0_17_2 = ["v17", "node/0_17_2"]
 0_17_1 = ["v17", "node/0_17_1"]
 
 # These features are just for internal use (feature gating).
