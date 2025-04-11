@@ -51,7 +51,10 @@ pub use corepc_client::{client_sync::v19::{Client, AddressType}, types::v19 as v
 #[cfg(all(feature = "0_18_1", not(feature = "0_19_1")))]
 pub use corepc_client::{client_sync::v18::{Client, AddressType}, types::v18 as vtype};
 
-#[cfg(all(feature = "0_17_1", not(feature = "0_18_1")))]
+#[cfg(all(feature = "0_17_2", not(feature = "0_18_1")))]
+pub use corepc_client::{client_sync::v17::{Client, AddressType}, types::v17 as vtype};
+
+#[cfg(all(feature = "0_17_1", not(feature = "0_17_2")))]
 pub use corepc_client::{client_sync::v17::{Client, AddressType}, types::v17 as vtype};
 
 /// This is meaningless but we need it otherwise we can't get far enough into
@@ -72,6 +75,7 @@ pub use corepc_client::{client_sync::v17::{Client, AddressType}, types::v17 as v
     not(feature = "0_20_2"),
     not(feature = "0_19_1"),
     not(feature = "0_18_1"),
+    not(feature = "0_17_2"),
     not(feature = "0_17_1")
 ))]
 pub use corepc_client::{client_sync::v28::{Client, AddressType}, types::v28 as vtype};
