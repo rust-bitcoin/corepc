@@ -5,6 +5,7 @@
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
 pub mod wallet;
+pub mod blockchain;
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -44,6 +45,7 @@ crate::impl_client_v17__gettxoutproof!();
 crate::impl_client_v17__gettxoutsetinfo!();
 crate::impl_client_v17__preciousblock!();
 crate::impl_client_v17__verifytxoutproof!();
+crate::impl_client_v23__savemempool!();
 
 // == Control ==
 crate::impl_client_v17__getmemoryinfo!();

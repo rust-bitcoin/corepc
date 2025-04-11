@@ -85,7 +85,7 @@ abandontransaction "txid"
 abortrescan
 addmultisigaddress nrequired ["key",...] ( "label" "address_type" )
 backupwallet "destination"
-bumpfee "txid" ( options ) 
+bumpfee "txid" ( options )
 createwallet "wallet_name" ( disable_private_keys )
 dumpprivkey "address"
 dumpwallet "filename"

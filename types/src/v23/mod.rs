@@ -232,7 +232,10 @@
 //! - Method does not return anything.
 //! - Method returns a simple type (e.g. bool or integer).
 //! - Method is deprecated.
+mod blockchain;
 
+#[doc(inline)]
+pub use self::blockchain::SaveMempool;
 #[doc(inline)]
 pub use crate::{
     v17::{

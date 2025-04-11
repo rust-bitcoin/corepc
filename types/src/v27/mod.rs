@@ -281,6 +281,7 @@ pub use crate::{
         SoftforkType,
     },
     v22::{GetTxOut, GetTxOutError, Logging, ScriptPubkey},
+    v23::SaveMempool,
     v26::{
         CreateWallet, GetPrioritisedTransactions, GetTxOutSetInfo, GetTxOutSetInfoError,
         LoadWallet, PrioritisedTransaction, UnloadWallet,

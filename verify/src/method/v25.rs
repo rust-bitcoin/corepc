@@ -34,7 +34,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("gettxspendingprevout", "GetTxSpendingPrevout", "get_tx_spending_prevout"),
     Method::new_nothing("preciousblock", "precious_block"),
     Method::new_numeric("pruneblockchain", "prune_blockchain"),
-    Method::new_nothing("savemempool", "save_mempool"),
+    Method::new_no_model("savemempool", "SaveMempool", "save_mempool"),
     Method::new_modelled("scanblocks", "ScanBlocks", "scan_blocks"),
     Method::new_modelled("scantxoutset", "ScanTxOutSet", "scan_tx_out_set"),
     Method::new_bool("verifychain", "verify_chain"),

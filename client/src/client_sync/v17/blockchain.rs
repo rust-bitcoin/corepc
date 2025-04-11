@@ -301,3 +301,33 @@ macro_rules! impl_client_v17__verifytxoutproof {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `pruneblockchain`
+#[macro_export]
+macro_rules! impl_client_v17__pruneblockchain {
+    () => {
+        impl Client {
+            /// Instructs the node to prune the blockchain up to a specified height or timestamp.
+            pub fn prune_blockchain(&self, target: u64) -> Result<PruneBlockchain> {
+                self.call("pruneblockchain", &[target.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `savemempool`
+#[macro_export]
+macro_rules! impl_client_v17__savemempool {
+    () => {
+        impl Client {
+            // Dumps the mempool to disk (v17 - v22)
+            pub fn save_mempool(&self) -> Result<()> {
+                match self.call("savemempool", &[]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(_) => Ok(()),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}

@@ -666,3 +666,16 @@ pub struct GetTxOutSetInfo {
 /// Inner field is the txid(s) which the proof commits to, or empty array if the proof can not be validated.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct VerifyTxOutProof(pub Vec<String>);
+
+/// Result of JSON-RPC method `pruneblockchain`.
+///
+/// > pruneblockchain height
+/// >
+/// > Arguments:
+/// > 1. "height"       (numeric, required) The block height to prune up to. May be set to a discrete height, or a unix timestamp
+/// >                   to prune blocks whose block time is at least 2 hours older than the provided timestamp.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct PruneBlockchain(
+    /// The height of the last block pruned.
+    pub i64
+);

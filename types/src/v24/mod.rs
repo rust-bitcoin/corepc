@@ -274,4 +274,5 @@ pub use crate::{
     },
     v21::UnloadWallet,
     v22::{GetTxOut, GetTxOutError, Logging, ScriptPubkey},
+    v23::SaveMempool,
 };
