@@ -20,6 +20,7 @@ use bitcoin::{Amount, Block, BlockHash, PublicKey, Txid};
 use serde::{Deserialize, Serialize};
 
 use crate::client_sync::into_json;
+use crate::client_sync::{AddNodeCommand, SetBanCommand};
 use crate::types::v17::*;
 
 #[rustfmt::skip]                // Keep public re-exports separate.
@@ -49,6 +50,9 @@ crate::impl_client_v17__gettxoutproof!();
 crate::impl_client_v17__gettxoutsetinfo!();
 crate::impl_client_v17__preciousblock!();
 crate::impl_client_v17__verifytxoutproof!();
+crate::impl_client_v17__pruneblockchain!();
+crate::impl_client_v17__savemempool!();
+crate::impl_client_v17__verifychain!();
 
 // == Control ==
 crate::impl_client_v17__getmemoryinfo!();
@@ -74,6 +78,14 @@ crate::impl_client_v17__getaddednodeinfo!();
 crate::impl_client_v17__getnettotals!();
 crate::impl_client_v17__getnetworkinfo!();
 crate::impl_client_v17__getpeerinfo!();
+crate::impl_client_v17__addnode!();
+crate::impl_client_v17__clearbanned!();
+crate::impl_client_v17__setban!();
+crate::impl_client_v17__listbanned!();
+crate::impl_client_v17__disconnectnode!();
+crate::impl_client_v17__getconnectioncount!();
+crate::impl_client_v17__ping!();
+crate::impl_client_v17__setnetworkactive!();
 
 // == Rawtransactions ==
 crate::impl_client_v17__createrawtransaction!();
@@ -112,6 +124,23 @@ crate::impl_client_v17__signrawtransactionwithwallet!();
 crate::impl_client_v17__unloadwallet!();
 crate::impl_client_v17__walletcreatefundedpsbt!();
 crate::impl_client_v17__walletprocesspsbt!();
+crate::impl_client_v17__abandontransaction!();
+crate::impl_client_v17__abortrescan!();
+crate::impl_client_v17__backupwallet!();
+crate::impl_client_v17__encryptwallet!();
+crate::impl_client_v17__importaddress!();
+crate::impl_client_v17__importprivkey!();
+crate::impl_client_v17__importprunedfunds!();
+crate::impl_client_v17__importpubkey!();
+crate::impl_client_v17__importwallet!();
+crate::impl_client_v17__keypoolrefill!();
+crate::impl_client_v17__lockunspent!();
+crate::impl_client_v17__removeprunedfunds!();
+crate::impl_client_v17__sethdseed!();
+crate::impl_client_v17__settxfee!();
+crate::impl_client_v17__walletlock!();
+crate::impl_client_v17__walletpassphrase!();
+crate::impl_client_v17__walletpassphrasechange!();
 
 /// Argument to the `Client::get_new_address_with_type` function.
 ///
@@ -135,4 +164,13 @@ impl fmt::Display for AddressType {
         };
         fmt::Display::fmt(s, f)
     }
+}
+
+const SATS_PER_BTC_F64: f64 = 100_000_000.0;
+
+pub fn fee_rate_to_rpc_arg(fee_rate: bitcoin::FeeRate) -> f64 {
+    let sat_per_kwu = fee_rate.to_sat_per_kwu();
+
+    let sat_per_kvb = (sat_per_kwu as f64) / 4.0;
+    sat_per_kvb / SATS_PER_BTC_F64
 }

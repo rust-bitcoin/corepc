@@ -263,7 +263,7 @@ pub use crate::v17::{
     RescanBlockchain, ScriptPubkey, SendMany, SendRawTransaction, SendToAddress, SignErrorData,
     SignErrorDataError, SignMessage, SignRawTransactionWithWallet,
     SignRawTransactionWithWalletError, SoftforkReject, TransactionCategory, UploadTarget,
-    VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
+    VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, SetNetworkActive, SaveMempool, VerifyChain, AbandonTransaction, AbortRescan, BackupWallet, EncryptWallet, ImportAddress, ImportPrivKey, ImportPrunedFunds, ImportPubKey, ImportWallet, KeypoolRefill, LockUnspent, RemovePrunedFunds, SetHdSeed, SetTxFee, WalletLock, WalletPassPhrase, WalletPassPhraseChange,
 };
 #[doc(inline)]
 pub use crate::v18::{ActiveCommand, GetRpcInfo};

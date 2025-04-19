@@ -260,5 +260,5 @@ pub use crate::v17::{
     SendRawTransaction, SendToAddress, SignErrorData, SignErrorDataError, SignMessage,
     SignRawTransactionWithWallet, SignRawTransactionWithWalletError, Softfork, SoftforkReject,
     TransactionCategory, UploadTarget, VerifyTxOutProof, WalletCreateFundedPsbt,
-    WalletCreateFundedPsbtError, WalletProcessPsbt,
+    WalletCreateFundedPsbtError, WalletProcessPsbt, SetNetworkActive, SaveMempool, VerifyChain, AbandonTransaction, AbortRescan, BackupWallet, EncryptWallet, ImportAddress, ImportPrivKey, ImportPrunedFunds, ImportPubKey, ImportWallet, KeypoolRefill, LockUnspent, RemovePrunedFunds, SetHdSeed, SetTxFee, WalletLock, WalletPassPhrase, WalletPassPhraseChange,
 };

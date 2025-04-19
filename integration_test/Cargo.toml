@@ -49,8 +49,9 @@ v17 = []
 TODO = []                       # This is a dirty hack while writing the tests.
 
 [dependencies]
-bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
+bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde", "rand"] }
 node = { package = "corepc-node", version = "0.7.0", default-features = false, features = ["download"] }
+client = { package = "corepc-client", version = "0.7.0", default-features = false, features = ["client-sync"] }
 rand = "0.8.5"
 env_logger = "0.9.0"
 

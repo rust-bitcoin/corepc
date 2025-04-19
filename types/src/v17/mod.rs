@@ -235,7 +235,7 @@ pub use self::{
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutError, GetTxOutSetInfo,
         GetTxOutSetInfoError, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
         MempoolEntryFees, MempoolEntryFeesError, ScriptPubkey, Softfork, SoftforkReject,
-        VerifyTxOutProof,
+        VerifyTxOutProof, PruneBlockchain, SaveMempool, VerifyChain,
     },
     control::{GetMemoryInfoStats, Locked, Logging},
     generating::{Generate, GenerateToAddress},
@@ -246,7 +246,7 @@ pub use self::{
     network::{
         AddedNode, AddedNodeAddress, Banned, GetAddedNodeInfo, GetNetTotals, GetNetworkInfo,
         GetNetworkInfoAddress, GetNetworkInfoError, GetNetworkInfoNetwork, GetPeerInfo, ListBanned,
-        PeerInfo, UploadTarget,
+        PeerInfo, UploadTarget, AddNode, ClearBanned, SetBan, DisconnectNode, Ping, SetNetworkActive, GetConnectionCount,
     },
     raw_transactions::{
         CreateRawTransaction, FundRawTransaction, FundRawTransactionError, SendRawTransaction,
@@ -266,7 +266,7 @@ pub use self::{
         ListUnspentItemError, ListWallets, LoadWallet, RescanBlockchain, SendMany, SendToAddress,
         SignErrorData, SignErrorDataError, SignMessage, SignRawTransactionWithWallet,
         SignRawTransactionWithWalletError, TransactionCategory, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WalletProcessPsbt,
+        WalletCreateFundedPsbtError, WalletProcessPsbt, AbandonTransaction, AbortRescan, BackupWallet, EncryptWallet, ImportAddress, ImportPrivKey, ImportPrunedFunds, ImportPubKey, ImportWallet, KeypoolRefill, LockUnspent, RemovePrunedFunds, SetHdSeed, SetTxFee, WalletLock, WalletPassPhrase, WalletPassPhraseChange,
     },
     zmq::GetZmqNotifications,
 };

@@ -290,3 +290,77 @@ fn verify_tx_out_proof(node: &Node) -> Result<(), client_sync::Error> {
 
     Ok(())
 }
+
+#[test]
+fn blockchain__prune_blockchain() {
+    const NBLOCKS: usize = 1;
+
+    let node = Node::with_wallet(Wallet::Default, &["-prune=550"]);
+    let address = node.client.new_address().expect("Failed to get new address");
+
+    let gen_result = node.client.generate_to_address(NBLOCKS, &address).expect("generate_to_address RPC call failed");
+    assert_eq!(gen_result.0.len(), NBLOCKS, "generate_to_address did not return the expected number of block hashes");
+
+    let target_height: u64 = 500;
+
+    let _ = node.client.prune_blockchain(target_height);
+}
+
+#[test]
+fn blockchain__savemempool() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+
+    node.fund_wallet();
+    let (_addr, _txid) = node.create_mempool_transaction();
+
+    // Give node a moment to process mempool tx
+    std::thread::sleep(std::time::Duration::from_millis(200));
+
+    let result = node.client.save_mempool();
+
+    // Assert based on version feature flag active during test run
+    #[cfg(any(
+        feature = "0_17_1",
+        feature = "0_18_1",
+        feature = "0_19_1",
+        feature = "0_20_2",
+        feature = "0_21_2",
+        feature = "22_1"
+    ))] {
+        result.expect("savemempool RPC call failed (v17 - v22");
+    }
+
+    #[cfg(any(
+        feature = "23_2",
+        feature = "24_2",
+        feature = "25_2",
+        feature = "26_2",
+        feature = "27_2",
+        feature = "28_0"
+    ))] {
+        let save_result = result.expect("savemempool RPC call failed (v23 - v28)");
+        assert!(!save_result.filename.is_empty(), "Filename returned by savemempool should not be empty (v23 - v28)");
+    }
+}
+
+#[test]
+fn blockchain__verify_chain() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+
+    // Test with default parameters
+    let result_default = node.client.verify_chain_default().expect("veifychain with defaults failed");
+    let result_default_value = result_default.0;
+    assert!(result_default_value, "verifychain with defaults should return true on a clean chain");
+
+    // Test with specific parameters (e.g., check first 2 blocks thoroughly)
+    let checklevel = Some(4u32);
+    let nblocks = Some(2u32);
+    let result_specific = node.client.verify_chain(checklevel, nblocks).expect("verifychain with specific args failed");
+    let result_specific_value = result_specific.0;
+    assert!(result_specific_value, "verifychain with specific args should return true on a clean chain");
+
+    // Test with only nblocks (requires null for checklevel)
+    let result_nblocks_only = node.client.verify_chain(None, Some(1)).expect("verifychain with nblocks only failed");
+    let result_nblocks_only_value = result_nblocks_only.0;
+    assert!(result_nblocks_only_value, "verifychain with nblocks only should return true");
+}

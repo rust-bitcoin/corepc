@@ -225,6 +225,8 @@
 
 // JSON-RPC types by API section.
 mod control;
+mod network;
+mod wallet;
 
 #[doc(inline)]
 pub use self::control::Logging;
@@ -253,7 +255,7 @@ pub use crate::{
         PeerInfo, RescanBlockchain, ScriptPubkey, SendMany, SendRawTransaction, SendToAddress,
         SignErrorData, SignMessage, SignRawTransactionWithWallet, SoftforkReject,
         TransactionCategory, UploadTarget, VerifyTxOutProof, WalletCreateFundedPsbt,
-        WalletProcessPsbt,
+        WalletProcessPsbt, SaveMempool, VerifyChain, AbandonTransaction, BackupWallet, ImportAddress, ImportPrivKey, ImportPrunedFunds, ImportPubKey, ImportWallet, KeypoolRefill, LockUnspent, RemovePrunedFunds, SetHdSeed, SetTxFee, WalletLock, WalletPassPhrase, WalletPassPhraseChange,
     },
     v18::{ActiveCommand, GetRpcInfo},
     v19::{
@@ -264,4 +266,5 @@ pub use crate::{
         MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, Softfork,
         SoftforkType,
     },
+    v20::{network::SetNetworkActive, wallet::{AbortRescan, EncryptWallet}},
 };

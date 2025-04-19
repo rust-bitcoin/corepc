@@ -232,7 +232,10 @@
 //! - Method does not return anything.
 //! - Method returns a simple type (e.g. bool or integer).
 //! - Method is deprecated.
+mod blockchain;
 
+#[doc(inline)]
+pub use self::blockchain::SaveMempool;
 #[doc(inline)]
 pub use crate::{
     v17::{
@@ -257,7 +260,7 @@ pub use crate::{
         ListUnspentItem, ListWallets, LoadWallet, Locked, PeerInfo, RescanBlockchain, SendMany,
         SendRawTransaction, SendToAddress, SignErrorData, SignMessage,
         SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletProcessPsbt,
+        VerifyTxOutProof, WalletCreateFundedPsbt, WalletProcessPsbt, VerifyChain, AbandonTransaction, BackupWallet, ImportAddress, ImportPrivKey, ImportPrunedFunds, ImportPubKey, ImportWallet, KeypoolRefill, LockUnspent, RemovePrunedFunds, SetHdSeed, SetTxFee, WalletLock, WalletPassPhrase, WalletPassPhraseChange,
     },
     v18::{ActiveCommand, GetRpcInfo},
     v19::{
@@ -268,6 +271,7 @@ pub use crate::{
         MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, Softfork,
         SoftforkType,
     },
+    v20::{SetNetworkActive, AbortRescan},
     v21::UnloadWallet,
     v22::{GetTxOut, GetTxOutError, Logging, ScriptPubkey},
 };

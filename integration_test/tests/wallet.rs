@@ -6,11 +6,21 @@
 
 #[cfg(feature = "TODO")]
 use bitcoin::address::{Address, NetworkChecked};
-use bitcoin::Amount;
-use integration_test::{Node, NodeExt as _, Wallet};
+use bitcoin::{Amount, Txid};
+use integration_test::{Node, NodeExt as _, Wallet, LockUnspentOutput};
 use node::AddressType;
+use std::str::FromStr;
 use node::vtype::*;             // All the version specific types.
 use node::mtype;
+use std::fs;
+
+use bitcoin::{
+    Address,
+    FeeRate,
+    Network,
+    secp256k1::{SecretKey, PublicKey},
+    key::{CompressedPublicKey, Secp256k1, PrivateKey}
+};
 
 #[test]
 #[cfg(feature = "TODO")]
@@ -281,4 +291,478 @@ fn create_load_unload_wallet() {
     }
 
     let _: LoadWallet = node.client.load_wallet(&wallet).expect("loadwallet");
+}
+
+#[test]
+fn wallet__abandon_transaction() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    // node.fund_wallet(); // Fails due to timeout, needs fixing
+    let address = node.client.new_address().expect("failed to get new address");
+
+    for _ in 0..=11 {
+        node.client.generate_to_address(10, &address).expect("failed to generate to address");
+    }
+
+    let (_, txid) = node.create_mempool_transaction();
+    let _ = node.client.abandon_transaction(txid);
+}
+
+#[test]
+fn wallet__abort_rescan() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    let result = node.client.abort_rescan();
+
+    #[cfg(any(
+        feature = "v17",
+        feature = "v18",
+        feature = "v19",
+    ))] {
+        result.expect("abortrescan RPC call failed (v17-v19)");
+    }
+
+    #[cfg(not(any(
+        feature = "v17",
+        feature = "v18",
+        feature = "v19",
+    )))] {
+        let success = result.expect("abortrescan RPC call failed (v20+");
+        assert!(!success.0, "abortrescan should return false when no scan is active (v20+)");
+    }
+}
+
+#[test]
+fn wallet__backup_wallet() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    let backup_dest = integration_test::random_tmp_file();
+
+    if backup_dest.exists() {
+        fs::remove_file(&backup_dest).expect("Failed to remove pre-existing temp file");
+    }
+
+    node.client.backup_wallet(&backup_dest).expect("backupwallet RPC call failed");
+    assert!(backup_dest.exists(), "Backup file should exist at destination");
+    assert!(backup_dest.is_file(), "Backup destination should be a file");
+
+    fs::remove_file(&backup_dest).expect("Failed to remove backup file during cleanup");
+}
+
+#[test]
+fn wallet__encrypt_wallet() {
+    let wallet_name = format!("test_encrypt_{}", rand::random::<u32>());
+    let node = Node::with_wallet(Wallet::None, &[]);
+    let _ = node.client.create_wallet(&wallet_name);
+
+    let passphrase = "my_secret_test_passphrase";
+    let encrypt_result = node.client.encrypt_wallet(passphrase);
+
+    #[cfg(any(
+        feature="v17",
+        feature="v18",
+        feature="v19"))]
+    {
+        encrypt_result.0.expect("encrypt_wallet RPC call failed (v17-v19)");
+    }
+
+    #[cfg(not(any(
+        feature="v17",
+        feature="v18",
+        feature="v19")))]
+    {
+        let return_msg = encrypt_result.expect("encrypt_wallet RPC call failed (v20+)");
+        assert!(!return_msg.0.is_empty(), "encrypt_wallet should return a non-empty string (v20+)");
+        assert!(return_msg.0.contains("wallet encrypted"), "Return message should mention encryption");
+    }
+}
+
+#[test]
+fn wallet__import_address() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_import_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet for v20+ test");
+
+            node
+        }
+    };
+
+        let secp = Secp256k1::new();
+        let mut rng = rand::thread_rng();
+
+        // Test Case 1: Import with default label and rescan
+        let secret_key = SecretKey::new(&mut rng);
+        let public_key = PublicKey::from_secret_key(&secp, &secret_key);
+        let compressed_public_key = CompressedPublicKey(public_key);
+
+        let ext_addr = Address::p2wpkh(&compressed_public_key, Network::Regtest);
+        let ext_addr_str = ext_addr.to_string();
+
+        node.client.import_address(&ext_addr_str, None, None, None).expect("importaddress with defaults failed");
+
+        // Test Case 2" Import with label, no rescan, no p2sh
+        let secret_key2 = SecretKey::new(&mut rng);
+        let public_key2 = PublicKey::from_secret_key(&secp, &secret_key2);
+        let compressed_public_key2 = CompressedPublicKey(public_key2);
+
+        let ext_addr2 = Address::p2wpkh(&compressed_public_key2, Network::Regtest);
+        let ext_addr_str2 = ext_addr2.to_string();
+        let label = "imported_watchonly";
+
+        node.client.import_address(&ext_addr_str2, Some(label), Some(false), Some(false)).expect("importaddress with options failed");
+}
+
+#[test]
+fn wallet__import_priv_key() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_importprivkey_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet for v20+ test");
+            node
+        }
+    };
+
+    let mut rng = rand::thread_rng();
+
+    // Test Case 1: Import key with label, no rescan
+    let secret_key = SecretKey::new(&mut rng);
+    let private_key = PrivateKey::new(secret_key, Network::Regtest);
+
+    let label = "imported_privkey";
+    let _ = node.client.import_priv_key(&private_key, Some(label), Some(false)).expect("importprivkey failed");
+}
+
+#[test]
+fn wallet__import_pruned_funds() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_pruned_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet for v20+ test");
+
+            node
+        }
+    };
+
+    let dummy_raw_tx = "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff01e8030000000000001976a914000000000000000000000000000000000000000088ac00000000";
+    let dummy_tx_proof = "00";
+
+    let _ = node.client.import_pruned_funds(dummy_raw_tx, dummy_tx_proof);
+}
+
+#[test]
+fn wallet__import_pubkey() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_importpubkey_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet for v20+");
+            node
+        }
+    };
+
+    let secp = Secp256k1::new();
+    let mut rng = rand::thread_rng();
+
+    let secret_key = SecretKey::new(&mut rng);
+    let public_key = PublicKey::from_secret_key(&secp, &secret_key);
+    let pub_key = bitcoin::PublicKey::new(public_key);
+
+    // Test Case 1: Import with default label and rescan
+    let label = "imported_pubkey";
+    node.client.import_pubkey(&pub_key, Some(label), Some(false)).expect("importpubkey failed");
+}
+
+#[test]
+fn wallet__import_wallet() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_source_dump_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create  legacy source wallet");
+            node
+        }
+    };
+
+    node.client.new_address().expect("Failed to generate address before dump");
+
+    let dump_file_path = integration_test::random_tmp_file();
+
+    node.client.dump_wallet(&dump_file_path).expect("dump_wallet failed");
+    assert!(dump_file_path.exists(), "Dump file should exist after dumpwallet");
+
+    node.client.import_wallet(&dump_file_path).expect("importwallet RPC call failed");
+}
+
+#[test]
+fn wallet__keypool_refill() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+
+    // Test Case 1: Refill with default size
+    node.client.keypool_refill(None).expect("keypool_refill (default) failed");
+
+    // Test Case 2: Refill with specific size
+    let specific_size = 50usize;
+    node.client.keypool_refill(Some(specific_size)).expect("keypool_refill (specific) failed");
+}
+
+#[test]
+fn wallet__lock_unspent() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet(); // Fails due to timeout, needs fixing
+    // let address = node.client.new_address().expect("failed to get new address");
+
+    // for _ in 0..=11 {
+    //     node.client.generate_to_address(10, &address).expect("failed to generate to address");
+    // }
+
+    let unspent_list = node.client.list_unspent().expect("listunspent failed during setup");
+
+    let utxo_to_lock = unspent_list.0.get(0).expect("Wallet should have at least one UTXO after funding");
+
+    let lock_target = LockUnspentOutput {
+        txid: utxo_to_lock.txid,
+        vout: u32::try_from(utxo_to_lock.vout).expect("Failed to convert vout i64 to u32 (was negative?)"),
+    };
+
+    let lock_result = node.client.lock_unspent(false, Some(&[lock_target.clone()]), None).expect("lock_unspent(false) call failed");
+    assert!(lock_result.0, "lock_unspent(false) should return true for success");
+}
+
+#[test]
+fn wallet__remove_pruned_funds() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_removepruned_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet for v20+ test");
+            node
+        }
+    };
+    node.fund_wallet();
+
+    let tx_list = node.client.list_transactions().expect("listtransactions failed during setup");
+    println!("tx list: {:#?}", tx_list);
+    let tx_to_remove = tx_list.0.get(0).expect("Wallet should have at least one transaction");
+
+    let txid_to_remove = tx_to_remove.txid;
+
+    let _ = node.client.remove_pruned_funds(txid_to_remove);
+}
+
+#[test]
+fn wallet__set_hd_seed() {
+    let node = {
+        #[cfg(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        ))] {
+            Node::with_wallet(Wallet::Default, &[])
+        }
+
+        #[cfg(not(any(
+            feature = "v17",
+            feature = "v18",
+            feature = "v19",
+        )))] {
+            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let wallet_name = format!("legacy_sethdseed_{}", rand::random::<u32>());
+            node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet for v20+ test");
+            node
+        }
+    };
+    // Test Case 1: Set new random seed, default newkeypool (true)
+    node.client.set_hd_seed(None, None).expect("sethdseed with defaults failed");
+
+    // Test Case 2: Set new random seed, newkeypool=false
+    node.client.set_hd_seed(Some(false), None).expect("sethdseed with newkeypool=false failed");
+
+    // Test Case 3: Set specific seed, newkeypool=true
+    let mut rng = rand::thread_rng();
+    let secret_key = SecretKey::new(&mut rng);
+    let private_key = PrivateKey::new(secret_key, Network::Regtest);
+
+    node.client.set_hd_seed(Some(true), Some(&private_key)).expect("sethdseed with specific seed failed");
+}
+
+#[test]
+fn wallet__set_tx_fee() {
+    // Requires a wallet loaded
+    let node = Node::with_wallet(Wallet::Default, &[]);
+
+    // Test Case 1: Set a specific fee rate >= min relay fee
+    // Min relay fee is 1 sat/vB (0.00001 BTC/kvB). Let's set 2 sat/vB.
+    let target_fee_rate = FeeRate::from_sat_per_vb(2).expect("Valid fee rate"); // 2 sat/vB
+
+    let result1 = node.client.set_tx_fee(target_fee_rate)
+        .expect("settxfee with specific rate failed"); // This should now pass
+    assert!(result1.0, "settxfee should return true for success");
+
+    // Test Case 2: Disable custom fee (set to 0)
+    // Setting to 0 is always allowed.
+    let zero_fee_rate = FeeRate::ZERO;
+
+     let result2 = node.client.set_tx_fee(zero_fee_rate)
+         .expect("settxfee with zero rate failed");
+     assert!(result2.0, "settxfee(0) should return true for success");
+}
+
+#[test]
+fn wallet__wallet_lock() {
+    let passphrase = "test_lock_passphrase";
+    let wallet_name = format!("test_lock_{}", rand::random::<u32>());
+
+    let node = Node::with_wallet(Wallet::None, &{
+         #[cfg(not(any(
+            feature="v17",
+            feature="v18",
+            feature="v19",
+        )))] {
+             &["-deprecatedrpc=create_bdb"]
+         }
+         #[cfg(any(
+            feature="v17",
+            feature="v18",
+            feature="v19",
+        ))] {
+             &[]
+         }
+    }[..]);
+
+    // Create Wallet
+    node.client.create_legacy_wallet(&wallet_name).expect("Failed to create legacy wallet");
+
+    // Encrypt Wallet
+    node.client.encrypt_wallet(passphrase).expect("encryptwallet RPC call failed");
+
+    // Test walletlock
+    node.client.wallet_lock().expect("walletlock RPC call failed");
+}
+
+#[test]
+fn wallet__wallet_passphrase_and_lock() {
+    let passphrase = "test_passphrase_passphrase";
+    let wallet_name = format!("test_passphrase_{}", rand::random::<u32>());
+
+    let node = Node::with_wallet(Wallet::None, &{
+         #[cfg(not(any(
+            feature="v17",
+            feature="v18",
+            feature="v19",
+        )))] {
+             &["-deprecatedrpc=create_bdb"]
+         }
+         #[cfg(any(
+            feature="v17",
+            feature="v18",
+            feature="v19",
+        ))] {
+             &[]
+         }
+    }[..]);
+
+    node.client.create_legacy_wallet(&wallet_name).expect("Failed to create a legacy wallet");
+
+    let _ = node.client.encrypt_wallet(passphrase);
+
+    // walletpassphrase
+    let unlock_duration = 60u64;
+    node.client.wallet_passphrase(passphrase, unlock_duration)
+        .expect("walletpassphrase RPC call failed");
+
+    // Verify Unlocked
+    node.client.new_address().expect("Verification failed for wallet unlocked");
+    node.client.wallet_lock().expect("walletlock RPC call failed");
+}
+
+#[test]
+fn wallet__wallet_passphrase_change() {
+    let initial_passphrase = "initial_secret_for_change";
+    let new_passphrase = "new_secret_after_change";
+    let wallet_name = format!("test_pwchange_{}", rand::random::<u32>());
+
+    let node = Node::with_wallet(Wallet::None, &[]);
+
+    // Create Wallet & Encrypt Wallet
+    node.client.create_wallet(&wallet_name).expect("Unable to create wallet");
+    node.client.encrypt_wallet(initial_passphrase).expect("Unable to encrypt wallet");
+    // Test walletpassphrasechange
+    node.client.wallet_passphrase_change(initial_passphrase, new_passphrase)
+        .expect("walletpassphrasechange RPC call failed");
+    // Try unlocking with the NEW passphrase (should succeed)
+    node.client.wallet_passphrase(new_passphrase, 60)
+        .expect("walletpassphrase failed with NEW passphrase");
 }

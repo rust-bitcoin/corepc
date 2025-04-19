@@ -465,3 +465,368 @@ macro_rules! impl_client_v17__walletprocesspsbt {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `abandontransaction`
+#[macro_export]
+macro_rules! impl_client_v17__abandontransaction {
+    () => {
+        impl Client {
+            pub fn abandon_transaction(&self, txid: Txid) -> Result<AbandonTransaction> {
+                match self.call("abandontransaction", &[into_json(txid)?]) {
+                    Ok(serde_json::Value::Null) => Ok(AbandonTransaction),
+                    Ok(ref val) if val.is_null() => Ok(AbandonTransaction),
+                    Ok(other) => Err(Error::Returned(format!("abandontransaction expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `abortrescan`
+#[macro_export]
+macro_rules! impl_client_v17__abortrescan {
+    () => {
+        impl Client {
+            pub fn abort_rescan(&self) -> Result<AbortRescan> {
+                match self.call("abortrescan", &[]) {
+                    Ok(serde_json::Value::Null) => Ok(AbortRescan),
+                    Ok(ref val) if val.is_null() => Ok(AbortRescan),
+                    Ok(other) => Err(Error::Returned(format!("abortrescan expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `backupwallet`
+#[macro_export]
+macro_rules! impl_client_v17__backupwallet {
+    () => {
+        impl Client {
+            pub fn backup_wallet(&self, destination: &Path) -> Result<BackupWallet> {
+                let dest_str = destination.to_string_lossy();
+                match self.call("backupwallet", &[dest_str.as_ref().into()]) {
+                    Ok(serde_json::Value::Null) => Ok(BackupWallet),
+                    Ok(ref val) if val.is_null() => Ok(BackupWallet),
+                    Ok(other) => Err(Error::Returned(format!("backupwallet expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `encryptwallet`
+#[macro_export]
+macro_rules! impl_client_v17__encryptwallet {
+    () => {
+        impl Client {
+            pub fn encrypt_wallet(&self, passphrase: &str) -> Result<EncryptWallet> {
+                match self.call("encryptwallet", &[passphrase.into()]) {
+                    Ok(serde_json::Value::Null) => Ok(EncryptWallet),
+                    Ok(ref val) if val.is_null() => Ok(EncryptWallet),
+                    Ok(other) => Err(Error::Returned(format!("encryptwallet v17-v19 expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `importaddress`
+#[macro_export]
+macro_rules! impl_client_v17__importaddress {
+    () => {
+        impl Client {
+            pub fn import_address(
+                &self,
+                address_or_script: &str,
+                label: Option<&str>,
+                rescan: Option<bool>,
+                p2sh: Option<bool>,
+            ) -> Result<ImportAddress> {
+                let mut params = vec![address_or_script.into()];
+
+                if label.is_some() || rescan.is_some() || p2sh.is_some() {
+                    params.push(label.map_or(serde_json::Value::String("".into()), |l| l.into()));
+                }
+
+                if rescan.is_some() || p2sh.is_some() {
+                    params.push(rescan.map_or(true.into(), |r| r.into()));
+                }
+
+                if let Some(p) = p2sh {
+                    params.push(p.into());
+                }
+
+                match self.call("importaddress", &params) {
+                    Ok(serde_json::Value::Null) => Ok(ImportAddress),
+                    Ok(ref val) if val.is_null() => Ok(ImportAddress),
+                    Ok(other) => Err(Error::Returned(format!(
+                        "importaddress expected null, got: {}", other
+                    ))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `importprunedfunds`
+#[macro_export]
+macro_rules! impl_client_v17__importprunedfunds {
+    () => {
+        impl Client {
+            pub fn import_pruned_funds(
+                &self,
+                raw_transaction: &str,
+                txout_proof: &str,
+            ) -> Result<ImportPrunedFunds> {
+                match self.call("importprunedfunds", &[raw_transaction.into(), txout_proof.into()]) {
+                    Ok(serde_json::Value::Null) => Ok(ImportPrunedFunds),
+                    Ok(ref val) if val.is_null() => Ok(ImportPrunedFunds),
+                    Ok(other) => Err(Error::Returned(format!(
+                        "importprunedfunds expected null, got: {}", other
+                    ))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `importpubkey`
+#[macro_export]
+macro_rules! impl_client_v17__importpubkey {
+    () => {
+        impl Client {
+            pub fn import_pubkey(
+                &self,
+                pubkey: &PublicKey,
+                label: Option<&str>,
+                rescan: Option<bool>,
+            ) -> Result<ImportPubKey> {
+                let pubkey_hex = pubkey.to_string();
+                let mut params = vec![pubkey_hex.into()];
+
+                if label.is_some() || rescan.is_some() {
+                    params.push(label.map_or(serde_json::Value::String("".into()), |l| l.into()));
+                }
+
+                if let Some(r) = rescan {
+                    params.push(r.into());
+                }
+
+                match self.call("importpubkey", &params) {
+                    Ok(serde_json::Value::Null) => Ok(ImportPubKey),
+                    Ok(ref val) if val.is_null() => Ok(ImportPubKey),
+                    Ok(other) => Err(Error::Returned(format!(
+                        "importpubkey expected null, got: {}", other
+                    ))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `importwallet`
+#[macro_export]
+macro_rules! impl_client_v17__importwallet {
+    () => {
+        impl Client {
+            pub fn import_wallet(&self, filename: &Path) -> Result<ImportWallet> {
+                let filename_str = filename.to_string_lossy();
+                match self.call("importwallet", &[filename_str.as_ref().into()]) {
+                    Ok(serde_json::Value::Null) => Ok(ImportWallet),
+                    Ok(ref val) if val.is_null() => Ok(ImportWallet),
+                    Ok(other) => Err(Error::Returned(format!("importwallet expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `keypoolrefill`
+#[macro_export]
+macro_rules! impl_client_v17__keypoolrefill {
+    () => {
+        impl Client {
+            pub fn keypool_refill(&self, new_size: Option<usize>) -> Result<KeypoolRefill> {
+                let params = match new_size {
+                    Some(size) => vec![size.into()],
+                    None => vec![],
+                };
+
+                match self.call("keypoolrefill", &params) {
+                    Ok(serde_json::Value::Null) => Ok(KeypoolRefill),
+                    Ok(ref val) if val.is_null() => Ok(KeypoolRefill),
+                    Ok(other) => Err(Error::Returned(format!("keypoolrefill expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `lockunspent`
+#[macro_export]
+macro_rules! impl_client_v17__lockunspent {
+    () => {
+        use crate::client_sync::LockUnspentOutput;
+        impl Client {
+            pub fn lock_unspent(
+                &self,
+                unlock: bool,
+                outputs: Option<&[LockUnspentOutput]>,
+                persistent: Option<bool>,
+            ) -> Result<LockUnspent> {
+                let mut params = vec![unlock.into()];
+
+                match outputs {
+                    Some(outs) => params.push(serde_json::to_value(outs)?),
+                    None => {
+                        if unlock {
+                            params.push(serde_json::Value::Array(vec![]));
+                        } else {
+                            return Err(Error::Returned("lockunspent requires specific outputs when locking (unlock=false)".to_string()));
+                        }
+                    }
+                }
+
+                if !unlock {
+                    if let Some(p) = persistent {
+                        if params.len() == 1 {
+                            params.push(serde_json::Value::Array(vec![]));
+                        }
+                        params.push(p.into());
+                    }
+                }
+                self.call("lockunspent", &params)
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `removeprunedfunds`
+#[macro_export]
+macro_rules! impl_client_v17__removeprunedfunds {
+    () => {
+        impl Client {
+            pub fn remove_pruned_funds(&self, txid: Txid) -> Result<RemovePrunedFunds> {
+                match self.call("removeprunedfunds", &[into_json(txid)?]) {
+                    Ok(serde_json::Value::Null) => Ok(RemovePrunedFunds),
+                    Ok(ref val) if val.is_null() => Ok(RemovePrunedFunds),
+                    Ok(other) => Err(Error::Returned(format!("removeprunedfunds expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `sethdseed`
+#[macro_export]
+macro_rules! impl_client_v17__sethdseed {
+    () => {
+        impl Client {
+            pub fn set_hd_seed(
+                &self,
+                new_keypool: Option<bool>,
+                seed: Option<&PrivateKey>,
+            ) -> Result<SetHdSeed> {
+                let mut params = vec![];
+
+                if new_keypool.is_some() || seed.is_some() {
+                    params.push(new_keypool.map_or(true.into(), |k| k.into()));
+                }
+
+                if let Some(s) = seed {
+                    params.push(s.to_wif().into());
+                }
+
+                match self.call("sethdseed", &params) {
+                    Ok(serde_json::Value::Null) => Ok(SetHdSeed),
+                    Ok(ref val) if val.is_null() => Ok(SetHdSeed),
+                    Ok(other) => Err(Error::Returned(format!("sethdseed expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `settxfee`
+#[macro_export]
+macro_rules! impl_client_v17__settxfee {
+    () => {
+        const SATS_PER_BTC_F64_SETTXFEE: f64 = 100_000_000.0;
+        fn fee_rate_to_rpc_arg_settxfee(fee_rate: bitcoin::FeeRate) -> f64 {
+            let sat_per_kwu = fee_rate.to_sat_per_kwu();
+            let sat_per_kvb = (sat_per_kwu as f64) * 4.0;
+            sat_per_kvb / SATS_PER_BTC_F64_SETTXFEE
+        }
+
+        impl Client {
+            pub fn set_tx_fee(&self, fee_rate: bitcoin::FeeRate) -> Result<SetTxFee> {
+                let amount_rpc_arg = fee_rate_to_rpc_arg_settxfee(fee_rate);
+
+                self.call("settxfee", &[amount_rpc_arg.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `walletlock`
+#[macro_export]
+macro_rules! impl_client_v17__walletlock {
+    () => {
+        impl Client {
+            pub fn wallet_lock(&self) -> Result<WalletLock> {
+                match self.call("walletlock", &[]) {
+                    Ok(serde_json::Value::Null) => Ok(WalletLock),
+                    Ok(ref val) if val.is_null() => Ok(WalletLock),
+                    Ok(other) => Err(Error::Returned(format!("walletlock expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `walletpassphrase`
+#[macro_export]
+macro_rules! impl_client_v17__walletpassphrase {
+    () => {
+        impl Client {
+            pub fn wallet_passphrase(&self, passphrase: &str, timeout: u64) -> Result<WalletPassPhrase> {
+                match self.call("walletpassphrase", &[passphrase.into(), timeout.into()]) {
+                    Ok(serde_json::Value::Null) => Ok(WalletPassPhrase),
+                    Ok(ref val) if val.is_null() => Ok(WalletPassPhrase),
+                    Ok(other) => Err(Error::Returned(format!("walletpassphrase expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `walletpassphrasechange`
+#[macro_export]
+macro_rules! impl_client_v17__walletpassphrasechange {
+    () => {
+        impl Client {
+            pub fn wallet_passphrase_change(&self, old_passphrase: &str, new_passphrase: &str) -> Result<WalletPassPhraseChange> {
+                match self.call("walletpassphrasechange", &[old_passphrase.into(), new_passphrase.into()]) {
+                    Ok(serde_json::Value::Null) => Ok(WalletPassPhraseChange),
+                    Ok(ref val) if val.is_null() => Ok(WalletPassPhraseChange),
+                    Ok(other) => Err(Error::Returned(format!("walletpassphrasechange expected null, got: {}", other))),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}

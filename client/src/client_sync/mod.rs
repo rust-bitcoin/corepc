@@ -262,3 +262,67 @@ pub enum TemplateRules {
     /// Taproot supported.
     Taproot,
 }
+
+/// Args for the `addnode` method
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum AddNodeCommand {
+    Add,
+    Remove,
+    OneTry,
+}
+
+/// Args for the `setban` method
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum SetBanCommand {
+    Add,
+    Remove,
+}
+
+/// Args for the `lockunspent` method
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub struct LockUnspentOutput {
+    /// The transaction id
+    pub txid: Txid,
+    /// The output number
+    pub vout: u32,
+}
+
+/// Args for the `scantxoutset`
+///
+/// Represents the action for the `scantxoutset` RPC call.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ScanAction {
+    Start,
+    Abort,
+    Status,
+}
+
+/// Represents the range for HD descriptor scanning.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ScanRange {
+    Single(u64),
+    Range([u64; 2]),
+}
+
+// Helper function for serde default
+fn default_scan_range() -> ScanRange {
+    // Default range is 1000 as per Bitcoin Core docs
+    ScanRange::Single(1000)
+}
+
+/// Represents a scan object for scantxoutset, either a descriptor string
+/// or an object with descriptor and range.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ScanObject {
+    Descriptor(String),
+    WithRange {
+        desc: String,
+        #[serde(default = "default_scan_range")]
+        range: ScanRange,
+    },
+}
