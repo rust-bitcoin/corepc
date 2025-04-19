@@ -2,7 +2,7 @@
 
 use std::{error, fmt, io};
 
-use bitcoin::{hex, secp256k1};
+use bitcoin::hex;
 
 /// The error type for errors produced in this library.
 #[derive(Debug)]
@@ -12,9 +12,7 @@ pub enum Error {
     HexToBytes(hex::HexToBytesError),
     Json(serde_json::error::Error),
     BitcoinSerialization(bitcoin::consensus::encode::FromHexError),
-    Secp256k1(secp256k1::Error),
     Io(io::Error),
-    InvalidAmount(bitcoin::amount::ParseAmountError),
     InvalidCookieFile,
     /// The JSON result had an unexpected structure.
     UnexpectedStructure,
@@ -46,16 +44,8 @@ impl From<bitcoin::consensus::encode::FromHexError> for Error {
     fn from(e: bitcoin::consensus::encode::FromHexError) -> Error { Error::BitcoinSerialization(e) }
 }
 
-impl From<secp256k1::Error> for Error {
-    fn from(e: secp256k1::Error) -> Error { Error::Secp256k1(e) }
-}
-
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error { Error::Io(e) }
-}
-
-impl From<bitcoin::amount::ParseAmountError> for Error {
-    fn from(e: bitcoin::amount::ParseAmountError) -> Error { Error::InvalidAmount(e) }
 }
 
 impl fmt::Display for Error {
@@ -68,9 +58,7 @@ impl fmt::Display for Error {
             HexToBytes(ref e) => write!(f, "hex to bytes decode error: {}", e),
             Json(ref e) => write!(f, "JSON error: {}", e),
             BitcoinSerialization(ref e) => write!(f, "Bitcoin serialization error: {}", e),
-            Secp256k1(ref e) => write!(f, "secp256k1 error: {}", e),
             Io(ref e) => write!(f, "I/O error: {}", e),
-            InvalidAmount(ref e) => write!(f, "invalid amount: {}", e),
             InvalidCookieFile => write!(f, "invalid cookie file"),
             UnexpectedStructure => write!(f, "the JSON result had an unexpected structure"),
             Returned(ref s) => write!(f, "the daemon returned an error string: {}", s),
@@ -90,9 +78,7 @@ impl error::Error for Error {
             HexToBytes(ref e) => Some(e),
             Json(ref e) => Some(e),
             BitcoinSerialization(ref e) => Some(e),
-            Secp256k1(ref e) => Some(e),
             Io(ref e) => Some(e),
-            InvalidAmount(ref e) => Some(e),
             ServerVersion(ref e) => Some(e),
             InvalidCookieFile | UnexpectedStructure | Returned(_) | MissingUserPassword => None,
         }
