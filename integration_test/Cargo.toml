@@ -13,6 +13,7 @@ edition = "2021"
 [features]
 # Enable the same feature in `node` and the version feature here.
 # All minor releases of the latest three versions.
+29_0 = ["v29", "node/29_0"]
 28_0 = ["v28", "node/28_0"]
 27_2 = ["v27", "node/27_2"]
 27_1 = ["v27", "node/27_1"]
@@ -33,6 +34,7 @@ edition = "2021"
 
 # These features are just for internal use (feature gating).
 # Each major version is tested with the same client.
+v29 = []
 v28 = []
 v27 = []
 v26 = []
