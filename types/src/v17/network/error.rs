@@ -21,8 +21,9 @@ impl fmt::Display for GetNetworkInfoError {
 
         match *self {
             E::RelayFee(ref e) => write_err!(f, "conversion of the `relay_fee` field failed"; e),
-            E::IncrementalFee(ref e) =>
-                write_err!(f, "conversion of the `incremental_fee` field failed"; e),
+            E::IncrementalFee(ref e) => {
+                write_err!(f, "conversion of the `incremental_fee` field failed"; e)
+            }
         }
     }
 }

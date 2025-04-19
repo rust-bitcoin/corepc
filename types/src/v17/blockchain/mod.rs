@@ -251,6 +251,9 @@ pub struct GetBlockHeaderVerbose {
     pub nonce: i64,
     /// The bits.
     pub bits: String,
+    /// The difficulty target (hex-encoded). From v29+
+    #[serde(default)]
+    pub target: Option<String>,
     /// The difficulty.
     pub difficulty: f64,
     /// Expected number of hashes required to produce the current chain (in hex).

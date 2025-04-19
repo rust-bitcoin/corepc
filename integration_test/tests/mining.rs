@@ -6,8 +6,7 @@
 
 use bitcoin::SignedAmount;
 use integration_test::{Node, NodeExt as _, Wallet};
-use node::client::client_sync::{TemplateRequest, TemplateRules};
-use node::vtype::*;             // All the version specific types.
+use node::vtype::*;
 use node::mtype;
 
 #[test]
@@ -15,16 +14,36 @@ fn mining__get_block_template__modelled() {
     // Requires connected nodes otherwise the RPC call errors.
     let (node1, node2, node3) = integration_test::three_node_network();
 
-    // Use the nodes otherwise they get dropped.
     node1.mine_a_block();
     node2.mine_a_block();
     node3.mine_a_block();
+    std::thread::sleep(std::time::Duration::from_millis(500));
 
-    let options = TemplateRequest { rules: vec![TemplateRules::Segwit] };
+    #[cfg(not(feature = "v29"))]
+    {
+        use node::client::client_sync::{TemplateRequest, TemplateRules};
 
-    let json: GetBlockTemplate = node1.client.get_block_template(&options).expect("rpc");
-    let model: Result<mtype::GetBlockTemplate, GetBlockTemplateError> = json.into_model();
-    model.unwrap();
+        let options = TemplateRequest { rules: vec![TemplateRules::Segwit] };
+        let result: GetBlockTemplate = node1.client.get_block_template(&options)
+            .expect("get_block_template RPC failed (pre-v29)");
+        let _ = result.into_model();
+    }
+
+    #[cfg(feature = "v29")]
+    {
+        use node::client::client_sync::TemplateRequestV29;
+
+        let request_v29 = TemplateRequestV29 {
+            rules: vec!["segwit".to_string()],
+            mode: Some("template".to_string()),
+            ..Default::default()
+        };
+
+        let result_v29 = node1.client.get_block_template(&request_v29)
+            .expect("get_block_template RPC failed (v29)");
+
+        let _ = result_v29.into_model();
+    }
 }
 
 #[test]

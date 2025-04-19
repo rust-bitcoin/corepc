@@ -23,6 +23,8 @@ pub enum GetBlockVerboseOneError {
     Bits(UnprefixedHexError),
     /// Conversion of the transaction `chain_work` field failed.
     ChainWork(UnprefixedHexError),
+    /// Conversion of the `target` field failed.
+    Target(UnprefixedHexError),
     /// Conversion of the transaction `previous_block_hash` field failed.
     PreviousBlockHash(hex::HexToArrayError),
     /// Conversion of the transaction `next_block_hash` field failed.
@@ -39,10 +41,13 @@ impl fmt::Display for GetBlockVerboseOneError {
             Tx(ref e) => write_err!(f, "conversion of the `tx` field failed"; e),
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
-            NextBlockHash(ref e) =>
-                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
+            PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e)
+            }
+            NextBlockHash(ref e) => {
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e)
+            }
         }
     }
 }
@@ -58,6 +63,7 @@ impl std::error::Error for GetBlockVerboseOneError {
             Tx(ref e) => Some(e),
             Bits(ref e) => Some(e),
             ChainWork(ref e) => Some(e),
+            Target(ref e) => Some(e),
             PreviousBlockHash(ref e) => Some(e),
             NextBlockHash(ref e) => Some(e),
         }
@@ -75,6 +81,10 @@ pub enum GetBlockchainInfoError {
     Numeric(NumericError),
     /// Conversion of the `chain` field failed.
     Chain(network::ParseNetworkError),
+    /// Conversion of the transaction `bits` field failed.
+    Bits(UnprefixedHexError),
+    /// Conversion of the `target` field failed.
+    Target(UnprefixedHexError),
     /// Conversion of the `best_block_hash` field failed.
     BestBlockHash(hex::HexToArrayError),
     /// Conversion of the `chain_work` field failed.
@@ -88,8 +98,11 @@ impl fmt::Display for GetBlockchainInfoError {
         match *self {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             Chain(ref e) => write_err!(f, "conversion of the `chain` field failed"; e),
-            BestBlockHash(ref e) =>
-                write_err!(f, "conversion of the `best_block_hash` field failed"; e),
+            Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
+            Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
+            BestBlockHash(ref e) => {
+                write_err!(f, "conversion of the `best_block_hash` field failed"; e)
+            }
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
         }
     }
@@ -103,6 +116,8 @@ impl std::error::Error for GetBlockchainInfoError {
         match *self {
             Numeric(ref e) => Some(e),
             Chain(ref e) => Some(e),
+            Bits(ref e) => Some(e),
+            Target(ref e) => Some(e),
             BestBlockHash(ref e) => Some(e),
             ChainWork(ref e) => Some(e),
         }
@@ -158,6 +173,8 @@ pub enum GetBlockHeaderVerboseError {
     Bits(UnprefixedHexError),
     /// Conversion of `chain_work` field failed.
     ChainWork(UnprefixedHexError),
+    /// Conversion of `target` field failed.
+    Target(UnprefixedHexError),
     /// Conversion of `previous_block_hash` field failed.
     PreviousBlockHash(hex::HexToArrayError),
     /// Conversion of `next_block_hash` field failed.
@@ -174,10 +191,13 @@ impl fmt::Display for GetBlockHeaderVerboseError {
             MerkleRoot(ref e) => write_err!(f, "conversion of the `merkle_root` field failed"; e),
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_bock_hash` field failed"; e),
-            NextBlockHash(ref e) =>
-                write_err!(f, "conversion of the `next_bock_hash` field failed"; e),
+            Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
+            PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_bock_hash` field failed"; e)
+            }
+            NextBlockHash(ref e) => {
+                write_err!(f, "conversion of the `next_bock_hash` field failed"; e)
+            }
         }
     }
 }
@@ -193,6 +213,7 @@ impl std::error::Error for GetBlockHeaderVerboseError {
             MerkleRoot(ref e) => Some(e),
             Bits(ref e) => Some(e),
             ChainWork(ref e) => Some(e),
+            Target(ref e) => Some(e),
             PreviousBlockHash(ref e) => Some(e),
             NextBlockHash(ref e) => Some(e),
         }
@@ -290,8 +311,9 @@ impl fmt::Display for GetChainTxStatsError {
 
         match *self {
             Numeric(ref e) => write_err!(f, "numeric"; e),
-            WindowFinalBlockHash(ref e) =>
-                write_err!(f, "conversion of the `window_final_block_hash` field failed"; e),
+            WindowFinalBlockHash(ref e) => {
+                write_err!(f, "conversion of the `window_final_block_hash` field failed"; e)
+            }
         }
     }
 }
@@ -495,8 +517,9 @@ impl fmt::Display for GetTxOutError {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             BestBlock(ref e) => write_err!(f, "conversion of the `beast_block` field failed"; e),
             Value(ref e) => write_err!(f, "conversion of the `value` field failed"; e),
-            ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
+            ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the `script_pubkey` field failed"; e)
+            }
             Addresses(ref e) => write_err!(f, "conversion of the `addresses` field failed"; e),
         }
     }

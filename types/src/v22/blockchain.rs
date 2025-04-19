@@ -103,8 +103,9 @@ impl fmt::Display for GetTxOutError {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             BestBlock(ref e) => write_err!(f, "conversion of the `beast_block` field failed"; e),
             Value(ref e) => write_err!(f, "conversion of the `value` field failed"; e),
-            ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
+            ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the `script_pubkey` field failed"; e)
+            }
             Addresses(ref e) => write_err!(f, "conversion of the `addresses` field failed"; e),
         }
     }
