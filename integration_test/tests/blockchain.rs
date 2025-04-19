@@ -36,6 +36,7 @@ fn blockchain__get_block__modelled() {
     // assert!(json.into_model().is_ok());
 }
 
+#[cfg(not(feature = "v29"))]
 #[test]
 fn blockchain__get_blockchain_info__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
@@ -304,4 +305,13 @@ fn verify_tx_out_proof(node: &Node) -> Result<(), client_sync::Error> {
     assert_eq!(txids.0.len(), 1);
 
     Ok(())
+}
+
+#[test]
+#[cfg(feature = "v29")]
+fn blockchain__get_descriptor_activity__modelled() {
+    let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);
+
+    let res: GetDescriptorActivity = node.client.get_descriptor_activity(&[], &[], false).expect("get_descriptor_activity(None, None, None) failed");
+    let _: Result<mtype::GetDescriptorActivity, GetDescriptorActivityError> = res.into_model();
 }

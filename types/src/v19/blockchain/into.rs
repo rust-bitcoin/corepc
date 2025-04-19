@@ -36,6 +36,8 @@ impl GetBlockchainInfo {
             blocks: crate::to_u32(self.blocks, "blocks")?,
             headers: crate::to_u32(self.headers, "headers")?,
             best_block_hash,
+            bits: None,
+            target: None,
             difficulty: self.difficulty,
             median_time: crate::to_u32(self.median_time, "median_time")?,
             verification_progress: self.verification_progress,
@@ -47,6 +49,7 @@ impl GetBlockchainInfo {
             automatic_pruning: self.automatic_pruning,
             prune_target_size,
             softforks,
+            signet_challenge: None,
             warnings: vec![self.warnings],
         })
     }
