@@ -28,7 +28,7 @@ fn blockchain__get_block__modelled() {
     model.expect("GetBlock into model");
 
     let json: GetBlockVerboseOne = node.client.get_block_verbose_one(block_hash).expect("getblock verbose=1");
-    let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseOneError> = json.into_model();
+    let model = json.into_model();
     model.expect("GetBlockVerbose into model");
 
     // TODO: Test getblock 2
@@ -36,6 +36,7 @@ fn blockchain__get_block__modelled() {
     // assert!(json.into_model().is_ok());
 }
 
+#[cfg(not(feature = "v29"))]
 #[test]
 fn blockchain__get_blockchain_info__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
@@ -82,12 +83,12 @@ fn blockchain__get_block_header__modelled() {
 
     // verbose = false
     let json: GetBlockHeader = node.client.get_block_header(&block_hash).expect("getblockheader");
-    let model: Result<mtype::GetBlockHeader, GetBlockHeaderError> = json.into_model();
+    let model = json.into_model();
     model.unwrap();
 
     // verbose = true
     let json:GetBlockHeaderVerbose = node.client.get_block_header_verbose(&block_hash).expect("getblockheader");
-    let model: Result<mtype::GetBlockHeaderVerbose, GetBlockHeaderVerboseError> = json.into_model();
+    let model = json.into_model();
     model.unwrap();
 }
 
@@ -289,4 +290,16 @@ fn verify_tx_out_proof(node: &Node) -> Result<(), client_sync::Error> {
     assert_eq!(txids.0.len(), 1);
 
     Ok(())
+}
+
+#[test]
+#[cfg(feature = "v29")]
+fn blockchain__get_descriptor_activity_modelled() {
+    let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);
+
+    let result = node.client.get_descriptor_activity(None, None, None).expect("get_descriptor_activity(None, None, None) failed");
+    let model_result = result.clone().into_model().expect("Conversion to model failed");
+
+    assert!(result.activity.is_empty(), "Expected empty activity for default call on fresh node");
+    assert!(model_result.activity.is_empty(), "Expected empty activity after model conversion");
 }

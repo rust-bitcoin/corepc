@@ -15,6 +15,7 @@ pub mod v25;
 pub mod v26;
 pub mod v27;
 pub mod v28;
+pub mod v29;
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -261,4 +262,19 @@ pub enum TemplateRules {
     Csv,
     /// Taproot supported.
     Taproot,
+}
+
+/// Arg for the `getblocktemplate` method. (v29+).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+pub struct TemplateRequestV29 {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mode: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub capabilities: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub rules: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub longpollid: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<String>,
 }

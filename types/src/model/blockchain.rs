@@ -9,8 +9,8 @@ use alloc::collections::BTreeMap;
 
 use bitcoin::address::NetworkUnchecked;
 use bitcoin::{
-    block, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, TxMerkleNode, TxOut,
-    Txid, Weight, Work, Wtxid,
+    block, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptBuf, Target,
+    TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
 };
 use serde::{Deserialize, Serialize};
 
@@ -217,6 +217,8 @@ pub struct GetBlockHeaderVerbose {
     pub nonce: u32,
     /// The target value below which the blockhash must lie.
     pub bits: CompactTarget,
+    /// The difficulty target (hex-encoded). Present in v29+
+    pub target: Option<Target>,
     /// The difficulty.
     pub difficulty: f64,
     /// Expected number of hashes required to produce the current chain.
@@ -486,3 +488,72 @@ pub struct GetTxOutSetInfo {
 /// Models the result of JSON-RPC method `verifytxoutproof`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct VerifyTxOutProof(pub Vec<Txid>);
+
+/// Models the result of the JSON-RPC method `getdescriptoractivity`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetDescriptorActivity {
+    /// A list of activity events related to the descriptors.
+    pub activity: Vec<ActivityEntry>,
+}
+
+/// Models a script pubkey with strongly typed fields.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ScriptPubkey {
+    /// Script assembly representation.
+    pub asm: String,
+    /// Script hex converted to `bitcoin::ScriptBuf`.
+    pub hex: ScriptBuf,
+    /// The type, eg "pubkeyhash".
+    #[serde(rename = "type")]
+    pub type_: String,
+    /// Bitcoin address (only if a well-defined address exists), parsed into `bitcoin::Address`.
+    pub address: Option<Address<NetworkUnchecked>>,
+}
+
+/// Models a 'spend' activity event with strongly typed fields.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct SpendActivity {
+    /// The total amount in BTC of the spent output, converted to `bitcoin::Amount`.
+    pub amount: Amount,
+    /// The blockhash (omitted if unconfirmed), parsed into `bitcoin::BlockHash`.
+    pub block_hash: Option<BlockHash>,
+    /// Height of the spend (omitted if unconfirmed).
+    pub height: Option<u32>,
+    /// The txid of the spending transaction, parsed into `bitcoin::Txid`.
+    pub spend_txid: Txid,
+    /// The vout of the spend.
+    pub spend_vout: u32,
+    /// The txid of the prevout, parsed into `bitcoin::Txid`.
+    pub prevout_txid: Txid,
+    /// The vout of the prevout.
+    pub prevout_vout: u32,
+    /// The prev scriptPubKey, converted to `model::ScriptPubkey`.
+    pub prevout_spk: ScriptPubkey,
+}
+
+/// Models a 'receive' activity event with strongly typed fields.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ReceiveActivity {
+    /// The total amount in BTC of the new output, converted to `bitcoin::Amount`.
+    pub amount: Amount,
+    /// The block that this receive is in (omitted if unconfirmed), parsed into `bitcoin::BlockHash`.
+    pub block_hash: Option<BlockHash>,
+    /// The height of the receive (omitted if unconfirmed).
+    pub height: Option<u32>,
+    /// The txid of the receiving transaction, parsed into `bitcoin::Txid`.
+    pub txid: Txid,
+    /// The vout of the receiving output.
+    pub vout: u32,
+    /// The ScriptPubKey, converted to `model::ScriptPubkey`.
+    pub output_spk: ScriptPubkey,
+}
+
+/// Enum representing either a spend or receive activity entry using model types.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum ActivityEntry {
+    /// The spend activity using `model::SpendActivity`.
+    Spend(SpendActivity),
+    /// The receive activity using `model::ReceiveActivity`.
+    Receive(ReceiveActivity),
+}

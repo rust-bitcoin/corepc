@@ -24,15 +24,12 @@ impl fmt::Display for SubmitPackageError {
         use SubmitPackageError as E;
 
         match *self {
-            E::TxResultKey(ref e) => {
-                write_err!(f, "conversion of key from `tx_results` map failed"; e)
-            }
-            E::TxResultValue(ref e) => {
-                write_err!(f, "conversion of value from `tx_results` map failed"; e)
-            }
-            E::ReplaceTransactions(ref e) => {
-                write_err!(f, "conversion of a list item from `replaced_transactions` field failed"; e)
-            }
+            E::TxResultKey(ref e) =>
+                write_err!(f, "conversion of key from `tx_results` map failed"; e),
+            E::TxResultValue(ref e) =>
+                write_err!(f, "conversion of value from `tx_results` map failed"; e),
+            E::ReplaceTransactions(ref e) =>
+                write_err!(f, "conversion of a list item from `replaced_transactions` field failed"; e),
         }
     }
 }
@@ -70,9 +67,8 @@ impl fmt::Display for SubmitPackageTxResultError {
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
             E::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
-            E::OtherWtxid(ref e) => {
-                write_err!(f, "conversion of the `other_wtxid` field failed"; e)
-            }
+            E::OtherWtxid(ref e) =>
+                write_err!(f, "conversion of the `other_wtxid` field failed"; e),
             E::Fees(ref e) => write_err!(f, "conversion of the `fees` field failed"; e),
         }
     }
@@ -113,9 +109,8 @@ impl fmt::Display for SubmitPackageTxResultFeesError {
 
         match *self {
             E::BaseFee(ref e) => write_err!(f, "conversion of the `base_fee` field failed"; e),
-            E::EffectiveFeeRate(ref e) => {
-                write_err!(f, "conversion of the `effective_fee_rate` field failed"; e)
-            }
+            E::EffectiveFeeRate(ref e) =>
+                write_err!(f, "conversion of the `effective_fee_rate` field failed"; e),
             E::EffectiveIncludes(ref e) => write_err!(f, "effective_includes"; e),
         }
     }

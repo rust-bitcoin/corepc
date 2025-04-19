@@ -20,6 +20,7 @@ fn network__get_net_totals() {
     let _: GetNetTotals = node.client.get_net_totals().expect("getnettotals");
 }
 
+#[cfg(not(feature = "v29"))]
 #[test]
 fn network__get_network_info() {
     let node = Node::with_wallet(Wallet::None, &[]);

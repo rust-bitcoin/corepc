@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::{block, hex, Block, BlockHash, CompactTarget, Txid, Weight, Work};
+use bitcoin::{block, hex, Block, BlockHash, CompactTarget, Target, Txid, Weight, Work};
 
 // TODO: Use explicit imports?
 use super::*;
@@ -174,6 +174,12 @@ impl GetBlockHeaderVerbose {
         let merkle_root = self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?;
         let bits = CompactTarget::from_unprefixed_hex(&self.bits).map_err(E::Bits)?;
         let chain_work = Work::from_unprefixed_hex(&self.bits).map_err(E::ChainWork)?;
+        let target = self
+            .target
+            .as_deref()
+            .map(Target::from_unprefixed_hex)
+            .transpose()
+            .map_err(E::Target)?;
         let previous_block_hash = self
             .previous_block_hash
             .map(|s| s.parse::<BlockHash>().map_err(E::PreviousBlockHash))
@@ -193,6 +199,7 @@ impl GetBlockHeaderVerbose {
             median_time: crate::to_u32(self.median_time, "median_time")?,
             nonce: crate::to_u32(self.nonce, "nonce")?,
             bits,
+            target,
             difficulty: self.difficulty,
             chain_work,
             n_tx: self.n_tx,
