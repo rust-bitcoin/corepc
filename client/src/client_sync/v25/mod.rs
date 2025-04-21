@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! A JSON-RPC client for testing against Bitcoin Core `v0.20`.
+//! A JSON-RPC client for testing against Bitcoin Core `v25`.
 //!
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
+mod blockchain;
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -10,14 +11,22 @@ use std::path::Path;
 use bitcoin::address::{Address, NetworkChecked};
 use bitcoin::{Amount, Block, BlockHash, PublicKey, Txid};
 
-use crate::client_sync::into_json;
-use crate::types::v20::*;
+use crate::client_sync::{
+    into_json, AddNodeCommand, ImportMultiOptions, ImportMultiRequest, ScanAction, ScanObject,
+    SetBanCommand,
+};
+use crate::types::v17::{
+    AddNode, ClearBanned, DisconnectNode, GetConnectionCount, ImportMulti, ImportPrivKey, Ping,
+    PruneBlockchain, SetBan, SetNetworkActive,
+};
+use crate::types::v20::EncryptWallet;
+use crate::types::v25::*;
 
 #[rustfmt::skip]                // Keep public re-exports separate.
-pub use crate::client_sync::{v17::AddressType, WalletCreateFundedPsbtInput};
+pub use crate::client_sync::{v23::AddressType, WalletCreateFundedPsbtInput};
 
-crate::define_jsonrpc_minreq_client!("v20");
-crate::impl_client_check_expected_server_version!({ [200200] });
+crate::define_jsonrpc_minreq_client!("v25");
+crate::impl_client_check_expected_server_version!({ [250200] });
 
 // == Blockchain ==
 crate::impl_client_v17__getbestblockhash!();
@@ -36,11 +45,15 @@ crate::impl_client_v19__getmempooldescendants!();
 crate::impl_client_v19__getmempoolentry!();
 crate::impl_client_v17__getmempoolinfo!();
 crate::impl_client_v17__getrawmempool!();
-crate::impl_client_v17__gettxout!();
+crate::impl_client_v22__gettxout!();
 crate::impl_client_v17__gettxoutproof!();
 crate::impl_client_v17__gettxoutsetinfo!();
 crate::impl_client_v17__preciousblock!();
 crate::impl_client_v17__verifytxoutproof!();
+crate::impl_client_v23__savemempool!();
+crate::impl_client_v17__verifychain!();
+crate::impl_client_v25__scantxoutset!();
+crate::impl_client_v17__pruneblockchain!();
 
 // == Control ==
 crate::impl_client_v17__getmemoryinfo!();
@@ -66,6 +79,14 @@ crate::impl_client_v17__getaddednodeinfo!();
 crate::impl_client_v17__getnettotals!();
 crate::impl_client_v17__getnetworkinfo!();
 crate::impl_client_v17__getpeerinfo!();
+crate::impl_client_v17__addnode!();
+crate::impl_client_v17__clearbanned!();
+crate::impl_client_v17__setban!();
+crate::impl_client_v17__listbanned!();
+crate::impl_client_v17__disconnectnode!();
+crate::impl_client_v17__getconnectioncount!();
+crate::impl_client_v17__ping!();
+crate::impl_client_v20__setnetworkactive!();
 
 // == Rawtransactions ==
 crate::impl_client_v17__createrawtransaction!();
@@ -75,7 +96,7 @@ crate::impl_client_v17__sendrawtransaction!();
 // == Wallet ==
 crate::impl_client_v17__addmultisigaddress!();
 crate::impl_client_v17__bumpfee!();
-crate::impl_client_v17__createwallet!();
+crate::impl_client_v23__createwallet!();
 crate::impl_client_v17__dumpprivkey!();
 crate::impl_client_v17__dumpwallet!();
 crate::impl_client_v17__getaddressesbylabel!();
@@ -96,12 +117,30 @@ crate::impl_client_v17__listsinceblock!();
 crate::impl_client_v17__listtransactions!();
 crate::impl_client_v17__listunspent!();
 crate::impl_client_v17__listwallets!();
-crate::impl_client_v17__loadwallet!();
+crate::impl_client_v22__loadwallet!();
 crate::impl_client_v17__rescanblockchain!();
 crate::impl_client_v17__sendmany!();
 crate::impl_client_v17__sendtoaddress!();
 crate::impl_client_v17__signmessage!();
 crate::impl_client_v17__signrawtransactionwithwallet!();
-crate::impl_client_v17__unloadwallet!();
+crate::impl_client_v21__unloadwallet!();
 crate::impl_client_v17__walletcreatefundedpsbt!();
 crate::impl_client_v17__walletprocesspsbt!();
+crate::impl_client_v17__abandontransaction!();
+crate::impl_client_v20__abortrescan!();
+crate::impl_client_v17__backupwallet!();
+crate::impl_client_v20__encryptwallet!();
+crate::impl_client_v17__importaddress!();
+crate::impl_client_v17__importprivkey!();
+crate::impl_client_v17__importprunedfunds!();
+crate::impl_client_v17__importpubkey!();
+crate::impl_client_v17__importwallet!();
+crate::impl_client_v17__keypoolrefill!();
+crate::impl_client_v17__lockunspent!();
+crate::impl_client_v17__removeprunedfunds!();
+crate::impl_client_v17__sethdseed!();
+crate::impl_client_v17__settxfee!();
+crate::impl_client_v17__walletlock!();
+crate::impl_client_v17__walletpassphrase!();
+crate::impl_client_v17__walletpassphrasechange!();
+crate::impl_client_v17__importmulti!();

@@ -225,35 +225,39 @@
 
 // JSON-RPC types by API section.
 mod control;
+mod network;
+mod wallet;
 
 #[doc(inline)]
 pub use self::control::Logging;
 #[doc(inline)]
 pub use crate::{
     v17::{
-        AddMultisigAddress, AddMultisigAddressError, AddedNode, AddedNodeAddress,
-        AddressInformation, Banned, BumpFee, BumpFeeError, ChainTips, ChainTipsError,
-        ChainTipsStatus, CreateRawTransaction, CreateWallet, DumpPrivKey, DumpWallet,
-        FundRawTransaction, FundRawTransactionError, Generate, GenerateToAddress, GetAddedNodeInfo,
-        GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoError, GetAddressInfoLabel,
-        GetAddressesByLabel, GetBalance, GetBestBlockHash, GetBlockCount, GetBlockHash,
-        GetBlockHeader, GetBlockHeaderError, GetBlockHeaderVerbose, GetBlockHeaderVerboseError,
-        GetBlockStats, GetBlockStatsError, GetBlockTemplate, GetBlockTemplateError,
-        GetBlockVerboseOne, GetBlockVerboseOneError, GetBlockVerboseZero, GetChainTips,
-        GetChainTxStats, GetChainTxStatsError, GetDifficulty, GetMemoryInfoStats, GetMempoolInfo,
-        GetMempoolInfoError, GetMiningInfo, GetNetTotals, GetNetworkInfo, GetNetworkInfoAddress,
-        GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress, GetPeerInfo,
-        GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose, GetReceivedByAddress,
-        GetTransaction, GetTransactionDetail, GetTransactionError, GetTxOut, GetTxOutError,
-        GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo,
-        GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsItem, ListBanned,
+        AbandonTransaction, AddMultisigAddress, AddMultisigAddressError, AddedNode,
+        AddedNodeAddress, AddressInformation, BackupWallet, Banned, BumpFee, BumpFeeError,
+        ChainTips, ChainTipsError, ChainTipsStatus, CreateRawTransaction, CreateWallet,
+        DumpPrivKey, DumpWallet, FundRawTransaction, FundRawTransactionError, Generate,
+        GenerateToAddress, GetAddedNodeInfo, GetAddressInfo, GetAddressInfoEmbedded,
+        GetAddressInfoError, GetAddressInfoLabel, GetAddressesByLabel, GetBalance,
+        GetBestBlockHash, GetBlockCount, GetBlockHash, GetBlockHeader, GetBlockHeaderError,
+        GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockStats, GetBlockStatsError,
+        GetBlockTemplate, GetBlockTemplateError, GetBlockVerboseOne, GetBlockVerboseOneError,
+        GetBlockVerboseZero, GetChainTips, GetChainTxStats, GetChainTxStatsError, GetDifficulty,
+        GetMemoryInfoStats, GetMempoolInfo, GetMempoolInfoError, GetMiningInfo, GetNetTotals,
+        GetNetworkInfo, GetNetworkInfoAddress, GetNetworkInfoError, GetNetworkInfoNetwork,
+        GetNewAddress, GetPeerInfo, GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose,
+        GetReceivedByAddress, GetTransaction, GetTransactionDetail, GetTransactionError, GetTxOut,
+        GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo,
+        GetZmqNotifications, ImportAddress, ImportPrivKey, ImportPrunedFunds, ImportPubKey,
+        ImportWallet, KeypoolRefill, ListAddressGroupings, ListAddressGroupingsItem, ListBanned,
         ListLabels, ListLockUnspent, ListLockUnspentItem, ListReceivedByAddress,
         ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockTransaction, ListTransactions,
-        ListTransactionsItem, ListUnspent, ListUnspentItem, ListWallets, LoadWallet, Locked,
-        PeerInfo, RescanBlockchain, ScriptPubkey, SendMany, SendRawTransaction, SendToAddress,
-        SignErrorData, SignMessage, SignRawTransactionWithWallet, SoftforkReject,
-        TransactionCategory, UploadTarget, VerifyTxOutProof, WalletCreateFundedPsbt,
-        WalletProcessPsbt,
+        ListTransactionsItem, ListUnspent, ListUnspentItem, ListWallets, LoadWallet, LockUnspent,
+        Locked, PeerInfo, RemovePrunedFunds, RescanBlockchain, SaveMempool, ScriptPubkey, SendMany,
+        SendRawTransaction, SendToAddress, SetHdSeed, SetTxFee, SignErrorData, SignMessage,
+        SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
+        VerifyChain, VerifyTxOutProof, WalletCreateFundedPsbt, WalletLock, WalletPassPhrase,
+        WalletPassPhraseChange, WalletProcessPsbt,
     },
     v18::{ActiveCommand, GetRpcInfo},
     v19::{
@@ -261,7 +265,11 @@ pub use crate::{
         GetBalancesWatchOnly, GetBlockFilter, GetBlockFilterError, GetBlockchainInfo,
         GetBlockchainInfoError, GetMempoolAncestors, GetMempoolAncestorsVerbose,
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, MapMempoolEntryError,
-        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, Softfork,
-        SoftforkType,
+        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, ScanTxOutSet,
+        Softfork, SoftforkType,
+    },
+    v20::{
+        network::SetNetworkActive,
+        wallet::{AbortRescan, EncryptWallet},
     },
 };

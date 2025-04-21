@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
 pub use self::error::*;
+pub use crate::v18::ScanTxOutSetUnspent;
 
 /// Result of JSON-RPC method `getblockchaininfo`.
 ///
@@ -245,4 +246,40 @@ pub struct MempoolEntryFees {
     pub ancestor: f64,
     /// Modified fees (see above) of in-mempool descendants (including this one) in BTC.
     pub descendant: f64,
+}
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. action                        (string, required) The action to execute
+/// >   "start" for starting a scan
+/// >   "abort" for aborting the current scan (returns true when abort was successful)
+/// >   "status" for progress report (in %) of the current scan
+/// 2. scanobjects                   (json array, required) Array of scan objects
+/// > Every scan object is either a string descriptor or an object:
+/// > [
+/// > "descriptor",             (string) An output descriptor
+/// > {                         (json object) An object with output descriptor and metadata
+/// > "desc": "str",          (string, required) An output descriptor
+/// > "range": n or \[n,n\],   (numeric or array, optional, default=1000) The range of HD chain indexes to explore (either end or \[begin,end\])
+/// > },
+/// > ...
+/// > ]
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSet {
+    /// Whether the scan is completed
+    pub success: bool,
+    /// The number of unspent transaction outputs scanned
+    pub txouts: u64,
+    /// The current block height (index)
+    pub height: u64,
+    /// The hash of the block at the tip of the chain
+    pub bestblock: String,
+    /// The unspents
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC
+    pub total_amount: f64,
 }

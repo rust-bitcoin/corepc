@@ -262,3 +262,145 @@ pub enum TemplateRules {
     /// Taproot supported.
     Taproot,
 }
+
+/// Args for the `addnode` method
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum AddNodeCommand {
+    Add,
+    Remove,
+    OneTry,
+}
+
+/// Args for the `setban` method
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum SetBanCommand {
+    Add,
+    Remove,
+}
+
+/// Args for the `lockunspent` method
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub struct LockUnspentOutput {
+    /// The transaction id
+    pub txid: Txid,
+    /// The output number
+    pub vout: u32,
+}
+
+/// Args for the `scantxoutset`
+///
+/// Represents the action for the `scantxoutset` RPC call.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum ScanAction {
+    Start,
+    Abort,
+    Status,
+}
+
+/// Represents the range for HD descriptor scanning (handles n or [n, n]).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ScanRange {
+    /// Represents the end index (beginning is 0).
+    Single(u64),
+    /// Array represents [begin, end] indexes
+    Range([u64; 2]),
+}
+
+// Helper function for serde default
+fn default_scan_range() -> ScanRange {
+    // Default range is 1000 as per Bitcoin Core docs
+    ScanRange::Single(1000)
+}
+
+/// Represents a scan object for scantxoutset (descriptor string or object).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ScanObject {
+    /// Plain descriptor string
+    Descriptor(String),
+    /// Object containing descriptor and optional range
+    WithRange {
+        desc: String,
+        #[serde(default = "default_scan_range")]
+        range: ScanRange,
+    },
+}
+
+/// Args for the `importmulti`
+///
+/// Represents the scriptPubKey field in an importmulti request.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ImportMultiScriptPubKey {
+    /// Script hex string
+    Script(String),
+    /// Address object
+    Address { address: String },
+}
+
+/// Represents the timestamp field in an importmulti request.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ImportMultiTimestamp {
+    /// Use current blockchain time
+    Now(String),
+    /// Specific UNIX epoch time
+    Time(u64),
+}
+
+impl Default for ImportMultiTimestamp {
+    fn default() -> Self { ImportMultiTimestamp::Now("now".to_string()) }
+}
+
+/// Represents a single request object within the importmulti call.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+pub struct ImportMultiRequest {
+    /// Descriptor to import (optional, mutually exclusive with scriptPubKey/address etc.) (v18+)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub desc: Option<String>,
+    /// ScriptPubKey or address object (required unless desc is provided)
+    #[serde(rename = "scriptPubKey", skip_serializing_if = "Option::is_none")]
+    pub script_pub_key: Option<ImportMultiScriptPubKey>,
+    /// Creation time of the key
+    pub timestamp: ImportMultiTimestamp,
+    /// Redeem script (P2SH/P2SH-P2WSH only)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub redeemscript: Option<String>,
+    /// Witness script (P2WSH/P2SH-P2WSH only) (v18+)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub witnessscript: Option<String>,
+    /// Pubkeys to import (cannot be used with descriptor)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub pubkeys: Vec<String>,
+    /// Private keys to import (WIF format)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub keys: Vec<String>,
+    /// Range for ranged descriptors (v18+)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub range: Option<ScanRange>,
+    /// Treat matching outputs as change
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub internal: Option<bool>,
+    /// Treat matching outputs as watchonly
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub watchonly: Option<bool>,
+    /// Label for address (use "" for default)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    /// Add pubkeys to keypool (only when private keys disabled) (v18+)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub keypool: Option<bool>,
+}
+
+/// Represents the optional options object for importmulti
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
+/// Rescan after import (default true)
+pub struct ImportMultiOptions {
+    /// Rescan after import (default true)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rescan: Option<bool>,
+}

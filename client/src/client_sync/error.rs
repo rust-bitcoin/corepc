@@ -24,6 +24,10 @@ pub enum Error {
     ServerVersion(UnexpectedServerVersionError),
     /// Missing user/password
     MissingUserPassword,
+    /// Invalid arguments for disconnect_node: Both address and nodeid provided
+    DisconnectNodeArgsBoth,
+    /// Invalid arguments for disconnect_node: Neither address nor nodeid provided.
+    DisconnectNodeArgsNone,
 }
 
 impl From<jsonrpc::error::Error> for Error {
@@ -76,6 +80,8 @@ impl fmt::Display for Error {
             Returned(ref s) => write!(f, "the daemon returned an error string: {}", s),
             ServerVersion(ref e) => write!(f, "server version: {}", e),
             MissingUserPassword => write!(f, "missing user and/or password"),
+            DisconnectNodeArgsBoth => write!(f, "invalid arguments for disconnect_node: provide either address OR nodeid, not both"),
+            DisconnectNodeArgsNone => write!(f, "invalid arguments for disconnect_node: provide either address OR nodeid, none given"),
         }
     }
 }
@@ -95,6 +101,7 @@ impl error::Error for Error {
             InvalidAmount(ref e) => Some(e),
             ServerVersion(ref e) => Some(e),
             InvalidCookieFile | UnexpectedStructure | Returned(_) | MissingUserPassword => None,
+            DisconnectNodeArgsBoth | DisconnectNodeArgsNone => None,
         }
     }
 }
