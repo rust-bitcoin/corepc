@@ -83,6 +83,14 @@ fn verify_version(version: Version, test_output: Option<&String>, quiet: bool) -
     verify_status(version, test_output)?;
     close(correct, quiet);
 
+    let msg = "Verifying no model types for no_model methods";
+    check(msg, quiet);
+    let correct = verify_no_model_methods(version)?;
+    close(correct, quiet);
+    if !correct {
+        process::exit(1);
+    }
+
     Ok(())
 }
 
@@ -152,6 +160,36 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
     Ok(())
 }
 
+/// Verifies that methods marked as new_no_model don't have model types.
+fn verify_no_model_methods(version: Version) -> Result<bool> {
+    let methods = versioned::methods_and_status(version)?;
+    let mut all_errors = Vec::new();
+
+    for method in methods {
+        let method_name = &method.name;
+        let out = Method::from_name(version, method_name).expect("guaranteed by methods_and_status()");
+
+        if out.ret.is_some() && !model::requires_type(version, method_name)? {
+            if model::type_physically_exists(version, method_name)? {
+                all_errors.push(format!(
+                    "model type found for method marked as no_model: {}. Change to new_modelled",
+                    output_method(&out)
+                ));
+            }
+        }
+    }
+
+    if !all_errors.is_empty() {
+        eprintln!("\nFound {} methods with model types that should be marked as new_modelled:", all_errors.len());
+        for error in all_errors {
+            eprintln!("  {}", error);
+        }
+        return Ok(false);
+    }
+
+    Ok(true)
+}
+
 fn check_types_exist_if_required(version: Version, method_name: &str) -> Result<()> {
     let out = Method::from_name(version, method_name).expect("guaranteed by methods_and_status()");
 
@@ -163,6 +201,10 @@ fn check_types_exist_if_required(version: Version, method_name: &str) -> Result<
     if model::requires_type(version, method_name)? {
         if !model::type_exists(version, method_name)? {
             eprintln!("missing model type: {}", output_method(out));
+        }
+    } else {
+        if model::type_exists(version, method_name)? {
+            eprintln!("found model type when not expected: {}", output_method(out));
         }
     }
     Ok(())

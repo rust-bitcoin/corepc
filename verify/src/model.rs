@@ -40,9 +40,24 @@ pub fn type_exists(version: Version, method_name: &str) -> Result<bool> {
     };
 
     if let Some(Return::Type(s)) = method.ret {
-        if method.requires_model {
-            return crate::grep_for_string(&path(), s);
-        }
+        return crate::grep_for_re_export(&path(), s);
+    }
+    Ok(false)
+}
+
+/// Checks if a type exists in `model` module regardless of whether it's required.
+pub fn type_physically_exists(version: Version, method_name: &str) -> Result<bool> {
+    let method = match method::Method::from_name(version, method_name) {
+        Some(m) => m,
+        None =>
+            return Err(anyhow::Error::msg(format!(
+                "model type for method not found: {}",
+                method_name
+            ))),
+    };
+
+    if let Some(Return::Type(s)) = method.ret {
+        return crate::grep_for_string(&path(), s);
     }
     Ok(false)
 }
