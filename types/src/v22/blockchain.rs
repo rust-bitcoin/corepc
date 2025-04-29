@@ -10,6 +10,7 @@ use bitcoin::{address, amount, hex, Address, Amount, BlockHash, ScriptBuf, TxOut
 use serde::{Deserialize, Serialize};
 
 use crate::error::write_err;
+use crate::v19::ScanTxOutSet as ScanTxOutSetStart;
 use crate::{model, NumericError};
 
 /// Result of JSON-RPC method `gettxout`.
@@ -127,4 +128,21 @@ impl std::error::Error for GetTxOutError {
 
 impl From<NumericError> for GetTxOutError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+pub struct ScanTxOutSetStatus {
+    /// Approximate percent complete
+    pub progress: f64,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum ScanTxOutSet {
+    /// Returns after scan completes
+    Start(ScanTxOutSetStart),
+    /// True (scan will be aborted), False (no scan to abort)
+    Abort(bool),
+    /// Scan in progress or Completed
+    Status(Option<ScanTxOutSetStatus>),
 }

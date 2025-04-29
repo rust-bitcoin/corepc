@@ -8,6 +8,7 @@ use rand::Rng;
 
 #[rustfmt::skip]    // Keep public re-exports separate.
 pub use node::Node; // Re-export this to make test imports more terse.
+pub use client::client_sync::{AddNodeCommand, SetBanCommand, LockUnspentOutput};
 
 /// Initialize a logger (configure with `RUST_LOG=trace cargo test`).
 #[allow(dead_code)] // Not all tests use this function.

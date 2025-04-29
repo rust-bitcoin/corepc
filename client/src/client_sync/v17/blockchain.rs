@@ -301,3 +301,101 @@ macro_rules! impl_client_v17__verifytxoutproof {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `pruneblockchain`
+#[macro_export]
+macro_rules! impl_client_v17__pruneblockchain {
+    () => {
+        impl Client {
+            /// Instructs the node to prune the blockchain up to a specified height or timestamp.
+            pub fn prune_blockchain(&self, target: u64) -> Result<PruneBlockchain> {
+                self.call("pruneblockchain", &[target.into()])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `savemempool`
+#[macro_export]
+macro_rules! impl_client_v17__savemempool {
+    () => {
+        impl Client {
+            // Dumps the mempool to disk (v17 - v22)
+            pub fn save_mempool(&self) -> Result<SaveMempool> {
+                match self.call("savemempool", &[]) {
+                    Ok(serde_json::Value::Null) => Ok(SaveMempool),
+                    Ok(_) => Ok(SaveMempool),
+                    Err(e) => Err(e.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `verifychain`
+#[macro_export]
+macro_rules! impl_client_v17__verifychain {
+    () => {
+        impl Client {
+            /// Verifies blockchain database using default checklevel and nblocks.
+            /// Returns true if verification finised successfully.
+            pub fn verify_chain_default(&self) -> Result<VerifyChain> {
+                // Core returns a boolean directly
+                self.call("verifychain", &[])
+            }
+
+            /// Verifies blockchain database with specified checklevel and nblocks.
+            ///
+            /// # Arguments
+            /// * `checklevel`: (0-4) How thorough the verification is (optional, defaults to 3).
+            /// * `nblocks`: Number of blocks to check (optional, defaults to 6, 0=all).
+            ///
+            /// Returns true if verification finished successfully.
+            pub fn verify_chain(
+                &self,
+                checklevel: Option<u32>,
+                nblocks: Option<u32>,
+            ) -> Result<VerifyChain> {
+                // Construct params carefully for optional args
+                // Bitcoin Core often uses positional nulls for omitted optional args
+                let params = match (checklevel, nblocks) {
+                    (Some(level), Some(num)) => vec![level.into(), num.into()],
+                    (Some(level), None) => vec![level.into()],
+                    (None, Some(num)) => vec![serde_json::Value::Null, num.into()],
+                    (None, None) => vec![],
+                };
+
+                self.call("verifychain", &params)
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `scantxoutset`
+#[macro_export]
+macro_rules! impl_client_v17__scantxoutset {
+    () => {
+        impl Client {
+            pub fn scan_tx_out_set(
+                &self,
+                action: ScanAction,
+                scan_objects: Option<&[ScanObject]>,
+            ) -> Result<ScanTxOutSet> {
+                let params = match action {
+                    ScanAction::Start => match scan_objects {
+                        Some(objects) =>
+                            vec![serde_json::to_value(action)?, serde_json::to_value(objects)?],
+                        None =>
+                            return Err(Error::Returned(
+                                "scan_objects required for 'start'".to_string(),
+                            )),
+                    },
+                    ScanAction::Abort | ScanAction::Status => {
+                        vec![serde_json::to_value(action)?]
+                    }
+                };
+                self.call("scantxoutset", &params)
+            }
+        }
+    };
+}

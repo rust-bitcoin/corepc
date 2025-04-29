@@ -990,3 +990,255 @@ pub struct WalletProcessPsbt {
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
 }
+
+/// Result of the JSON-RPC method `abandontransaction`.
+///
+/// > abandontransaction "txid"
+/// >
+/// >
+/// >
+/// > Arguments:
+/// > 1. txid    (string, required) The transaction id
+/// >
+/// > Result null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AbandonTransaction;
+
+/// Result of JSON-RPC method `abortrescan`.
+///
+/// > abortrescan
+/// >
+/// > Returns null
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AbortRescan;
+
+/// Result of JSON-RPC method `backupwallet`.
+///
+/// > backupwallet
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct BackupWallet;
+
+/// Result of JSON-RPC method `encryptwallet`.
+///
+/// > encryptwallet
+/// >
+/// > Arguments:
+/// > 1. passphrase (string, required) The pass phrase to encrypt the wallet with. It must be at least 1 character, but should be long.
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct EncryptWallet;
+
+/// Result of JSON-RPC method `importaddress`.
+///
+/// > importaddress
+/// >
+/// > Arguments:
+/// > 1. address    (string, required) The Bitcoin address (or hex-encoded script)
+/// > 2. label      (string, optional, default="") An optional label
+/// > 3. rescan     (boolean, optional, default=true) Scan the chain and mempool for wallet transactions.
+/// > 4. p2sh       (boolean, optional, default=false) Add the P2SH version of the script as well
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ImportAddress;
+
+/// Result of JSON-RPC method `importprivkey`.
+///
+/// > importprivkey
+/// >
+/// > Arguments:
+/// > 1. privkey    (string, required) The private key (see dumpprivkey)
+/// > 2. label      (string, optional, default=current label if address exists, otherwise "") An optional label
+/// > 3. rescan     (boolean, optional, default=true) Rescan the wallet for transactions
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ImportPrivKey;
+
+/// Result of JSON-RPC method `importprunedfunds`.
+///
+/// > importprunedfunds
+/// >
+/// > Arguments:
+/// > 1. rawtransaction    (string, required) A raw transaction in hex funding an already-existing address in wallet
+/// > 2. txoutproof        (string, required) The hex output from gettxoutproof that contains the transaction
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ImportPrunedFunds;
+
+/// Result of JSON-RPC method `importpubkey`.
+///
+/// > importpubkey
+/// >
+/// > Arguments:
+/// > 1. pubkey    (string, required) The hex-encoded public key
+/// > 2. label     (string, optional, default="") An optional label
+/// > 3. rescan    (boolean, optional, default=true) Scan the chain and mempool for wallet transactions.
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ImportPubKey;
+
+/// Result of JSON-RPC method `importwallet`.
+///
+/// > importwallet
+/// >
+/// > Arguments:
+/// > 1. filename    (string, required) The wallet file
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct ImportWallet;
+
+/// Result of JSON-RPC method `keypoolrefill`.
+///
+/// > keypoolrefill
+/// >
+/// > Arguments:
+/// > 1. newsize    (numeric, optional, default=1000, or as set by -keypool) The new keypool size
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct KeypoolRefill;
+
+/// Result of JSON-RPC method `lockunspent`.
+///
+/// > lockunspent
+/// >
+/// > Arguments:
+/// > 1. unlock                  (boolean, required) Whether to unlock (true) or lock (false) the specified transactions
+/// > 2. transactions            (json array, optional, default=[]) The transaction outputs and within each, the txid (string) vout (numeric).
+/// >   [
+/// >   {                   (json object)
+///   > "txid": "hex",    (string, required) The transaction id
+///   > "vout": n,        (numeric, required) The output number
+/// >   },
+/// >   ...
+///]
+/// > 3. persistent              (boolean, optional, default=false) Whether to write/erase this lock in the wallet database, or keep the change in memory only. Ignored for unlocking.
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct LockUnspent(pub bool);
+
+/// Result of JSON-RPC method `removeprunedfunds`.
+///
+/// > removeprunedfunds
+/// >
+/// > Arguments:
+/// > 1. txid    (string, required) The hex-encoded id of the transaction you are deleting
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct RemovePrunedFunds;
+
+/// Result of JSON-RPC method `sethdseed`.
+///
+/// > sethdseed
+/// >
+/// > Arguments:
+/// > 1. newkeypool    (boolean, optional, default=true) Whether to flush old unused addresses, including change addresses, from the keypool and regenerate it.
+/// >   If true, the next address from getnewaddress and change address from getrawchangeaddress will be from this new seed.
+/// >   If false, addresses (including change addresses if the wallet already had HD Chain Split enabled) from the existing
+/// >   keypool will be used until it has been depleted.
+/// > 2. seed          (string, optional, default=random seed) The WIF private key to use as the new HD seed.
+/// >   The seed value can be retrieved using the dumpwallet command. It is the private key marked hdseed=1
+/// >
+/// > Returns null (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct SetHdSeed;
+
+/// Result of JSON-RPC method `settxfee`.
+///
+/// > settxfee
+/// >
+/// > Arguments:
+/// > 1. amount         (numeric or string, required) The transaction fee in BTC/kB
+/// >
+/// > Returns true|false        (boolean) Returns true if successful
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct SetTxFee(pub bool);
+
+/// Result of JSON-RPC method `walletlock`.
+///
+/// > walletlock
+/// >
+/// > Returns:
+/// > null    (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct WalletLock;
+
+/// Result of JSON-RPC method `walletpassphrase`.
+///
+/// > walletpassphrase
+/// >
+/// > Arguments:
+/// > 1. passphrase    (string, required) The wallet passphrase
+/// > 2. timeout       (numeric, required) The time to keep the decryption key in seconds; capped at 100000000 (~3 years).
+///
+/// > Returns:
+/// > null    (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct WalletPassPhrase;
+
+/// Result of JSON-RPC method `walletpassphrasechange`.
+///
+/// > walletpassphrasechange
+/// >
+/// > Arguments:
+/// > 1. oldpassphrase    (string, required) The current passphrase
+/// > 2. newpassphrase    (string, required) The new passphrase
+///
+/// > Returns:
+/// > null    (json null)
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct WalletPassPhraseChange;
+
+/// Result of JSON-RPC method `importmulti`.
+///
+/// > importmulti requests ( options )
+/// >
+/// > Arguments:
+/// > 1. requests                                                         (json array, required) Data to be imported
+/// >   [
+/// >   {                                                            (json object)
+/// >   "desc": "str",                                             (string, optional) Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys
+/// >   "scriptPubKey": "script" | { "address":"address" },    (string / json, required) Type of scriptPubKey (string for script, json for address). Should not be provided if using a descriptor
+/// >   "timestamp": timestamp | "now",                            (integer / string, required) Creation time of the key expressed in UNIX epoch time,or the string "now" to substitute the current synced blockchain time. The timestamp of the oldest key will determine how far back blockchain rescans need to begin for missing wallet transactions. "now" can be specified to bypass scanning, for keys which are known to never have been used, and 0 can be specified to scan the entire blockchain. Blocks up to 2 hours before the earliest key creation time of all keys being imported by the importmulti call will be scanned.
+/// >   "redeemscript": "str",                                     (string, optional) Allowed only if the scriptPubKey is a P2SH or P2SH-P2WSH address/scriptPubKey
+/// >   "witnessscript": "str",                                    (string, optional) Allowed only if the scriptPubKey is a P2SH-P2WSH or P2WSH address/scriptPubKey
+/// >   "pubkeys": [                                               (json array, optional, default=[]) Array of strings giving pubkeys to import. They must occur in P2PKH or P2WPKH scripts. They are not required when the private key is also provided (see the "keys" argument).
+/// >   "pubKey",                                                (string)
+/// >   ...
+/// >   ],
+/// >   "keys": [                                                  (json array, optional, default=[]) Array of strings giving private keys to import. The corresponding public keys must occur in the output or redeemscript.
+/// >   "key",                                                   (string)
+/// >   ...
+/// >   ],
+/// >   "range": n or \[n,n\],                                       (numeric or array, optional) If a ranged descriptor is used, this specifies the end or the range (in the form \[begin,end\]) to import
+/// >   "internal": bool,                                          (boolean, optional, default=false) Stating whether matching outputs should be treated as not incoming payments (also known as change)
+/// >   "watchonly": bool,                                         (boolean, optional, default=false) Stating whether matching outputs should be considered watchonly.
+/// >   "label": "str",                                            (string, optional, default="") Label to assign to the address, only allowed with internal=false
+/// >   "keypool": bool,                                           (boolean, optional, default=false) Stating whether imported public keys should be added to the keypool for when users request new addresses. Only allowed when wallet private keys are disabled
+/// >   },
+/// >   ...
+/// >   ]
+/// 2. options                                                          (json object, optional) Options object that can be used to pass named arguments, listed below.
+/// > Named Arguments:
+/// > rescan    (boolean, optional, default=true) Scan the chain and mempool for wallet transactions after all imports.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct ImportMulti(pub Vec<ImportMultiEntry>);
+
+/// Represents a single entry in the importmulti result array.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct ImportMultiEntry {
+    pub success: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warnings: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+}

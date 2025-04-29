@@ -257,4 +257,105 @@ pub struct ListBanned(pub Vec<Banned>);
 
 /// An item from the list returned by the JSON-RPC method `listbanned`
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct Banned(String); // FIXME: The docs are empty so I don't know what shape this is.
+pub struct Banned {
+    /// The IP/Subnet of the banned node (Present in all versions)
+    pub address: String,
+    /// The UNIX epoch time the ban was created (Present v17+)
+    /// None if missing in JSON
+    pub ban_created: Option<i64>,
+    /// The UNIX epoch time the ban expires (Present v17+)
+    pub banned_until: Option<i64>,
+    /// The ban reason string (Present only in v17 - v20)
+    pub ban_reason: Option<String>,
+    /// The ban duraction, in seconds (Present v22+)
+    pub ban_duration: Option<i64>,
+    /// The time remaining until ban expires, in seconds (Present v22+)
+    pub time_remaining: Option<i64>,
+}
+
+/// Result of JSON-RPC method `addnode`.
+///
+/// > addnode
+/// >
+/// > Returns null (json null)
+/// >
+/// > Arguments:
+/// > 1. node           (string, required) The address of the peer to connect to
+/// > 2. command        (string, required) 'add' to add a node to the list, 'remove' to remove a node from the list, 'onetry' to try a connection to the node once
+/// > 3. v2transport    (boolean, optional, default=set by -v2transport) Attempt to connect using BIP324 v2 transport protocol (ignored for 'remove' command)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct AddNode;
+
+/// Result of JSON-RPC method `clearbanned`.
+///
+/// > clearbanned
+/// >
+/// > Returns null (json null)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct ClearBanned;
+
+/// Result of JSON-RPC method `setban`.
+///
+/// > setban
+/// >
+/// > Returns null (json null)
+/// >
+/// > Arguments:
+/// > 1. subnet      (string, required) The IP/Subnet (see getpeerinfo for nodes IP) with an optional netmask (default is /32 = single IP)
+/// > 2. command     (string, required) 'add' to add an IP/Subnet to the list, 'remove' to remove an IP/Subnet from the list
+/// > 3. bantime     (numeric, optional, default=0) time in seconds how long (or until when if \[absolute\] is set) the IP is banned (0 or empty means using the default time of 24h which can also be overwritten by the -bantime startup argument)
+/// > 4. absolute    (boolean, optional, default=false) If set, the bantime must be an absolute timestamp expressed in UNIX epoch time
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct SetBan;
+
+/// Result of JSON-RPC method `disconnectnode`.
+///
+/// > disconnectnode
+/// >
+/// > Returns null (json null)
+/// >
+/// > Arguments:
+/// > 1. address    (string, optional, default=fallback to nodeid) The IP address/port of the node
+/// > 2. nodeid     (numeric, optional, default=fallback to address) The node ID (see getpeerinfo for node IDs)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct DisconnectNode;
+
+/// Result of JSON-RPC method `ping`.
+///
+/// > ping
+/// >
+/// > Returns null (json null)
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct Ping;
+
+/// Result of JSON-RPC method `setnetworkactive`.
+///
+/// > setnetworkactive
+/// >
+/// > Returns null (json null)
+/// >
+/// > Arguments:
+/// > 1. state (boolean, required) true to enable networking, false to disable
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct SetNetworkActive;
+
+/// Result of JSON-RPC method `importprivkey`.
+///
+/// > importprivkey
+/// >
+/// > Returns null (json null)
+/// >
+/// > Arguments:
+/// > 1. privkey    (string, required) The private key (see dumpprivkey)
+/// > 2. label      (string, optional, default=current label if address exists, otherwise "") An optional label
+/// > 3. rescan     (boolean, optional, default=true) Scan the chain and mempool for wallet transactions.
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct ImportPrivKey;
+
+/// Result of JSON-RPC method `getconnectioncount`.
+///
+/// > getconnectioncount
+/// >
+/// > Returns n (numeric) The connection count
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct GetConnectionCount(pub u64);
