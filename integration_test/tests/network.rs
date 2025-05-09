@@ -32,6 +32,20 @@ fn network__get_network_info__modelled() {
 }
 
 #[test]
+// Core version 18 onwards.
+#[cfg(not(feature = "v17"))]
+fn network__get_node_addresses() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+    let json: GetNodeAddresses = node.client.get_node_addresses(None).expect("getnodeaddresses");
+    assert!(json.0.len() <= 2500);
+    if let Some(addr) = json.0.first() {
+        assert!(addr.port > 0);
+        assert!(!addr.address.is_empty());
+        assert!(addr.time > 1231006505);
+    }
+}
+
+#[test]
 fn network__get_peer_info() {
     get_peer_info_one_node_network();
     get_peer_info_three_node_network();
