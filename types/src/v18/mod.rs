@@ -103,7 +103,7 @@
 //! | getconnectioncount                 | returns numeric |                                        |
 //! | getnettotals                       | version         |                                        |
 //! | getnetworkinfo                     | version + model |                                        |
-//! | getnodeaddresses                   | version         | TODO                                   |
+//! | getnodeaddresses                   | version         |                                        |
 //! | getpeerinfo                        | version         |                                        |
 //! | listbanned                         | returns string  |                                        |
 //! | ping                               | returns nothing |                                        |
@@ -224,11 +224,13 @@
 
 // JSON-RPC types by API section.
 mod control;
+mod network;
 mod raw_transactions;
 
 #[doc(inline)]
 pub use self::{
     control::{ActiveCommand, GetRpcInfo},
+    network::{GetNodeAddresses, NodeAddress},
     raw_transactions::{
         AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
         AnalyzePsbtInputMissingError, JoinPsbts, UtxoUpdatePsbt,

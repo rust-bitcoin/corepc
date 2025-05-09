@@ -104,7 +104,7 @@
 //! | getconnectioncount                 | returns numeric |                                        |
 //! | getnettotals                       | version         |                                        |
 //! | getnetworkinfo                     | version + model |                                        |
-//! | getnodeaddresses                   | version         | TODO                                   |
+//! | getnodeaddresses                   | version         |                                        |
 //! | getpeerinfo                        | version         |                                        |
 //! | listbanned                         | returns string  |                                        |
 //! | ping                               | returns nothing |                                        |
@@ -299,7 +299,8 @@ pub use crate::{
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
-        AnalyzePsbtInputMissingError, GetRpcInfo, JoinPsbts, UtxoUpdatePsbt,
+        AnalyzePsbtInputMissingError, GetNodeAddresses, GetRpcInfo, JoinPsbts, NodeAddress,
+        UtxoUpdatePsbt,
     },
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalances, GetBalancesMine,
