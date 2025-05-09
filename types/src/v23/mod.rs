@@ -281,8 +281,8 @@ pub use crate::{
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
-        AnalyzePsbtInputMissingError, GetRpcInfo, JoinPsbts, UtxoUpdatePsbt,
-        GetNodeAddresses, NodeAddress,
+        AnalyzePsbtInputMissingError, GetNodeAddresses, GetRpcInfo, JoinPsbts, NodeAddress,
+        UtxoUpdatePsbt,
     },
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalances, GetBalancesMine,

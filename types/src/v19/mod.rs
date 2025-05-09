@@ -274,6 +274,6 @@ pub use crate::v17::{
 #[doc(inline)]
 pub use crate::v18::{
     ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
-    AnalyzePsbtInputMissingError, GetRpcInfo, JoinPsbts, UtxoUpdatePsbt,
-    GetNodeAddresses, NodeAddress,
+    AnalyzePsbtInputMissingError, GetNodeAddresses, GetRpcInfo, JoinPsbts, NodeAddress,
+    UtxoUpdatePsbt,
 };
