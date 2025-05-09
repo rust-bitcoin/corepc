@@ -5,6 +5,7 @@
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
 pub mod control;
+pub mod network;
 pub mod raw_transactions;
 
 use std::collections::BTreeMap;
@@ -70,6 +71,7 @@ crate::impl_client_v17__submitblock!();
 crate::impl_client_v17__getaddednodeinfo!();
 crate::impl_client_v17__getnettotals!();
 crate::impl_client_v17__getnetworkinfo!();
+crate::impl_client_v18__getnodeaddresses!();
 crate::impl_client_v17__getpeerinfo!();
 
 // == Rawtransactions ==

@@ -70,6 +70,7 @@ crate::impl_client_v17__submitblock!();
 crate::impl_client_v17__getaddednodeinfo!();
 crate::impl_client_v17__getnettotals!();
 crate::impl_client_v17__getnetworkinfo!();
+crate::impl_client_v18__getnodeaddresses!();
 crate::impl_client_v17__getpeerinfo!();
 
 // == Rawtransactions ==
