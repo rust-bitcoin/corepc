@@ -42,6 +42,7 @@ CONFIGURATION
 
 - Examples
 
+    v29 29.0 290 /opt/bitcoin-29.0/bin/bitcoind
     v28 28.1 281 /opt/bitcoin-28.0/bin/bitcoind
     v24 24.2 242 /opt/bitcoin-24.2/bin/bitcoind
     v21 0.21.2 212 /opt/bitcoin-0.21.2/bin/bitcoind
