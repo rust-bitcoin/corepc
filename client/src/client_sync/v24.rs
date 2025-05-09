@@ -14,7 +14,10 @@ use crate::client_sync::into_json;
 use crate::types::v24::*;
 
 #[rustfmt::skip]                // Keep public re-exports separate.
-pub use crate::client_sync::{v23::AddressType, WalletCreateFundedPsbtInput};
+pub use crate::client_sync::{
+    v17::{TemplateRequest, TemplateRules},
+    v23::AddressType, WalletCreateFundedPsbtInput
+};
 
 crate::define_jsonrpc_minreq_client!("v24");
 crate::impl_client_check_expected_server_version!({ [240200] });

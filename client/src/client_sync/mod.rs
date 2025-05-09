@@ -259,24 +259,3 @@ pub struct WalletCreateFundedPsbtInput {
     txid: Txid,
     vout: u32,
 }
-
-/// Arg for the `getblocktemplate` method.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct TemplateRequest {
-    /// A list of strings.
-    pub rules: Vec<TemplateRules>,
-}
-
-/// Client side supported softfork deployment.
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum TemplateRules {
-    /// SegWit v0 supported.
-    Segwit,
-    /// Signet supported.
-    Signet,
-    /// CSV supported.
-    Csv,
-    /// Taproot supported.
-    Taproot,
-}

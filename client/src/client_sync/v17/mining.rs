@@ -16,7 +16,7 @@ macro_rules! impl_client_v17__getblocktemplate {
         impl Client {
             pub fn get_block_template(
                 &self,
-                request: &$crate::client_sync::TemplateRequest,
+                request: &TemplateRequest,
             ) -> Result<GetBlockTemplate> {
                 self.call("getblocktemplate", &[into_json(request)?])
             }

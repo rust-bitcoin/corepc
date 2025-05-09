@@ -24,7 +24,7 @@ pub use {anyhow, serde_json, tempfile, which};
 #[doc(inline)]
 pub use self::{
     // Re-export `vtype` - the version specific types.
-    client_versions::{vtype, Client, AddressType},
+    client_versions::{vtype, Client, AddressType, TemplateRequest, TemplateRules},
     // Re-export the version string e.g., "28.0".
     versions::VERSION,
     // Re-export the model types as `mtype` to differentiate it from `vtype`.

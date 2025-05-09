@@ -6,7 +6,7 @@
 
 use bitcoin::SignedAmount;
 use integration_test::{Node, NodeExt as _, Wallet};
-use node::client::client_sync::{TemplateRequest, TemplateRules};
+use node::{TemplateRequest, TemplateRules};
 use node::vtype::*;             // All the version specific types.
 use node::mtype;
 

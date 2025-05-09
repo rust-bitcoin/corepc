@@ -150,3 +150,26 @@ impl fmt::Display for AddressType {
         fmt::Display::fmt(s, f)
     }
 }
+
+/// Arg for the `getblocktemplate` method.
+///
+/// For Core versions 0.17 through to v28. For Core v29 and onwards use `v29::TemplateRequest`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct TemplateRequest {
+    /// A list of strings.
+    pub rules: Vec<TemplateRules>,
+}
+
+/// Client side supported softfork deployment.
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum TemplateRules {
+    /// SegWit v0 supported.
+    Segwit,
+    /// Signet supported.
+    Signet,
+    /// CSV supported.
+    Csv,
+    /// Taproot supported.
+    Taproot,
+}
