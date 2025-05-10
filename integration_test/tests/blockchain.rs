@@ -321,6 +321,13 @@ fn blockchain__get_tx_out_proof__modelled() {
     verify_tx_out_proof(&node).unwrap();
 }
 
+#[test]
+fn blockchain__verify_chain() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+
+    let _: Result<VerifyChain, _> = node.client.verify_chain();
+}
+
 fn verify_tx_out_proof(node: &Node) -> Result<(), client_sync::Error> {
     let (_address, tx) = node.create_mined_transaction();
     let txid = tx.compute_txid();

@@ -318,6 +318,16 @@ macro_rules! impl_client_v17__savemempool {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `verifychain`
+#[macro_export]
+macro_rules! impl_client_v17__verifychain {
+    () => {
+        impl Client {
+            pub fn verify_chain(&self) -> Result<VerifyChain> { self.call("verifychain", &[]) }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `verifytxoutproof`
 #[macro_export]
 macro_rules! impl_client_v17__verifytxoutproof {

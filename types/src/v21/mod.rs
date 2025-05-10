@@ -267,8 +267,8 @@ pub use crate::{
         RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain, SendMany,
         SendRawTransaction, SendToAddress, SignMessage, SignRawTransaction,
         SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,
-        UploadTarget, VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo,
+        UploadTarget, VerifyChain, VerifyTxOutProof, WalletCreateFundedPsbt,
+        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

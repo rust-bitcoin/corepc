@@ -650,6 +650,10 @@ pub struct PruneBlockchain(
     pub i64,
 );
 
+/// Result of JSON-RPC method `verifychain`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct VerifyChain(pub bool);
+
 /// Result of JSON-RPC method `verifytxoutproof`.
 ///
 /// > verifytxoutproof "proof"

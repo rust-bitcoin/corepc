@@ -244,7 +244,7 @@ pub use self::{
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutError, GetTxOutSetInfo,
         GetTxOutSetInfoError, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
         MempoolEntryFees, MempoolEntryFeesError, PruneBlockchain, Softfork, SoftforkReject,
-        VerifyTxOutProof,
+        VerifyChain, VerifyTxOutProof,
     },
     control::{GetMemoryInfoStats, Locked, Logging},
     generating::{Generate, GenerateToAddress},

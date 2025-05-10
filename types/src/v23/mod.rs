@@ -276,7 +276,7 @@ pub use crate::{
         LoadWallet, Locked, PeerInfo, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, SendMany, SendRawTransaction, SendToAddress,
         SignMessage, SignRawTransaction, SignRawTransactionError, SoftforkReject,
-        TestMempoolAccept, TransactionCategory, UploadTarget, VerifyTxOutProof,
+        TestMempoolAccept, TransactionCategory, UploadTarget, VerifyChain, VerifyTxOutProof,
         WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{

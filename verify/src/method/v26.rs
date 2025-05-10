@@ -42,7 +42,7 @@ pub const METHODS: &[Method] = &[
     Method::new_no_model("savemempool", "SaveMempool", "save_mempool"),
     Method::new_modelled("scanblocks", "ScanBlocks", "scan_blocks"),
     Method::new_modelled("scantxoutset", "ScanTxOutSet", "scan_tx_out_set"),
-    Method::new_bool("verifychain", "verify_chain"),
+    Method::new_no_model("verifychain", "VerifyChain", "verify_chain"),
     Method::new_modelled("verifytxoutproof", "VerifyTxOutProof", "verify_tx_out_proof"),
     // control
     Method::new_no_model("getmemoryinfo", "GetMemoryInfoStats", "get_memory_info"),
