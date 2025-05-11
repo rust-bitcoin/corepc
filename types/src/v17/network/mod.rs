@@ -4,8 +4,9 @@
 //!
 //! Types for methods found under the `== Network ==` section of the API docs.
 //!
-/// These types do not implement `into_model` because apart from fee rate there is no additional
-/// `rust-bitcoin` types needed.
+//! These types do not implement `into_model` because apart from fee rate there is no additional
+//! `rust-bitcoin` types needed.
+
 mod error;
 mod into;
 
