@@ -504,6 +504,29 @@ fn blockchain__scan_blocks_modelled() {
 }
 
 #[test]
+fn blockchain__scan_tx_out_set_modelled() {
+    let node = match () {
+        #[cfg(feature = "v21_and_below")]
+        () => Node::with_wallet(Wallet::None, &[]),
+        #[cfg(not(feature = "v21_and_below"))]
+        () => Node::with_wallet(Wallet::None, &["-coinstatsindex=1"]),
+    };
+
+    let dummy_pubkey_hex = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+    let scan_desc = format!("pkh({})", dummy_pubkey_hex);
+
+    let json: ScanTxOutSetStart =
+        node.client.scan_tx_out_set_start(&[&scan_desc]).expect("scantxoutset start");
+    let model: Result<mtype::ScanTxOutSetStart, ScanTxOutSetError> = json.into_model();
+    model.unwrap();
+
+    let _: Option<ScanTxOutSetStatus> =
+        node.client.scan_tx_out_set_status().expect("scantxoutset status");
+
+    let _: ScanTxOutSetAbort = node.client.scan_tx_out_set_abort().expect("scantxoutset abort");
+}
+
+#[test]
 fn blockchain__verify_chain() {
     let node = Node::with_wallet(Wallet::None, &[]);
 

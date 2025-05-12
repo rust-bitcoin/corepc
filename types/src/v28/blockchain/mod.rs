@@ -4,12 +4,14 @@
 //!
 //! Types for methods found under the `== Blockchain ==` section of the API docs.
 
+mod into;
+
 use alloc::collections::BTreeMap;
 
 use bitcoin::{BlockHash, Network, Work};
 use serde::{Deserialize, Serialize};
 
-use super::{GetBlockchainInfoError, Softfork};
+use super::{GetBlockchainInfoError, ScanTxOutSetError, Softfork};
 use crate::model;
 
 /// Result of JSON-RPC method `getblockchaininfo`.
@@ -102,4 +104,56 @@ impl GetBlockchainInfo {
             warnings: self.warnings,
         })
     }
+}
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. action                        (string, required) The action to execute
+/// > 2. scanobjects                   (json array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetStart {
+    /// Whether the scan was completed.
+    pub success: bool,
+    /// The number of unspent transaction outputs scanned.
+    pub txouts: u64,
+    /// The block height at which the scan was done.
+    pub height: u64,
+    /// The hash of the block at the tip of the chain.
+    #[serde(rename = "bestblock")]
+    pub best_block: String,
+    /// The unspents.
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC.
+    pub total_amount: f64,
+}
+
+/// Unspent outputs. Part of `scantxoutset`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id.
+    pub txid: String,
+    /// The vout value.
+    pub vout: u32,
+    /// The output script.
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: String,
+    /// A specialized descriptor for the matched output script.
+    #[serde(rename = "desc")]
+    pub descriptor: String,
+    /// The total amount in BTC of the unspent output.
+    pub amount: f64,
+    /// Whether this is a coinbase output.
+    pub coinbase: bool,
+    /// Height of the unspent transaction output.
+    pub height: u64,
+    /// Blockhash of the unspent transaction output.
+    #[serde(rename = "blockhash")]
+    pub block_hash: String,
+    /// Number of confirmations of the unspent transaction output when the scan was done.
+    pub confirmations: u64,
 }

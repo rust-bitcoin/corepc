@@ -679,6 +679,56 @@ pub struct PruneBlockchain(
     pub i64,
 );
 
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. "action"                       (string, required) The action to execute
+/// > 2. "scanobjects"                  (array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetStart {
+    /// Whether the scan is completed.
+    pub success: bool,
+    /// The unspents
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC
+    pub total_amount: f64,
+    /// Undocumented searched_items field.
+    pub searched_items: u64,
+}
+
+/// Result of JSON-RPC method `scantxoutset` when action is `abort`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetAbort(pub bool);
+
+/// Result of JSON-RPC method `scantxoutset` when action is `status`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetStatus {
+    /// Approximate percent complete.
+    pub progress: f64,
+}
+
+/// Unspent output item. Part of `scantxoutset`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id.
+    pub txid: String,
+    /// The vout value.
+    pub vout: u32,
+    /// The output script.
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: String,
+    /// The total amount in BTC of the unspent output.
+    pub amount: f64,
+    /// Height of the unspent transaction output.
+    pub height: u64,
+}
+
 /// Result of JSON-RPC method `verifychain`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]

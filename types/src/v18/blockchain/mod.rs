@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{MapMempoolEntryError, MempoolEntryError, MempoolEntryFees};
+use super::{MapMempoolEntryError, MempoolEntryError, MempoolEntryFees, ScanTxOutSetError};
 
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to `false`.
 ///
@@ -127,3 +127,43 @@ pub struct GetRawMempool(pub Vec<String>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. "action"                       (string, required) The action to execute
+/// > 2. "scanobjects"                  (array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetStart {
+    /// Whether the scan is completed.
+    pub success: bool,
+    /// The unspents.
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC.
+    pub total_amount: f64,
+    /// Undocumented searched_items field.
+    pub searched_items: u64,
+}
+
+/// Unspent outputs. Part of `scantxoutset`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id.
+    pub txid: String,
+    /// The vout value.
+    pub vout: u32,
+    /// The output script.
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: String,
+    /// A specialized descriptor for the matched output script.
+    #[serde(rename = "desc")]
+    pub descriptor: String,
+    /// The total amount in BTC of the unspent output.
+    pub amount: f64,
+    /// Height of the unspent transaction output.
+    pub height: u64,
+}
