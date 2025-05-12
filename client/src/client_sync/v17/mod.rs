@@ -47,6 +47,7 @@ crate::impl_client_v17__gettxoutsetinfo!();
 crate::impl_client_v17__preciousblock!();
 crate::impl_client_v17__pruneblockchain!();
 crate::impl_client_v17__savemempool!();
+crate::impl_client_v17__scantxoutset!();
 crate::impl_client_v17__verifychain!();
 crate::impl_client_v17__verifytxoutproof!();
 
@@ -205,4 +206,25 @@ impl Output {
 pub struct WalletCreateFundedPsbtInput {
     txid: Txid,
     vout: u32,
+}
+
+/// Args for the `scantxoutset`
+///
+/// Represents the action for the `scantxoutset` RPC call.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ScanAction {
+    Start,
+    Abort,
+    Status,
+}
+
+/// Represents a scan object for scantxoutset (descriptor string or object).
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum ScanObject {
+    /// Plain descriptor string
+    Descriptor(String),
+    /// Object containing descriptor and optional range
+    WithDesc { desc: String },
 }
