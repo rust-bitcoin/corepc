@@ -489,7 +489,6 @@ fn blockchain__savemempool() {
 #[cfg(not(feature = "v24_and_below"))]
 fn blockchain__scan_blocks_modelled() {
     let node = Node::with_wallet(Wallet::None, &["-blockfilterindex=1"]);
-
     // Arbitrary scan descriptor
     let scan_desc = "pkh(022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e)";
 
@@ -501,6 +500,35 @@ fn blockchain__scan_blocks_modelled() {
     let _: Option<ScanBlocksStatus> = node.client.scan_blocks_status().expect("scanblocks status");
 
     let _: ScanBlocksAbort = node.client.scan_blocks_abort().expect("scanblocks abort");
+}
+
+#[test]
+fn blockchain__scan_tx_out_set_modelled() {
+    let node = match () {
+        #[cfg(feature = "v21_and_below")]
+        () => Node::with_wallet(Wallet::None, &[]),
+        #[cfg(not(feature = "v21_and_below"))]
+        () => Node::with_wallet(Wallet::None, &["-coinstatsindex=1"])
+    };
+
+    let dummy_pubkey_hex = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+    let scan_desc = format!("pkh({})", dummy_pubkey_hex);
+
+    let json: ScanTxOutSetStart = node.client.scan_tx_out_set_start(&[&scan_desc]).expect("scantxoutset start");
+
+    let _: Option<ScanTxOutSetStatus> = node.client.scan_tx_out_set_status().expect("scantxoutset status");
+
+    let model: Result<mtype::ScanTxOutSetStart, ScanTxOutSetError> = json.into_model();
+    model.unwrap();
+
+    let _: ScanTxOutSetAbort = node.client.scan_tx_out_set_abort().expect("scantxoutset abort");
+}
+
+#[test]
+fn blockchain__verify_tx_out_proof__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    verify_tx_out_proof(&node).unwrap();
 }
 
 #[test]

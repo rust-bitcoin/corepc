@@ -318,7 +318,30 @@ macro_rules! impl_client_v17__save_mempool {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `verifychain`.
+/// Implements Bitcoin Core JSON-RPC API method `scantxoutset`
+#[macro_export]
+macro_rules! impl_client_v17__scan_tx_out_set {
+    () => {
+        impl Client {
+            /// Aborts an ongoing `scantxoutset` scan.
+            pub fn scan_tx_out_set_abort(&self) -> Result<ScanTxOutSetAbort> {
+                self.call("scantxoutset", &[into_json("abort")?])
+            }
+
+            /// Starts a scan of the UTXO set for specified descriptors.
+            pub fn scan_tx_out_set_start(&self, scan_objects: &[&str]) -> Result<ScanTxOutSetStart> {
+                self.call("scantxoutset", &[into_json("start")?, into_json(scan_objects)?])
+            }
+
+            /// Checks the status of an ongoing `scantxoutset` scan.
+            pub fn scan_tx_out_set_status(&self) -> Result<Option<ScanTxOutSetStatus>> {
+                self.call("scantxoutset", &[into_json("status")?])
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `verifychain`
 #[macro_export]
 macro_rules! impl_client_v17__verify_chain {
     () => {

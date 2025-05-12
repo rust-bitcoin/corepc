@@ -47,8 +47,9 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
+//! | scantxoutset                       | version + model | API marked as experimental             |
+//! | verifychain                        | returns boolean |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
 //! </details>
@@ -236,7 +237,7 @@ pub use self::{
     blockchain::{
         GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetRawMempool, GetRawMempoolVerbose,
-        MempoolEntry,
+        MempoolEntry, ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
     control::{ActiveCommand, GetRpcInfo},
     network::{GetNodeAddresses, GetPeerInfo, NodeAddress, PeerInfo},
@@ -290,5 +291,5 @@ pub use crate::v17::{
     ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
     WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock,
     WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-    WitnessUtxo, WitnessUtxoError,
+    WitnessUtxo, WitnessUtxoError, ScanTxOutSetAbort, ScanTxOutSetError, ScanTxOutSetStatus,
 };

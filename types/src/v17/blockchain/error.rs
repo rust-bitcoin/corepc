@@ -522,3 +522,67 @@ impl std::error::Error for GetTxOutSetInfoError {
 impl From<NumericError> for GetTxOutSetInfoError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
+
+/// Error that can occur when converting the result of the `scantxoutset`
+/// RPC method into the strongly typed `ScanTxOutSet` model.
+#[derive(Debug)]
+pub enum ScanTxOutSetError {
+    /// Failed to parse the `bestblock` field (a block hash) from a hex string.
+    BestBlockHash(hex::HexToArrayError),
+    /// Failed to parse the `blockhash` field (per unspent) from a hex string.
+    BlockHash(hex::HexToArrayError),
+    /// Failed to parse the `txid` field from a hex string.
+    Txid(hex::HexToArrayError),
+    /// Failed to parse the `scriptPubKey` field from hex string into script bytes.
+    ScriptPubKey(hex::HexToBytesError),
+    /// Failed to convert the `total_amount` field to a valid Bitcoin amount.
+    TotalAmount(amount::ParseAmountError),
+    /// Failed to convert an `amount` field in an unspent output to a valid Bitcoin amount.
+    Amount(amount::ParseAmountError),
+    /// A numeric field could not be converted to the expected Rust numeric type.
+    Numeric(NumericError),
+}
+
+impl fmt::Display for ScanTxOutSetError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use ScanTxOutSetError::*;
+
+        match self {
+            BestBlockHash(e) =>
+                write_err!(f, "conversion of the `bestblock` field failed"; e),
+            BlockHash(e) =>
+                write_err!(f, "conversion of the `blockhash` field failed"; e),
+            Txid(e) =>
+                write_err!(f, "conversion of the `txid` field failed"; e),
+            ScriptPubKey(e) =>
+                write_err!(f, "conversion of the `scriptPubKey` field failed"; e),
+            TotalAmount(e) =>
+                write_err!(f, "conversion of the `total_amount` field failed"; e),
+            Amount(e) =>
+                write_err!(f, "conversion of the `amount` field failed"; e),
+            Numeric(e) =>
+                write_err!(f, "numeric"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for ScanTxOutSetError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        use ScanTxOutSetError::*;
+
+        match self {
+            BestBlockHash(e) => Some(e),
+            BlockHash(e) => Some(e),
+            Txid(e) => Some(e),
+            ScriptPubKey(e) => Some(e),
+            TotalAmount(e) => Some(e),
+            Amount(e) => Some(e),
+            Numeric(e) => Some(e),
+        }
+    }
+}
+
+impl From<NumericError> for ScanTxOutSetError {
+    fn from(e: NumericError) -> Self { Self::Numeric(e) }
+}

@@ -48,7 +48,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -297,7 +297,7 @@ pub use crate::{
         TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
         VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError, WaitForBlockHeight,
         WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
+        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -316,7 +316,7 @@ pub use crate::{
     v20::{
         AddMultisigAddress, CreateMultisig, GenerateToDescriptor, GetTransaction,
         GetTransactionDetail, ListSinceBlock, ListSinceBlockError, ListTransactions,
-        TransactionItem, TransactionItemError,
+        TransactionItem, TransactionItemError, ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
     v21::{
         AddPeerAddress, Bip9SoftforkInfo, GenerateBlock, GetBlockchainInfo, GetIndexInfo,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{MapMempoolEntryError, MempoolEntryError, MempoolEntryFees};
+use super::{MapMempoolEntryError, MempoolEntryError, MempoolEntryFees, ScanTxOutSetError};
 
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to `false`.
 ///
@@ -127,3 +127,36 @@ pub struct GetRawMempool(pub Vec<String>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. "action"                       (string, required) The action to execute
+/// > 2. "scanobjects"                  (array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetStart {
+    /// The unspents
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC
+    pub total_amount: f64,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id
+    pub txid: String,
+    /// The vout value
+    pub vout: u32,
+    /// The script key
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: String,
+    /// A specialized descriptor for the matched scriptPubKey
+    #[serde(rename = "desc")]
+    pub descriptor: String,
+    /// The total amount in BTC of unspent output
+    pub amount: f64,
+    /// Height of the unspent transaction output
+    pub height: u64,
+}

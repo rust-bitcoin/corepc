@@ -306,7 +306,7 @@ pub use crate::{
         SoftforkReject, TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError,
         VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError,
         WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError,
-        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo, WitnessUtxoError,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -353,6 +353,6 @@ pub use crate::{
         DescriptorInfo, GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors,
         MempoolAcceptance, MempoolAcceptanceError, MempoolAcceptanceFees, ScanBlocksAbort,
         ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus, TestMempoolAccept,
-        TestMempoolAcceptError,
+        TestMempoolAcceptError, ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
 };

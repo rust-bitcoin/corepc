@@ -296,7 +296,7 @@ pub use crate::{
         TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
         VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError, WaitForBlockHeight,
         WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WitnessUtxo, WitnessUtxoError,
+        WalletCreateFundedPsbtError, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -354,7 +354,8 @@ pub use crate::{
     v28::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
         GetNetworkInfo, GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock,
-        ListSinceBlockError, ListTransactions, Logging, SubmitPackage, SubmitPackageError,
+        ListSinceBlockError, ListTransactions, Logging, SubmitPackage, SubmitPackageError, ScanTxOutSetStart,
+        ScanTxOutSetUnspent,
         SubmitPackageTxResult, SubmitPackageTxResultError, SubmitPackageTxResultFees,
         SubmitPackageTxResultFeesError, TransactionItem, TransactionItemError,
     },

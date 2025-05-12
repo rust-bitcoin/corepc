@@ -770,3 +770,42 @@ pub struct WaitForNewBlock {
     /// Block height.
     pub height: u32,
 }
+
+/// Models the result of the JSON-RPC method `scantxoutset` start.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetStart {
+    /// Whether the scan is completed. For v19 onwards.
+    pub success: Option<bool>,
+    /// The number of unspent transaction outputs scanned. For v19 onwards.
+    pub txouts: Option<u64>,
+    /// The current block height (index). For v19 onwards.
+    pub height: Option<u64>,
+    /// The hash of the block at the tip of the chain. For v19 onwards.
+    pub bestblock: Option<BlockHash>,
+    /// The unspents
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC
+    pub total_amount: Amount,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id
+    pub txid: Txid,
+    /// The vout value
+    pub vout: u32,
+    /// The script key
+    pub script_pubkey: ScriptBuf,
+    /// An output descriptor. For v18 onwards.
+    pub desc: Option<String>,
+    /// The total amount in BTC of unspent output
+    pub amount: Amount,
+    /// Whether this is a coinbase output. For v25 onwards.
+    pub coinbase: Option<bool>,
+    /// Height of the unspent transaction output
+    pub height: u64,
+    /// Blockhash of the unspent transaction output. For v28 onwards.
+    pub blockhash: Option<BlockHash>,
+    /// Number of confirmations of the unspent transaction output when the scan was done. For v28 onwards.
+    pub confirmations: Option<u64>,
+}

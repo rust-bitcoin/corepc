@@ -259,7 +259,9 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::GetBlockchainInfo,
+    blockchain::{
+        GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent,
+    },
     control::Logging,
     mining::GetMiningInfo,
     network::GetNetworkInfo,
@@ -303,7 +305,7 @@ pub use crate::{
         SoftforkReject, TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError,
         VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError,
         WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError,
-        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo, WitnessUtxoError,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

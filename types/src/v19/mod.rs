@@ -48,7 +48,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -239,7 +239,7 @@ pub use self::{
         GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, GetRawMempool,
         GetRawMempoolVerbose, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
-        MempoolEntryFees, MempoolEntryFeesError, Softfork, SoftforkType,
+        MempoolEntryFees, MempoolEntryFeesError, Softfork, SoftforkType, ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
     control::GetRpcInfo,
     network::{GetNetworkInfo, GetPeerInfo, PeerInfo},
@@ -282,7 +282,7 @@ pub use crate::v17::{
     UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
     VerifyTxOutProof, WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
     WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-    WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
+    WalletProcessPsbt, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
 };
 #[doc(inline)]
 pub use crate::v18::{

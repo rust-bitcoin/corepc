@@ -249,7 +249,7 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        GetBlockStats, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus,
+        GetBlockStats, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus, ScanTxOutSetStart, ScanTxOutSetUnspent
     },
     control::Logging,
     generating::{GenerateBlock, GenerateBlockError},
@@ -290,7 +290,7 @@ pub use crate::{
         ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
         WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
         WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
+        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

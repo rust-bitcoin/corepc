@@ -51,7 +51,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -296,7 +296,7 @@ pub use crate::{
         ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
         WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
         WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
+        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -311,7 +311,7 @@ pub use crate::{
         GetBalancesError, GetBalancesMine, GetBalancesWatchOnly, GetBlockFilter,
         GetBlockFilterError, GetBlockchainInfoError, GetChainTxStats, GetDescriptorInfo,
         GetRpcInfo, MapMempoolEntryError, MempoolEntryError, MempoolEntryFees,
-        MempoolEntryFeesError, SetWalletFlag, Softfork, SoftforkType,
+        MempoolEntryFeesError, SetWalletFlag, Softfork, SoftforkType, ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
     v20::GenerateToDescriptor,
     v21::{
