@@ -56,7 +56,7 @@
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
 //! | scanblocks                         | version + model | TODO                                   |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -259,7 +259,9 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::GetBlockchainInfo,
+    blockchain::{
+        GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent,
+    },
     control::Logging,
     mining::GetMiningInfo,
     network::GetNetworkInfo,
@@ -296,11 +298,12 @@ pub use crate::{
         ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
         ListTransactionsItemError, ListUnspentItemError, ListWallets, LockUnspent, Locked,
         PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
-        RescanBlockchain, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee,
-        SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
-        SoftforkReject, TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress,
-        ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+        RescanBlockchain, ScanTxOutSetError, SendMany, SendRawTransaction, SendToAddress,
+        SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+        SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,
+        UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
+        VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
+        WitnessUtxo, ScanTxOutSetAbort, ScanTxOutSetStatus,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

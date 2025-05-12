@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
 pub use self::error::*;
-use super::{GetChainTxStatsError, GetMempoolInfoError};
+use super::{GetChainTxStatsError, GetMempoolInfoError, ScanTxOutSetError};
 
 /// Result of JSON-RPC method `getblockchaininfo`.
 ///
@@ -340,4 +340,46 @@ pub struct GetMempoolInfo {
     /// Current minimum relay fee for transactions.
     #[serde(rename = "minrelaytxfee")]
     pub min_relay_tx_fee: f64,
+}
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. action                        (string, required) The action to execute
+/// 2. scanobjects                   (json array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetStart {
+    /// Whether the scan is completed
+    pub success: bool,
+    /// The number of unspent transaction outputs scanned
+    pub txouts: u64,
+    /// The current block height (index)
+    pub height: u64,
+    /// The hash of the block at the tip of the chain
+    #[serde(rename = "bestblock")]
+    pub best_block: String,
+    /// The unspents
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC
+    pub total_amount: f64,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id
+    pub txid: String,
+    /// The vout value
+    pub vout: u32,
+    /// The script key
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: String,
+    /// An output descriptor
+    #[serde(rename = "desc")]
+    pub descriptor: String,
+    /// The total amount in BTC of unspent output
+    pub amount: f64,
+    /// Height of the unspent transaction output
+    pub height: u64,
 }

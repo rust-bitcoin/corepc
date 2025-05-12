@@ -48,7 +48,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -238,8 +238,8 @@ pub use self::{
         GetBlockFilterError, GetBlockchainInfo, GetBlockchainInfoError, GetChainTxStats,
         GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, MapMempoolEntryError,
-        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, Softfork,
-        SoftforkType,
+        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError,
+        ScanTxOutSetStart, ScanTxOutSetUnspent, Softfork, SoftforkType,
     },
     control::GetRpcInfo,
     network::{GetNetworkInfo, GetPeerInfo, PeerInfo},
@@ -276,11 +276,12 @@ pub use crate::v17::{
     ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
     ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets, LoadWallet,
     LockUnspent, Locked, Logging, PruneBlockchain, RawTransactionError, RawTransactionInput,
-    RawTransactionOutput, RescanBlockchain, SendMany, SendRawTransaction, SendToAddress,
-    SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
-    SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory, UploadTarget,
-    ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
-    WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+    RawTransactionOutput, RescanBlockchain, ScanTxOutSetError, SendMany, SendRawTransaction,
+    SendToAddress, SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey,
+    SignRawTransaction, SignRawTransactionError, SoftforkReject, TestMempoolAccept,
+    TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
+    VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+    WalletProcessPsbt, WitnessUtxo, ScanTxOutSetAbort, ScanTxOutSetStatus,
 };
 #[doc(inline)]
 pub use crate::v18::{

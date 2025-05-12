@@ -47,8 +47,9 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
+//! | scantxoutset                       | version + model | API marked as experimental             |
+//! | verifychain                        | returns boolean |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
 //! </details>
@@ -232,7 +233,10 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::{GetMempoolEntry, MempoolEntry},
+    blockchain::{
+        GetMempoolEntry, MempoolEntry, ScanTxOutSetStart,
+        ScanTxOutSetUnspent,
+    },
     control::{ActiveCommand, GetRpcInfo},
     network::{GetNodeAddresses, GetPeerInfo, NodeAddress, PeerInfo},
     raw_transactions::{
@@ -276,10 +280,11 @@ pub use crate::v17::{
     ListTransactionsItemError, ListUnspentItemError, ListWallets, LoadWallet, LockUnspent, Locked,
     Logging, MapMempoolEntryError, MempoolAcceptance, MempoolEntryError, MempoolEntryFees,
     MempoolEntryFeesError, PruneBlockchain, PsbtInput, PsbtOutput, PsbtScript, RawTransaction,
-    RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain, SendMany,
-    SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignFail, SignFailError,
-    SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, Softfork,
-    SoftforkReject, TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress,
-    ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
-    WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+    RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain,
+    ScanTxOutSetError, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee,
+    SignFail, SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+    SignRawTransactionError, Softfork, SoftforkReject, TestMempoolAccept, TransactionCategory,
+    UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
+    VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
+    WitnessUtxo, ScanTxOutSetAbort, ScanTxOutSetStatus,
 };
