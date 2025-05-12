@@ -48,7 +48,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | returns numeric |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | returns boolean |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -235,7 +235,8 @@ pub use self::{
         GetBlockFilterError, GetBlockchainInfo, GetBlockchainInfoError, GetMempoolAncestors,
         GetMempoolAncestorsVerbose, GetMempoolDescendants, GetMempoolDescendantsVerbose,
         GetMempoolEntry, MapMempoolEntryError, MempoolEntry, MempoolEntryError, MempoolEntryFees,
-        MempoolEntryFeesError, Softfork, SoftforkType,
+        MempoolEntryFeesError, ScanTxOutSet, ScanTxOutSetStart, ScanTxOutSetStatus,
+        ScanTxOutSetUnspent, Softfork, SoftforkType,
     },
     wallet::{GetBalances, GetBalancesMine, GetBalancesWatchOnly},
 };

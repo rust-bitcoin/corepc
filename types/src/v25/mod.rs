@@ -52,7 +52,7 @@
 //! | pruneblockchain                    | returns numeric |                                        |
 //! | savemempool                        | version         |                                        |
 //! | scanblocks                         | version + model | TODO                                   |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | returns boolean |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -240,10 +240,14 @@
 //!
 //! </details>
 
+mod blockchain;
 mod wallet;
 
 #[doc(inline)]
-pub use self::wallet::{CreateWallet, LoadWallet, UnloadWallet};
+pub use self::{
+    blockchain::{ScanTxOutSet, ScanTxOutSetStart, ScanTxOutSetStatus, ScanTxOutSetUnspent},
+    wallet::{CreateWallet, LoadWallet, UnloadWallet},
+};
 #[doc(inline)]
 pub use crate::{
     v17::{
