@@ -1,0 +1,18 @@
+C-client:
+  - changed-files:
+      - any-glob-to-any-file: crates/client/**
+C-integration_test:
+  - changed-files:
+      - any-glob-to-any-file: crates/integration_test/**
+C-jsonrpc:
+  - changed-files:
+      - any-glob-to-any-file: crates/jsonrpc/**
+C-node:
+  - changed-files:
+      - any-glob-to-any-file: crates/node/**
+C-types:
+  - changed-files:
+      - any-glob-to-any-file: crates/types/**
+C-verify:
+  - changed-files:
+      - any-glob-to-any-file: crates/verify/**
