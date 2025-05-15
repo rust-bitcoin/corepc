@@ -35,6 +35,7 @@ pub mod model;
 
 use core::fmt;
 
+use bitcoin::address::{self, Address, NetworkUnchecked};
 use bitcoin::amount::ParseAmountError;
 use bitcoin::hex::{self, FromHex as _};
 use bitcoin::{Amount, FeeRate, ScriptBuf, Witness};
@@ -172,24 +173,42 @@ pub fn compact_size_decode(slice: &mut &[u8]) -> u64 {
 }
 
 /// Data returned by Core for a script pubkey.
+///
+/// This is used by methods in the blockchain section and in the raw transaction section (i.e raw
+/// transaction and psbt methods). The shape changed in Core v22 but the new shape is fully
+/// backwards compatible so we only provide it not a v17 specific type. The `mtype::ScriptPubkey`
+/// mirrors this design (but with concrete `rust-bitcoin` types).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ScriptPubkey {
     /// Script assembly.
     pub asm: String,
     /// Script hex.
     pub hex: String,
+    /// Number of required signatures - deprecated in Core v22.
+    ///
+    /// Only returned before in versions prior to 22 or for version 22 onwards if
+    /// config option `-deprecatedrpc=addresses` is passed.
     #[serde(rename = "reqSigs")]
     pub req_sigs: Option<i64>,
     /// The type, eg pubkeyhash.
     #[serde(rename = "type")]
     pub type_: String,
-    /// Array of bitcoin address.
+    /// Bitcoin address (only if a well-defined address exists).
+    pub address: Option<String>,
+    /// Array of bitcoin addresses - deprecated in Core v22.
+    ///
+    /// Only returned before in versions prior to 22 or for version 22 onwards if
+    /// config option `-deprecatedrpc=addresses` is passed.
     pub addresses: Option<Vec<String>>,
 }
 
 impl ScriptPubkey {
     fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
         ScriptBuf::from_hex(&self.hex)
+    }
+
+    fn address(&self) -> Option<Result<Address<NetworkUnchecked>, address::ParseError>> {
+        self.address.as_ref().map(|addr| addr.parse::<Address<_>>())
     }
 }
 

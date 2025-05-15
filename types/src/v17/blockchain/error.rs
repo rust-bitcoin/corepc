@@ -473,6 +473,9 @@ impl From<ParseAmountError> for GetMempoolInfoError {
 }
 
 /// Error when converting a `GetTxOut` type into the model type.
+///
+/// Note that variants in this type are not named in the usual fashion. The `ScriptBuf` and
+/// `Address` variants are named after the functions on [`crate::ScriptPubkey`].
 #[derive(Debug)]
 pub enum GetTxOutError {
     /// Conversion of numeric type to expected type failed.
@@ -481,10 +484,10 @@ pub enum GetTxOutError {
     BestBlock(hex::HexToArrayError),
     /// Conversion of the transaction `value` field failed.
     Value(amount::ParseAmountError),
-    /// Conversion of the transaction `script_pubkey` field failed.
-    ScriptPubkey(hex::HexToBytesError),
-    /// Conversion of the transaction `addresses` field failed.
-    Addresses(address::ParseError),
+    /// Conversion of the `ScriptPubkey` hex to a `ScriptBuf` failed.
+    ScriptBuf(hex::HexToBytesError),
+    /// Conversion of the `ScriptPubkey` `address` field failed.
+    Address(address::ParseError),
 }
 
 impl fmt::Display for GetTxOutError {
@@ -495,9 +498,10 @@ impl fmt::Display for GetTxOutError {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             BestBlock(ref e) => write_err!(f, "conversion of the `beast_block` field failed"; e),
             Value(ref e) => write_err!(f, "conversion of the `value` field failed"; e),
-            ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
-            Addresses(ref e) => write_err!(f, "conversion of the `addresses` field failed"; e),
+            ScriptBuf(ref e) =>
+                write_err!(f, "conversion of the `ScriptPubkey` hex to a `ScriptBuf` failed"; e),
+            Address(ref e) =>
+                write_err!(f, "conversion of the `ScriptPubkey` `address` field failed"; e),
         }
     }
 }
@@ -511,8 +515,8 @@ impl std::error::Error for GetTxOutError {
             Numeric(ref e) => Some(e),
             BestBlock(ref e) => Some(e),
             Value(ref e) => Some(e),
-            ScriptPubkey(ref e) => Some(e),
-            Addresses(ref e) => Some(e),
+            ScriptBuf(ref e) => Some(e),
+            Address(ref e) => Some(e),
         }
     }
 }

@@ -455,7 +455,9 @@ pub struct GetTxOut {
     /// The returned `TxOut` (strongly typed).
     pub tx_out: TxOut,
     /// Address that `tx_out` spends to.
-    pub addresses: Vec<Address<NetworkUnchecked>>,
+    ///
+    /// Only if a well-defined address exists.
+    pub address: Option<Address<NetworkUnchecked>>,
     /// Coinbase or not.
     pub coinbase: bool,
 }

@@ -243,14 +243,10 @@
 //! </details>
 
 // JSON-RPC types by API section.
-mod blockchain;
 mod control;
 
 #[doc(inline)]
-pub use self::{
-    blockchain::{GetTxOut, GetTxOutError, ScriptPubkey},
-    control::Logging,
-};
+pub use self::control::Logging;
 #[doc(inline)]
 pub use crate::{
     v17::{
@@ -271,18 +267,19 @@ pub use crate::{
         GetPeerInfo, GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose, GetRawTransaction,
         GetRawTransactionVerbose, GetRawTransactionVerboseError, GetReceivedByAddress,
         GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
-        GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo,
-        GetWalletInfoError, GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsError,
-        ListAddressGroupingsItem, ListBanned, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddress, ListReceivedByAddressError,
-        ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError, ListSinceBlockTransaction,
-        ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
-        ListTransactionsItemError, ListUnspent, ListUnspentItem, ListUnspentItemError, ListWallets,
-        LoadWallet, Locked, PeerInfo, PruneBlockchain, RawTransactionError, RawTransactionInput,
-        RawTransactionOutput, RescanBlockchain, SendMany, SendRawTransaction, SendToAddress,
-        SignMessage, SignRawTransaction, SignRawTransactionError, SoftforkReject,
-        TestMempoolAccept, TransactionCategory, UploadTarget, VerifyChain, VerifyTxOutProof,
-        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+        GetTxOut, GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
+        GetWalletInfo, GetWalletInfoError, GetZmqNotifications, ListAddressGroupings,
+        ListAddressGroupingsError, ListAddressGroupingsItem, ListBanned, ListLabels,
+        ListLockUnspent, ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
+        ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
+        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
+        ListTransactionsItem, ListTransactionsItemError, ListUnspent, ListUnspentItem,
+        ListUnspentItemError, ListWallets, LoadWallet, Locked, PeerInfo, PruneBlockchain,
+        RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain, SendMany,
+        SendRawTransaction, SendToAddress, SignMessage, SignRawTransaction,
+        SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,
+        UploadTarget, VerifyChain, VerifyTxOutProof, WalletCreateFundedPsbt,
+        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -298,4 +295,5 @@ pub use crate::{
         SoftforkType,
     },
     v21::UnloadWallet,
+    ScriptPubkey,
 };

@@ -32,7 +32,7 @@ main() {
 
     # But only run tests for the latest version. This is ok because we are mainly checking
     # MSRV and docs with this script. Integration test will check every Core version.
-    $cargo test --features=download,28_0
+    $cargo test --features=download,29_0
 }
 
 #

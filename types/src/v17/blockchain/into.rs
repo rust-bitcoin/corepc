@@ -490,23 +490,16 @@ impl GetTxOut {
         let best_block = self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?;
         let tx_out = TxOut {
             value: Amount::from_btc(self.value).map_err(E::Value)?,
-            script_pubkey: ScriptBuf::from_hex(&self.script_pubkey.hex).map_err(E::ScriptPubkey)?,
+            script_pubkey: self.script_pubkey.script_buf().map_err(E::ScriptBuf)?,
         };
 
-        let addresses = match self.script_pubkey.addresses {
-            Some(addresses) => addresses
-                .into_iter()
-                .map(|address| address.parse::<Address<_>>())
-                .collect::<Result<Vec<_>, _>>()
-                .map_err(E::Addresses)?,
-            None => vec![],
-        };
+        let address = self.script_pubkey.address().transpose().map_err(E::Address)?;
 
         Ok(model::GetTxOut {
             best_block,
             confirmations: self.confirmations,
             tx_out,
-            addresses,
+            address,
             coinbase: self.coinbase,
         })
     }

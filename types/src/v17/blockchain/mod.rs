@@ -10,7 +10,7 @@ mod into;
 use alloc::collections::BTreeMap;
 
 use bitcoin::hex::FromHex;
-use bitcoin::{Address, Amount, FeeRate, Network, ScriptBuf, TxMerkleNode, TxOut, Wtxid};
+use bitcoin::{Amount, FeeRate, Network, TxMerkleNode, TxOut, Wtxid};
 use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
