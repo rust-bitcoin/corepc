@@ -1,3 +1,11 @@
+# 0.8.0 2025-05-12
+
+- Improve the version specific SSOT docs [#142](https://github.com/rust-bitcoin/corepc/pull/)
+- Remove model for `dumpwallet` [#141](https://github.com/rust-bitcoin/corepc/pull/141)
+- Implement `pruneblock` method and test [#132](https://github.com/rust-bitcoin/corepc/pull/132)
+- Implement `savemempool` method and test [#148](https://github.com/rust-bitcoin/corepc/pull/148)
+- Implement `verifychain` method and test [#155](https://github.com/rust-bitcoin/corepc/pull/155)
+
 # 0.7.0 2025-04-04
 
 - Fix `{create,load}wallet` on `v25` [#108](https://github.com/rust-bitcoin/corepc/pull/108)

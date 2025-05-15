@@ -1,3 +1,9 @@
+# 0.8.0 2025-05-12
+
+- Add support for Bitcoin Core 0.17.2 [#128](https://github.com/rust-bitcoin/corepc/pull/128)
+- Upgrade `zip` in light of RUSTSEC-2020-0071 [#143](https://github.com/rust-bitcoin/corepc/pull/143)
+- Drop default features for `zip` [#130](https://github.com/rust-bitcoin/corepc/pull/130)
+
 # 0.7.1 2025-05-05
 
 - backport: bump zip in light of RUSTSEC-2020-0071 [#145](https://github.com/rust-bitcoin/corepc/pull/145)

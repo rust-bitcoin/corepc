@@ -1,3 +1,12 @@
+# 0.8.0 2025-05-12
+
+- Remove unnecessary error variants [#127](https://github.com/rust-bitcoin/corepc/pull/127)
+- Move types to version specific module [#156](https://github.com/rust-bitcoin/corepc/pull/156)
+- Move `TemplateRequest` and `TemplateRules` into their proper module [#151](https://github.com/rust-bitcoin/corepc/pull/151)
+- Implement `pruneblock` method and test [#132](https://github.com/rust-bitcoin/corepc/pull/132)
+- Implement `savemempool` method and test [#148](https://github.com/rust-bitcoin/corepc/pull/148)
+- Implement `verifychain` method and test [#155](https://github.com/rust-bitcoin/corepc/pull/155)
+
 # 0.7.0 2025-04-04
 
 - Fix unloadwallet method [#110](https://github.com/rust-bitcoin/corepc/pull/110)
