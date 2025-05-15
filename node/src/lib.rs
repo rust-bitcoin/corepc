@@ -152,7 +152,7 @@ impl fmt::Debug for Error {
             NoBitcoindExecutableFound =>  write!(f, "`bitcoind` executable is required, provide it with one of the following: set env var `BITCOIND_EXE` or use a feature like \"22_1\" or have `bitcoind` executable in the `PATH`"),
             EarlyExit(e) => write!(f, "The bitcoind process terminated early with exit code {}", e),
             BothDirsSpecified => write!(f, "tempdir and staticdir cannot be enabled at same time in configuration options"),
-            RpcUserAndPasswordUsed => write!(f, "`-rpcuser` and `-rpcpassword` cannot be used, it will be deprecated soon and it's recommended to use `-rpcauth` instead which works alongside with the default cookie authentication"),
+            RpcUserAndPasswordUsed => write!(f, "The use of -rpcuser and -rpcpassword is deprecated and will be removed in the future. It is recommended to use -rpcauth instead, which works alongside the default cookie-based authentication."),
             SkipDownload => write!(f, "expecting an auto-downloaded executable but `BITCOIND_SKIP_DOWNLOAD` env var is set"),
             NoBitcoindInstance => write!(f, "it appears that bitcoind is not reachable"),
         }
