@@ -36,6 +36,7 @@ fn blockchain__get_block__modelled() {
     // assert!(json.into_model().is_ok());
 }
 
+#[cfg(not(feature = "v29"))]
 #[test]
 fn blockchain__get_blockchain_info__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
@@ -145,6 +146,16 @@ fn blockchain__get_chain_tx_stats__modelled() {
 
     let json: GetChainTxStats = node.client.get_chain_tx_stats().expect("getchaintxstats");
     let model: Result<mtype::GetChainTxStats, GetChainTxStatsError> = json.into_model();
+    model.unwrap();
+}
+
+#[test]
+#[cfg(feature = "v29")]
+fn blockchain__get_descriptor_activity__modelled() {
+    let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);
+
+    let json: GetDescriptorActivity = node.client.get_descriptor_activity(&[], &[], false).expect("getdescriptoractivity");
+    let model: Result<mtype::GetDescriptorActivity, GetDescriptorActivityError> = json.into_model();
     model.unwrap();
 }
 

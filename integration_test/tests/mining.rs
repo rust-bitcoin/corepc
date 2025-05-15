@@ -14,16 +14,32 @@ fn mining__get_block_template__modelled() {
     // Requires connected nodes otherwise the RPC call errors.
     let (node1, node2, node3) = integration_test::three_node_network();
 
-    // Use the nodes otherwise they get dropped.
     node1.mine_a_block();
     node2.mine_a_block();
     node3.mine_a_block();
+    std::thread::sleep(std::time::Duration::from_millis(500));
 
-    let options = TemplateRequest { rules: vec![TemplateRules::Segwit] };
+    #[cfg(not(feature = "v29"))]
+    {
+        let options = TemplateRequest { rules: vec![TemplateRules::Segwit] };
+        let json: GetBlockTemplate = node1.client.get_block_template(&options)
+            .expect("get_block_template RPC failed");
+        let _: Result<mtype::GetBlockTemplate, GetBlockTemplateError> = json.into_model();
+    }
 
-    let json: GetBlockTemplate = node1.client.get_block_template(&options).expect("rpc");
-    let model: Result<mtype::GetBlockTemplate, GetBlockTemplateError> = json.into_model();
-    model.unwrap();
+    #[cfg(feature = "v29")]
+    {
+        let request = TemplateRequest {
+            rules: vec![TemplateRules::Segwit],
+            mode: Some("template".to_string()),
+            ..Default::default()
+        };
+
+        let json: GetBlockTemplate = node1.client.get_block_template(&request)
+            .expect("get_block_template RPC failed");
+
+        let _: Result<mtype::GetBlockTemplate, GetBlockTemplateError> = json.into_model();
+    }
 }
 
 #[test]
