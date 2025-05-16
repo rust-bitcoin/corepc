@@ -9,7 +9,7 @@ C-jsonrpc:
       - any-glob-to-any-file: jsonrpc/**
 C-node:
   - changed-files:
-      - any-glob-to-any-file: node/**
+      - any-glob-to-any-file: node/src/lib.rs
 C-types:
   - changed-files:
       - any-glob-to-any-file: types/**
