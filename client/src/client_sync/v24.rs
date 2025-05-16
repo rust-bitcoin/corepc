@@ -15,7 +15,10 @@ use crate::types::v24::*;
 
 #[rustfmt::skip]                // Keep public re-exports separate.
 pub use crate::client_sync::{
-    v17::{Input, Output, TemplateRequest, TemplateRules, WalletCreateFundedPsbtInput},
+    v17::{
+        Input, Output, ScanAction, ScanObject, TemplateRequest, TemplateRules,
+        WalletCreateFundedPsbtInput
+    },
     v23::AddressType,
 };
 
@@ -45,6 +48,7 @@ crate::impl_client_v17__gettxoutsetinfo!();
 crate::impl_client_v17__preciousblock!();
 crate::impl_client_v17__pruneblockchain!();
 crate::impl_client_v23__savemempool!();
+crate::impl_client_v17__scantxoutset!();
 crate::impl_client_v17__verifychain!();
 crate::impl_client_v17__verifytxoutproof!();
 

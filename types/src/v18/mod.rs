@@ -47,7 +47,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | returns numeric |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | returns boolean |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -223,12 +223,14 @@
 //! </details>
 
 // JSON-RPC types by API section.
+mod blockchain;
 mod control;
 mod network;
 mod raw_transactions;
 
 #[doc(inline)]
 pub use self::{
+    blockchain::{ScanTxOutSet, ScanTxOutSetStart, ScanTxOutSetStatus, ScanTxOutSetUnspent},
     control::{ActiveCommand, GetRpcInfo},
     network::{GetNodeAddresses, NodeAddress},
     raw_transactions::{
