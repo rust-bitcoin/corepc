@@ -17,7 +17,10 @@ use crate::types::v21::*;
 
 #[rustfmt::skip]                // Keep public re-exports separate.
 pub use crate::client_sync::{
-    v17::{AddressType, Input, Output, TemplateRequest, TemplateRules, WalletCreateFundedPsbtInput},
+    v17::{
+        AddressType, Input, Output, ScanAction, ScanObject, TemplateRequest,
+        TemplateRules, WalletCreateFundedPsbtInput
+    },
 };
 
 crate::define_jsonrpc_minreq_client!("v21");
@@ -46,6 +49,7 @@ crate::impl_client_v17__gettxoutsetinfo!();
 crate::impl_client_v17__preciousblock!();
 crate::impl_client_v17__pruneblockchain!();
 crate::impl_client_v17__savemempool!();
+crate::impl_client_v17__scantxoutset!();
 crate::impl_client_v17__verifychain!();
 crate::impl_client_v17__verifytxoutproof!();
 

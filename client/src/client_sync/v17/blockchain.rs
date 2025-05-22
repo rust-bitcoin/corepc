@@ -318,6 +318,30 @@ macro_rules! impl_client_v17__savemempool {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `scantxoutset`
+#[macro_export]
+macro_rules! impl_client_v17__scantxoutset {
+    () => {
+        impl Client {
+            pub fn scan_tx_out_set(
+                &self,
+                action: ScanAction,
+                scan_objects: &[ScanObject],
+            ) -> Result<ScanTxOutSet> {
+                let params = match action {
+                    ScanAction::Start => {
+                        vec![into_json(action)?, into_json(scan_objects)?]
+                    }
+                    ScanAction::Abort | ScanAction::Status => {
+                        vec![into_json(action)?]
+                    }
+                };
+                self.call("scantxoutset", &params)
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `verifychain`
 #[macro_export]
 macro_rules! impl_client_v17__verifychain {

@@ -56,7 +56,7 @@
 //! | pruneblockchain                    | returns numeric |                                        |
 //! | savemempool                        | version         |                                        |
 //! | scanblocks                         | version + model | TODO                                   |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | returns boolean |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -255,7 +255,13 @@ mod mining;
 mod network;
 
 #[doc(inline)]
-pub use self::{blockchain::GetBlockchainInfo, mining::GetMiningInfo, network::GetNetworkInfo};
+pub use self::{
+    blockchain::{
+        GetBlockchainInfo, ScanTxOutSet, ScanTxOutSetStart, ScanTxOutSetStatus, ScanTxOutSetUnspent,
+    },
+    mining::GetMiningInfo,
+    network::GetNetworkInfo,
+};
 #[doc(inline)]
 pub use crate::{
     v17::{

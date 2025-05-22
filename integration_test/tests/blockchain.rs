@@ -318,6 +318,35 @@ fn blockchain__savemempool() {
 }
 
 #[test]
+fn blockchain__scan_tx_out_set_modelled() {
+    #[cfg(any(
+        feature = "v17",
+        feature = "v18",
+        feature = "v19",
+        feature = "v20",
+        feature = "v21"
+    ))]
+    let node = Node::with_wallet(Wallet::None, &[]);
+
+    #[cfg(not(any(
+        feature = "v17",
+        feature = "v18",
+        feature = "v19",
+        feature = "v20",
+        feature = "v21"
+    )))]
+    let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1"]);
+
+    let dummy_pubkey_hex = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
+    let scan_desc = format!("pkh({})", dummy_pubkey_hex);
+
+    let scan_objects: node::ScanObject = node::ScanObject::Descriptor(scan_desc);
+    let action: node::ScanAction = node::ScanAction::Start;
+
+    let _: Result<ScanTxOutSet, _> = node.client.scan_tx_out_set(action, &[scan_objects]);
+}
+
+#[test]
 fn blockchain__verify_tx_out_proof__modelled() {
     let node = Node::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
