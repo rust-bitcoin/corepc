@@ -29,7 +29,7 @@ jobs:
             const filePathsToLabels = {
               'node/': 'C-node',
               'client/': 'C-client',
-              'integration_test/': 'C-integration_test',
+              'integration_test/': 'C-integration-test',
               'jsonrpc/': 'C-jsonrpc',
               'types/': 'C-types',
               'verify/': 'C-verify'
