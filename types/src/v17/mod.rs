@@ -187,7 +187,7 @@
 //! | listreceivedbyaddress              | version + model | UNTESTED                               |
 //! | listsinceblock                     | version + model | UNTESTED                               |
 //! | listtransactions                   | version + model | UNTESTED                               |
-//! | listunspent                        | version + model | UNTESTED                               |
+//! | listunspent                        | version + model |                                        |
 //! | listwallets                        | version + model | UNTESTED                               |
 //! | loadwallet                         | version + model |                                        |
 //! | lockunspent                        | returns boolean |                                        |

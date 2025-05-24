@@ -622,6 +622,17 @@ impl ListTransactionsItem {
     }
 }
 
+impl ListUnspent {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::ListUnspent, ListUnspentItemError> {
+        self.0
+            .into_iter()
+            .map(|item| item.into_model())
+            .collect::<Result<Vec<_>, _>>()
+            .map(model::ListUnspent)
+    }
+}
+
 impl ListUnspentItem {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::ListUnspentItem, ListUnspentItemError> {

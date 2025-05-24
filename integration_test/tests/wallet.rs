@@ -216,6 +216,22 @@ fn wallet__get_transaction__modelled() {
 }
 
 #[test]
+fn wallet__list_unspent__modelled() {
+    let node = match () {
+        #[cfg(feature = "v17")]
+        () => Node::with_wallet(Wallet::Default, &["-deprecatedrpc=accounts"]),
+        #[cfg(not(feature = "v17"))]
+        () => Node::with_wallet(Wallet::Default, &[]),
+    };
+
+    node.fund_wallet();
+
+    let json: ListUnspent = node.client.list_unspent().expect("listunspent");
+    let model: Result<mtype::ListUnspent, ListUnspentItemError> = json.into_model();
+    model.unwrap();
+}
+
+#[test]
 fn wallet__load_wallet__modelled() {
     create_load_unload_wallet();
 }
