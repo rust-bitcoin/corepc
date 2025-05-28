@@ -136,8 +136,9 @@ pub enum Error {
     RpcUserAndPasswordUsed,
     /// Returned when expecting an auto-downloaded executable but `BITCOIND_SKIP_DOWNLOAD` env var is set
     SkipDownload,
-    /// It appears that bitcoind is not reachable.
-    NoBitcoindInstance,
+    /// Returned when bitcoind could not be reached after multiple attempts.
+    /// The attached string, if present, contains the error encountered when trying to connect.
+    NoBitcoindInstance(Option<String>),
 }
 
 impl fmt::Debug for Error {
@@ -154,7 +155,8 @@ impl fmt::Debug for Error {
             BothDirsSpecified => write!(f, "tempdir and staticdir cannot be enabled at same time in configuration options"),
             RpcUserAndPasswordUsed => write!(f, "`-rpcuser` and `-rpcpassword` cannot be used, it will be deprecated soon and it's recommended to use `-rpcauth` instead which works alongside with the default cookie authentication"),
             SkipDownload => write!(f, "expecting an auto-downloaded executable but `BITCOIND_SKIP_DOWNLOAD` env var is set"),
-            NoBitcoindInstance => write!(f, "it appears that bitcoind is not reachable"),
+            NoBitcoindInstance(Some(msg)) => write!(f, "it appears that bitcoind is not reachable: {}", msg),
+            NoBitcoindInstance(None) => write!(f, "it appears that bitcoind is not reachable."),
         }
     }
 }
@@ -177,7 +179,7 @@ impl std::error::Error for Error {
             | BothDirsSpecified
             | RpcUserAndPasswordUsed
             | SkipDownload
-            | NoBitcoindInstance => None,
+            | NoBitcoindInstance(_) => None,
         }
     }
 }
@@ -388,6 +390,7 @@ impl Node {
         assert!(process.stderr.is_none());
 
         let mut tries = 0;
+        let mut last_error = None;
         let auth = Auth::CookieFile(cookie_file.clone());
 
         let client = loop {
@@ -395,13 +398,14 @@ impl Node {
 
             if tries > 10 {
                 error!("failed to get a response from bitcoind");
-                return Err(Error::NoBitcoindInstance.into());
+                return Err(Error::NoBitcoindInstance(last_error).into());
             }
 
             let client_base = match Client::new_with_auth(&rpc_url, auth.clone()) {
                 Ok(client) => client,
                 Err(e) => {
                     error!("failed to create client: {}. Retrying!", e);
+                    last_error = Some(format!("{}", e));
                     thread::sleep(Duration::from_millis(1000));
                     continue;
                 }
@@ -439,6 +443,7 @@ impl Node {
                 }
                 Err(e) => {
                     error!("failed to get a response from bitcoind: {}. Retrying!", e);
+                    last_error = Some(format!("{}", e));
                     thread::sleep(Duration::from_millis(1000));
                     continue;
                 }
