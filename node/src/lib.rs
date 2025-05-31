@@ -623,7 +623,7 @@ pub fn downloaded_exe_path() -> anyhow::Result<String> {
 ///
 /// 1) If it's specified in the `BITCOIND_EXE` env var
 /// 2) If there is no env var but the auto-download feature is enabled, returns the
-///    path of the downloaded executabled
+///    path of the downloaded executable
 /// 3) If neither of the precedent are available, the `bitcoind` executable is searched in the `PATH`
 pub fn exe_path() -> anyhow::Result<String> {
     if let Ok(path) = std::env::var("BITCOIND_EXE") {

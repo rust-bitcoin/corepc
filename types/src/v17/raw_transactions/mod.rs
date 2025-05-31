@@ -222,7 +222,7 @@ pub struct DecodeScript {
 }
 
 /// Seemingly undocumented data returned in the `segwit` field of `DecodeScript`.
-// This seems to be the same as `DecodeScript` except the `p2sh` field is caled `p2sh-segwit`.
+// This seems to be the same as `DecodeScript` except the `p2sh` field is called `p2sh-segwit`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct DecodeScriptSegwit {
     /// Script public key.

@@ -65,7 +65,7 @@ pub struct GetConnectionCount(pub u64);
 pub struct GetNetTotals {
     /// Total bytes received.
     #[serde(rename = "totalbytesrecv")]
-    pub total_bytes_recieved: u64,
+    pub total_bytes_received: u64,
     /// Total bytes sent.
     #[serde(rename = "totalbytessent")]
     pub total_bytes_sent: u64,
