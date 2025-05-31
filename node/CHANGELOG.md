@@ -32,8 +32,8 @@
 # 0.4.0 - 2024-11-14
 
 - Add support for Bitcoin Core v28
-- Re-name the repository from `rust-bitcoind-josn-rpc` to `corepc`.
-- Re-name the crate from `bitcoind-josn-rpc-regtest` to `corepc-node`.
+- Re-name the repository from `rust-bitcoind-json-rpc` to `corepc`.
+- Re-name the crate from `bitcoind-json-rpc-regtest` to `corepc-node`.
 
 # 0.3.0 - 2024-06-21
 
@@ -51,4 +51,3 @@ confusion around the flag on `docs.rs` that says "Available on crate feature 26_
 # 0.1.0 - 2024-06-13
 
 Initial release, this is an import of `bitcoind v.036.0`.
-

@@ -36,7 +36,7 @@ CONFIGURATION
     <VERSION_ALIAS> <VERSION_NUMBER> <VERSION_ID> <BITCOIND_PATH>
 
     VERSION_ALIAS       Passed as command line argument to $(start).
-    VERISON_NUMBER      The Bitocin Core version number.
+    VERSION_NUMBER      The Bitcoin Core version number.
     VERSION_ID          Used as part of port numbers.
     BITCOIND_PATH       Path to $(bitcoind) binary.
 

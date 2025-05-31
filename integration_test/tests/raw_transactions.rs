@@ -150,7 +150,7 @@ fn raw_transactions__decode_psbt__modelled() {
         use bitcoin::bip32::{Fingerprint, DerivationPath, Xpub};
 
         let mut map = BTreeMap::default();
-        // Some arbitrary xpub I grabbed fom rust-bitcoin.
+        // Some arbitrary xpub I grabbed from rust-bitcoin.
         let xpub = "xpub6ERApfZwUNrhLCkDtcHTcxd75RbzS1ed54G1LkBUHQVHQKqhMkhgbmJbZRkrgZw4koxb5JaHWkY4ALHY2grBGRjaDMzQLcgJvLJuZZvRcEL";
         let xpub = xpub.parse::<Xpub>().expect("failed to parse xpub");
         let fp = Fingerprint::from([1u8, 2, 3, 42]);

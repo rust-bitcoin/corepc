@@ -113,7 +113,7 @@ pub struct GetBlockchainInfo {
 /// Status of softfork.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Softfork {
-    /// The [`SoftforkType`]: one of "burried", "bip9".
+    /// The [`SoftforkType`]: one of "buried", "bip9".
     #[serde(rename = "type")]
     pub type_: SoftforkType,
     /// The status of bip9 softforks (only for "bip9" type).
@@ -124,11 +124,11 @@ pub struct Softfork {
     pub active: bool,
 }
 
-/// The softfork type: one of "burried", "bip9".
+/// The softfork type: one of "buried", "bip9".
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SoftforkType {
-    /// Softfork is "burried" (as defined in [BIP-90]).
+    /// Softfork is "buried" (as defined in [BIP-90]).
     ///
     /// [BIP-90] <https://github.com/bitcoin/bips/blob/master/bip-0090.mediawiki>
     Buried,

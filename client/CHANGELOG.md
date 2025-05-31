@@ -36,8 +36,8 @@
 # 0.4.0 - 2024-11-14
 
 - Add support for Bitcoin Core v28
-- Re-name the repository from `rust-bitcoind-josn-rpc` to `corepc`.
-- Re-name the crate from `bitcoind-josn-rpc-client` to `corepc-client`.
+- Re-name the repository from `rust-bitcoind-json-rpc` to `corepc`.
+- Re-name the crate from `bitcoind-json-rpc-client` to `corepc-client`.
 
 # 0.3.0 - 2024-06-21
 
@@ -55,4 +55,3 @@
 # 0.1.0 - 2024-06-13
 
 Initial release.
-
