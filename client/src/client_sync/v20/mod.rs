@@ -60,7 +60,7 @@ crate::impl_client_v17__uptime!();
 
 // == Generating ==
 crate::impl_client_v17__generate_to_address!();
-crate::impl_client_v17__invalidateblock!();
+crate::impl_client_v17__invalidate_block!();
 
 // == Mining ==
 crate::impl_client_v17__get_block_template!();

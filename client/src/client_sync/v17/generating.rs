@@ -37,14 +37,14 @@ macro_rules! impl_client_v17__generate {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `invalidateblock`
+/// Implements Bitcoin Core JSON-RPC API method `invalidate_block`
 // This method does not appear in the output of `bitcoin-cli help`.
 #[macro_export]
-macro_rules! impl_client_v17__invalidateblock {
+macro_rules! impl_client_v17__invalidate_block {
     () => {
         impl Client {
             pub fn invalidate_block(&self, hash: BlockHash) -> Result<()> {
-                match self.call("invalidateblock", &[into_json(hash)?]) {
+                match self.call("invalidate_block", &[into_json(hash)?]) {
                     Ok(serde_json::Value::Null) => Ok(()),
                     Ok(res) => Err(Error::Returned(res.to_string())),
                     Err(err) => Err(err.into()),
