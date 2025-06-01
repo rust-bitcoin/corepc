@@ -119,6 +119,16 @@ macro_rules! impl_client_v17__get_peer_info {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `listbanned`
+#[macro_export]
+macro_rules! impl_client_v17__list_banned {
+    () => {
+        impl Client {
+            pub fn list_banned(&self) -> Result<ListBanned> { self.call("listbanned", &[]) }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `ping`
 #[macro_export]
 macro_rules! impl_client_v17__ping {

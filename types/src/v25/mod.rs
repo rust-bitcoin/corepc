@@ -100,7 +100,7 @@
 //! | getnetworkinfo                     | version + model |                                        |
 //! | getnodeaddresses                   | version + model |                                        |
 //! | getpeerinfo                        | version         |                                        |
-//! | listbanned                         | returns string  |                                        |
+//! | listbanned                         | version         |                                        |
 //! | ping                               | returns nothing |                                        |
 //! | setban                             | returns nothing |                                        |
 //! | setnetworkactive                   | returns nothing |                                        |
@@ -248,7 +248,7 @@ pub use self::wallet::{CreateWallet, LoadWallet, UnloadWallet};
 pub use crate::{
     v17::{
         AddMultisigAddress, AddMultisigAddressError, AddedNode, AddedNodeAddress,
-        AddressInformation, Banned, BumpFee, BumpFeeError, ChainTips, ChainTipsError,
+        AddressInformation, BumpFee, BumpFeeError, ChainTips, ChainTipsError,
         ChainTipsStatus, CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreateMultisig,
         CreateMultisigError, CreatePsbt, CreateRawTransaction, DecodeRawTransaction, DecodeScript,
         DecodeScriptError, DumpPrivKey, DumpWallet, EstimateSmartFee, FinalizePsbt,
@@ -267,7 +267,7 @@ pub use crate::{
         GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
         GetTxOut, GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfo, GetWalletInfoError, GetZmqNotifications, ListAddressGroupings,
-        ListAddressGroupingsError, ListAddressGroupingsItem, ListBanned, ListLabels,
+        ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels,
         ListLockUnspent, ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
         ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
@@ -292,7 +292,9 @@ pub use crate::{
         MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, Softfork,
         SoftforkType,
     },
-    v22::{Logging, ScriptPubkey},
+    v22::{
+        Banned, ListBanned, Logging, ScriptPubkey,
+    },
     v23::SaveMempool,
     v24::{
         DecodePsbt, DecodePsbtError, GlobalXpub, Proprietary, PsbtInput, PsbtOutput,
