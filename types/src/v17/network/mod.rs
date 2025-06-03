@@ -263,7 +263,8 @@ pub struct ListBanned(pub Vec<Banned>);
 
 /// An item from the list returned by the JSON-RPC method `listbanned`
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct Banned { // NOTE: Shape taken from Core source code,as method is undocumented in the Bitcoin RPC CLI.
+pub struct Banned {
+    // NOTE: Shape taken from Core source code,as method is undocumented in the Bitcoin RPC CLI.
     /// The IP/Subnet of the banned node.
     pub address: String,
     /// The UNIX epoch time the ban was expires.

@@ -250,10 +250,10 @@ pub use self::{
 pub use crate::{
     v17::{
         AddMultisigAddress, AddMultisigAddressError, AddedNode, AddedNodeAddress,
-        AddressInformation, BumpFee, BumpFeeError, ChainTips, ChainTipsError,
-        ChainTipsStatus, CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreateMultisig,
-        CreateMultisigError, CreatePsbt, CreateRawTransaction, CreateWallet, DecodeRawTransaction,
-        DecodeScript, DecodeScriptError, DumpPrivKey, DumpWallet, EstimateSmartFee, FinalizePsbt,
+        AddressInformation, BumpFee, BumpFeeError, ChainTips, ChainTipsError, ChainTipsStatus,
+        CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreateMultisig, CreateMultisigError,
+        CreatePsbt, CreateRawTransaction, CreateWallet, DecodeRawTransaction, DecodeScript,
+        DecodeScriptError, DumpPrivKey, DumpWallet, EstimateSmartFee, FinalizePsbt,
         FinalizePsbtError, FundRawTransaction, FundRawTransactionError, Generate,
         GenerateToAddress, GetAddedNodeInfo, GetAddressInfo, GetAddressInfoEmbedded,
         GetAddressInfoEmbeddedError, GetAddressInfoError, GetAddressInfoLabel, GetAddressesByLabel,
@@ -269,8 +269,8 @@ pub use crate::{
         GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
         GetTxOut, GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfo, GetWalletInfoError, GetZmqNotifications, ListAddressGroupings,
-        ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels,
-        ListLockUnspent, ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
+        ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
+        ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
         ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
@@ -295,7 +295,5 @@ pub use crate::{
         SoftforkType,
     },
     v21::UnloadWallet,
-    v22::{
-        Banned, ListBanned, Logging, ScriptPubkey,
-    },
+    v22::{Banned, ListBanned, Logging, ScriptPubkey},
 };
