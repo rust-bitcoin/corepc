@@ -111,6 +111,7 @@ crate::impl_client_v17__verify_message!();
 crate::impl_client_v17__abandon_transaction!();
 crate::impl_client_v17__abort_rescan!();
 crate::impl_client_v17__add_multisig_address!();
+crate::impl_client_v17__backup_wallet!();
 crate::impl_client_v17__bump_fee!();
 crate::impl_client_v17__create_wallet!();
 crate::impl_client_v17__dump_priv_key!();

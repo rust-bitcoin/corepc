@@ -61,6 +61,22 @@ macro_rules! impl_client_v17__add_multisig_address {
 
 /// Implements Bitcoin Core JSON-RPC API method `bumpfee`.
 #[macro_export]
+macro_rules! impl_client_v17__backup_wallet {
+    () => {
+        impl Client {
+            pub fn backup_wallet(&self, destination: &Path) -> Result<()> {
+                match self.call("backupwallet", &[into_json(destination)?]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `bumpfee`.
+#[macro_export]
 macro_rules! impl_client_v17__bump_fee {
     () => {
         impl Client {

@@ -10,6 +10,7 @@ use bitcoin::{Amount, PrivateKey};
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::{mtype,AddressType};
 use node::vtype::*;             // All the version specific types.
+use std::fs;
 
 #[test]
 fn wallet__abandon_transaction() {
@@ -61,6 +62,22 @@ fn wallet__add_multisig_address__modelled() {
         .expect("addmultisigaddress");
     let model: Result<mtype::AddMultisigAddress, AddMultisigAddressError> = json.into_model();
     model.unwrap();
+}
+
+#[test]
+fn wallet__backup_wallet() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    let file_path = integration_test::random_tmp_file();
+
+    if file_path.exists() {
+        fs::remove_file(&file_path).expect("removefile");
+    }
+
+    node.client.backup_wallet(&file_path).expect("backupwallet");
+    assert!(file_path.exists(), "Backup file should exist at destination");
+    assert!(file_path.is_file(), "Backup destination should be a file");
+
+    fs::remove_file(&file_path).expect("removefile");
 }
 
 #[test]
