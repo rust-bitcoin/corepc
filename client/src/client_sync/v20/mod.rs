@@ -80,6 +80,7 @@ crate::impl_client_v17__get_net_totals!();
 crate::impl_client_v17__get_network_info!();
 crate::impl_client_v18__get_node_addresses!();
 crate::impl_client_v17__get_peer_info!();
+crate::impl_client_v17__list_banned!();
 crate::impl_client_v17__ping!();
 crate::impl_client_v17__set_ban!();
 crate::impl_client_v17__set_network_active!();

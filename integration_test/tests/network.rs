@@ -114,6 +114,20 @@ fn get_peer_info_three_node_network() {
 }
 
 #[test]
+fn network__list_banned() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+    let dummy_subnet = "192.0.2.5/32";
+
+    node.client.set_ban(dummy_subnet, SetBanCommand::Add).expect("setban add");
+    let json: ListBanned = node.client.list_banned().expect("listbanned");
+    assert!(json.0.iter().any(|item| item.address == dummy_subnet));
+
+    node.client.set_ban(dummy_subnet, SetBanCommand::Remove).expect("setban remove");
+    let json: ListBanned = node.client.list_banned().expect("listbanned");
+    assert!(json.0.iter().all(|item| item.address != dummy_subnet));
+}
+
+#[test]
 fn network__ping() {
     let node = Node::with_wallet(Wallet::None, &[]);
     node.client.ping().expect("ping");
