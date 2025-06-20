@@ -170,7 +170,7 @@ fn wallet__get_addresses_by_label__modelled() {
 
     // sanity checks.
     assert!(!map.0.is_empty());
-    assert!(map.0.get(&addr).is_some());
+    assert!(map.0.contains_key(&addr));
 }
 
 #[test]
@@ -305,7 +305,7 @@ fn wallet__import_address() {
     // Derive the address from the private key
     let secp = bitcoin::secp256k1::Secp256k1::new();
     let pubkey = privkey.public_key(&secp);
-    let addr = bitcoin::Address::p2pkh(&pubkey, privkey.network);
+    let addr = bitcoin::Address::p2pkh(pubkey, privkey.network);
 
     node.client.import_address(&addr).expect("importaddress");
 }
@@ -428,7 +428,7 @@ fn create_load_unload_wallet() {
 
     // Upto version 20 Core returns null for `unloadwallet`.
     #[cfg(feature = "v20_and_below")]
-    let _ = node.client.unload_wallet(&wallet).expect("unloadwallet");
+    node.client.unload_wallet(&wallet).expect("unloadwallet");
 
     // From version 21 Core returns warnings for `unloadwallet`.
     #[cfg(not(feature = "v20_and_below"))]

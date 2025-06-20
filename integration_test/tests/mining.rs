@@ -134,7 +134,7 @@ fn submit_empty_block(node: &Node, bt: &mtype::GetBlockTemplate) {
             version: block::Version::default(),
             prev_blockhash: bt.previous_block_hash,
             merkle_root: TxMerkleNode::all_zeros(),
-            time: Ord::max(bt.min_time, std::time::UNIX_EPOCH.elapsed().expect("elapsed").as_secs() as u32) as u32,
+            time: Ord::max(bt.min_time, std::time::UNIX_EPOCH.elapsed().expect("elapsed").as_secs() as u32),
             bits: bt.bits,
             nonce: 0,
         },
@@ -150,7 +150,7 @@ fn submit_empty_block(node: &Node, bt: &mtype::GetBlockTemplate) {
         }
     }
 
-    let _ = node.client.submit_block(&block).expect("submitblock");
+    node.client.submit_block(&block).expect("submitblock");
 }
 
 // FIXME: Submitting this block returns 'inconclusive'.
@@ -208,7 +208,7 @@ fn mining__submit_block_with_dummy_coinbase(node: &Node, bt: &mtype::GetBlockTem
         }
     }
 
-    let _ = node.client.submit_block(&block).expect("submitblock");
+    node.client.submit_block(&block).expect("submitblock");
 }
 
 #[cfg(not(feature = "v17"))]
