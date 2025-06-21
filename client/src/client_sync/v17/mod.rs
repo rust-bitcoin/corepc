@@ -281,7 +281,5 @@ pub enum ImportMultiTimestamp {
 }
 
 impl Default for ImportMultiTimestamp {
-    fn default() -> Self {
-        ImportMultiTimestamp::Now("now".to_string())
-    }
+    fn default() -> Self { ImportMultiTimestamp::Now("now".to_string()) }
 }

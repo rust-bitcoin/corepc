@@ -303,7 +303,7 @@ macro_rules! impl_client_v17__import_address {
 macro_rules! impl_client_v17__import_multi {
     () => {
         impl Client {
-            pub fn import_multi( &self, requests: &[ImportMultiRequest]) -> Result<ImportMulti> {
+            pub fn import_multi(&self, requests: &[ImportMultiRequest]) -> Result<ImportMulti> {
                 self.call("importmulti", &[into_json(requests)?])
             }
         }
