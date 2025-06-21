@@ -221,8 +221,12 @@ fn mining__submit_header() {
     let best_block = node.client.get_best_block_hash().expect("getbestblockhash").into_model().unwrap().0;
     let mut header = node.client.get_block_header(&best_block).expect("getblockheader").into_model().unwrap().0;
 
-    // Change the nonce to ensure the header is different from the current tip.
-    header.nonce = header.nonce.wrapping_add(1);
+    for _ in 1..=u32::MAX {
+        header.nonce = header.nonce.wrapping_add(1);
+        if header.validate_pow(header.target()).is_ok() {
+            break;
+        }
+    }
 
-    let _ = node.client.submit_header(&header);
+    let _: () = node.client.submit_header(&header).expect("submitheader");
 }
