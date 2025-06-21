@@ -298,6 +298,18 @@ macro_rules! impl_client_v17__import_address {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `importmulti`
+#[macro_export]
+macro_rules! impl_client_v17__import_multi {
+    () => {
+        impl Client {
+            pub fn import_multi( &self, requests: &[ImportMultiRequest]) -> Result<ImportMulti> {
+                self.call("importmulti", &[into_json(requests)?])
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `importprivkey`.
 #[macro_export]
 macro_rules! impl_client_v17__import_privkey {

@@ -177,7 +177,7 @@
 //! | getunconfirmedbalance              | version + model | UNTESTED                               |
 //! | getwalletinfo                      | version + model | UNTESTED                               |
 //! | importaddress                      | returns nothing |                                        |
-//! | importmulti                        | returns nothing |                                        |
+//! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |
 //! | importprunedfunds                  | returns nothing |                                        |
 //! | importpubkey                       | returns nothing |                                        |
@@ -281,5 +281,5 @@ pub use crate::v17::{
     SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, Softfork, SoftforkReject,
     TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError,
     VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
-    WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+    WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo, ImportMulti, ImportMultiEntry, JsonRpcError,
 };

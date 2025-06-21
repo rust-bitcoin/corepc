@@ -128,6 +128,7 @@ crate::impl_client_v17__get_transaction!();
 crate::impl_client_v17__get_unconfirmed_balance!();
 crate::impl_client_v17__get_wallet_info!();
 crate::impl_client_v17__import_address!();
+crate::impl_client_v17__import_multi!();
 crate::impl_client_v17__import_privkey!();
 crate::impl_client_v17__list_address_groupings!();
 crate::impl_client_v17__list_labels!();
@@ -244,4 +245,43 @@ pub enum AddNodeCommand {
 pub enum SetBanCommand {
     Add,
     Remove,
+}
+
+/// Args for the `importmulti` method
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+pub struct ImportMultiRequest {
+    /// Descriptor to import. If using descriptor, donot also provide address/scriptPubKey, scripts, or pubkeys.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub desc: Option<String>,
+    /// Type of scriptPubKey (string for script, json for address). Should not be provided if using descriptor.
+    #[serde(rename = "scriptPubKey", skip_serializing_if = "Option::is_none")]
+    pub script_pub_key: Option<ImportMultiScriptPubKey>,
+    /// Creation time of the key expressed in UNIX epoch time, or the string "now" to substitute the current synced blockchain time.
+    pub timestamp: ImportMultiTimestamp,
+}
+
+/// `scriptPubKey` can be a string for script or json for address.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ImportMultiScriptPubKey {
+    /// The script.
+    Script(String),
+    /// The address.
+    Address { address: String },
+}
+
+/// `timestamp` can be a number (UNIX epoch time) or the string `"now"`
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum ImportMultiTimestamp {
+    /// The string "now".
+    Now(String),
+    /// The UNIX epoch time.
+    Time(u64),
+}
+
+impl Default for ImportMultiTimestamp {
+    fn default() -> Self {
+        ImportMultiTimestamp::Now("now".to_string())
+    }
 }

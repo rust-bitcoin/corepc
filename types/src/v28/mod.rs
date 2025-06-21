@@ -194,7 +194,7 @@
 //! | getwalletinfo                      | version + model | UNTESTED                               |
 //! | importaddress                      | returns nothing |                                        |
 //! | importdescriptors                  | version         | TODO                                   |
-//! | importmulti                        | returns nothing |                                        |
+//! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |
 //! | importprunedfunds                  | returns nothing |                                        |
 //! | importpubkey                       | returns nothing |                                        |
@@ -297,7 +297,7 @@ pub use crate::{
         SignRawTransaction, SignRawTransactionError, SoftforkReject, TestMempoolAccept,
         TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
         VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo,
+        WalletProcessPsbt, WitnessUtxo, ImportMulti, ImportMultiEntry, JsonRpcError,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

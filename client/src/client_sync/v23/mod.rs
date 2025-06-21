@@ -21,7 +21,7 @@ use crate::types::v23::*;
 pub use crate::client_sync::{
     v17::{
         AddNodeCommand, Input, Output, SetBanCommand, TemplateRequest, TemplateRules,
-        WalletCreateFundedPsbtInput
+        WalletCreateFundedPsbtInput, ImportMultiRequest, ImportMultiScriptPubKey, ImportMultiTimestamp,
     },
 };
 
@@ -140,6 +140,7 @@ crate::impl_client_v17__get_transaction!();
 crate::impl_client_v17__get_unconfirmed_balance!();
 crate::impl_client_v17__get_wallet_info!();
 crate::impl_client_v17__import_address!();
+crate::impl_client_v17__import_multi!();
 crate::impl_client_v17__import_privkey!();
 crate::impl_client_v17__list_address_groupings!();
 crate::impl_client_v18__list_received_by_label!();
