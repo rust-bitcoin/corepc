@@ -134,7 +134,8 @@ impl FromStr for Status {
             "version" => Ok(Status::Done),
             "version + model" => Ok(Status::Done),
             "omitted" => Ok(Status::Omitted),
-            "returns nothing" | "returns numeric" | "returns boolean" | "returns string"=> Ok(Status::Done),
+            "returns nothing" | "returns numeric" | "returns boolean" | "returns string" =>
+                Ok(Status::Done),
             other => Err(anyhow::Error::msg(format!("unknown status: '{}'", other))),
         }
     }
