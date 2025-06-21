@@ -267,7 +267,7 @@ fn blockchain__precious_block() {
     let hash = node.client.best_block_hash().expect("best_block_hash failed");
     node.mine_a_block();
 
-    let _ = node.client.precious_block(hash).expect("preciousblock");
+    node.client.precious_block(hash).expect("preciousblock");
 }
 
 #[test]

@@ -38,7 +38,7 @@ fn util__derive_addresses__modelled() {
     // Use a valid, deterministic public key from the pubkey_sort test vectors and the checksum for it.
     let descriptor = "pkh(02ff12471208c14bd580709cb2358d98975247d8765f92bc25eab3b2763ed605f8)#sf4k0g3u";
 
-    let json: DeriveAddresses = node.client.derive_addresses(&descriptor).expect("deriveaddresses");
+    let json: DeriveAddresses = node.client.derive_addresses(descriptor).expect("deriveaddresses");
     let res: Result<mtype::DeriveAddresses, _> = json.into_model();
     let _ = res.expect("DeriveAddresses into model");
 }
@@ -75,7 +75,7 @@ fn util__sign_message_with_priv_key__modelled() {
     // Derive the address from the private key
     let secp = bitcoin::secp256k1::Secp256k1::new();
     let pubkey = privkey.public_key(&secp);
-    let addr = bitcoin::Address::p2pkh(&pubkey, privkey.network);
+    let addr = bitcoin::Address::p2pkh(pubkey, privkey.network);
 
     // Sign the message with the private key
     let json: SignMessageWithPrivKey = node

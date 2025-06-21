@@ -146,8 +146,8 @@ fn network__set_ban() {
 fn network__set_network_active() {
     let node = Node::with_wallet(Wallet::None, &[]);
     let json: SetNetworkActive = node.client.set_network_active(false).expect("setnetworkactive false");
-    assert!(json.0 == false);
+    assert!(!json.0);
 
     let json: SetNetworkActive = node.client.set_network_active(true).expect("setnetworkactive true");
-    assert!(json.0 == true);
+    assert!(json.0);
 }
