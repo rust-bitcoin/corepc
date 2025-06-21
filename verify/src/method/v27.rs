@@ -55,11 +55,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getblocktemplate", "GetBlockTemplate", "get_block_template"),
     Method::new_modelled("getmininginfo", "GetMiningInfo", "get_mining_info"),
     Method::new_nothing("getnetworkhashps", "get_network_hashes_per_second"),
-    Method::new_modelled(
-        "getprioritisedtransactions",
-        "GetPrioritisedTransactions",
-        "get_prioritised_transactions",
-    ),
+    Method::new_modelled("getprioritisedtransactions", "GetPrioritisedTransactions", "get_prioritised_transactions"),
     Method::new_bool("prioritisetransaction", "prioritise_transaction"),
     Method::new_nothing("submitblock", "submit_block"),
     Method::new_bool("prioritisetransaction", "prioritise_transaction"),
@@ -90,11 +86,7 @@ pub const METHODS: &[Method] = &[
     Method::new_nothing("decodepsbt", "decode_psbt"),
     Method::new_nothing("decoderawtransaction", "decode_raw_transaction"),
     Method::new_nothing("decodescript", "decode_script"),
-    Method::new_modelled(
-        "descriptorprocesspsbt",
-        "DescriptorProcessPsbt",
-        "descriptor_process_psbt",
-    ),
+    Method::new_modelled("descriptorprocesspsbt", "DescriptorProcessPsbt", "descriptor_process_psbt"),
     Method::new_nothing("finalizepsbt", "finalize_psbt"),
     Method::new_nothing("fundrawtransaction", "fund_raw_transaction"),
     Method::new_nothing("getrawtransaction", "get_raw_transaction"),
@@ -183,11 +175,7 @@ pub const METHODS: &[Method] = &[
         "SignRawTransaction",
         "sign_raw_transaction_with_wallet",
     ),
-    Method::new_modelled(
-        "simulaterawtransaction",
-        "SimulateRawTransaction",
-        "simulate_raw_transaction",
-    ),
+    Method::new_modelled("simulaterawtransaction", "SimulateRawTransaction", "simulate_raw_transaction"),
     Method::new_nothing("unloadwallet", "unload_wallet"),
     Method::new_no_model("upgradewallet", "UpgradeWalled", "upgrade_wallet"),
     Method::new_modelled(

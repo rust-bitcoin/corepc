@@ -42,10 +42,12 @@ impl fmt::Display for GetBlockVerboseOneError {
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
-            NextBlockHash(ref e) =>
-                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e)
+            }
+            NextBlockHash(ref e) => {
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e)
+            }
         }
     }
 }
@@ -98,13 +100,15 @@ impl fmt::Display for GetBlockchainInfoError {
         match *self {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             Chain(ref e) => write_err!(f, "conversion of the `chain` field failed"; e),
-            BestBlockHash(ref e) =>
-                write_err!(f, "conversion of the `best_block_hash` field failed"; e),
+            BestBlockHash(ref e) => {
+                write_err!(f, "conversion of the `best_block_hash` field failed"; e)
+            }
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            SignetChallenge(ref e) =>
-                write_err!(f, "conversion of the `signet_challenge` field failed"; e),
+            SignetChallenge(ref e) => {
+                write_err!(f, "conversion of the `signet_challenge` field failed"; e)
+            }
         }
     }
 }
@@ -198,10 +202,12 @@ impl fmt::Display for GetBlockHeaderVerboseError {
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
-            NextBlockHash(ref e) =>
-                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e)
+            }
+            NextBlockHash(ref e) => {
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e)
+            }
         }
     }
 }

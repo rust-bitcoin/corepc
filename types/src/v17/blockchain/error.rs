@@ -39,10 +39,12 @@ impl fmt::Display for GetBlockVerboseOneError {
             Tx(ref e) => write_err!(f, "conversion of the `tx` field failed"; e),
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
-            NextBlockHash(ref e) =>
-                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e)
+            }
+            NextBlockHash(ref e) => {
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e)
+            }
         }
     }
 }
@@ -88,8 +90,9 @@ impl fmt::Display for GetBlockchainInfoError {
         match *self {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             Chain(ref e) => write_err!(f, "conversion of the `chain` field failed"; e),
-            BestBlockHash(ref e) =>
-                write_err!(f, "conversion of the `best_block_hash` field failed"; e),
+            BestBlockHash(ref e) => {
+                write_err!(f, "conversion of the `best_block_hash` field failed"; e)
+            }
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
         }
     }
@@ -174,10 +177,12 @@ impl fmt::Display for GetBlockHeaderVerboseError {
             MerkleRoot(ref e) => write_err!(f, "conversion of the `merkle_root` field failed"; e),
             Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             ChainWork(ref e) => write_err!(f, "conversion of the `chain_work` field failed"; e),
-            PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
-            NextBlockHash(ref e) =>
-                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e)
+            }
+            NextBlockHash(ref e) => {
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e)
+            }
         }
     }
 }
@@ -290,8 +295,9 @@ impl fmt::Display for GetChainTxStatsError {
 
         match *self {
             Numeric(ref e) => write_err!(f, "numeric"; e),
-            WindowFinalBlockHash(ref e) =>
-                write_err!(f, "conversion of the `window_final_block_hash` field failed"; e),
+            WindowFinalBlockHash(ref e) => {
+                write_err!(f, "conversion of the `window_final_block_hash` field failed"; e)
+            }
         }
     }
 }
@@ -498,10 +504,12 @@ impl fmt::Display for GetTxOutError {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             BestBlock(ref e) => write_err!(f, "conversion of the `beast_block` field failed"; e),
             Value(ref e) => write_err!(f, "conversion of the `value` field failed"; e),
-            ScriptBuf(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` hex to a `ScriptBuf` failed"; e),
-            Address(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` `address` field failed"; e),
+            ScriptBuf(ref e) => {
+                write_err!(f, "conversion of the `ScriptPubkey` hex to a `ScriptBuf` failed"; e)
+            }
+            Address(ref e) => {
+                write_err!(f, "conversion of the `ScriptPubkey` `address` field failed"; e)
+            }
         }
     }
 }

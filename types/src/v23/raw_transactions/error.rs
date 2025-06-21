@@ -30,12 +30,15 @@ impl fmt::Display for DecodePsbtError {
 
         match *self {
             E::Tx(ref e) => write_err!(f, "conversion of raw transaction data field failed"; e),
-            E::GlobalXpubs(ref e) =>
-                write_err!(f, "conversion of one the map items in the `global_xbubs` field failed"; e),
-            E::Proprietary(ref e) =>
-                write_err!(f, "conversion of one the map items in the `proprietray` field failed"; e),
-            E::Unknown(ref e) =>
-                write_err!(f, "conversion of one the map items in the `unknown` field failed"; e),
+            E::GlobalXpubs(ref e) => {
+                write_err!(f, "conversion of one the map items in the `global_xbubs` field failed"; e)
+            }
+            E::Proprietary(ref e) => {
+                write_err!(f, "conversion of one the map items in the `proprietray` field failed"; e)
+            }
+            E::Unknown(ref e) => {
+                write_err!(f, "conversion of one the map items in the `unknown` field failed"; e)
+            }
             E::Inputs(ref e) => write_err!(f, "conversion of one of the PSBT inputs failed"; e),
             E::Outputs(ref e) => write_err!(f, "conversion of one of the PSBT outputs failed"; e),
         }
@@ -75,8 +78,9 @@ impl fmt::Display for GlobalXpubError {
 
         match *self {
             E::Xpub(ref e) => write_err!(f, "conversion of the xpub failed"; e),
-            E::MasterFingerprint(ref e) =>
-                write_err!(f, "conversion of the `master_fingerprint` field failed"; e),
+            E::MasterFingerprint(ref e) => {
+                write_err!(f, "conversion of the `master_fingerprint` field failed"; e)
+            }
             E::Path(ref e) => write_err!(f, "conversion of the `path` field failed"; e),
         }
     }
@@ -143,37 +147,50 @@ impl fmt::Display for PsbtInputError {
         use PsbtInputError as E;
 
         match *self {
-            E::NonWitnessUtxo(ref e) =>
-                write_err!(f, "conversion of the `non_witness_utxo` field failed"; e),
-            E::WitnessUtxo(ref e) =>
-                write_err!(f, "conversion of the `witness_utxo` field failed"; e),
-            E::PartialSignatures(ref e) =>
-                write_err!(f, "conversion of the `partial_signatures` field failed"; e),
+            E::NonWitnessUtxo(ref e) => {
+                write_err!(f, "conversion of the `non_witness_utxo` field failed"; e)
+            }
+            E::WitnessUtxo(ref e) => {
+                write_err!(f, "conversion of the `witness_utxo` field failed"; e)
+            }
+            E::PartialSignatures(ref e) => {
+                write_err!(f, "conversion of the `partial_signatures` field failed"; e)
+            }
             E::Sighash(ref e) => write_err!(f, "conversion of the `sighash` field failed"; e),
-            E::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
-            E::WitnessScript(ref e) =>
-                write_err!(f, "conversion of the `witness_script` field failed"; e),
-            E::Bip32Derivs(ref e) =>
-                write_err!(f, "conversion of the `bip32_derivs` field failed"; e),
-            E::FinalScriptSig(ref e) =>
-                write_err!(f, "conversion of the `final_script_sig` field failed"; e),
-            E::FinalScriptWitness(ref e) =>
-                write_err!(f, "conversion of the `final_script_witness` field failed"; e),
+            E::RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
+            E::WitnessScript(ref e) => {
+                write_err!(f, "conversion of the `witness_script` field failed"; e)
+            }
+            E::Bip32Derivs(ref e) => {
+                write_err!(f, "conversion of the `bip32_derivs` field failed"; e)
+            }
+            E::FinalScriptSig(ref e) => {
+                write_err!(f, "conversion of the `final_script_sig` field failed"; e)
+            }
+            E::FinalScriptWitness(ref e) => {
+                write_err!(f, "conversion of the `final_script_witness` field failed"; e)
+            }
             E::Ripemd160(ref e) => write_err!(f, "conversion of the `ripemd160` hash failed"; e),
-            E::Ripemd160Preimage(ref e) =>
-                write_err!(f, "conversion of the `ripemd160` preimage failed"; e),
+            E::Ripemd160Preimage(ref e) => {
+                write_err!(f, "conversion of the `ripemd160` preimage failed"; e)
+            }
             E::Sha256(ref e) => write_err!(f, "conversion of the `sha256` hash failed"; e),
-            E::Sha256Preimage(ref e) =>
-                write_err!(f, "conversion of the `sha256` preimage failed"; e),
+            E::Sha256Preimage(ref e) => {
+                write_err!(f, "conversion of the `sha256` preimage failed"; e)
+            }
             E::Hash160(ref e) => write_err!(f, "conversion of the `hash160` hash failed"; e),
-            E::Hash160Preimage(ref e) =>
-                write_err!(f, "conversion of the `hash160` preimage failed"; e),
+            E::Hash160Preimage(ref e) => {
+                write_err!(f, "conversion of the `hash160` preimage failed"; e)
+            }
             E::Hash256(ref e) => write_err!(f, "conversion of the `hash256` hash failed"; e),
-            E::Hash256Preimage(ref e) =>
-                write_err!(f, "conversion of the `hash256` preimage failed"; e),
-            E::Proprietary(ref e) =>
-                write_err!(f, "conversion of one the map items in the `proprietray` field failed"; e),
+            E::Hash256Preimage(ref e) => {
+                write_err!(f, "conversion of the `hash256` preimage failed"; e)
+            }
+            E::Proprietary(ref e) => {
+                write_err!(f, "conversion of one the map items in the `proprietray` field failed"; e)
+            }
             E::Unknown(ref e) => write_err!(f, "conversion of the `unknown` field failed"; e),
         }
     }
@@ -228,14 +245,18 @@ impl fmt::Display for PsbtOutputError {
         use PsbtOutputError as E;
 
         match *self {
-            E::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
-            E::WitnessScript(ref e) =>
-                write_err!(f, "conversion of the `witness_script` field failed"; e),
-            E::Bip32Derivs(ref e) =>
-                write_err!(f, "conversion of the `bip32_derivs` field failed"; e),
-            E::Proprietary(ref e) =>
-                write_err!(f, "conversion of one the map items in the `proprietray` field failed"; e),
+            E::RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
+            E::WitnessScript(ref e) => {
+                write_err!(f, "conversion of the `witness_script` field failed"; e)
+            }
+            E::Bip32Derivs(ref e) => {
+                write_err!(f, "conversion of the `bip32_derivs` field failed"; e)
+            }
+            E::Proprietary(ref e) => {
+                write_err!(f, "conversion of one the map items in the `proprietray` field failed"; e)
+            }
             E::Unknown(ref e) => write_err!(f, "conversion of the `unknown` field failed"; e),
         }
     }

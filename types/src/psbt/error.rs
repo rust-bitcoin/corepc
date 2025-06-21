@@ -21,10 +21,12 @@ impl fmt::Display for RawTransactionError {
         use RawTransactionError as E;
 
         match *self {
-            E::Inputs(ref e) =>
-                write_err!(f, "conversion of one of the transaction inputs failed"; e),
-            E::Outputs(ref e) =>
-                write_err!(f, "conversion of one of the transaction outputs failed"; e),
+            E::Inputs(ref e) => {
+                write_err!(f, "conversion of one of the transaction inputs failed"; e)
+            }
+            E::Outputs(ref e) => {
+                write_err!(f, "conversion of one of the transaction outputs failed"; e)
+            }
         }
     }
 }
@@ -58,10 +60,12 @@ impl fmt::Display for RawTransactionInputError {
 
         match *self {
             E::Txid(ref e) => write_err!(f, "conversion of the input `txid` field failed"; e),
-            E::ScriptSig(ref e) =>
-                write_err!(f, "conversion of the input `script_sig` field failed"; e),
-            E::Witness(ref e) =>
-                write_err!(f, "conversion of one of the `witness` hex strings failed"; e),
+            E::ScriptSig(ref e) => {
+                write_err!(f, "conversion of the input `script_sig` field failed"; e)
+            }
+            E::Witness(ref e) => {
+                write_err!(f, "conversion of one of the `witness` hex strings failed"; e)
+            }
         }
     }
 }
@@ -94,8 +98,9 @@ impl fmt::Display for RawTransactionOutputError {
 
         match *self {
             E::Value(ref e) => write_err!(f, "conversion of the output `value` field failed"; e),
-            E::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the output `script_pubkey` field failed"; e),
+            E::ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the output `script_pubkey` field failed"; e)
+            }
         }
     }
 }
@@ -127,8 +132,9 @@ impl fmt::Display for WitnessUtxoError {
 
         match *self {
             E::Amount(ref e) => write_err!(f, "conversion of the `amount` field failed"; e),
-            E::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
+            E::ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the `script_pubkey` field failed"; e)
+            }
         }
     }
 }
@@ -159,8 +165,9 @@ impl fmt::Display for PartialSignatureError {
         use PartialSignatureError as E;
 
         match *self {
-            E::PublicKey(ref e) =>
-                write_err!(f, "partial sigs key-value pair parse pubkey failed"; e),
+            E::PublicKey(ref e) => {
+                write_err!(f, "partial sigs key-value pair parse pubkey failed"; e)
+            }
             E::Signature(ref e) => write_err!(f, "partial sigs key-value pair parse sig failed"; e),
         }
     }
@@ -195,8 +202,9 @@ impl fmt::Display for Bip32DerivError {
 
         match *self {
             E::Pubkey(ref e) => write_err!(f, "conversion of the pubkey failed"; e),
-            E::MasterFingerprint(ref e) =>
-                write_err!(f, "conversion of the `master_fingerprint` field failed"; e),
+            E::MasterFingerprint(ref e) => {
+                write_err!(f, "conversion of the `master_fingerprint` field failed"; e)
+            }
             E::Path(ref e) => write_err!(f, "conversion of the `path` field failed"; e),
         }
     }

@@ -32,8 +32,9 @@ impl fmt::Display for DecodePsbtError {
 
         match *self {
             E::Tx(ref e) => write_err!(f, "conversion of raw transaction data field failed"; e),
-            E::Unknown(ref e) =>
-                write_err!(f, "conversion of one the map items in the `unknown` field failed"; e),
+            E::Unknown(ref e) => {
+                write_err!(f, "conversion of one the map items in the `unknown` field failed"; e)
+            }
             E::Inputs(ref e) => write_err!(f, "conversion of one of the PSBT inputs failed"; e),
             E::Outputs(ref e) => write_err!(f, "conversion of one of the PSBT outputs failed"; e),
         }
@@ -84,23 +85,31 @@ impl fmt::Display for PsbtInputError {
         use PsbtInputError as E;
 
         match *self {
-            E::NonWitnessUtxo(ref e) =>
-                write_err!(f, "conversion of the `non_witness_utxo` field failed"; e),
-            E::WitnessUtxo(ref e) =>
-                write_err!(f, "conversion of the `witness_utxo` field failed"; e),
-            E::PartialSignatures(ref e) =>
-                write_err!(f, "conversion of the `partial_signatures` field failed"; e),
+            E::NonWitnessUtxo(ref e) => {
+                write_err!(f, "conversion of the `non_witness_utxo` field failed"; e)
+            }
+            E::WitnessUtxo(ref e) => {
+                write_err!(f, "conversion of the `witness_utxo` field failed"; e)
+            }
+            E::PartialSignatures(ref e) => {
+                write_err!(f, "conversion of the `partial_signatures` field failed"; e)
+            }
             E::Sighash(ref e) => write_err!(f, "conversion of the `sighash` field failed"; e),
-            E::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
-            E::WitnessScript(ref e) =>
-                write_err!(f, "conversion of the `witness_script` field failed"; e),
-            E::Bip32Derivs(ref e) =>
-                write_err!(f, "conversion of the `bip32_derivs` field failed"; e),
-            E::FinalScriptSig(ref e) =>
-                write_err!(f, "conversion of the `final_script_sig` field failed"; e),
-            E::FinalScriptWitness(ref e) =>
-                write_err!(f, "conversion of the `final_script_witness` field failed"; e),
+            E::RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
+            E::WitnessScript(ref e) => {
+                write_err!(f, "conversion of the `witness_script` field failed"; e)
+            }
+            E::Bip32Derivs(ref e) => {
+                write_err!(f, "conversion of the `bip32_derivs` field failed"; e)
+            }
+            E::FinalScriptSig(ref e) => {
+                write_err!(f, "conversion of the `final_script_sig` field failed"; e)
+            }
+            E::FinalScriptWitness(ref e) => {
+                write_err!(f, "conversion of the `final_script_witness` field failed"; e)
+            }
             E::Unknown(ref e) => write_err!(f, "conversion of the `unknown` field failed"; e),
         }
     }
@@ -144,12 +153,15 @@ impl fmt::Display for PsbtOutputError {
         use PsbtOutputError as E;
 
         match *self {
-            E::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
-            E::WitnessScript(ref e) =>
-                write_err!(f, "conversion of the `witness_script` field failed"; e),
-            E::Bip32Derivs(ref e) =>
-                write_err!(f, "conversion of the `bip32_derivs` field failed"; e),
+            E::RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
+            E::WitnessScript(ref e) => {
+                write_err!(f, "conversion of the `witness_script` field failed"; e)
+            }
+            E::Bip32Derivs(ref e) => {
+                write_err!(f, "conversion of the `bip32_derivs` field failed"; e)
+            }
             E::Unknown(ref e) => write_err!(f, "conversion of the `unknown` field failed"; e),
         }
     }
@@ -285,10 +297,12 @@ impl fmt::Display for GetRawTransactionVerboseError {
         use GetRawTransactionVerboseError as E;
 
         match *self {
-            E::Inputs(ref e) =>
-                write_err!(f, "conversion of one of the transaction inputs failed"; e),
-            E::Outputs(ref e) =>
-                write_err!(f, "conversion of one of the transaction outputs failed"; e),
+            E::Inputs(ref e) => {
+                write_err!(f, "conversion of one of the transaction inputs failed"; e)
+            }
+            E::Outputs(ref e) => {
+                write_err!(f, "conversion of one of the transaction outputs failed"; e)
+            }
             E::BlockHash(ref e) => write_err!(f, "conversion of the `block_hash` field failed"; e),
         }
     }

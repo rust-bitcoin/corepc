@@ -25,8 +25,9 @@ impl fmt::Display for AddMultisigAddressError {
 
         match *self {
             Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
-            RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
+            RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
         }
     }
 }
@@ -60,8 +61,9 @@ impl fmt::Display for BumpFeeError {
 
         match *self {
             E::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
-            E::OriginalFee(ref e) =>
-                write_err!(f, "conversion of the `original_fee` field failed"; e),
+            E::OriginalFee(ref e) => {
+                write_err!(f, "conversion of the `original_fee` field failed"; e)
+            }
             E::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
         }
     }
@@ -118,15 +120,19 @@ impl fmt::Display for GetAddressInfoError {
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
-            E::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
+            E::ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the `script_pubkey` field failed"; e)
+            }
             E::WitnessVersionValue(v) => write!(f, "invalid witness version number: {}", v),
-            E::WitnessVersion(ref e) =>
-                write_err!(f, "conversion of the `witness_version` field failed"; e),
-            E::WitnessProgramBytes(ref e) =>
-                write_err!(f, "conversion of the `witness_program` field hex string to bytes failed"; e),
-            E::WitnessProgram(ref e) =>
-                write_err!(f, "conversion of the `witness_program` field failed"; e),
+            E::WitnessVersion(ref e) => {
+                write_err!(f, "conversion of the `witness_version` field failed"; e)
+            }
+            E::WitnessProgramBytes(ref e) => {
+                write_err!(f, "conversion of the `witness_program` field hex string to bytes failed"; e)
+            }
+            E::WitnessProgram(ref e) => {
+                write_err!(f, "conversion of the `witness_program` field failed"; e)
+            }
             E::Hex(ref e) => write_err!(f, "conversion of the `hex` field failed"; e),
             E::Pubkeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
             E::Pubkey(ref e) => write_err!(f, "conversion of the `pubkey` failed"; e),
@@ -196,15 +202,19 @@ impl fmt::Display for GetAddressInfoEmbeddedError {
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
-            E::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
+            E::ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the `script_pubkey` field failed"; e)
+            }
             E::WitnessVersionValue(v) => write!(f, "invalid witness version number: {}", v),
-            E::WitnessVersion(ref e) =>
-                write_err!(f, "conversion of the `witness_version` field failed"; e),
-            E::WitnessProgramBytes(ref e) =>
-                write_err!(f, "conversion of the `witness_program` field hex string to bytes failed"; e),
-            E::WitnessProgram(ref e) =>
-                write_err!(f, "conversion of the `witness_program` field failed"; e),
+            E::WitnessVersion(ref e) => {
+                write_err!(f, "conversion of the `witness_version` field failed"; e)
+            }
+            E::WitnessProgramBytes(ref e) => {
+                write_err!(f, "conversion of the `witness_program` field hex string to bytes failed"; e)
+            }
+            E::WitnessProgram(ref e) => {
+                write_err!(f, "conversion of the `witness_program` field failed"; e)
+            }
             E::Hex(ref e) => write_err!(f, "conversion of the `hex` field failed"; e),
             E::Pubkeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
             E::Pubkey(ref e) => write_err!(f, "conversion of the `pubkey` failed"; e),
@@ -267,8 +277,9 @@ impl fmt::Display for GetTransactionError {
             E::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
             E::BlockHash(ref e) => write_err!(f, "conversion of the `block_hash` field failed"; e),
             E::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
-            E::WalletConflicts(ref e) =>
-                write_err!(f, "conversion of the `wallet_conflicts` field failed"; e),
+            E::WalletConflicts(ref e) => {
+                write_err!(f, "conversion of the `wallet_conflicts` field failed"; e)
+            }
             E::Tx(ref e) => write_err!(f, "conversion of the `hex` field failed"; e),
             E::Details(ref e) => write_err!(f, "conversion of the `details` field failed"; e),
         }
@@ -357,10 +368,12 @@ impl fmt::Display for GetWalletInfoError {
         match *self {
             Numeric(ref e) => write_err!(f, "numeric"; e),
             Balance(ref e) => write_err!(f, "conversion of the `balance` field failed"; e),
-            UnconfirmedBalance(ref e) =>
-                write_err!(f, "conversion of the `unconfirmed_balance` field failed"; e),
-            ImmatureBalance(ref e) =>
-                write_err!(f, "conversion of the `immature_balance` field failed"; e),
+            UnconfirmedBalance(ref e) => {
+                write_err!(f, "conversion of the `unconfirmed_balance` field failed"; e)
+            }
+            ImmatureBalance(ref e) => {
+                write_err!(f, "conversion of the `immature_balance` field failed"; e)
+            }
             PayTxFee(ref e) => write_err!(f, "conversion of the `pay_tx_fee` field failed"; e),
             HdSeedId(ref e) => write_err!(f, "conversion of the `hd_seed_id` field failed"; e),
         }
@@ -473,8 +486,9 @@ impl fmt::Display for ListReceivedByAddressError {
         match *self {
             Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
             Amount(ref e) => write_err!(f, "conversion of the `amount` field failed"; e),
-            Txids(index, ref e) =>
-                write_err!(f, "conversion of the txid at index {} in the `txids` field failed", index; e),
+            Txids(index, ref e) => {
+                write_err!(f, "conversion of the txid at index {} in the `txids` field failed", index; e)
+            }
         }
     }
 }
@@ -508,8 +522,9 @@ impl fmt::Display for ListSinceBlockError {
         use ListSinceBlockError::*;
 
         match *self {
-            Transactions(ref e) =>
-                write_err!(f, "conversion of the `transactions` field failed"; e),
+            Transactions(ref e) => {
+                write_err!(f, "conversion of the `transactions` field failed"; e)
+            }
             Removed(ref e) => write_err!(f, "conversion of the `removed` field failed"; e),
             LastBlock(ref e) => write_err!(f, "conversion of the `last_block` field failed"; e),
         }
@@ -660,11 +675,13 @@ impl fmt::Display for ListUnspentItemError {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
             E::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
-            E::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `script_pubkey` field failed"; e),
+            E::ScriptPubkey(ref e) => {
+                write_err!(f, "conversion of the `script_pubkey` field failed"; e)
+            }
             E::Amount(ref e) => write_err!(f, "conversion of the `amount` field failed"; e),
-            E::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
+            E::RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
             E::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
         }
     }

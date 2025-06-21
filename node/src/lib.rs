@@ -346,10 +346,10 @@ impl Node {
 
             let client_base = Self::create_client_base(&rpc_url, &auth)?;
             let client = match &conf.wallet {
-                Some(wallet) =>
+                Some(wallet) => {
                     match Self::create_client_wallet(&client_base, &rpc_url, &auth, wallet) {
                         Ok(client) => client,
-                        Err(e) =>
+                        Err(e) => {
                             if attempt == conf.attempts - 1 {
                                 return Err(e);
                             } else {
@@ -357,8 +357,10 @@ impl Node {
                                 // with the work_dir or process. Kill the process and retry.
                                 let _ = process.kill();
                                 continue;
-                            },
-                    },
+                            }
+                        }
+                    }
+                }
                 None => client_base,
             };
             if Self::wait_for_client(&client, Duration::from_secs(5)).is_err() {

@@ -20,8 +20,9 @@ impl fmt::Display for CreateMultisigError {
 
         match *self {
             E::Address(ref e) => write!(f, "conversion of the `address` field failed: {}", e),
-            E::RedeemScript(ref e) =>
-                write!(f, "conversion of the `redeem_script` field failed: {}", e),
+            E::RedeemScript(ref e) => {
+                write!(f, "conversion of the `redeem_script` field failed: {}", e)
+            }
         }
     }
 }
@@ -61,18 +62,21 @@ impl fmt::Display for ValidateAddressError {
 
         match *self {
             E::Address(ref e) => write!(f, "conversion of the `address` field failed: {}", e),
-            E::ScriptPubkey(ref e) =>
-                write!(f, "conversion of the `script_pub_key` field failed: {}", e),
+            E::ScriptPubkey(ref e) => {
+                write!(f, "conversion of the `script_pub_key` field failed: {}", e)
+            }
             E::WitnessVersionValue(v) => write!(f, "invalid witness version number: {}", v),
-            E::WitnessVersion(ref e) =>
-                write!(f, "conversion of the `witness_version` field failed: {}", e),
+            E::WitnessVersion(ref e) => {
+                write!(f, "conversion of the `witness_version` field failed: {}", e)
+            }
             E::WitnessProgramBytes(ref e) => write!(
                 f,
                 "conversion of the `witness_program` field hex string to bytes failed: {}",
                 e
             ),
-            E::WitnessProgram(ref e) =>
-                write!(f, "conversion of the `witness_program` field failed: {}", e),
+            E::WitnessProgram(ref e) => {
+                write!(f, "conversion of the `witness_program` field failed: {}", e)
+            }
         }
     }
 }

@@ -24,8 +24,9 @@ impl fmt::Display for AnalyzePsbtError {
 
         match *self {
             E::Inputs(ref e) => write_err!(f, "conversion of one of the `inputs` failed"; e),
-            E::EstimatedFeeRate(ref e) =>
-                write_err!(f, "conversion of the `estimated_fee_rate` field failed"; e),
+            E::EstimatedFeeRate(ref e) => {
+                write_err!(f, "conversion of the `estimated_fee_rate` field failed"; e)
+            }
             E::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
         }
     }
@@ -64,10 +65,12 @@ impl fmt::Display for AnalyzePsbtInputMissingError {
         match *self {
             E::Pubkeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
             E::Signatures(ref e) => write_err!(f, "conversion of the `signatures` field failed"; e),
-            E::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `redeem_script` field failed"; e),
-            E::WitnessScript(ref e) =>
-                write_err!(f, "conversion of the `witness_script` field failed"; e),
+            E::RedeemScript(ref e) => {
+                write_err!(f, "conversion of the `redeem_script` field failed"; e)
+            }
+            E::WitnessScript(ref e) => {
+                write_err!(f, "conversion of the `witness_script` field failed"; e)
+            }
         }
     }
 }

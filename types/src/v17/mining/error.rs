@@ -31,10 +31,12 @@ impl fmt::Display for GetBlockTemplateError {
 
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
-            E::PreviousBlockHash(ref e) =>
-                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
-            E::Transactions(ref e) =>
-                write_err!(f, "conversion of the `transactions` field failed"; e),
+            E::PreviousBlockHash(ref e) => {
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e)
+            }
+            E::Transactions(ref e) => {
+                write_err!(f, "conversion of the `transactions` field failed"; e)
+            }
             E::Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
             E::Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
         }

@@ -75,8 +75,9 @@ impl fmt::Display for GetMiningInfoError {
         match *self {
             E::Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             E::Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
-            E::Next(ref e) =>
-                write_err!(f, "conversion of one of the items in field `next` failed"; e),
+            E::Next(ref e) => {
+                write_err!(f, "conversion of one of the items in field `next` failed"; e)
+            }
         }
     }
 }

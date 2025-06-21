@@ -21,28 +21,18 @@ use verify::{method, model, ssot, Version};
 // TODO: Add a --quiet option.
 
 const VERSIONS: [Version; 13] = [
-    Version::V17,
-    Version::V18,
-    Version::V19,
-    Version::V20,
-    Version::V21,
-    Version::V22,
-    Version::V23,
-    Version::V24,
-    Version::V25,
-    Version::V26,
-    Version::V27,
-    Version::V28,
+    Version::V17, Version::V18, Version::V19, Version::V20, Version::V21, Version::V22,
+    Version::V23, Version::V24, Version::V25, Version::V26, Version::V27, Version::V28,
     Version::V29,
 ];
 
 fn main() -> Result<()> {
-    let cmd = Command::new("verify").args([
-        arg!([version] "Verify specific version of Core (use \"all\" for all versions)")
-            .required(true),
-        arg!(-t --tests <TEST_OUTPUT> "Optionally check claimed status of tests").required(false),
-        arg!(-q --quiet ... "Run tests in quiet mode").required(false),
-    ]);
+    let cmd = Command::new("verify")
+        .args([
+            arg!([version] "Verify specific version of Core (use \"all\" for all versions)").required(true),
+            arg!(-t --tests <TEST_OUTPUT> "Optionally check claimed status of tests").required(false),
+            arg!(-q --quiet ... "Run tests in quiet mode").required(false),
+        ]);
 
     let matches = cmd.clone().get_matches();
     let version = matches.get_one::<String>("version").unwrap();
@@ -126,11 +116,7 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
                 check_types_exist_if_required(version, &method.name)?;
 
                 if let Some(test_output) = test_output {
-                    if !check_integration_test_crate::test_exists(
-                        version,
-                        &method.name,
-                        test_output,
-                    )? {
+                    if !check_integration_test_crate::test_exists(version, &method.name, test_output)? {
                         eprintln!("missing integration test: {}", method.name);
                     }
                 }
@@ -140,35 +126,26 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
 
                 // Make sure we didn't forget to mark as tested after implementing integration test.
                 if let Some(test_output) = test_output {
-                    if check_integration_test_crate::test_exists(
-                        version,
-                        &method.name,
-                        test_output,
-                    )? {
+                    if check_integration_test_crate::test_exists(version, &method.name, test_output)? {
                         eprintln!("found integration test for untested method: {}", method.name);
                     }
                 }
             }
             Status::Omitted | Status::Todo => {
-                let out = Method::from_name(version, &method.name)
-                    .expect("guaranteed by methods_and_status()");
+                let out =
+                    Method::from_name(version, &method.name).expect("guaranteed by methods_and_status()");
 
-                if !versioned::requires_type(version, &method.name)?
-                    && versioned::type_exists(version, &method.name)?
-                {
-                    eprintln!(
-                        "return type found but method is omitted or TODO: {}",
-                        output_method(out)
-                    );
+                if !versioned::requires_type(version, &method.name)? {
+                    if versioned::type_exists(version, &method.name)? {
+                        eprintln!("return type found but method is omitted or TODO: {}", output_method(out));
+                    }
                 }
-                if !model::requires_type(version, &method.name)?
-                    && model::type_exists(version, &method.name)?
-                {
-                    eprintln!(
-                        "model type found but method is omitted or TODO: {}",
-                        output_method(out)
-                    );
+                if !model::requires_type(version, &method.name)? {
+                    if model::type_exists(version, &method.name)? {
+                        eprintln!("model type found but method is omitted or TODO: {}", output_method(out));
+                    }
                 }
+
             }
         }
     }
@@ -179,15 +156,19 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
 fn check_types_exist_if_required(version: Version, method_name: &str) -> Result<()> {
     let out = Method::from_name(version, method_name).expect("guaranteed by methods_and_status()");
 
-    if versioned::requires_type(version, method_name)?
-        && !versioned::type_exists(version, method_name)?
-    {
-        eprintln!("missing return type: {}", output_method(out));
+    if versioned::requires_type(version, method_name)? {
+        if !versioned::type_exists(version, method_name)? {
+            eprintln!("missing return type: {}", output_method(out));
+        }
     }
-    if model::requires_type(version, method_name)? && !model::type_exists(version, method_name)? {
-        eprintln!("missing model type: {}", output_method(out));
-    } else if model::type_exists(version, method_name)? {
-        eprintln!("found model type when none expected: {}", output_method(out));
+    if model::requires_type(version, method_name)? {
+        if !model::type_exists(version, method_name)? {
+            eprintln!("missing model type: {}", output_method(out));
+        }
+    } else {
+        if model::type_exists(version, method_name)? {
+            eprintln!("found model type when none expected: {}", output_method(out));
+        }
     }
     Ok(())
 }
@@ -218,8 +199,9 @@ mod check_integration_test_crate {
         let mut functions = vec![];
 
         let path = PathBuf::from(test_output);
-        let file = File::open(&path)
-            .with_context(|| format!("Failed to open test output file {}", path.display()))?;
+        let file = File::open(&path).with_context(|| {
+            format!("Failed to open test output file {}", path.display())
+        })?;
         let reader = io::BufReader::new(file);
         let test_re = Regex::new(r"test ([a-z_]+) ... ok")?;
 
@@ -253,7 +235,7 @@ mod check_integration_test_crate {
         };
         for t in all_test_functions(test_output)? {
             if t.contains(&test_name) {
-                return Ok(true);
+                return Ok(true)
             }
         }
         Ok(false)
