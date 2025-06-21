@@ -10,7 +10,7 @@ use std::io::{self, BufRead};
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Ok, Result};
 use regex::Regex;
 
 use crate::method::{self, Return};
@@ -75,10 +75,7 @@ pub fn requires_type(version: Version, method_name: &str) -> Result<bool> {
             ))),
     };
 
-    let requires = match method.ret {
-        Some(Return::Type(_)) => true,
-        _ => false,
-    };
+    let requires = matches!(method.ret, Some(Return::Type(_)));
     Ok(requires)
 }
 
@@ -137,7 +134,8 @@ impl FromStr for Status {
             "version" => Ok(Status::Done),
             "version + model" => Ok(Status::Done),
             "omitted" => Ok(Status::Omitted),
-            "returns nothing" | "returns numeric" | "returns boolean" | "returns string"=> Ok(Status::Done),
+            "returns nothing" | "returns numeric" | "returns boolean" | "returns string" =>
+                Ok(Status::Done),
             other => Err(anyhow::Error::msg(format!("unknown status: '{}'", other))),
         }
     }

@@ -65,7 +65,11 @@ pub const METHODS: &[Method] = &[
     Method::new_no_model("setnetworkactive", "SetNetworkActive", "set_network_active"),
     // raw transactions
     Method::new_modelled("combinepsbt", "CombinePsbt", "combine_psbt"),
-    Method::new_modelled("combinerawtransaction", "CombineRawTransaction", "combine_raw_transaction"),
+    Method::new_modelled(
+        "combinerawtransaction",
+        "CombineRawTransaction",
+        "combine_raw_transaction",
+    ),
     Method::new_modelled("converttopsbt", "ConvertToPsbt", "convert_to_psbt"),
     Method::new_modelled("createpsbt", "CreatePsbt", "create_psbt"),
     Method::new_modelled("createrawtransaction", "CreateRawTransaction", "create_raw_transaction"),
@@ -77,12 +81,20 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getrawtransaction", "GetRawTransaction", "get_raw_transaction"),
     Method::new_modelled("sendrawtransaction", "SendRawTransaction", "send_raw_transaction"),
     Method::new_modelled("signrawtransaction", "SignRawTransaction", "sign_raw_transaction"),
-    Method::new_modelled("signrawtransactionwithkey", "SignRawTransaction", "sign_raw_transaction_with_key"),
+    Method::new_modelled(
+        "signrawtransactionwithkey",
+        "SignRawTransaction",
+        "sign_raw_transaction_with_key",
+    ),
     Method::new_modelled("testmempoolaccept", "TestMempoolAccept", "test_mempool_accept"),
     // util
     Method::new_modelled("createmultisig", "CreateMultisig", "create_multisig"),
     Method::new_modelled("estimatesmartfee", "EstimateSmartFee", "estimate_smart_fee"),
-    Method::new_modelled("signmessagewithprivkey", "SignMessageWithPrivKey", "sign_message_with_priv_key"),
+    Method::new_modelled(
+        "signmessagewithprivkey",
+        "SignMessageWithPrivKey",
+        "sign_message_with_priv_key",
+    ),
     Method::new_modelled("validateaddress", "ValidateAddress", "validate_address"),
     Method::new_no_model("verifymessage", "VerifyMessage", "verify_message"),
     // wallet
