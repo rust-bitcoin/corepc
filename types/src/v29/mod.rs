@@ -195,7 +195,7 @@
 //! | getwalletinfo                      | version + model | UNTESTED                               |
 //! | importaddress                      | returns nothing |                                        |
 //! | importdescriptors                  | version         | TODO                                   |
-//! | importmulti                        | returns nothing |                                        |
+//! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |
 //! | importprunedfunds                  | returns nothing |                                        |
 //! | importpubkey                       | returns nothing |                                        |
@@ -290,18 +290,18 @@ pub use crate::{
         GetRawTransactionVerbose, GetRawTransactionVerboseError, GetReceivedByAddress,
         GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
         GetTxOut, GetTxOutError, GetUnconfirmedBalance, GetWalletInfo, GetWalletInfoError,
-        GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsError,
-        ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddress, ListReceivedByAddressError,
-        ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError, ListSinceBlockTransaction,
-        ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
-        ListTransactionsItemError, ListUnspentItemError, ListWallets, Locked, PruneBlockchain,
-        RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain, SendMany,
-        SendRawTransaction, SendToAddress, SetNetworkActive, SignMessage, SignMessageWithPrivKey,
-        SignRawTransaction, SignRawTransactionError, TestMempoolAccept, TransactionCategory,
-        UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-        WitnessUtxo,
+        GetZmqNotifications, ImportMulti, ImportMultiEntry, JsonRpcError, ListAddressGroupings,
+        ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
+        ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
+        ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
+        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
+        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets, Locked,
+        PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
+        RescanBlockchain, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive,
+        SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
+        TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress,
+        ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
+        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

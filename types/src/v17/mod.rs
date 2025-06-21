@@ -173,7 +173,7 @@
 //! | getunconfirmedbalance              | version + model | UNTESTED                               |
 //! | getwalletinfo                      | version + model | UNTESTED                               |
 //! | importaddress                      | returns nothing |                                        |
-//! | importmulti                        | returns nothing |                                        |
+//! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |
 //! | importprunedfunds                  | returns nothing |                                        |
 //! | importpubkey                       | returns nothing |                                        |
@@ -276,15 +276,15 @@ pub use self::{
         GetAddressInfoEmbedded, GetAddressInfoEmbeddedError, GetAddressInfoError,
         GetAddressInfoLabel, GetAddressesByLabel, GetBalance, GetNewAddress, GetRawChangeAddress,
         GetReceivedByAddress, GetTransaction, GetTransactionDetail, GetTransactionDetailError,
-        GetTransactionError, GetUnconfirmedBalance, GetWalletInfo, GetWalletInfoError,
-        ListAddressGroupings, ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels,
-        ListLockUnspent, ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
-        ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspent, ListUnspentItem,
-        ListUnspentItemError, ListWallets, LoadWallet, RescanBlockchain, SendMany, SendToAddress,
-        SignMessage, TransactionCategory, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt,
+        GetTransactionError, GetUnconfirmedBalance, GetWalletInfo, GetWalletInfoError, ImportMulti,
+        ImportMultiEntry, JsonRpcError, ListAddressGroupings, ListAddressGroupingsError,
+        ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
+        ListLockUnspentItemError, ListReceivedByAddress, ListReceivedByAddressError,
+        ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError, ListSinceBlockTransaction,
+        ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
+        ListTransactionsItemError, ListUnspent, ListUnspentItem, ListUnspentItemError, ListWallets,
+        LoadWallet, RescanBlockchain, SendMany, SendToAddress, SignMessage, TransactionCategory,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
     },
     zmq::GetZmqNotifications,
 };

@@ -547,6 +547,48 @@ pub struct GetWalletInfo {
     pub private_keys_enabled: bool,
 }
 
+/// Result of JSON-RPC method `importmulti`.
+///
+/// > importmulti requests ( options )
+/// >
+/// > Arguments:
+/// > 1. requests                                                         (json array, required) Data to be imported
+/// >   [
+/// >   {                                                            (json object)
+/// >   "desc": "str",                                             (string, optional) Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys
+/// >   "scriptPubKey": "script" | { "address":"address" },    (string / json, required) Type of scriptPubKey (string for script, json for address). Should not be provided if using a descriptor
+/// >   "timestamp": timestamp | "now",                            (integer / string, required) Creation time of the key expressed in UNIX epoch time,or the string "now" to substitute the current synced blockchain time. The timestamp of the oldest key will determine how far back blockchain rescans need to begin for missing wallet transactions. "now" can be specified to bypass scanning, for keys which are known to never have been used, and 0 can be specified to scan the entire blockchain. Blocks up to 2 hours before the earliest key creation time of all keys being imported by the importmulti call will be scanned.
+/// >   },
+/// >   ...
+/// >   ]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct ImportMulti(pub Vec<ImportMultiEntry>);
+
+/// Represents a single entry in the importmulti result array.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct ImportMultiEntry {
+    /// The success.
+    pub success: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The warnings.
+    pub warnings: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The error.
+    pub error: Option<JsonRpcError>,
+}
+
+/// Represents the error object in a JSON-RPC error response.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct JsonRpcError {
+    /// The error code.
+    pub code: i32,
+    /// The error message.
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// The error data.
+    pub data: Option<serde_json::Value>, // Can hold arbitrary extra information
+}
+
 /// Result of the JSON-RPC method `listaddressgroupings`.
 ///
 /// > listaddressgroupings
