@@ -318,6 +318,7 @@ impl GetChainTxStats {
             time: crate::to_u32(self.time, "time")?,
             tx_count: crate::to_u32(self.tx_count, "tx_count")?,
             window_final_block_hash,
+            window_final_block_height: None,
             window_block_count: crate::to_u32(self.window_block_count, "window_block_count")?,
             window_tx_count,
             window_interval,
@@ -457,6 +458,7 @@ impl GetMempoolInfo {
         let min_relay_tx_fee = crate::btc_per_kb(self.min_relay_tx_fee)?;
 
         Ok(model::GetMempoolInfo {
+            loaded: None,
             size,
             bytes,
             usage,

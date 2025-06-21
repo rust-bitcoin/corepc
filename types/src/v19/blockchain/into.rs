@@ -10,9 +10,9 @@ use super::error::{
     MempoolEntryFeesError,
 };
 use super::{
-    GetBlockFilter, GetBlockchainInfo, GetMempoolAncestors, GetMempoolAncestorsVerbose,
-    GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, MempoolEntry,
-    MempoolEntryFees,
+    GetBlockFilter, GetBlockchainInfo, GetChainTxStats, GetChainTxStatsError, GetMempoolAncestors,
+    GetMempoolAncestorsVerbose, GetMempoolDescendants, GetMempoolDescendantsVerbose,
+    GetMempoolEntry, GetMempoolInfo, GetMempoolInfoError, MempoolEntry, MempoolEntryFees,
 };
 use crate::model;
 
@@ -63,6 +63,34 @@ impl GetBlockFilter {
         let filter = Vec::from_hex(&self.filter).map_err(E::Filter)?;
         let header = self.header.parse::<bip158::FilterHash>().map_err(E::Header)?;
         Ok(model::GetBlockFilter { filter, header })
+    }
+}
+
+impl GetChainTxStats {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetChainTxStats, GetChainTxStatsError> {
+        use GetChainTxStatsError as E;
+
+        let window_final_block_hash =
+            self.window_final_block_hash.parse::<BlockHash>().map_err(E::WindowFinalBlockHash)?;
+        let window_final_block_height =
+            crate::to_u32(self.window_final_block_height, "window_final_block_height")?;
+        let window_tx_count =
+            self.window_tx_count.map(|h| crate::to_u32(h, "window_tx_count")).transpose()?;
+        let window_interval =
+            self.window_interval.map(|h| crate::to_u32(h, "window_interval")).transpose()?;
+        let tx_rate = self.tx_rate.map(|h| crate::to_u32(h, "tx_rate")).transpose()?;
+
+        Ok(model::GetChainTxStats {
+            time: crate::to_u32(self.time, "time")?,
+            tx_count: crate::to_u32(self.tx_count, "tx_count")?,
+            window_final_block_hash,
+            window_final_block_height: Some(window_final_block_height),
+            window_block_count: crate::to_u32(self.window_block_count, "window_block_count")?,
+            window_tx_count,
+            window_interval,
+            tx_rate,
+        })
     }
 }
 
@@ -178,6 +206,28 @@ impl MempoolEntryFees {
             modified: Amount::from_btc(self.modified).map_err(E::Modified)?,
             ancestor: Amount::from_btc(self.ancestor).map_err(E::MempoolEntry)?,
             descendant: Amount::from_btc(self.descendant).map_err(E::Descendant)?,
+        })
+    }
+}
+
+impl GetMempoolInfo {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetMempoolInfo, GetMempoolInfoError> {
+        let size = crate::to_u32(self.size, "size")?;
+        let bytes = crate::to_u32(self.bytes, "bytes")?;
+        let usage = crate::to_u32(self.usage, "usage")?;
+        let max_mempool = crate::to_u32(self.max_mempool, "max_mempool")?;
+        let mempool_min_fee = crate::btc_per_kb(self.mempool_min_fee)?;
+        let min_relay_tx_fee = crate::btc_per_kb(self.min_relay_tx_fee)?;
+
+        Ok(model::GetMempoolInfo {
+            loaded: Some(self.loaded),
+            size,
+            bytes,
+            usage,
+            max_mempool,
+            mempool_min_fee,
+            min_relay_tx_fee,
         })
     }
 }

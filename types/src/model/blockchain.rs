@@ -346,6 +346,8 @@ pub struct GetChainTxStats {
     pub tx_count: u32,
     /// The hash of the final block in the window.
     pub window_final_block_hash: BlockHash,
+    /// The height of the final block in the window. v0.19 and later only.
+    pub window_final_block_height: Option<u32>,
     /// Size of the window in number of blocks.
     pub window_block_count: u32,
     /// The number of transactions in the window. Only returned if "window_block_count" is > 0.
@@ -438,6 +440,8 @@ pub struct MempoolEntryFees {
 /// Models the result of JSON-RPC method `getmempoolinfo` with verbose set to true.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetMempoolInfo {
+    /// True if the mempool is fully loaded. v0.19 and later only.
+    pub loaded: Option<bool>,
     /// Current transaction count.
     pub size: u32,
     /// Sum of all virtual transaction sizes as defined in BIP 141.

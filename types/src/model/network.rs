@@ -20,6 +20,8 @@ pub struct GetNetworkInfo {
     pub protocol_version: usize,
     /// The services we offer to the network (hex string).
     pub local_services: String,
+    /// The services we offer to the network. v0.19 and later only.
+    pub local_services_names: Option<Vec<String>>,
     /// `true` if transaction relay is requested from peers.
     pub local_relay: bool,
     /// The time offset.

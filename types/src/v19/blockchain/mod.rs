@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
 pub use self::error::*;
+use super::{GetChainTxStatsError, GetMempoolInfoError};
 
 /// Result of JSON-RPC method `getblockchaininfo`.
 ///
@@ -155,6 +156,33 @@ pub struct GetBlockFilter {
     pub header: String,
 }
 
+/// Result of JSON-RPC method `getchaintxstats`.
+///
+/// > getchaintxstats ( nblocks blockhash )
+/// >
+/// > Compute statistics about the total number and rate of transactions in the chain.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetChainTxStats {
+    /// The timestamp for the final block in the window in UNIX format.
+    pub time: i64,
+    /// The total number of transactions in the chain up to that point.
+    #[serde(rename = "txcount")]
+    pub tx_count: i64,
+    /// The hash of the final block in the window.
+    pub window_final_block_hash: String,
+    /// The height of the final block in the window.
+    pub window_final_block_height: i64,
+    /// Size of the window in number of blocks.
+    pub window_block_count: i64,
+    /// The number of transactions in the window. Only returned if "window_block_count" is > 0.
+    pub window_tx_count: Option<i64>,
+    /// The elapsed time in the window in seconds. Only returned if "window_block_count" is > 0.
+    pub window_interval: Option<i64>,
+    /// The average rate of transactions per second in the window. Only returned if "window_interval" is > 0.
+    #[serde(rename = "txrate")]
+    pub tx_rate: Option<i64>,
+}
+
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to `false`.
 ///
 /// > getmempoolancestors txid (verbose)
@@ -268,4 +296,34 @@ pub struct MempoolEntryFees {
     pub ancestor: f64,
     /// Modified fees (see above) of in-mempool descendants (including this one) in BTC.
     pub descendant: f64,
+}
+
+/// Result of JSON-RPC method `getmempoolinfo` with verbose set to `true`.
+///
+/// > getmempoolinfo
+/// >
+/// > Returns details on the active state of the TX memory pool.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetMempoolInfo {
+    /// True if the mempool is fully loaded. v0.19 and later only.
+    pub loaded: bool,
+    /// Current transaction count.
+    pub size: i64,
+    /// Sum of all virtual transaction sizes as defined in BIP 141.
+    ///
+    /// Differs from actual serialized size because witness data is discounted.
+    pub bytes: i64,
+    /// Total memory usage for the mempool.
+    pub usage: i64,
+    /// Maximum memory usage for the mempool.
+    #[serde(rename = "maxmempool")]
+    pub max_mempool: i64,
+    /// Minimum fee rate in BTC/kB for a transaction to be accepted.
+    ///
+    /// This is the maximum of `minrelaytxfee` and the minimum mempool fee.
+    #[serde(rename = "mempoolminfee")]
+    pub mempool_min_fee: f64,
+    /// Current minimum relay fee for transactions.
+    #[serde(rename = "minrelaytxfee")]
+    pub min_relay_tx_fee: f64,
 }

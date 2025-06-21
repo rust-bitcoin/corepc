@@ -25,6 +25,9 @@ pub struct GetNetworkInfo {
     /// The services we offer to the network (hex string).
     #[serde(rename = "localservices")]
     pub local_services: String,
+    /// The services we offer to the network. v0.19 and later only.
+    #[serde(rename = "localservicesnames")]
+    pub local_services_names: Vec<String>,
     /// `true` if transaction relay is requested from peers.
     #[serde(rename = "localrelay")]
     pub local_relay: bool,
@@ -47,7 +50,7 @@ pub struct GetNetworkInfo {
     /// List of local addresses.
     #[serde(rename = "localaddresses")]
     pub local_addresses: Vec<GetNetworkInfoAddress>,
-    /// Any network and blockchain warnings.
+    /// Any network and blockchain warnings. Before v28 this was a single String.
     pub warnings: Vec<String>,
 }
 
@@ -64,6 +67,7 @@ impl GetNetworkInfo {
             subversion: self.subversion,
             protocol_version: self.protocol_version,
             local_services: self.local_services,
+            local_services_names: Some(self.local_services_names),
             local_relay: self.local_relay,
             time_offset: self.time_offset,
             connections: self.connections,
