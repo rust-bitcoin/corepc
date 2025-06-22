@@ -153,15 +153,21 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
                 let out = Method::from_name(version, &method.name)
                     .expect("guaranteed by methods_and_status()");
 
-                if !versioned::requires_type(version, &method.name)? {
-                    if versioned::type_exists(version, &method.name)? {
-                        eprintln!("return type found but method is omitted or TODO: {}", output_method(out));
-                    }
+                if !versioned::requires_type(version, &method.name)?
+                    && versioned::type_exists(version, &method.name)?
+                {
+                    eprintln!(
+                        "return type found but method is omitted or TODO: {}",
+                        output_method(out)
+                    );
                 }
-                if !model::requires_type(version, &method.name)? {
-                    if model::type_exists(version, &method.name)? {
-                        eprintln!("model type found but method is omitted or TODO: {}", output_method(out));
-                    }
+                if !model::requires_type(version, &method.name)?
+                    && model::type_exists(version, &method.name)?
+                {
+                    eprintln!(
+                        "model type found but method is omitted or TODO: {}",
+                        output_method(out)
+                    );
                 }
             }
         }
@@ -173,19 +179,15 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
 fn check_types_exist_if_required(version: Version, method_name: &str) -> Result<()> {
     let out = Method::from_name(version, method_name).expect("guaranteed by methods_and_status()");
 
-    if versioned::requires_type(version, method_name)? {
-        if !versioned::type_exists(version, method_name)? {
-            eprintln!("missing return type: {}", output_method(out));
-        }
+    if versioned::requires_type(version, method_name)?
+        && !versioned::type_exists(version, method_name)?
+    {
+        eprintln!("missing return type: {}", output_method(out));
     }
-    if model::requires_type(version, method_name)? {
-        if !model::type_exists(version, method_name)? {
-            eprintln!("missing model type: {}", output_method(out));
-        }
-    } else {
-        if model::type_exists(version, method_name)? {
-            eprintln!("found model type when none expected: {}", output_method(out));
-        }
+    if model::requires_type(version, method_name)? && !model::type_exists(version, method_name)? {
+        eprintln!("missing model type: {}", output_method(out));
+    } else if model::type_exists(version, method_name)? {
+        eprintln!("found model type when none expected: {}", output_method(out));
     }
     Ok(())
 }
