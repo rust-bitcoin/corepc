@@ -93,8 +93,12 @@ pub struct DecodeRawTransaction(pub Transaction);
 pub struct DecodeScript {
     /// The `scriptPubkey`.
     pub script_pubkey: Option<ScriptBuf>,
+    /// Inferred descriptor for the script. v23 and later only.
+    pub descriptor: Option<String>,
     /// The output type.
     pub type_: String,
+    /// Bitcoin address (only if a well-defined address exists). v22 and later only.
+    pub address: Option<Address<NetworkUnchecked>>,
     /// The required signatures.
     pub required_signatures: Option<u64>,
     /// List of bitcoin addresses.

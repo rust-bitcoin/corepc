@@ -291,6 +291,10 @@ impl DecodeScript {
             Some(hex) => Some(ScriptBuf::from_hex(&hex).map_err(E::Hex)?),
             None => None,
         };
+        let address = match self.address {
+            Some(addr) => Some(addr.parse::<Address<_>>().map_err(E::Address)?),
+            None => None,
+        };
         let addresses = match self.addresses {
             Some(addresses) => addresses
                 .iter()
@@ -304,6 +308,8 @@ impl DecodeScript {
         Ok(model::DecodeScript {
             script_pubkey,
             type_: self.type_,
+            descriptor: self.descriptor,
+            address,
             required_signatures: self.required_signatures,
             addresses,
             p2sh,

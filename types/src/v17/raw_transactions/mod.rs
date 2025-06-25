@@ -207,9 +207,14 @@ pub struct DecodeScript {
     pub asm: String,
     /// Hex encoded public key.
     pub hex: Option<String>,
+    /// Inferred descriptor for the script. v23 and later only.
+    #[serde(rename = "desc")]
+    pub descriptor: Option<String>,
     /// The output type.
     #[serde(rename = "type")]
     pub type_: String,
+    /// Bitcoin address (only if a well-defined address exists). v22 and later only.
+    pub address: Option<String>,
     /// The required signatures.
     #[serde(rename = "reqSigs")]
     pub required_signatures: Option<u64>,
@@ -235,11 +240,16 @@ pub struct DecodeScriptSegwit {
     /// The output type.
     #[serde(rename = "type")]
     pub type_: String,
+    /// Bitcoin address (only if a well-defined address exists). v22 and later only.
+    pub address: Option<String>,
     /// The required signatures.
     #[serde(rename = "reqSigs")]
     pub required_signatures: Option<u64>,
     /// List of bitcoin addresses.
     pub addresses: Option<Vec<String>>,
+    /// Inferred descriptor for the script. v23 and later only.
+    #[serde(rename = "desc")]
+    pub descriptor: Option<String>,
     /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
     #[serde(rename = "p2sh-segwit")]
     pub p2sh_segtwit: Option<String>,
