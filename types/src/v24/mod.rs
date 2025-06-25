@@ -279,7 +279,7 @@ pub use crate::{
         ListLockUnspentItemError, ListReceivedByAddress, ListReceivedByAddressError,
         ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError, ListSinceBlockTransaction,
         ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
-        ListTransactionsItemError, ListUnspentItemError, ListWallets, LoadWallet, Locked,
+        ListTransactionsItemError, ListUnspentItemError, ListWallets, LoadWallet, Locked, Logging,
         PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
         RescanBlockchain, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive,
         SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
@@ -302,6 +302,6 @@ pub use crate::{
         Softfork, SoftforkType,
     },
     v21::{GetNetworkInfo, UnloadWallet},
-    v22::{Banned, ListBanned, Logging, ScriptPubkey},
+    v22::{Banned, ListBanned, ScriptPubkey},
     v23::{CreateMultisig, GetBlockchainInfo, SaveMempool},
 };

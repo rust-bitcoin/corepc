@@ -54,11 +54,14 @@ pub struct Locked {
 pub struct Logging {
     pub addrman: bool,
     pub bench: bool,
+    pub blockstorage: Option<bool>, // v23 and later only
     pub cmpctblock: bool,
     pub coindb: bool,
-    pub db: bool,
+    pub db: Option<bool>, // v22 and before only
     pub estimatefee: bool,
     pub http: bool,
+    pub i2p: Option<bool>, // v23 and later only
+    pub ipc: Option<bool>, // v23 and later only
     pub leveldb: bool,
     pub libevent: bool,
     pub mempool: bool,
@@ -70,7 +73,13 @@ pub struct Logging {
     pub rand: bool,
     pub reindex: bool,
     pub rpc: bool,
+    pub scan: Option<bool>, // v25 and later only
     pub selectcoins: bool,
     pub tor: bool,
+    pub txpackages: Option<bool>,       // v26 and later only
+    pub txreconciliation: Option<bool>, // v25 and later only
+    pub util: Option<bool>,             // v23 and later only
+    pub validation: Option<bool>,       // v23 and later only
+    pub walletdb: Option<bool>,         // v23 and later only
     pub zmq: bool,
 }

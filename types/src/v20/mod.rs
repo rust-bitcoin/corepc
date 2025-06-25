@@ -226,13 +226,11 @@
 //! </details>
 
 // JSON-RPC types by API section.
-mod control;
 mod network;
 mod util;
 
 #[doc(inline)]
 pub use self::{
-    control::Logging,
     network::{Banned, ListBanned},
     util::CreateMultisig,
 };
@@ -263,7 +261,7 @@ pub use crate::{
         ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
-        LoadWallet, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
+        LoadWallet, Locked, Logging, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, SendMany, SendRawTransaction, SendToAddress,
         SetNetworkActive, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
         SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,

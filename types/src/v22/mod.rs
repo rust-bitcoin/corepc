@@ -244,13 +244,11 @@
 
 // JSON-RPC types by API section.
 mod blockchain;
-mod control;
 mod network;
 
 #[doc(inline)]
 pub use self::{
     blockchain::GetMempoolInfo,
-    control::Logging,
     network::{Banned, GetPeerInfo, ListBanned},
 };
 #[doc(inline)]
@@ -280,7 +278,7 @@ pub use crate::{
         ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
-        LoadWallet, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
+        LoadWallet, Locked, Logging, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, SendMany, SendRawTransaction, SendToAddress,
         SetNetworkActive, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
         SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,

@@ -292,7 +292,7 @@ pub use crate::{
         ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets, Locked,
-        PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
+        Logging, PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
         RescanBlockchain, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive,
         SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
         SoftforkReject, TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress,
@@ -314,7 +314,7 @@ pub use crate::{
         Softfork, SoftforkType,
     },
     v21::GetNetworkInfo,
-    v22::{Banned, ListBanned, Logging, ScriptPubkey},
+    v22::{Banned, ListBanned, ScriptPubkey},
     v23::{CreateMultisig, GetBlockchainInfo, SaveMempool},
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GlobalXpub, Proprietary,
