@@ -183,6 +183,9 @@ pub fn compact_size_decode(slice: &mut &[u8]) -> u64 {
 pub struct ScriptPubkey {
     /// Script assembly.
     pub asm: String,
+    /// Inferred descriptor for the output. v23 and later only.
+    #[serde(rename = "desc")]
+    pub descriptor: Option<String>,
     /// Script hex.
     pub hex: String,
     /// Number of required signatures - deprecated in Core v22.
