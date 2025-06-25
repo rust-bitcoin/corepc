@@ -11,7 +11,7 @@ use alloc::collections::BTreeMap;
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::key::{self, PrivateKey};
-use bitcoin::{hex, Amount, Txid};
+use bitcoin::{hex, Amount, Transaction, Txid};
 use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
@@ -436,41 +436,70 @@ pub struct GetTransaction {
     pub fee: Option<f64>,
     /// The number of confirmations.
     pub confirmations: i64,
+    /// Only present if the transaction's only input is a coinbase one. v29 and later only.
+    pub generated: Option<bool>, // v29 and later only.
     /// Whether we consider the outputs of this unconfirmed transaction safe to spend.
     pub trusted: Option<bool>,
     /// The block hash.
     #[serde(rename = "blockhash")]
-    // The docs say this field should exist but integration test fail without `Option`.
     pub block_hash: Option<String>,
+    /// The block height containing the transaction. v29 and later only.
+    #[serde(rename = "blockheight")]
+    pub block_height: Option<i64>, // v29 and later only.
     /// The index of the transaction in the block that includes it.
     #[serde(rename = "blockindex")]
-    // The docs say this field should exist but integration test fail without `Option`.
     pub block_index: Option<i64>,
     /// The time in seconds since epoch (1 Jan 1970 GMT).
     #[serde(rename = "blocktime")]
-    pub block_time: Option<u32>, // Docs are wrong, this is not documented as optional.
+    pub block_time: Option<u32>,
     /// The transaction id.
     pub txid: String,
+    /// The hash of serialized transaction, including witness data. v23 and later only.
+    pub wtxid: Option<String>,
     /// Confirmed transactions that have been detected by the wallet to conflict with this transaction.
     #[serde(rename = "walletconflicts")]
     pub wallet_conflicts: Vec<String>,
+    /// Only if 'category' is 'send'. The txid if this tx was replaced. v29 and later only.
+    pub replaced_by_txid: Option<String>,
+    /// Only if 'category' is 'send'. The txid if this tx replaces another. v29 and later only.
+    pub replaces_txid: Option<String>,
+    /// Transactions in the mempool that directly conflict with either this transaction or an ancestor
+    /// transaction. v29 and later only.
+    #[serde(rename = "mempoolconflicts")]
+    pub mempool_conflicts: Option<Vec<String>>,
+    /// If a comment to is associated with the transaction. v29 and later only.
+    pub to: Option<String>,
     /// The transaction time in seconds since epoch (1 Jan 1970 GMT).
     pub time: u32,
     /// The time received in seconds since epoch (1 Jan 1970 GMT).
     #[serde(rename = "timereceived")]
     pub time_received: u32,
+    /// If a comment is associated with the transaction, only present if not empty. v29 and later only.
+    pub comment: Option<String>,
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
     /// may be unknown for unconfirmed transactions not in the mempool
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: Bip125Replaceable,
+    /// Only if 'category' is 'received'. List of parent descriptors for the output script of this
+    /// coin. v24 and later only.
+    #[serde(rename = "parent_descs")]
+    pub parent_descriptors: Option<Vec<String>>,
     /// Transaction details.
     pub details: Vec<GetTransactionDetail>,
     /// Raw data for transaction.
     pub hex: String,
+    /// The decoded transaction (only present when `verbose` is passed). v29 and later only.
+    pub decoded: Option<Transaction>,
+    /// Hash and height of the block this information was generated on. v26 and later only.
+    #[serde(rename = "lastprocessedblock")]
+    pub last_processed_block: Option<LastProcessedBlock>,
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetTransactionDetail {
+    /// Only returns true if imported addresses were involved in transaction. v29 and later only.
+    #[serde(rename = "involvesWatchonly")]
+    pub involves_watchonly: Option<bool>,
     /// DEPRECATED. The account name involved in the transaction, can be "" for the default account.
     pub account: Option<String>, // Docs are wrong, this is not documented as optional.
     /// The bitcoin address involved in the transaction.
@@ -491,6 +520,19 @@ pub struct GetTransactionDetail {
     ///
     /// Only available for the 'send' category of transactions.
     pub abandoned: Option<bool>,
+    /// Only if 'category' is 'received'. List of parent descriptors for the output script of this
+    /// coin. v24 and later only.
+    #[serde(rename = "parent_descs")]
+    pub parent_descriptors: Option<Vec<String>>,
+}
+
+/// Item returned as part of of `gettransaction`. v26 and later only.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct LastProcessedBlock {
+    /// Hash of the block this information was generated on.
+    pub hash: String,
+    /// Height of the block this information was generated on.
+    pub height: i64,
 }
 
 /// Result of the JSON-RPC method `getunconfirmedbalance`.
