@@ -209,7 +209,7 @@ pub struct DecodeScript {
     pub hex: Option<String>,
     /// The output type.
     #[serde(rename = "type")]
-    pub type_: Option<String>,
+    pub type_: String,
     /// The required signatures.
     #[serde(rename = "reqSigs")]
     pub required_signatures: Option<u64>,

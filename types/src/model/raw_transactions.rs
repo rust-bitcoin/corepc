@@ -94,7 +94,7 @@ pub struct DecodeScript {
     /// The `scriptPubkey`.
     pub script_pubkey: Option<ScriptBuf>,
     /// The output type.
-    pub type_: Option<String>,
+    pub type_: String,
     /// The required signatures.
     pub required_signatures: Option<u64>,
     /// List of bitcoin addresses.
