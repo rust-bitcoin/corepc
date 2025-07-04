@@ -150,7 +150,7 @@
 //! | getdescriptorinfo                  | version         |                                        |
 //! | getindexinfo                       | version         | TODO                                   |
 //! | signmessagewithprivkey             | version + model |                                        |
-//! | validateaddress                    | version + model | TODO                                   |
+//! | validateaddress                    | version + model |                                        |
 //! | verifymessage                      | version         |                                        |
 //!
 //! </details>

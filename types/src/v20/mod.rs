@@ -148,7 +148,7 @@
 //! | estimatesmartfee                   | version + model |                                        |
 //! | getdescriptorinfo                  | version         |                                        |
 //! | signmessagewithprivkey             | version + model |                                        |
-//! | validateaddress                    | version + model | TODO                                   |
+//! | validateaddress                    | version + model |                                        |
 //! | verifymessage                      | version         |                                        |
 //!
 //! </details>
