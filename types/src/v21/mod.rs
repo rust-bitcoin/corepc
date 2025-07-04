@@ -149,7 +149,7 @@
 //! | estimatesmartfee                   | version + model |                                        |
 //! | getdescriptorinfo                  | version         |                                        |
 //! | getindexinfo                       | version         | TODO                                   |
-//! | signmessagewithprivkey             | version + model | TODO                                   |
+//! | signmessagewithprivkey             | version + model |                                        |
 //! | validateaddress                    | version + model | TODO                                   |
 //! | verifymessage                      | version         |                                        |
 //!
