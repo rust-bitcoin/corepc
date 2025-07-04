@@ -592,6 +592,22 @@ macro_rules! impl_client_v17__send_to_address {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `sethdseed`.
+#[macro_export]
+macro_rules! impl_client_v17__set_hd_seed {
+    () => {
+        impl Client {
+            pub fn set_hd_seed(&self) -> Result<()> {
+                match self.call("sethdseed", &[]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `signmessage`.
 #[macro_export]
 macro_rules! impl_client_v17__sign_message {
