@@ -304,7 +304,7 @@ pub use crate::{
         MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo, SetWalletFlag,
         Softfork, SoftforkType,
     },
-    v20::GetTransactionDetail,
+    v20::{GenerateToDescriptor, GetTransactionDetail},
     v21::{GetNetworkInfo, UnloadWallet},
     v22::{Banned, GetMempoolInfo, ListBanned, ScriptPubkey},
 };

@@ -75,7 +75,7 @@
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | generateblock                      | version + model | TODO                                   |
 //! | generatetoaddress                  | version + model |                                        |
-//! | generatetodescriptor               | version + model | TODO                                   |
+//! | generatetodescriptor               | version + model |                                        |
 //!
 //! </details>
 //!
@@ -304,7 +304,7 @@ pub use crate::{
         MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo,
         SetWalletFlag,
     },
-    v20::{CreateMultisig, GetTransaction, GetTransactionDetail},
+    v20::{CreateMultisig, GenerateToDescriptor, GetTransaction, GetTransactionDetail},
     v21::{
         Bip9SoftforkInfo, GetBlockchainInfo, GetMempoolEntry, GetNetworkInfo, Softfork,
         SoftforkType, UnloadWallet,

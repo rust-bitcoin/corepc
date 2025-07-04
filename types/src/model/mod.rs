@@ -30,7 +30,7 @@ pub use self::{
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutSetInfo, MempoolEntry,
         MempoolEntryFees, ReceiveActivity, Softfork, SoftforkType, SpendActivity, VerifyTxOutProof,
     },
-    generating::{Generate, GenerateToAddress},
+    generating::{Generate, GenerateToAddress, GenerateToDescriptor},
     mining::{
         BlockTemplateTransaction, GetBlockTemplate, GetMiningInfo, GetPrioritisedTransactions,
         NextBlockInfo, PrioritisedTransaction,

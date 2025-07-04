@@ -75,7 +75,7 @@
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | generateblock                      | version + model | TODO                                   |
 //! | generatetoaddress                  | version + model |                                        |
-//! | generatetodescriptor               | version + model | TODO                                   |
+//! | generatetodescriptor               | version + model |                                        |
 //!
 //! </details>
 //!
@@ -294,5 +294,8 @@ pub use crate::{
         MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo,
         SetWalletFlag,
     },
-    v20::{Banned, CreateMultisig, GetTransaction, GetTransactionDetail, ListBanned, Logging},
+    v20::{
+        Banned, CreateMultisig, GenerateToDescriptor, GetTransaction, GetTransactionDetail,
+        ListBanned, Logging,
+    },
 };

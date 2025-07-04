@@ -314,6 +314,7 @@ pub use crate::{
         MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo, SetWalletFlag,
         Softfork, SoftforkType,
     },
+    v20::GenerateToDescriptor,
     v22::{Banned, ListBanned, ScriptPubkey},
     v23::{CreateMultisig, DecodeScript, DecodeScriptError, SaveMempool},
     v24::{

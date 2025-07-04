@@ -33,3 +33,16 @@ impl GenerateToAddress {
     /// Returns true if 0 blocks were generated.
     pub fn is_empty(&self) -> bool { self.0.is_empty() }
 }
+
+/// Models the result of JSON-RPC method `generatetodescriptor`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct GenerateToDescriptor(pub Vec<BlockHash>);
+
+impl GenerateToDescriptor {
+    /// Returns the number of blocks generated.
+    pub fn len(&self) -> usize { self.0.len() }
+
+    /// Returns true if 0 blocks were generated.
+    pub fn is_empty(&self) -> bool { self.0.is_empty() }
+}

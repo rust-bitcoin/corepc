@@ -4,6 +4,8 @@
 //!
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
+pub mod generating;
+
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -60,6 +62,7 @@ crate::impl_client_v17__uptime!();
 
 // == Generating ==
 crate::impl_client_v17__generate_to_address!();
+crate::impl_client_v17__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Mining ==
