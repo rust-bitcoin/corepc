@@ -74,7 +74,7 @@
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | generatetoaddress                  | version + model |                                        |
-//! | generatetodescriptor               | version + model | TODO                                   |
+//! | generatetodescriptor               | version + model |                                        |
 //!
 //! </details>
 //!
@@ -143,12 +143,12 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | createmultisig                     | version + model | TODO                                   |
+//! | createmultisig                     | version + model |                                        |
 //! | deriveaddresses                    | version + model |                                        |
 //! | estimatesmartfee                   | version + model |                                        |
 //! | getdescriptorinfo                  | version         |                                        |
-//! | signmessagewithprivkey             | version + model | TODO                                   |
-//! | validateaddress                    | version + model | TODO                                   |
+//! | signmessagewithprivkey             | version + model |                                        |
+//! | validateaddress                    | version + model |                                        |
 //! | verifymessage                      | version         |                                        |
 //!
 //! </details>
@@ -227,6 +227,7 @@
 
 // JSON-RPC types by API section.
 mod control;
+mod generating;
 mod network;
 mod util;
 mod wallet;
@@ -234,6 +235,7 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     control::Logging,
+    generating::GenerateToDescriptor,
     network::{Banned, ListBanned},
     util::CreateMultisig,
     wallet::{GetTransaction, GetTransactionDetail},

@@ -34,6 +34,20 @@ fn generating__generate_to_address__modelled() {
     let _ = model.unwrap();
 }
 
+#[cfg(not(feature = "v19_and_below"))]
+#[test]
+fn generating__generate_to_descriptor__modelled() {
+    const NBLOCKS: usize = 1;
+
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    let address = node.client.new_address().expect("failed to get new address");
+    let descriptor = format!("addr({})", address);
+
+    let json: GenerateToDescriptor = node.client.generate_to_descriptor(NBLOCKS, &descriptor).expect("generatetodescriptor");
+    let model: Result<mtype::GenerateToDescriptor, _> = json.into_model();
+    let _ = model.unwrap();
+}
+
 // This method does not appear in the output of `bitcoin-cli help`.
 #[test]
 fn generating__invalidate_block() {

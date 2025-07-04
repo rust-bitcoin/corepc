@@ -144,13 +144,13 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | createmultisig                     | version + model | TODO                                   |
+//! | createmultisig                     | version + model |                                        |
 //! | deriveaddresses                    | version + model |                                        |
 //! | estimatesmartfee                   | version + model |                                        |
 //! | getdescriptorinfo                  | version         |                                        |
 //! | getindexinfo                       | version         | TODO                                   |
-//! | signmessagewithprivkey             | version + model | TODO                                   |
-//! | validateaddress                    | version + model | TODO                                   |
+//! | signmessagewithprivkey             | version + model |                                        |
+//! | validateaddress                    | version + model |                                        |
 //! | verifymessage                      | version         |                                        |
 //!
 //! </details>
@@ -304,7 +304,7 @@ pub use crate::{
         MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo, SetWalletFlag,
         Softfork, SoftforkType,
     },
-    v20::GetTransactionDetail,
+    v20::{GenerateToDescriptor, GetTransactionDetail},
     v21::{GetNetworkInfo, UnloadWallet},
     v22::{Banned, GetMempoolInfo, ListBanned, ScriptPubkey},
 };

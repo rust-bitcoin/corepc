@@ -75,7 +75,7 @@
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | generateblock                      | version + model | TODO                                   |
 //! | generatetoaddress                  | version + model |                                        |
-//! | generatetodescriptor               | version + model | TODO                                   |
+//! | generatetodescriptor               | version + model |                                        |
 //!
 //! </details>
 //!
@@ -153,13 +153,13 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | createmultisig                     | version + model | TODO                                   |
+//! | createmultisig                     | version + model |                                        |
 //! | deriveaddresses                    | version + model |                                        |
 //! | estimatesmartfee                   | version + model |                                        |
 //! | getdescriptorinfo                  | version         |                                        |
 //! | getindexinfo                       | version         | TODO                                   |
-//! | signmessagewithprivkey             | version + model | TODO                                   |
-//! | validateaddress                    | version + model | TODO                                   |
+//! | signmessagewithprivkey             | version + model |                                        |
+//! | validateaddress                    | version + model |                                        |
 //! | verifymessage                      | version         |                                        |
 //!
 //! </details>
@@ -304,7 +304,7 @@ pub use crate::{
         MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo,
         SetWalletFlag,
     },
-    v20::{CreateMultisig, GetTransaction, GetTransactionDetail},
+    v20::{CreateMultisig, GenerateToDescriptor, GetTransaction, GetTransactionDetail},
     v21::{
         Bip9SoftforkInfo, GetBlockchainInfo, GetMempoolEntry, GetNetworkInfo, Softfork,
         SoftforkType, UnloadWallet,

@@ -63,6 +63,7 @@ crate::impl_client_v17__uptime!();
 
 // == Generating ==
 crate::impl_client_v17__generate_to_address!();
+crate::impl_client_v17__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Mining ==
