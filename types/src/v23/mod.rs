@@ -249,8 +249,8 @@ pub use self::{
     control::Logging,
     network::GetPeerInfo,
     raw_transactions::{
-        DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, GlobalXpub, Proprietary,
-        PsbtInput, PsbtOutput,
+        DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, DecodeScriptSegwit,
+         GlobalXpub, Proprietary, PsbtInput, PsbtOutput,
     },
     util::CreateMultisig,
     wallet::{GetTransaction, GetTransactionError},
@@ -310,5 +310,5 @@ pub use crate::{
         ImportDescriptors, ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
         UnloadWallet, UpgradeWallet,
     },
-    v22::{Banned, GetMempoolInfo, ListBanned, ScriptPubkey},
+    v22::{Banned, GetMempoolInfo, ListBanned, ScriptPubkey,},
 };

@@ -7,9 +7,11 @@
 mod error;
 mod into;
 
+use bitcoin::address::{Address, NetworkUnchecked};
+use bitcoin::ScriptBuf;
 use serde::{Deserialize, Serialize};
 
-pub use self::error::DecodeScriptError;
+pub use self::error::{DecodeScriptError, DecodeScriptSegwitError};
 
 /// Result of JSON-RPC method `decodescript`.
 ///
@@ -25,7 +27,7 @@ pub use self::error::DecodeScriptError;
 pub struct DecodeScript {
     /// Script public key.
     pub asm: String,
-    /// The output type.
+    /// The output type 
     #[serde(rename = "type")]
     pub type_: String,
     /// Bitcoin address (only if a well-defined address exists). v22 and later only.
@@ -37,22 +39,22 @@ pub struct DecodeScript {
     pub addresses: Option<Vec<String>>,
     /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
     pub p2sh: Option<String>,
-    /// Segwit data (see `DecodeScriptSegwit` for explanation).
+    /// Result of a witness output script wrapping this redeem script (not returned for types that should not be wrapped).
     pub segwit: Option<DecodeScriptSegwit>,
     /// Address of the P2SH script wrapping this witness redeem script
     #[serde(rename = "p2sh-segwit")]
-    pub p2sh_segwit: Option<String>,
+    pub p2sh_segwit: Option<Address<NetworkUnchecked>>,
 }
 
 /// `segwit` item returned as part of `decodescript`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct DecodeScriptSegwit {
-    /// Script public key.
+    /// Disassembly of the script.
     pub asm: String,
-    /// Hex encoded public key.
-    pub hex: String,
-    /// The output type.
+    /// The raw output script bytes, hex-encoded.
+    pub hex: ScriptBuf,
+    /// The output type (e.g. nonstandard, anchor, pubkey, pubkeyhash, scripthash, multisig, nulldata, witness_v0_scripthash, witness_v0_keyhash, witness_v1_taproot, witness_unknown).
     #[serde(rename = "type")]
     pub type_: String,
     /// Bitcoin address (only if a well-defined address exists). v22 and later only.
@@ -62,7 +64,7 @@ pub struct DecodeScriptSegwit {
     pub required_signatures: Option<u64>,
     /// List of bitcoin addresses.
     pub addresses: Option<Vec<String>>,
-    /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
+    /// Address of the P2SH script wrapping this witness redeem script.
     #[serde(rename = "p2sh-segwit")]
-    pub p2sh_segtwit: Option<String>,
+    pub p2sh_segwit: Option<Address<NetworkUnchecked>>,
 }
