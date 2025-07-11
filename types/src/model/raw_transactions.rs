@@ -118,7 +118,25 @@ pub struct DecodeScript {
     pub p2sh: Option<Address<NetworkUnchecked>>,
     /// Address of the P2SH script wrapping this witness redeem script
     pub p2sh_segwit: Option<String>,
+    /// Segwit data (see `DecodeScriptSegwit` for explanation).
+    pub segwit: Option<DecodeScriptSegwit>,
 }
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct DecodeScriptSegwit {
+    pub asm: String,
+    pub hex: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub address: Option<bitcoin::Address<bitcoin::address::NetworkUnchecked>>,
+    #[serde(rename = "reqSigs")]
+    pub required_signatures: Option<u64>,
+    pub addresses: Vec<bitcoin::Address<bitcoin::address::NetworkUnchecked>>,
+    #[serde(rename = "p2sh-segwit")]
+    pub p2sh_segtwit: Option<bitcoin::Address<bitcoin::address::NetworkUnchecked>>,
+}
+
 
 /// Models the result of JSON-RPC method `descriptorprocesspsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

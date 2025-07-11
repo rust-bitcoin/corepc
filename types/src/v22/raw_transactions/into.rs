@@ -3,6 +3,8 @@
 use bitcoin::Address;
 
 use super::{DecodeScript, DecodeScriptError};
+use crate::model::raw_transactions::DecodeScriptSegwit; 
+
 use crate::model;
 
 impl DecodeScript {
@@ -23,7 +25,18 @@ impl DecodeScript {
             None => vec![],
         };
         let p2sh = self.p2sh.map(|s| s.parse::<Address<_>>()).transpose().map_err(E::P2sh)?;
-
+        
+        
+        let segwit = self.segwit.map(|s| DecodeScriptSegwit {
+            asm: s.asm,
+            hex: s.hex,
+            type_: s.type_,
+            address: s.address,
+            required_signatures: s.required_signatures,
+            addresses: s.addresses,
+            p2sh_segtwit: s.p2sh_segtwit,
+        });
+        
         Ok(model::DecodeScript {
             script_pubkey: None,
             type_: self.type_,
@@ -33,6 +46,7 @@ impl DecodeScript {
             addresses,
             p2sh,
             p2sh_segwit: self.p2sh_segwit,
+            segwit,
         })
     }
 }
