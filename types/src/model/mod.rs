@@ -42,9 +42,9 @@ pub use self::{
         AnalyzePsbt, AnalyzePsbtInput, AnalyzePsbtInputMissing, CombinePsbt, CombineRawTransaction,
         ConvertToPsbt, CreatePsbt, CreateRawTransaction, DecodePsbt, DecodeRawTransaction,
         DecodeScript, DecodeScriptSegwit, DescriptorProcessPsbt, FinalizePsbt, FundRawTransaction,
-        GetRawTransaction, GetRawTransactionVerbose, JoinPsbts,  MempoolAcceptance, MempoolAcceptanceFees,
-        SendRawTransaction, SignFail, SignRawTransaction, SubmitPackage, SubmitPackageTxResult,
-        SubmitPackageTxResultFees, TestMempoolAccept, UtxoUpdatePsbt,
+        GetRawTransaction, GetRawTransactionVerbose, JoinPsbts, MempoolAcceptance,
+        MempoolAcceptanceFees, SendRawTransaction, SignFail, SignRawTransaction, SubmitPackage,
+        SubmitPackageTxResult, SubmitPackageTxResultFees, TestMempoolAccept, UtxoUpdatePsbt,
     },
     util::{
         CreateMultisig, DeriveAddresses, DeriveAddressesMultipath, EstimateSmartFee,

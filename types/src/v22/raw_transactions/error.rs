@@ -7,8 +7,8 @@ use bitcoin::amount::ParseAmountError;
 use bitcoin::{address, hex};
 
 use crate::error::write_err;
-use crate::NumericError;
 use crate::v19::DecodeScriptSegwitError;
+use crate::NumericError;
 
 /// Error when converting a `DecodeScript` type into the model type.
 #[derive(Debug)]

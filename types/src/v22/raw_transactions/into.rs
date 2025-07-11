@@ -3,8 +3,8 @@
 use bitcoin::{Address, Amount, Txid, Wtxid};
 
 use super::{
-    DecodeScript, DecodeScriptError,DecodeScriptSegwit,DecodeScriptSegwitError, MempoolAcceptance, MempoolAcceptanceError, TestMempoolAccept,
-    TestMempoolAcceptError,
+    DecodeScript, DecodeScriptError, DecodeScriptSegwit, DecodeScriptSegwitError,
+    MempoolAcceptance, MempoolAcceptanceError, TestMempoolAccept, TestMempoolAcceptError,
 };
 use crate::model;
 
