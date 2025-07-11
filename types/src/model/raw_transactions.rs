@@ -108,6 +108,7 @@ pub struct DecodeScript {
     /// Result of a witness output script wrapping this redeem script (not returned for types that should not be wrapped).
     pub segwit: Option<DecodeScriptSegwit>,
 }
+
 /// Models the `segwit` field returned by the `decodescript` RPC.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
