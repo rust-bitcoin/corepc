@@ -1,3 +1,4 @@
+//  SPDX-License-Identifier: CC0-1.0
 // SPDX-License-Identifier: CC0-1.0
 
 use core::fmt;
@@ -7,6 +8,7 @@ use bitcoin::{address, hex};
 
 use crate::error::write_err;
 use crate::NumericError;
+use crate::v19::DecodeScriptSegwitError;
 
 /// Error when converting a `DecodeScript` type into the model type.
 #[derive(Debug)]
@@ -19,6 +21,8 @@ pub enum DecodeScriptError {
     Addresses(address::ParseError),
     /// Conversion of the transaction `p2sh` field failed.
     P2sh(address::ParseError),
+    /// Conversion of the transaction `segwit` field failed.
+    Segwit(DecodeScriptSegwitError),
 }
 
 impl fmt::Display for DecodeScriptError {
@@ -30,6 +34,7 @@ impl fmt::Display for DecodeScriptError {
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
             E::Addresses(ref e) => write_err!(f, "conversion of the `addresses` field failed"; e),
             E::P2sh(ref e) => write_err!(f, "conversion of the `p2sh` field failed"; e),
+            E::Segwit(ref e) => write_err!(f, "conversion of the `segwit` field failed"; e),
         }
     }
 }
@@ -44,6 +49,7 @@ impl std::error::Error for DecodeScriptError {
             E::Address(ref e) => Some(e),
             E::Addresses(ref e) => Some(e),
             E::P2sh(ref e) => Some(e),
+            E::Segwit(ref e) => Some(e),
         }
     }
 }

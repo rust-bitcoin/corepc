@@ -256,7 +256,7 @@ pub use self::{
     control::Logging,
     network::{Banned, GetPeerInfo, ListBanned, PeerInfo},
     raw_transactions::{
-        DecodeScript, DecodeScriptError, MempoolAcceptance, MempoolAcceptanceError,
+        DecodeScript, DecodeScriptError, DecodeScriptSegwit, DecodeScriptSegwitError, MempoolAcceptance, MempoolAcceptanceError,
         TestMempoolAccept, TestMempoolAcceptError,
     },
     signer::EnumerateSigners,
