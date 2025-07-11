@@ -105,8 +105,29 @@ pub struct DecodeScript {
     pub addresses: Vec<Address<NetworkUnchecked>>,
     /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
     pub p2sh: Option<Address<NetworkUnchecked>>,
-    /// Address of the P2SH script wrapping this witness redeem script
-    pub p2sh_segwit: Option<String>,
+    /// Result of a witness output script wrapping this redeem script (not returned for types that should not be wrapped).
+    pub segwit: Option<DecodeScriptSegwit>,
+}
+/// Models the `segwit` field returned by the `decodescript` RPC.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct DecodeScriptSegwit {
+    /// Disassembly of the script.
+    pub asm: String,
+    /// The raw output script bytes, hex-encoded.
+    pub hex: ScriptBuf,
+    /// The output type (e.g. nonstandard, anchor, pubkey, pubkeyhash, scripthash, multisig, nulldata, witness_v0_scripthash, witness_v0_keyhash, witness_v1_taproot, witness_unknown).
+    pub type_: String,
+    /// Bitcoin address (only if a well-defined address exists)v22 and later only.
+    pub address: Option<Address<NetworkUnchecked>>,
+    /// The required signatures.
+    pub required_signatures: Option<u64>,
+    /// List of bitcoin addresses.
+    pub addresses: Vec<Address<NetworkUnchecked>>,
+    /// Inferred descriptor for the script. v23 and later only.
+    pub descriptor: Option<String>,
+    /// Address of the P2SH script wrapping this witness redeem script.
+    pub p2sh_segwit: Option<Address<NetworkUnchecked>>,
 }
 
 /// Models the result of JSON-RPC method `descriptorprocesspsbt`.

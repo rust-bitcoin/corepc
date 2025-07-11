@@ -9,8 +9,9 @@ use bitcoin::psbt::{self, raw, PsbtSighashType};
 use bitcoin::{Address, Amount};
 
 use super::{
-    DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, GlobalXpub, GlobalXpubError,
-    Proprietary, PsbtInput, PsbtInputError, PsbtOutput, PsbtOutputError,
+    DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, DecodeScriptSegwit,
+    DecodeScriptSegwitError, GlobalXpub, GlobalXpubError, Proprietary, PsbtInput, PsbtInputError,
+    PsbtOutput, PsbtOutputError,
 };
 use crate::model;
 
@@ -334,7 +335,39 @@ impl DecodeScript {
             required_signatures: self.required_signatures,
             addresses,
             p2sh,
-            p2sh_segwit: self.p2sh_segwit,
+            segwit: self.segwit.map(|s| s.into_model()).transpose().map_err(E::Segwit)?,
+        })
+    }
+}
+impl DecodeScriptSegwit {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::DecodeScriptSegwit, DecodeScriptSegwitError> {
+        use DecodeScriptSegwitError as E;
+
+        let address = match self.address {
+            Some(addr) => Some(addr.parse::<Address<_>>().map_err(E::Address)?),
+            None => None,
+        };
+        let addresses = match self.addresses {
+            Some(addrs) => addrs
+                .into_iter()
+                .map(|s| s.parse::<Address<_>>())
+                .collect::<Result<_, _>>()
+                .map_err(E::Addresses)?,
+            None => vec![],
+        };
+        let required_signatures = self.required_signatures;
+        let p2sh_segwit = self.p2sh_segwit;
+
+        Ok(model::DecodeScriptSegwit {
+            asm: self.asm,
+            hex: self.hex,
+            descriptor: self.descriptor,
+            type_: self.type_,
+            address,
+            required_signatures,
+            addresses,
+            p2sh_segwit,
         })
     }
 }

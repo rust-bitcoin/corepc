@@ -228,6 +228,7 @@
 mod blockchain;
 mod control;
 mod network;
+mod raw_transactions;
 mod util;
 mod wallet;
 
@@ -243,6 +244,9 @@ pub use self::{
     },
     control::GetRpcInfo,
     network::{GetNetworkInfo, GetPeerInfo, PeerInfo},
+    raw_transactions::{
+        DecodeScript, DecodeScriptError, DecodeScriptSegwit, DecodeScriptSegwitError,
+    },
     util::GetDescriptorInfo,
     wallet::{
         GetBalances, GetBalancesError, GetBalancesMine, GetBalancesWatchOnly, GetTransaction,
@@ -256,8 +260,7 @@ pub use crate::v17::{
     BlockTemplateTransaction, BlockTemplateTransactionError, BumpFee, BumpFeeError, ChainTips,
     ChainTipsError, ChainTipsStatus, CombinePsbt, CombineRawTransaction, ConvertToPsbt,
     CreateMultisig, CreateMultisigError, CreatePsbt, CreateRawTransaction, CreateWallet,
-    DecodePsbt, DecodePsbtError, DecodeRawTransaction, DecodeScript, DecodeScriptError,
-    DecodeScriptSegwit, DumpPrivKey, DumpWallet, EncryptWallet, EstimateSmartFee, FinalizePsbt,
+    DecodePsbt, DecodePsbtError, DecodeRawTransaction, DumpPrivKey, DumpWallet, EncryptWallet, EstimateSmartFee, FinalizePsbt,
     FinalizePsbtError, FundRawTransaction, FundRawTransactionError, Generate, GenerateToAddress,
     GetAddedNodeInfo, GetAddressInfoEmbeddedError, GetAddressInfoLabel, GetAddressesByLabel,
     GetBalance, GetBestBlockHash, GetBlockCount, GetBlockHash, GetBlockHeader, GetBlockHeaderError,

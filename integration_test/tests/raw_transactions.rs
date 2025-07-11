@@ -4,16 +4,21 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 #![allow(unused_imports)] // Because of feature gated tests.
-
+use bitcoin::address::NetworkUnchecked;
 use bitcoin::consensus::encode;
+use bitcoin::hashes::{hash160, sha256, Hash};
 use bitcoin::hex::FromHex as _;
+use bitcoin::key::{Secp256k1, XOnlyPublicKey};
 use bitcoin::opcodes::all::*;
+use bitcoin::script::Builder;
 use bitcoin::{
-    absolute, consensus, hex, psbt, script, transaction, Amount, ScriptBuf, Transaction, TxOut,
+    absolute, consensus, hex, psbt, script, secp256k1, transaction, Address, Amount, Network,
+    PublicKey, ScriptBuf, Transaction, TxOut, WPubkeyHash, WScriptHash,
 };
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::vtype::*;
 use node::{mtype, Input, Output}; // All the version specific types.
+use rand::Rng;
 
 #[test]
 #[cfg(not(feature = "v17"))] // analyzepsbt was added in v0.18.
@@ -196,24 +201,72 @@ fn raw_transactions__decode_raw_transaction__modelled() {
 }
 
 #[test]
-// FIXME: Seems the returned fields are  different depending on the script. Needs more thorough testing.
+// FIXME: Bitcoin Core may populate different fields depending on
+// the script type and Core version (e.g. legacy vs segwit vs taproot).
 fn raw_transactions__decode_script__modelled() {
     let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
-    let p2pkh = arbitrary_p2pkh_script();
-    let multi = arbitrary_multisig_script();
+    let cases = [
+        ("p2pkh", arbitrary_p2pkh_script(), Some("pubkeyhash")),
+        ("multisig", arbitrary_multisig_script(), Some("multisig")),
+        ("p2sh", arbitrary_p2sh_script(), Some("scripthash")),
+        ("bare", arbitrary_bare_script(), Some("nonstandard")),
+        ("p2wpkh", arbitrary_p2wpkh_script(), Some("witness_v0_keyhash")),
+        ("p2wsh", arbitrary_p2wsh_script(), Some("witness_v0_scripthash")),
+        ("p2tr", arbitrary_p2tr_script(), Some("witness_v1_taproot")),
+    ];
 
-    for script in &[p2pkh, multi] {
-        let hex = script.to_hex_string();
+    for (label, script, expected_type) in cases {
+        // The input is provided as raw script hex, not an address.
+        let json: DecodeScript =
+            node.client.decode_script(&script.to_hex_string())
+                .expect("decodescript");
 
-        let json: DecodeScript = node.client.decode_script(&hex).expect("decodescript");
-        let model: Result<mtype::DecodeScript, DecodeScriptError> = json.into_model();
-        model.unwrap();
+        // Convert the RPC response into the model type.
+        // This step normalizes Core’s JSON into a structured representation.
+        let decoded = json
+            .into_model()
+            .expect("DecodeScript into model");
+
+        // Verify that Core identifies the script type as expected.
+        // Some scripts may legitimately omit type information depending on Core behavior.
+        if let Some(expected) = expected_type {
+            assert_eq!(
+                decoded.type_, expected,
+                "Unexpected script type for {label}"
+            );
+        }
+
+        // For standard scripts, Core should provide at least one resolved address.
+        // Core may populate either `address` or `addresses`, depending on script class.
+        if expected_type != Some("nonstandard") {
+            assert!(
+                !decoded.addresses.is_empty() || decoded.address.is_some(),
+                "Expected at least one address for {label}"
+            );
+        }
     }
 }
+fn arbitrary_p2sh_script() -> ScriptBuf {
+    let redeem_script = arbitrary_multisig_script(); // or arbitrary_p2pkh_script()
+    let redeem_script_hash = hash160::Hash::hash(redeem_script.as_bytes());
 
-// Script builder code copied from rust-bitcoin script unit tests.
+    script::Builder::new()
+        .push_opcode(bitcoin::opcodes::all::OP_HASH160)
+        .push_slice(redeem_script_hash.as_byte_array())
+        .push_opcode(bitcoin::opcodes::all::OP_EQUAL)
+        .into_script()
+}
+fn arbitrary_bare_script() -> ScriptBuf {
+    script::Builder::new().push_opcode(OP_RETURN).push_slice(b"hello").into_script()
+}
+fn arbitrary_pubkey() -> PublicKey {
+    let secp = Secp256k1::new();
+    let secret_key = secp256k1::SecretKey::from_slice(&[1u8; 32]).unwrap();
+    PublicKey::new(secp256k1::PublicKey::from_secret_key(&secp, &secret_key))
+}
+
 fn arbitrary_p2pkh_script() -> ScriptBuf {
     let pubkey_hash = <[u8; 20]>::from_hex("16e1ae70ff0fa102905d4af297f6912bda6cce19").unwrap();
 
@@ -225,7 +278,6 @@ fn arbitrary_p2pkh_script() -> ScriptBuf {
         .push_opcode(OP_CHECKSIG)
         .into_script()
 }
-
 fn arbitrary_multisig_script() -> ScriptBuf {
     let pk1 =
         <[u8; 33]>::from_hex("022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e")
@@ -244,6 +296,96 @@ fn arbitrary_multisig_script() -> ScriptBuf {
         .push_opcode(OP_CHECKMULTISIG)
         .into_script()
 }
+fn arbitrary_p2wpkh_script() -> ScriptBuf {
+    let pubkey = arbitrary_pubkey();
+    let pubkey_hash = hash160::Hash::hash(&pubkey.to_bytes());
+
+    // P2WPKH: 0 <20-byte pubkey hash>
+    Builder::new().push_int(0).push_slice(pubkey_hash.as_byte_array()).into_script()
+}
+
+fn arbitrary_p2wsh_script() -> ScriptBuf {
+    let redeem_script = arbitrary_multisig_script(); // any witness script
+    let script_hash = sha256::Hash::hash(redeem_script.as_bytes());
+
+    // P2WSH: 0 <32-byte script hash>
+    Builder::new().push_int(0).push_slice(script_hash.as_byte_array()).into_script()
+}
+
+fn arbitrary_p2tr_script() -> ScriptBuf {
+    let secp = Secp256k1::new();
+    let sk = secp256k1::SecretKey::from_slice(&[2u8; 32]).unwrap();
+    let internal_key = secp256k1::PublicKey::from_secret_key(&secp, &sk);
+    let x_only = XOnlyPublicKey::from(internal_key);
+
+    // Taproot output script: OP_1 <x-only pubkey>
+    Builder::new().push_int(1).push_slice(&x_only.serialize()).into_script()
+}
+
+#[test]
+fn raw_transactions__decode_script_segwit__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    node.client.load_wallet("default").ok();
+    node.fund_wallet();
+
+    let address = node
+        .client
+        .get_new_address(None, None)
+        .expect("getnewaddress")
+        .address()
+        .expect("valid address")
+        .require_network(Network::Regtest)
+        .expect("regtest");
+
+    // Convert the address into its locking script (scriptPubKey).
+    // We assert on the script itself (not the address encoding) to ensure
+    // we are testing actual SegWit script semantics.
+    let spk = address.script_pubkey();
+    assert!(
+        spk.is_witness_program(),
+        "Expected segwit script"
+    );
+
+    // Decode the script and convert it into the model type.
+    // Core may populate fields differently depending on script type and version.
+    let decoded = node
+        .client
+        .decode_script(&spk.to_hex_string())
+        .expect("decodescript")
+        .into_model()
+        .expect("DecodeScript into model");
+
+    // For SegWit scripts, Core should populate the `segwit` sub-object.
+    let segwit = decoded
+        .segwit
+        .as_ref()
+        .expect("Expected segwit field");
+
+    // The decoded SegWit script hex must match the original scriptPubKey.
+    assert_eq!(segwit.hex, spk);
+
+    // Verify that Core correctly identifies the SegWit version and script type.
+    // For a wallet-generated address on regtest, this should be v0 P2WPKH.
+    assert_eq!(
+        segwit.type_.as_str(),
+        "witness_v0_keyhash",
+        "Unexpected segwit script type"
+    );
+
+    // Core returns addresses without network information.
+    // We compare against the unchecked form of the address for correctness.
+    let addr_unc = address.into_unchecked();
+    let addresses = &segwit.addresses;
+
+    // Ensure the decoded SegWit script resolves back to the original address.
+    assert!(
+        addresses.contains(&addr_unc),
+        "Expected address {:?} in segwit.addresses: {:?}",
+        addr_unc,
+        addresses
+    );
+}
+
 
 #[test]
 fn raw_transactions__finalize_psbt__modelled() {

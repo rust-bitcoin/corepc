@@ -256,8 +256,9 @@ pub use self::{
     control::Logging,
     network::{Banned, GetNodeAddresses, GetPeerInfo, ListBanned, NodeAddress, PeerInfo},
     raw_transactions::{
-        DecodeScript, DecodeScriptError, DecodeScriptSegwit, MempoolAcceptance,
-        MempoolAcceptanceError, MempoolAcceptanceFees, TestMempoolAccept, TestMempoolAcceptError,
+        DecodeScript, DecodeScriptError, DecodeScriptSegwit, DecodeScriptSegwitError,
+        MempoolAcceptance, MempoolAcceptanceError, MempoolAcceptanceFees,
+        TestMempoolAccept, TestMempoolAcceptError,
     },
     signer::{EnumerateSigners, Signers},
     wallet::{
