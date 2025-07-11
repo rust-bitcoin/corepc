@@ -4,16 +4,21 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 #![allow(unused_imports)] // Because of feature gated tests.
-
+use bitcoin::address::NetworkUnchecked;
 use bitcoin::consensus::encode;
+use bitcoin::hashes::{hash160, sha256, Hash};
 use bitcoin::hex::FromHex as _;
+use bitcoin::key::{Secp256k1, XOnlyPublicKey};
 use bitcoin::opcodes::all::*;
+use bitcoin::script::Builder;
 use bitcoin::{
-    absolute, consensus, hex, psbt, script, transaction, Amount, ScriptBuf, Transaction, TxOut,
+    absolute, consensus, hex, psbt, script, secp256k1, transaction, Address, Amount, Network,
+    PublicKey, ScriptBuf, Transaction, TxOut, WPubkeyHash, WScriptHash,
 };
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::vtype::*;
 use node::{mtype, Input, Output}; // All the version specific types.
+use rand::Rng;
 
 #[test]
 #[cfg(not(feature = "v17"))] // analyzepsbt was added in v0.18.
@@ -201,18 +206,56 @@ fn raw_transactions__decode_script__modelled() {
     let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
-    let p2pkh = arbitrary_p2pkh_script();
-    let multi = arbitrary_multisig_script();
+    let test_cases: Vec<(&str, ScriptBuf, Option<&str>)> = vec![
+        ("p2pkh", arbitrary_p2pkh_script(), Some("pubkeyhash")),
+        ("multisig", arbitrary_multisig_script(), Some("multisig")),
+        ("p2sh", arbitrary_p2sh_script(), Some("scripthash")),
+        ("bare", arbitrary_bare_script(), Some("nonstandard")),
+        ("p2wpkh", arbitrary_p2wpkh_script(), Some("witness_v0_keyhash")),
+        ("p2wsh", arbitrary_p2wsh_script(), Some("witness_v0_scripthash")),
+        ("p2tr", arbitrary_p2tr_script(), Some("witness_v1_taproot")),
+    ];
 
-    for script in &[p2pkh, multi] {
+    for (label, script, expected_type) in test_cases {
         let hex = script.to_hex_string();
 
         let json: DecodeScript = node.client.decode_script(&hex).expect("decodescript");
         let model: Result<mtype::DecodeScript, DecodeScriptError> = json.into_model();
-        model.unwrap();
+        let decoded = model.expect("DecodeScript into model");
+
+        println!("Decoded script ({label}): {:?}", decoded);
+
+        if let Some(expected) = expected_type {
+            assert_eq!(decoded.type_, expected, "Unexpected script type for {label}");
+        } else {
+            println!("Skipping type check for {}", label);
+        }
+
+        // Address should be present for standard scripts
+        if expected_type != Some("nonstandard") {
+            let has_any_address = !decoded.addresses.is_empty() || decoded.address.is_some();
+            assert!(has_any_address, "Expected at least one address for {label}");
+        }
     }
 }
+fn arbitrary_p2sh_script() -> ScriptBuf {
+    let redeem_script = arbitrary_multisig_script(); // or arbitrary_p2pkh_script()
+    let redeem_script_hash = hash160::Hash::hash(redeem_script.as_bytes());
 
+    script::Builder::new()
+        .push_opcode(bitcoin::opcodes::all::OP_HASH160)
+        .push_slice(redeem_script_hash.as_byte_array()) // [u8; 20]
+        .push_opcode(bitcoin::opcodes::all::OP_EQUAL)
+        .into_script()
+}
+fn arbitrary_bare_script() -> ScriptBuf {
+    script::Builder::new().push_opcode(OP_RETURN).push_slice(b"hello").into_script()
+}
+fn arbitrary_pubkey() -> PublicKey {
+    let secp = Secp256k1::new();
+    let secret_key = secp256k1::SecretKey::from_slice(&[1u8; 32]).unwrap();
+    PublicKey::new(secp256k1::PublicKey::from_secret_key(&secp, &secret_key))
+}
 // Script builder code copied from rust-bitcoin script unit tests.
 fn arbitrary_p2pkh_script() -> ScriptBuf {
     let pubkey_hash = <[u8; 20]>::from_hex("16e1ae70ff0fa102905d4af297f6912bda6cce19").unwrap();
@@ -225,7 +268,6 @@ fn arbitrary_p2pkh_script() -> ScriptBuf {
         .push_opcode(OP_CHECKSIG)
         .into_script()
 }
-
 fn arbitrary_multisig_script() -> ScriptBuf {
     let pk1 =
         <[u8; 33]>::from_hex("022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e")
@@ -243,6 +285,89 @@ fn arbitrary_multisig_script() -> ScriptBuf {
         .push_opcode(OP_PUSHNUM_2)
         .push_opcode(OP_CHECKMULTISIG)
         .into_script()
+}
+fn arbitrary_p2wpkh_script() -> ScriptBuf {
+    let pubkey = arbitrary_pubkey();
+    let pubkey_hash = hash160::Hash::hash(&pubkey.to_bytes());
+
+    // P2WPKH: 0 <20-byte pubkey hash>
+    Builder::new().push_int(0).push_slice(pubkey_hash.as_byte_array()).into_script()
+}
+
+fn arbitrary_p2wsh_script() -> ScriptBuf {
+    let redeem_script = arbitrary_multisig_script(); // any witness script
+    let script_hash = sha256::Hash::hash(redeem_script.as_bytes());
+
+    // P2WSH: 0 <32-byte script hash>
+    Builder::new().push_int(0).push_slice(script_hash.as_byte_array()).into_script()
+}
+
+fn arbitrary_p2tr_script() -> ScriptBuf {
+    let secp = Secp256k1::new();
+    let sk = secp256k1::SecretKey::from_slice(&[2u8; 32]).unwrap();
+    let internal_key = secp256k1::PublicKey::from_secret_key(&secp, &sk);
+    let x_only = XOnlyPublicKey::from(internal_key);
+
+    // Taproot output script: OP_1 <x-only pubkey>
+    Builder::new().push_int(1).push_slice(&x_only.serialize()).into_script()
+}
+
+#[test]
+fn raw_transactions__decode_script_segwit__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    node.client.load_wallet("default").ok(); // Ensure wallet is loaded
+    node.fund_wallet();
+
+    // Get a new address and script
+    let address_unc = node
+        .client
+        .get_new_address(None, None)
+        .expect("getnewaddress")
+        .address()
+        .expect("valid address string");
+
+    let address = address_unc.require_network(Network::Regtest).expect("must be regtest");
+
+    assert!(address.is_segwit(), "Expected SegWit address but got {:?}", address);
+
+    let script = address.script_pubkey();
+    let hex = script.to_hex_string();
+
+    // Decode script
+    let json = node.client.decode_script(&hex).expect("decodescript");
+    let model: Result<mtype::DecodeScript, DecodeScriptError> = json.into_model();
+    let decoded = model.expect("DecodeScript into model");
+
+    let segwit = decoded.segwit.as_ref().expect("Expected segwit field to be present");
+
+    assert_eq!(segwit.hex, script, "Segwit hex does not match script");
+
+    // Extract the type field
+    let script_type =
+        decoded.segwit.as_ref().map(|s| s.type_.as_str()).unwrap_or_else(|| decoded.type_.as_str());
+
+    assert_eq!(script_type, "witness_v0_keyhash", "Expected script type to be witness_v0_keyhash");
+
+    // Compare hex from segwit
+    let decoded_hex = decoded
+        .segwit
+        .as_ref()
+        .map(|s| &s.hex)
+        .unwrap_or_else(|| panic!("Expected segwit hex to be present"));
+
+    assert_eq!(*decoded_hex, script, "Script hex does not match");
+
+    // Compare addresses from segwit or fallback
+    let address_unc_check = address.into_unchecked();
+    let segwit_addresses =
+        decoded.segwit.as_ref().map(|s| &s.addresses).unwrap_or(&decoded.addresses);
+
+    assert!(
+        segwit_addresses.iter().any(|a| a == &address_unc_check),
+        "Expected address {:?} in segwit.addresses or top-level addresses: {:?}",
+        address_unc_check,
+        segwit_addresses
+    );
 }
 
 #[test]
