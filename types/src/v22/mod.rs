@@ -255,7 +255,9 @@ pub use self::{
     blockchain::GetMempoolInfo,
     control::Logging,
     network::{Banned, GetPeerInfo, ListBanned},
-    raw_transactions::{DecodeScript, DecodeScriptError},
+    raw_transactions::{
+        DecodeScript, DecodeScriptError, DecodeScriptSegwit, DecodeScriptSegwitError,
+    },
     signer::EnumerateSigners,
     wallet::{ListDescriptors, WalletDisplayAddress},
 };

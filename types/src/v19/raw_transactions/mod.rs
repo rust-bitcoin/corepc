@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! The JSON-RPC API for Bitcoin Core `v22` - raw transactions.
+//! The JSON-RPC API for Bitcoin Core `v19` - raw transactions.
 //!
 //! Types for methods found under the `== Rawtransactions ==` section of the API docs.
 
@@ -11,8 +11,7 @@ use bitcoin::address::{Address, NetworkUnchecked};
 use bitcoin::ScriptBuf;
 use serde::{Deserialize, Serialize};
 
-pub use self::error::DecodeScriptError;
-pub use crate::v19::DecodeScriptSegwitError;
+pub use self::error::{DecodeScriptError, DecodeScriptSegwitError};
 
 /// Result of JSON-RPC method `decodescript`.
 ///

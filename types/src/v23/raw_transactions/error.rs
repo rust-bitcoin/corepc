@@ -6,6 +6,7 @@ use bitcoin::{address, bip32, hex, sighash};
 
 use crate::error::write_err;
 use crate::v17::{Bip32DerivError, PartialSignatureError, RawTransactionError, WitnessUtxoError};
+use crate::v19::DecodeScriptSegwitError;
 
 /// Error when converting a `DecodePsbt` type into the model type.
 #[derive(Debug)]
@@ -265,6 +266,8 @@ pub enum DecodeScriptError {
     Address(address::ParseError),
     /// Conversion of the transaction `addresses` field failed.
     Addresses(address::ParseError),
+    /// Conversion of the transaction `segwit` field failed.
+    Segwit(DecodeScriptSegwitError),
     /// Conversion of the transaction `p2sh` field failed.
     P2sh(address::ParseError),
 }
@@ -277,6 +280,7 @@ impl fmt::Display for DecodeScriptError {
             E::Hex(ref e) => write_err!(f, "conversion of the `hex` field failed"; e),
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
             E::Addresses(ref e) => write_err!(f, "conversion of the `addresses` field failed"; e),
+            E::Segwit(ref e) => write_err!(f, "conversion of the `segwit` field failed"; e),
             E::P2sh(ref e) => write_err!(f, "conversion of the `p2sh` field failed"; e),
         }
     }
@@ -291,6 +295,7 @@ impl std::error::Error for DecodeScriptError {
             E::Hex(ref e) => Some(e),
             E::Address(ref e) => Some(e),
             E::Addresses(ref e) => Some(e),
+            E::Segwit(ref e) => Some(e),
             E::P2sh(ref e) => Some(e),
         }
     }
