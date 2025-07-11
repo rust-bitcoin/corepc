@@ -254,8 +254,8 @@ pub use self::{
     control::Logging,
     network::{GetPeerInfo, PeerInfo},
     raw_transactions::{
-        DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, DecodeScriptSegwit,DecodeScriptSegwitError,
-        GlobalXpub, Proprietary, PsbtInput, PsbtOutput,
+        DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, DecodeScriptSegwit,
+        DecodeScriptSegwitError, GlobalXpub, Proprietary, PsbtInput, PsbtOutput,
     },
     util::CreateMultisig,
     wallet::{

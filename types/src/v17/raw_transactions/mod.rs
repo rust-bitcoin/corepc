@@ -230,6 +230,8 @@ pub struct DecodeScript {
     pub addresses: Option<Vec<String>>,
     /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
     pub p2sh: Option<String>,
+    /// Result of a witness output script wrapping this redeem script (not returned for types that should not be wrapped).
+    pub segwit: Option<DecodeScriptSegwit>,
 }
 
 /// Segwit data. Part of `decodescript`.
