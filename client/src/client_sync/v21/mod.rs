@@ -180,6 +180,7 @@ crate::impl_client_v21__upgrade_wallet!();
 crate::impl_client_v17__wallet_create_funded_psbt!();
 crate::impl_client_v17__wallet_lock!();
 crate::impl_client_v17__wallet_passphrase!();
+crate::impl_client_v17__wallet_passphrase_change!();
 crate::impl_client_v17__wallet_process_psbt!();
 
 /// Request object for the `importdescriptors` method.

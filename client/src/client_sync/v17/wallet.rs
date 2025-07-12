@@ -714,6 +714,28 @@ macro_rules! impl_client_v17__wallet_lock {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `walletpassphrasechange`
+#[macro_export]
+macro_rules! impl_client_v17__wallet_passphrase_change {
+    () => {
+        impl Client {
+            pub fn wallet_passphrase_change(
+                &self,
+                old_passphrase: &str,
+                new_passphrase: &str,
+            ) -> Result<()> {
+                match self
+                    .call("walletpassphrasechange", &[old_passphrase.into(), new_passphrase.into()])
+                {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `walletprocesspsbt`.
 #[macro_export]
 macro_rules! impl_client_v17__wallet_process_psbt {
