@@ -335,6 +335,7 @@ impl DecodeScript {
             addresses,
             p2sh,
             p2sh_segwit: self.p2sh_segwit,
+            segwit,
         })
     }
 }
