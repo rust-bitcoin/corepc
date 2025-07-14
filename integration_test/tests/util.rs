@@ -66,8 +66,11 @@ fn util__get_descriptor_info() {
 #[cfg(not(feature = "v20_and_below"))]
 #[test]
 fn util__get_index_info() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
-    let _: GetIndexInfo = node.client.get_index_info().expect("getindexinfo");
+    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let index_info: GetIndexInfo = node.client.get_index_info().expect("getindexinfo");
+
+    let txindex_info = index_info.0.get("txindex").unwrap();
+    assert!(txindex_info.best_block_height < u32::MAX, "best_block_height should be a valid block height");
 }
 
 #[test]
