@@ -3,14 +3,19 @@
 //! Tests for methods found under the `== Wallet ==` section of the API docs.
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
+#![allow(unused_imports)] // Some imports are only used in specific versions.
 
-#[cfg(feature = "TODO")]
-use bitcoin::address::{Address, NetworkChecked};
-use bitcoin::{Amount, FeeRate, PrivateKey, PublicKey};
+use bitcoin::address::{Address, KnownHrp, NetworkChecked};
+use bitcoin::{secp256k1, Amount, CompressedPublicKey, FeeRate, PrivateKey, PublicKey};
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::{mtype, AddressType, ImportMultiRequest, ImportMultiScriptPubKey, ImportMultiTimestamp};
+
+#[cfg(not(feature = "v20_and_below"))]
+use node::ImportDescriptorsRequest;
+
 use node::vtype::*;             // All the version specific types.
 use std::fs;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[test]
 fn wallet__abandon_transaction() {
@@ -313,8 +318,6 @@ fn wallet__import_address() {
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
 fn wallet__import_descriptors() {
-    use node::{serde_json, ImportDescriptorsRequest};
-
     let node = Node::with_wallet(Wallet::None, &[]);
     let wallet_name = "desc_wallet";
 
@@ -325,15 +328,37 @@ fn wallet__import_descriptors() {
     #[cfg(not(feature = "v22_and_below"))]
     node.client.create_wallet(wallet_name).expect("create wallet");
 
-    let address = node.client.new_address().expect("failed to get new address");
-    let descriptor = format!("addr({})", address);
+    node.fund_wallet();
 
-    let request = ImportDescriptorsRequest {
-        desc: descriptor,
-        timestamp: serde_json::Value::String("now".to_string()),
-    };
+    // 1. Get the current time
+    let start_time = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("failed to get current time")
+        .as_secs();
 
-    let _: ImportDescriptors = node.client.import_descriptors(&[request]).expect("importdescriptors");
+    // 2. Use a known private key, derive the address from it and send some coins to it.
+    let privkey =
+        PrivateKey::from_wif("cVt4o7BGAig1UXywgGSmARhxMdzP5qvQsxKkSsc1XEkw3tDTQFpy").unwrap();
+    let secp = secp256k1::Secp256k1::new();
+    let pubkey = privkey.public_key(&secp);
+    let address = Address::p2wpkh(&CompressedPublicKey(pubkey.inner), KnownHrp::Regtest);
+    let amount = Amount::from_sat(10_000);
+    let _txid = node.client.send_to_address(&address, amount).expect("sendtoaddress");
+
+    // 3. Get the descriptor from the private key.
+    let raw_descriptor = format!("wpkh({})", privkey.to_wif());
+    let info = node.client.get_descriptor_info(&raw_descriptor).expect("get_descriptor_info");
+    let descriptor = format!("{}#{}", raw_descriptor, info.checksum);
+
+    // 4. Mine 100 blocks
+    let mining_address = node.client.new_address().expect("failed to get mining address");
+    let _blocks = node.client.generate_to_address(100, &mining_address).expect("generatetoaddress");
+
+    // 5. Scan for the descriptor using the time from (1)
+    let request = ImportDescriptorsRequest::new(descriptor, start_time);
+    let result: ImportDescriptors = node.client.import_descriptors(&[request]).expect("importdescriptors");
+    assert_eq!(result.0.len(), 1, "should have exactly one import result");
+    assert!(result.0[0].success);
 }
 
 #[test]
