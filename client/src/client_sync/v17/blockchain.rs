@@ -329,7 +329,10 @@ macro_rules! impl_client_v17__scan_tx_out_set {
             }
 
             /// Starts a scan of the UTXO set for specified descriptors.
-            pub fn scan_tx_out_set_start(&self, scan_objects: &[&str]) -> Result<ScanTxOutSetStart> {
+            pub fn scan_tx_out_set_start(
+                &self,
+                scan_objects: &[&str],
+            ) -> Result<ScanTxOutSetStart> {
                 self.call("scantxoutset", &[into_json("start")?, into_json(scan_objects)?])
             }
 

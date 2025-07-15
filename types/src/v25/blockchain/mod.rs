@@ -7,6 +7,7 @@
 mod into;
 
 use alloc::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 pub use super::{GetBlockStatsError, ScanTxOutSetError};

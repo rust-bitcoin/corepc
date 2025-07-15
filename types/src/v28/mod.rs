@@ -259,9 +259,7 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::{
-        GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent,
-    },
+    blockchain::{GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent},
     control::Logging,
     mining::GetMiningInfo,
     network::GetNetworkInfo,
@@ -298,12 +296,12 @@ pub use crate::{
         ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
         ListTransactionsItemError, ListUnspentItemError, ListWallets, LockUnspent, Locked,
         PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
-        RescanBlockchain, ScanTxOutSetError, SendMany, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
-        SignRawTransactionError, SoftforkReject, TestMempoolAccept, TransactionCategory,
-        UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-        WitnessUtxo, ScanTxOutSetAbort, ScanTxOutSetStatus,
+        RescanBlockchain, ScanTxOutSetAbort, ScanTxOutSetError, ScanTxOutSetStatus, SendMany,
+        SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
+        SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, SoftforkReject,
+        TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress,
+        ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
+        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

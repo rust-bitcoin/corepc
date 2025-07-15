@@ -294,11 +294,12 @@ pub use crate::{
         ListSinceBlockTransactionError, ListTransactions, ListTransactionsItem,
         ListTransactionsItemError, ListUnspentItemError, ListWallets, LockUnspent, Locked,
         PruneBlockchain, RawTransactionError, RawTransactionInput, RawTransactionOutput,
-        RescanBlockchain, ScanTxOutSetError, SendMany, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
-        SignRawTransactionError, TestMempoolAccept, TransactionCategory, UploadTarget,
-        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
-        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo, ScanTxOutSetAbort, ScanTxOutSetStatus,
+        RescanBlockchain, ScanTxOutSetAbort, ScanTxOutSetError, ScanTxOutSetStatus, SendMany,
+        SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
+        SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, TestMempoolAccept,
+        TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
+        VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -335,8 +336,7 @@ pub use crate::{
     },
     v28::{
         GetNetworkInfo, GetPeerInfo, GetTransaction, Logging, ScanTxOutSetStart,
-        ScanTxOutSetUnspent, SubmitPackage, SubmitPackageError,
-        SubmitPackageTxResult, SubmitPackageTxResultError, SubmitPackageTxResultFees,
-        SubmitPackageTxResultFeesError,
+        ScanTxOutSetUnspent, SubmitPackage, SubmitPackageError, SubmitPackageTxResult,
+        SubmitPackageTxResultError, SubmitPackageTxResultFees, SubmitPackageTxResultFeesError,
     },
 };

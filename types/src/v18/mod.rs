@@ -233,10 +233,7 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::{
-        GetMempoolEntry, MempoolEntry, ScanTxOutSetStart,
-        ScanTxOutSetUnspent,
-    },
+    blockchain::{GetMempoolEntry, MempoolEntry, ScanTxOutSetStart, ScanTxOutSetUnspent},
     control::{ActiveCommand, GetRpcInfo},
     network::{GetNodeAddresses, GetPeerInfo, NodeAddress, PeerInfo},
     raw_transactions::{
@@ -281,10 +278,10 @@ pub use crate::v17::{
     Logging, MapMempoolEntryError, MempoolAcceptance, MempoolEntryError, MempoolEntryFees,
     MempoolEntryFeesError, PruneBlockchain, PsbtInput, PsbtOutput, PsbtScript, RawTransaction,
     RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain,
-    ScanTxOutSetError, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee,
-    SignFail, SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
-    SignRawTransactionError, Softfork, SoftforkReject, TestMempoolAccept, TransactionCategory,
-    UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-    VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-    WitnessUtxo, ScanTxOutSetAbort, ScanTxOutSetStatus,
+    ScanTxOutSetAbort, ScanTxOutSetError, ScanTxOutSetStatus, SendMany, SendRawTransaction,
+    SendToAddress, SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage,
+    SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, Softfork, SoftforkReject,
+    TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError,
+    VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
+    WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
 };

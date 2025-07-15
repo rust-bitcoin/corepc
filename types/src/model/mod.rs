@@ -28,8 +28,8 @@ pub use self::{
         GetDescriptorActivity, GetDifficulty, GetMempoolAncestors, GetMempoolAncestorsVerbose,
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutSetInfo, MempoolEntry,
-        MempoolEntryFees, ReceiveActivity, ScanTxOutSetStart,
-        ScanTxOutSetUnspent, Softfork, SoftforkType, SpendActivity, VerifyTxOutProof,
+        MempoolEntryFees, ReceiveActivity, ScanTxOutSetStart, ScanTxOutSetUnspent, Softfork,
+        SoftforkType, SpendActivity, VerifyTxOutProof,
     },
     generating::{Generate, GenerateBlock, GenerateToAddress, GenerateToDescriptor},
     mining::{
