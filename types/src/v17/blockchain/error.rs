@@ -548,20 +548,13 @@ impl fmt::Display for ScanTxOutSetError {
         use ScanTxOutSetError::*;
 
         match self {
-            BestBlockHash(e) =>
-                write_err!(f, "conversion of the `bestblock` field failed"; e),
-            BlockHash(e) =>
-                write_err!(f, "conversion of the `blockhash` field failed"; e),
-            Txid(e) =>
-                write_err!(f, "conversion of the `txid` field failed"; e),
-            ScriptPubKey(e) =>
-                write_err!(f, "conversion of the `scriptPubKey` field failed"; e),
-            TotalAmount(e) =>
-                write_err!(f, "conversion of the `total_amount` field failed"; e),
-            Amount(e) =>
-                write_err!(f, "conversion of the `amount` field failed"; e),
-            Numeric(e) =>
-                write_err!(f, "numeric"; e),
+            BestBlockHash(e) => write_err!(f, "conversion of the `bestblock` field failed"; e),
+            BlockHash(e) => write_err!(f, "conversion of the `blockhash` field failed"; e),
+            Txid(e) => write_err!(f, "conversion of the `txid` field failed"; e),
+            ScriptPubKey(e) => write_err!(f, "conversion of the `scriptPubKey` field failed"; e),
+            TotalAmount(e) => write_err!(f, "conversion of the `total_amount` field failed"; e),
+            Amount(e) => write_err!(f, "conversion of the `amount` field failed"; e),
+            Numeric(e) => write_err!(f, "numeric"; e),
         }
     }
 }

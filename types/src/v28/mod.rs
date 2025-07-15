@@ -259,9 +259,7 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::{
-        GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent,
-    },
+    blockchain::{GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent},
     control::Logging,
     mining::GetMiningInfo,
     network::GetNetworkInfo,

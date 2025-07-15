@@ -63,7 +63,6 @@ crate::impl_client_v17__scan_tx_out_set!();
 crate::impl_client_v17__verify_chain!();
 crate::impl_client_v17__verify_tx_out_proof!();
 
-
 // == Control ==
 crate::impl_client_v17__get_memory_info!();
 crate::impl_client_v18__get_rpc_info!();

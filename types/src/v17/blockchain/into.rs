@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::{block, hex, Block, BlockHash, CompactTarget, Txid, Weight, Work, ScriptBuf};
+use bitcoin::{block, hex, Block, BlockHash, CompactTarget, ScriptBuf, Txid, Weight, Work};
 
 // TODO: Use explicit imports?
 use super::*;
@@ -556,11 +556,8 @@ impl ScanTxOutSetStart {
     pub fn into_model(self) -> Result<model::ScanTxOutSetStart, ScanTxOutSetError> {
         use ScanTxOutSetError as E;
 
-        let unspents = self
-            .unspents
-            .into_iter()
-            .map(|u| u.into_model())
-            .collect::<Result<Vec<_>, _>>()?;
+        let unspents =
+            self.unspents.into_iter().map(|u| u.into_model()).collect::<Result<Vec<_>, _>>()?;
 
         let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
 

@@ -2,9 +2,7 @@
 
 use bitcoin::{Amount, BlockHash, ScriptBuf, Txid};
 
-use super::{
-    ScanTxOutSetError, ScanTxOutSetStart, ScanTxOutSetUnspent,
-};
+use super::{ScanTxOutSetError, ScanTxOutSetStart, ScanTxOutSetUnspent};
 use crate::model;
 
 impl ScanTxOutSetStart {
