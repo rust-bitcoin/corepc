@@ -317,7 +317,13 @@ fn wallet__import_descriptors() {
 
     let node = Node::with_wallet(Wallet::None, &[]);
     let wallet_name = "desc_wallet";
-    node.client.create_wallet_with_descriptors(wallet_name).expect("create descriptor wallet");
+
+    #[cfg(feature = "v22_and_below")]
+    node.client.create_descriptor_wallet(wallet_name).expect("create descriptor wallet");
+
+    // v23 onwards uses descriptor wallets by default.
+    #[cfg(not(feature = "v22_and_below"))]
+    node.client.create_wallet(wallet_name).expect("create wallet");
 
     let address = node.client.new_address().expect("failed to get new address");
     let descriptor = format!("addr({})", address);

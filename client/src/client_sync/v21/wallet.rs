@@ -9,22 +9,51 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `createwallet` with descriptors=true (descriptor wallet)
+/// Implements Bitcoin Core JSON-RPC API method `createwallet`.
 #[macro_export]
-macro_rules! impl_client_v21__create_wallet_with_descriptors {
+macro_rules! impl_client_v21__create_wallet {
     () => {
         impl Client {
-            pub fn create_wallet_with_descriptors(&self, wallet: &str) -> Result<CreateWallet> {
-                let args = [
-                    wallet.into(),
-                    false.into(),            // disable_private_keys
-                    false.into(),            // blank
-                    serde_json::Value::Null, // passphrase
-                    false.into(),            // avoid_reuse
-                    true.into(),             // descriptors=true
-                    serde_json::Value::Null, // load_on_startup
-                ];
-                self.call("createwallet", &args)
+            /// Calls `createwallet` with `wallet` as the only argument.
+            ///
+            /// In v21 and v22 this creates a legacy wallet. Use `create_descriptor_wallet` to create
+            /// a descriptor wallet.
+            pub fn create_wallet(&self, wallet: &str) -> Result<CreateWallet> {
+                self.call("createwallet", &[wallet.into()])
+            }
+
+            /// Creates a wallet with descriptors=true (descriptor wallet).
+            ///
+            /// > createwallet "wallet_name" ( disable_private_keys blank "passphrase" avoid_reuse descriptors load_on_startup )
+            /// >
+            /// > Creates and loads a new wallet.
+            /// >
+            /// > Arguments:
+            /// > 1. wallet_name             (string, required) The name for the new wallet. If this is a path, the wallet will be created at the path location.
+            /// > 2. disable_private_keys    (boolean, optional, default=false) Disable the possibility of private keys (only watchonlys are possible in this mode).
+            /// > 3. blank                   (boolean, optional, default=false) Create a blank wallet. A blank wallet has no keys or HD seed. One can be set using sethdseed.
+            /// > 4. passphrase              (string, optional) Encrypt the wallet with this passphrase.
+            /// > 5. avoid_reuse             (boolean, optional, default=false) Keep track of coin reuse, and treat dirty and clean coins differently with privacy considerations in mind.
+            /// > 6. descriptors             (boolean, optional, default=true) Create a native descriptor wallet. The wallet will use descriptors internally to handle address creation
+            /// > 7. load_on_startup         (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
+            pub fn create_descriptor_wallet(&self, wallet: &str) -> Result<CreateWallet> {
+                let disable_private_keys = false;
+                let blank = false;
+                let passphrase = String::new();
+                let avoid_reuse = false;
+                let descriptors = true;
+
+                self.call(
+                    "createwallet",
+                    &[
+                        wallet.into(),
+                        disable_private_keys.into(),
+                        blank.into(),
+                        passphrase.into(),
+                        avoid_reuse.into(),
+                        descriptors.into(),
+                    ],
+                )
             }
         }
     };
