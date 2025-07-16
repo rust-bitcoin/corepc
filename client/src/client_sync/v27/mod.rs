@@ -32,6 +32,7 @@ crate::impl_client_v17__get_block!();
 crate::impl_client_v17__get_blockchain_info!();
 crate::impl_client_v17__get_block_count!();
 crate::impl_client_v19__get_block_filter!();
+crate::impl_client_v23__get_block_from_peer!();
 crate::impl_client_v17__get_block_hash!();
 crate::impl_client_v17__get_block_header!();
 crate::impl_client_v17__get_block_stats!();

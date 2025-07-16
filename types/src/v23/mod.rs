@@ -31,7 +31,7 @@
 //! | getblockchaininfo                  | version + model |                                        |
 //! | getblockcount                      | version + model |                                        |
 //! | getblockfilter                     | version         |                                        |
-//! | getblockfrompeer                   | version + model | TODO                                   |
+//! | getblockfrompeer                   | returns nothing |                                        |
 //! | getblockhash                       | version + model |                                        |
 //! | getblockheader                     | version + model | Includes additional 'verbose' type     |
 //! | getblockstats                      | version + model |                                        |
