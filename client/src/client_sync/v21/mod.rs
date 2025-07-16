@@ -191,3 +191,10 @@ pub struct ImportDescriptorsRequest {
     /// Time from which to start rescanning the blockchain for this descriptor, in UNIX epoch time or "now".
     pub timestamp: serde_json::Value,
 }
+
+impl ImportDescriptorsRequest {
+    /// Constructs a new ImportDescriptorsRequest.
+    pub fn new(desc: impl Into<String>, timestamp: impl Into<serde_json::Value>) -> Self {
+        ImportDescriptorsRequest { desc: desc.into(), timestamp: timestamp.into() }
+    }
+}
