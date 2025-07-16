@@ -66,12 +66,25 @@ fn wallet__add_multisig_address__modelled() {
 
 #[test]
 fn wallet__backup_wallet() {
+    backup_and_restore_wallet()
+}
+
+fn backup_and_restore_wallet() {
     let node = Node::with_wallet(Wallet::Default, &[]);
     let file_path = integration_test::random_tmp_file();
 
     let _: () = node.client.backup_wallet(&file_path).expect("backupwallet");
     assert!(file_path.exists(), "Backup file should exist at destination");
     assert!(file_path.is_file(), "Backup destination should be a file");
+
+    // Restore wallet only available for v23 and above.
+    #[cfg(not(feature = "v22_and_below"))]
+    {
+        let wallet_name = "test_wallet";
+        let node2 = Node::with_wallet(Wallet::None, &[]);
+        let restored_wallet: RestoreWallet = node2.client.restore_wallet(wallet_name, &file_path).expect("restorewallet");
+        assert_eq!(restored_wallet.name, wallet_name);
+    }
 
     fs::remove_file(&file_path).expect("removefile");
 }
@@ -594,6 +607,11 @@ fn wallet__remove_pruned_funds() {
 
     let _: () = node.client.remove_pruned_funds(txid).expect("removeprunedfunds");
 }
+
+// This is tested in `backup_and_restore_wallet()`, called by wallet__backup_wallet()
+#[cfg(not(feature = "v22_and_below"))]
+#[test]
+fn wallet__restore_wallet() {}
 
 // This is tested in raw_transactions.rs `create_sign_send()`.
 #[test]

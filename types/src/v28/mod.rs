@@ -218,7 +218,7 @@
 //! | lockunspent                        | version         |                                        |
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model | UNTESTED                               |
-//! | restorewallet                      | version + model | TODO                                   |
+//! | restorewallet                      | version         |                                        |
 //! | send                               | version + model |                                        |
 //! | sendall                            | version + model | TODO                                   |
 //! | sendmany                           | version + model | UNTESTED                               |
@@ -322,7 +322,7 @@ pub use crate::{
         PsbtBumpFeeError, Send, SendError, UpgradeWallet,
     },
     v22::{Banned, EnumerateSigners, ListBanned, ScriptPubkey, WalletDisplayAddress},
-    v23::{CreateMultisig, DecodeScript, DecodeScriptError, SaveMempool},
+    v23::{CreateMultisig, DecodeScript, DecodeScriptError, RestoreWallet, SaveMempool},
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GetTransactionDetail,
         GlobalXpub, ListUnspent, ListUnspentItem, Proprietary, PsbtInput, PsbtOutput,

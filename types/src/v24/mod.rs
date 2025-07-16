@@ -207,7 +207,7 @@
 //! | lockunspent                        | version         |                                        |
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model | UNTESTED                               |
-//! | restorewallet                      | version + model | TODO                                   |
+//! | restorewallet                      | version         |                                        |
 //! | send                               | version + model |                                        |
 //! | sendall                            | version + model | TODO                                   |
 //! | sendmany                           | version + model | UNTESTED                               |
@@ -315,6 +315,7 @@ pub use crate::{
         Banned, EnumerateSigners, ListBanned, ListDescriptors, ScriptPubkey, WalletDisplayAddress,
     },
     v23::{
-        CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, Logging, SaveMempool,
+        CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, Logging, RestoreWallet,
+        SaveMempool,
     },
 };

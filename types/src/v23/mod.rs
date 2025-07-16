@@ -205,7 +205,7 @@
 //! | lockunspent                        | version         |                                        |
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model | UNTESTED                               |
-//! | restorewallet                      | version + model | TODO                                   |
+//! | restorewallet                      | version         |                                        |
 //! | send                               | version + model |                                        |
 //! | sendmany                           | version + model | UNTESTED                               |
 //! | sendtoaddress                      | version + model |                                        |
@@ -253,7 +253,7 @@ pub use self::{
         PsbtInput, PsbtOutput,
     },
     util::CreateMultisig,
-    wallet::{GetTransaction, GetTransactionError},
+    wallet::{GetTransaction, GetTransactionError, RestoreWallet},
 };
 #[doc(inline)]
 pub use crate::{

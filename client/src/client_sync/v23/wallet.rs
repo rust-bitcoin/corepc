@@ -56,3 +56,22 @@ macro_rules! impl_client_v23__create_wallet {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `restorewallet`.
+#[macro_export]
+macro_rules! impl_client_v23__restore_wallet {
+    () => {
+        impl Client {
+            /// Calls `restorewallet` with required and optional arguments.
+            ///
+            /// > restorewallet "wallet_name" "backup_file" ( load_on_startup )
+            pub fn restore_wallet(
+                &self,
+                wallet_name: &str,
+                backup_file: &Path,
+            ) -> Result<RestoreWallet> {
+                self.call("restorewallet", &[wallet_name.into(), into_json(backup_file)?])
+            }
+        }
+    };
+}
