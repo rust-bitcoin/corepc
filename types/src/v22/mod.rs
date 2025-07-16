@@ -144,7 +144,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | enumeratesigners                   | version + model | TODO                                   |
+//! | enumeratesigners                   | version         | UNTESTED                               |
 //!
 //! </details>
 //!
@@ -198,7 +198,7 @@
 //! | importwallet                       | returns nothing |                                        |
 //! | keypoolrefill                      | returns nothing |                                        |
 //! | listaddressgroupings               | version + model | UNTESTED                               |
-//! | listdescriptors                    | version + model | TODO                                   |
+//! | listdescriptors                    | version         |                                        |
 //! | listlabels                         | version + model | UNTESTED                               |
 //! | listlockunspent                    | version + model | UNTESTED                               |
 //! | psbtbumpfee                        | version + model |                                        |
@@ -225,7 +225,7 @@
 //! | unloadwallet                       | returns nothing |                                        |
 //! | upgradewallet                      | version         |                                        |
 //! | walletcreatefundedpsbt             | version + model | UNTESTED                               |
-//! | walletdisplayaddress               | version + model | TODO                                   |
+//! | walletdisplayaddress               | version + model | UNTESTED                               |
 //! | walletlock                         | returns nothing |                                        |
 //! | walletpassphrase                   | returns nothing |                                        |
 //! | walletpassphrasechange             | returns nothing |                                        |
@@ -247,6 +247,8 @@ mod blockchain;
 mod control;
 mod network;
 mod raw_transactions;
+mod signer;
+mod wallet;
 
 #[doc(inline)]
 pub use self::{
@@ -254,6 +256,8 @@ pub use self::{
     control::Logging,
     network::{Banned, GetPeerInfo, ListBanned},
     raw_transactions::{DecodeScript, DecodeScriptError},
+    signer::EnumerateSigners,
+    wallet::{ListDescriptors, WalletDisplayAddress},
 };
 #[doc(inline)]
 pub use crate::{

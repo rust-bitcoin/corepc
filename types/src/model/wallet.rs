@@ -790,6 +790,14 @@ pub struct WalletCreateFundedPsbt {
     pub change_pos: u32,
 }
 
+/// Models the result of JSON-RPC method `walletdisplayaddress`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct WalletDisplayAddress {
+    /// The address as confirmed by the signer
+    pub address: Address<NetworkUnchecked>,
+}
+
 /// Models the result of JSON-RPC method `walletprocesspsbt`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

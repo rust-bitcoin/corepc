@@ -66,12 +66,25 @@ fn wallet__add_multisig_address__modelled() {
 
 #[test]
 fn wallet__backup_wallet() {
+    backup_and_restore_wallet()
+}
+
+fn backup_and_restore_wallet() {
     let node = Node::with_wallet(Wallet::Default, &[]);
     let file_path = integration_test::random_tmp_file();
 
     let _: () = node.client.backup_wallet(&file_path).expect("backupwallet");
     assert!(file_path.exists(), "Backup file should exist at destination");
     assert!(file_path.is_file(), "Backup destination should be a file");
+
+    // Restore wallet only available for v23 and above.
+    #[cfg(not(feature = "v22_and_below"))]
+    {
+        let wallet_name = "test_wallet";
+        let node2 = Node::with_wallet(Wallet::None, &[]);
+        let restored_wallet: RestoreWallet = node2.client.restore_wallet(wallet_name, &file_path).expect("restorewallet");
+        assert_eq!(restored_wallet.name, wallet_name);
+    }
 
     fs::remove_file(&file_path).expect("removefile");
 }
@@ -496,6 +509,25 @@ fn wallet__import_pubkey() {
 }
 
 #[test]
+#[cfg(not(feature = "v21_and_below"))]
+fn wallet__list_descriptors() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+    let wallet_name = "desc_wallet";
+
+    #[cfg(feature = "v22_and_below")]
+    node.client.create_wallet_with_descriptors(wallet_name).expect("create descriptor wallet");
+
+    // v23 onwards uses descriptor wallets by default.
+    #[cfg(not(feature = "v22_and_below"))]
+    node.client.create_wallet(wallet_name).expect("create wallet");
+
+    let json: ListDescriptors = node.client.list_descriptors().expect("listdescriptors");
+
+    let has_descriptor = json.descriptors.iter().any(|desc_info| desc_info.descriptor.starts_with("wpkh(") || desc_info.descriptor.starts_with("pkh("));
+    assert!(has_descriptor, "No standard descriptors found in listdescriptors result");
+}
+
+#[test]
 fn wallet__list_unspent__modelled() {
     let node = match () {
         #[cfg(feature = "v17")]
@@ -541,6 +573,14 @@ fn wallet__lock_unspent() {
     assert!(json.0);
 }
 
+#[cfg(not(feature = "v22_and_below"))]
+#[test]
+fn wallet__new_keypool() {
+    let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+    node.client.create_legacy_wallet("legacy_wallet").expect("createlegacywallet");
+    let _: () = node.client.new_keypool().expect("newkeypool");
+}
+
 #[cfg(not(feature = "v20_and_below"))]
 #[test]
 fn wallet__psbt_bump_fee__modelled() {
@@ -575,6 +615,11 @@ fn wallet__remove_pruned_funds() {
 
     let _: () = node.client.remove_pruned_funds(txid).expect("removeprunedfunds");
 }
+
+// This is tested in `backup_and_restore_wallet()`, called by wallet__backup_wallet()
+#[cfg(not(feature = "v22_and_below"))]
+#[test]
+fn wallet__restore_wallet() {}
 
 // This is tested in raw_transactions.rs `create_sign_send()`.
 #[test]

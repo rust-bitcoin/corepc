@@ -50,6 +50,38 @@ impl CreateWallet {
     /// Returns the created wallet name.
     pub fn name(self) -> String { self.into_model().name }
 }
+/// Result of JSON-RPC method `listdescriptors`.
+///
+/// > List descriptors imported into a descriptor-enabled wallet.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ListDescriptors {
+    /// Name of wallet this operation was performed on.
+    pub wallet_name: String,
+    /// Array of descriptor objects.
+    pub descriptors: Vec<DescriptorInfo>,
+}
+
+/// A descriptor object from `listdescriptors`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct DescriptorInfo {
+    /// Descriptor string representation.
+    #[serde(rename = "desc")]
+    pub descriptor: String,
+    /// The creation time of the descriptor.
+    pub timestamp: u64,
+    /// Activeness flag.
+    pub active: bool,
+    /// Whether this is an internal or external descriptor; defined only for active descriptors.
+    pub internal: Option<bool>,
+    /// Defined only for ranged descriptors.
+    pub range: Option<[u64; 2]>,
+    /// Same as `next_index` field. Kept for compatibility reason.
+    pub next: Option<u64>,
+    /// The next index to generate addresses from; defined only for ranged descriptors.
+    pub next_index: Option<u64>,
+}
 
 /// Result of the JSON-RPC method `loadwallet`.
 ///

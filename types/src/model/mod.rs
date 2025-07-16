@@ -21,14 +21,15 @@ mod zmq;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        ActivityEntry, Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, ChainTips,
-        ChainTipsStatus, GetBestBlockHash, GetBlockCount, GetBlockFilter, GetBlockHash,
-        GetBlockHeader, GetBlockHeaderVerbose, GetBlockStats, GetBlockVerboseOne,
-        GetBlockVerboseZero, GetBlockchainInfo, GetChainTips, GetChainTxStats,
-        GetDescriptorActivity, GetDifficulty, GetMempoolAncestors, GetMempoolAncestorsVerbose,
-        GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
-        GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutSetInfo, MempoolEntry,
-        MempoolEntryFees, ReceiveActivity, Softfork, SoftforkType, SpendActivity, VerifyTxOutProof,
+        ActivityEntry, Bip9Info, Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus,
+        Bip9Statistics, ChainTips, ChainTipsStatus, DeploymentInfo, GetBestBlockHash,
+        GetBlockCount, GetBlockFilter, GetBlockHash, GetBlockHeader, GetBlockHeaderVerbose,
+        GetBlockStats, GetBlockVerboseOne, GetBlockVerboseZero, GetBlockchainInfo, GetChainTips,
+        GetChainTxStats, GetDeploymentInfo, GetDescriptorActivity, GetDifficulty,
+        GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
+        GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, GetRawMempool,
+        GetRawMempoolVerbose, GetTxOut, GetTxOutSetInfo, MempoolEntry, MempoolEntryFees,
+        ReceiveActivity, Softfork, SoftforkType, SpendActivity, VerifyTxOutProof,
     },
     generating::{Generate, GenerateBlock, GenerateToAddress, GenerateToDescriptor},
     mining::{
@@ -60,6 +61,7 @@ pub use self::{
         ListReceivedByLabel, ListReceivedByLabelItem, ListSinceBlock, ListSinceBlockTransaction,
         ListTransactions, ListTransactionsItem, ListUnspent, ListUnspentItem, ListWallets,
         LoadWallet, PsbtBumpFee, RescanBlockchain, ScriptType, Send, SendMany, SendToAddress,
-        SignMessage, TransactionCategory, UnloadWallet, WalletCreateFundedPsbt, WalletProcessPsbt,
+        SignMessage, TransactionCategory, UnloadWallet, WalletCreateFundedPsbt,
+        WalletDisplayAddress, WalletProcessPsbt,
     },
 };

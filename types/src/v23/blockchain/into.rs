@@ -5,7 +5,8 @@ use alloc::collections::BTreeMap;
 use bitcoin::{BlockHash, Network, Txid, Work, Wtxid};
 
 use super::{
-    GetBlockchainInfo, GetBlockchainInfoError, GetMempoolEntry, MempoolEntry, MempoolEntryError,
+    Bip9Info, Bip9Statistics, DeploymentInfo, GetBlockchainInfo, GetBlockchainInfoError,
+    GetDeploymentInfo, GetDeploymentInfoError, GetMempoolEntry, MempoolEntry, MempoolEntryError,
 };
 use crate::model;
 
@@ -46,6 +47,63 @@ impl GetBlockchainInfo {
             softforks,
             signet_challenge: None,
             warnings: vec![self.warnings],
+        })
+    }
+}
+
+impl GetDeploymentInfo {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetDeploymentInfo, GetDeploymentInfoError> {
+        let hash = self.hash.parse::<BlockHash>().map_err(GetDeploymentInfoError::BlockHash)?;
+        let deployments = self
+            .deployments
+            .into_iter()
+            .map(|(name, dep)| {
+                dep.into_model().map(|d| (name, d)).map_err(GetDeploymentInfoError::Deployment)
+            })
+            .collect::<Result<_, _>>()?;
+        Ok(model::GetDeploymentInfo { hash, height: self.height, deployments })
+    }
+}
+
+impl DeploymentInfo {
+    /// Returned as part of `getdeploymentinfo`.
+    pub fn into_model(self) -> Result<model::DeploymentInfo, crate::NumericError> {
+        Ok(model::DeploymentInfo {
+            deployment_type: self.deployment_type,
+            height: self.height,
+            active: self.active,
+            bip9: self.bip9.map(|b| b.into_model()).transpose()?,
+        })
+    }
+}
+
+impl Bip9Info {
+    /// Returned as part of `getdeploymentinfo`.
+    pub fn into_model(self) -> Result<model::Bip9Info, crate::NumericError> {
+        Ok(model::Bip9Info {
+            bit: self.bit,
+            start_time: self.start_time,
+            timeout: self.timeout,
+            min_activation_height: self.min_activation_height,
+            status: self.status,
+            since: self.since,
+            status_next: self.status_next,
+            statistics: self.statistics.map(|s| s.into_model()).transpose()?,
+            signalling: self.signalling,
+        })
+    }
+}
+
+impl Bip9Statistics {
+    /// Returned as part of `getdeploymentinfo`.
+    pub fn into_model(self) -> Result<model::Bip9Statistics, crate::NumericError> {
+        Ok(model::Bip9Statistics {
+            period: self.period,
+            threshold: self.threshold,
+            elapsed: self.elapsed,
+            count: self.count,
+            possible: self.possible,
         })
     }
 }

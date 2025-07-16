@@ -66,6 +66,37 @@ fn blockchain__get_block_filter__modelled() {
 }
 
 #[test]
+#[cfg(not(feature = "v22_and_below"))]
+fn blockchain__get_block_from_peer() {
+    use bitcoin::hashes::Hash;
+    let (node1, _node2, _node3) = integration_test::three_node_network();
+
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_secs() as u32;
+
+    // Create a dummy header and submit it
+    let mut header = bitcoin::block::Header {
+        version: bitcoin::block::Version::from_consensus(0x20000000),
+        prev_blockhash: node1.client.best_block_hash().expect("best_block_hash failed"),
+        merkle_root: bitcoin::TxMerkleNode::all_zeros(),
+        time: now,
+        bits: bitcoin::CompactTarget::from_consensus(0x207fffff),
+        nonce: 0,
+    };
+    let target = header.target();
+    while header.validate_pow(target).is_err() {
+        header.nonce += 1;
+    }
+    node1.client.submit_header(&header).expect("submit_header failed");
+
+    let hash = header.block_hash();
+    let peer_id = node1.client.get_peer_info().expect("getpeerinfo").0[0].id;
+    let _: () = node1.client.get_block_from_peer(hash, peer_id).expect("getblockfrompeer");
+}
+
+#[test]
 fn blockchain__get_block_hash__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
@@ -144,6 +175,17 @@ fn blockchain__get_chain_tx_stats__modelled() {
 
     let json: GetChainTxStats = node.client.get_chain_tx_stats().expect("getchaintxstats");
     let model: Result<mtype::GetChainTxStats, GetChainTxStatsError> = json.into_model();
+    model.unwrap();
+}
+
+#[test]
+#[cfg(not(feature = "v22_and_below"))]
+fn blockchain__get_deployment_info__modelled() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+    let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+
+    let json: GetDeploymentInfo = node.client.get_deployment_info(&block_hash).expect("getdeploymentinfo");
+    let model: Result<mtype::GetDeploymentInfo, GetDeploymentInfoError> = json.into_model();
     model.unwrap();
 }
 

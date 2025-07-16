@@ -4,12 +4,14 @@
 //!
 //! Types for methods found under the `== Blockchain ==` section of the API docs.
 
+mod error;
 mod into;
 
 use alloc::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+pub use self::error::GetDeploymentInfoError;
 pub use super::{GetBlockchainInfoError, MempoolEntryError, MempoolEntryFees, Softfork};
 
 /// Result of JSON-RPC method `getblockchaininfo`.
@@ -61,6 +63,77 @@ pub struct GetBlockchainInfo {
     pub softforks: BTreeMap<String, Softfork>,
     /// Any network and blockchain warnings.
     pub warnings: String,
+}
+
+/// Result of the JSON-RPC method `getdeploymentinfo`.
+///
+/// > getdeploymentinfo ("blockhash")
+/// >
+/// > Returns an object containing various state info regarding deployments of consensus changes.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct GetDeploymentInfo {
+    /// Requested block hash (or tip).
+    pub hash: String,
+    /// Requested block height (or tip).
+    pub height: u32,
+    /// Deployments info, keyed by deployment name.
+    pub deployments: std::collections::BTreeMap<String, DeploymentInfo>,
+}
+
+/// Deployment info. Returned as part of `getdeploymentinfo`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct DeploymentInfo {
+    /// One of "buried", "bip9".
+    #[serde(rename = "type")]
+    pub deployment_type: String,
+    /// Height of the first block which the rules are or will be enforced (only for "buried" type, or "bip9" type with "active" status).
+    pub height: Option<u32>,
+    /// True if the rules are enforced for the mempool and the next block.
+    pub active: bool,
+    /// Status of bip9 softforks (only for "bip9" type).
+    pub bip9: Option<Bip9Info>,
+}
+
+/// Status of bip9 softforks. Returned as part of `getdeploymentinfo`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Bip9Info {
+    /// The bit (0-28) in the block version field used to signal this softfork (only for "started" and "locked_in" status).
+    pub bit: Option<u8>,
+    /// The minimum median time past of a block at which the bit gains its meaning.
+    pub start_time: i64,
+    /// The median time past of a block at which the deployment is considered failed if not yet locked in.
+    pub timeout: i64,
+    /// Minimum height of blocks for which the rules may be enforced.
+    pub min_activation_height: u32,
+    /// Status of deployment at specified block (one of "defined", "started", "locked_in", "active", "failed").
+    pub status: String,
+    /// Height of the first block to which the status applies.
+    pub since: u32,
+    /// Status of deployment at the next block.
+    pub status_next: String,
+    /// Numeric statistics about signalling for a softfork (only for "started" and "locked_in" status).
+    pub statistics: Option<Bip9Statistics>,
+    /// Indicates blocks that signalled with a # and blocks that did not with a -.
+    pub signalling: Option<String>,
+}
+
+/// Numeric statistics about signalling for a softfork. Returned as part of `getdeploymentinfo`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Bip9Statistics {
+    /// The length in blocks of the signalling period.
+    pub period: u32,
+    /// The number of blocks with the version bit set required to activate the feature (only for "started" status).
+    pub threshold: Option<u32>,
+    /// The number of blocks elapsed since the beginning of the current period.
+    pub elapsed: u32,
+    /// The number of blocks with the version bit set in the current period.
+    pub count: u32,
+    /// Returns false if there are not enough blocks left in this period to pass activation threshold (only for "started" status).
+    pub possible: Option<bool>,
 }
 
 /// Result of JSON-RPC method `getmempoolentry`.

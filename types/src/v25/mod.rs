@@ -31,13 +31,13 @@
 //! | getblockchaininfo                  | version + model |                                        |
 //! | getblockcount                      | version + model |                                        |
 //! | getblockfilter                     | version         |                                        |
-//! | getblockfrompeer                   | version + model | TODO                                   |
+//! | getblockfrompeer                   | returns nothing |                                        |
 //! | getblockhash                       | version + model |                                        |
 //! | getblockheader                     | version + model | Includes additional 'verbose' type     |
 //! | getblockstats                      | version + model |                                        |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdeploymentinfo                  | version + model | TODO                                   |
+//! | getdeploymentinfo                  | version + model |                                        |
 //! | getdifficulty                      | version + model |                                        |
 //! | getmempoolancestors                | version + model | UNTESTED (incl. verbose type)          |
 //! | getmempooldescendants              | version + model | UNTESTED (incl. verbose type)          |
@@ -137,7 +137,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | enumeratesigners                   | version + model | TODO                                   |
+//! | enumeratesigners                   | version         | UNTESTED                               |
 //!
 //! </details>
 //!
@@ -191,11 +191,11 @@
 //! | importwallet                       | returns nothing |                                        |
 //! | keypoolrefill                      | returns nothing |                                        |
 //! | listaddressgroupings               | version + model | UNTESTED                               |
-//! | listdescriptors                    | version + model | TODO                                   |
+//! | listdescriptors                    | version         |                                        |
 //! | listlabels                         | version + model | UNTESTED                               |
 //! | listlockunspent                    | version + model | UNTESTED                               |
 //! | migratewallet                      | version + model | TODO                                   |
-//! | newkeypool                         | version + model | TODO                                   |
+//! | newkeypool                         | returns nothing |                                        |
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model | UNTESTED                               |
 //! | listreceivedbylabel                | version + model |                                        |
@@ -208,7 +208,7 @@
 //! | lockunspent                        | version         |                                        |
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model | UNTESTED                               |
-//! | restorewallet                      | version + model | TODO                                   |
+//! | restorewallet                      | version         |                                        |
 //! | send                               | version + model |                                        |
 //! | sendall                            | version + model | TODO                                   |
 //! | sendmany                           | version + model | UNTESTED                               |
@@ -223,7 +223,7 @@
 //! | unloadwallet                       | returns nothing |                                        |
 //! | upgradewallet                      | version         |                                        |
 //! | walletcreatefundedpsbt             | version + model | UNTESTED                               |
-//! | walletdisplayaddress               | version + model | TODO                                   |
+//! | walletdisplayaddress               | version + model | UNTESTED                               |
 //! | walletlock                         | returns nothing |                                        |
 //! | walletpassphrase                   | returns nothing |                                        |
 //! | walletpassphrasechange             | returns nothing |                                        |
@@ -250,7 +250,7 @@ pub use self::{
     blockchain::GetBlockStats,
     control::Logging,
     generating::{GenerateBlock, GenerateBlockError},
-    wallet::{CreateWallet, LoadWallet, UnloadWallet},
+    wallet::{CreateWallet, ListDescriptors, LoadWallet, UnloadWallet},
 };
 #[doc(inline)]
 pub use crate::{
@@ -305,8 +305,11 @@ pub use crate::{
         GetIndexInfo, GetIndexInfoName, GetNetworkInfo, ImportDescriptors, ImportDescriptorsResult,
         PsbtBumpFee, PsbtBumpFeeError, Send, SendError, UpgradeWallet,
     },
-    v22::{Banned, ListBanned, ScriptPubkey},
-    v23::{CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, SaveMempool},
+    v22::{Banned, EnumerateSigners, ListBanned, ScriptPubkey, WalletDisplayAddress},
+    v23::{
+        Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError, DeploymentInfo,
+        GetBlockchainInfo, GetDeploymentInfo, GetDeploymentInfoError, RestoreWallet, SaveMempool,
+    },
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GetPeerInfo, GetTransaction,
         GetTransactionDetail, GetTransactionError, GlobalXpub, ListUnspent, ListUnspentItem,

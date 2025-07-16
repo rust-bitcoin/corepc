@@ -87,7 +87,7 @@ pub const METHODS: &[Method] = &[
     Method::new_nothing("testmempoolaccept", "test_mempool_accept"),
     Method::new_modelled("utxoupdatepsbt", "UtxoUpdatePsbt", "utxo_update_psbt"),
     // signer
-    Method::new_modelled("enumeratesigners", "EnumerateSigners", "enumerate_signers"),
+    Method::new_no_model("enumeratesigners", "EnumerateSigners", "enumerate_signers"),
     // util
     Method::new_modelled("createmultisig", "CreateMultisig", "create_multisig"),
     Method::new_modelled("deriveaddresses", "DeriveAddresses", "derive_addresses"),
@@ -131,7 +131,7 @@ pub const METHODS: &[Method] = &[
     Method::new_nothing("importwallet", "import_walet"),
     Method::new_nothing("keypoolrefill", "keypool_refill"),
     Method::new_modelled("listaddressgroupings", "ListAddressGroupings", "list_address_groupings"),
-    Method::new_modelled("listdescriptors", "ListDescriptors", "list_descriptors"),
+    Method::new_no_model("listdescriptors", "ListDescriptors", "list_descriptors"),
     Method::new_modelled("listlabels", "ListLabels", "list_labels"),
     Method::new_modelled("listlockunspent", "ListLockUnspent", "list_lock_unspent"),
     Method::new_modelled("psbtbumpfee", "PsbtBumpFee", "psbt_bump_fee"),

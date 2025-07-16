@@ -56,3 +56,44 @@ macro_rules! impl_client_v23__create_wallet {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `newkeypool`.
+#[macro_export]
+macro_rules! impl_client_v23__new_keypool {
+    () => {
+        impl Client {
+            /// Calls `newkeypool` for the loaded wallet.
+            ///
+            /// > newkeypool
+            /// >
+            /// > Entirely clears and refills the keypool.
+            /// > Requires wallet passphrase to be set if wallet is encrypted.
+            pub fn new_keypool(&self) -> Result<()> {
+                match self.call("newkeypool", &[]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+        }
+    };
+}
+
+/// Implements Bitcoin Core JSON-RPC API method `restorewallet`.
+#[macro_export]
+macro_rules! impl_client_v23__restore_wallet {
+    () => {
+        impl Client {
+            /// Calls `restorewallet` with required and optional arguments.
+            ///
+            /// > restorewallet "wallet_name" "backup_file" ( load_on_startup )
+            pub fn restore_wallet(
+                &self,
+                wallet_name: &str,
+                backup_file: &Path,
+            ) -> Result<RestoreWallet> {
+                self.call("restorewallet", &[wallet_name.into(), into_json(backup_file)?])
+            }
+        }
+    };
+}
