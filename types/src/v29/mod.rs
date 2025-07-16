@@ -39,7 +39,7 @@
 //! | getchainstates                     | version + model | TODO                                   |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdeploymentinfo                  | version + model | TODO                                   |
+//! | getdeploymentinfo                  | version + model |                                        |
 //! | getdescriptoractivity              | version + model |                                        |
 //! | getdifficulty                      | version + model |                                        |
 //! | getmempoolancestors                | version + model | UNTESTED (incl. verbose type)          |
@@ -320,7 +320,8 @@ pub use crate::{
         PsbtBumpFeeError, Send, SendError, UpgradeWallet,
     },
     v22::{Banned, EnumerateSigners, ListBanned, ScriptPubkey, WalletDisplayAddress},
-    v23::{CreateMultisig, DecodeScript, DecodeScriptError, RestoreWallet, SaveMempool},
+    v23::{CreateMultisig, DecodeScript, DecodeScriptError, RestoreWallet, SaveMempool,
+        GetDeploymentInfo, GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics},
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GetTransactionDetail,
         GlobalXpub, ListUnspent, ListUnspentItem, Proprietary, PsbtInput, PsbtOutput,

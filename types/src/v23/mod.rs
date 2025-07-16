@@ -37,7 +37,7 @@
 //! | getblockstats                      | version + model |                                        |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdeploymentinfo                  | version + model | TODO                                   |
+//! | getdeploymentinfo                  | version + model |                                        |
 //! | getdifficulty                      | version + model |                                        |
 //! | getmempoolancestors                | version + model | UNTESTED (incl. verbose type)          |
 //! | getmempooldescendants              | version + model | UNTESTED (incl. verbose type)          |
@@ -245,7 +245,10 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::{GetBlockchainInfo, GetMempoolEntry, SaveMempool},
+    blockchain::{
+        GetBlockchainInfo, GetMempoolEntry, SaveMempool, GetDeploymentInfo,
+        GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics
+    },
     control::Logging,
     network::GetPeerInfo,
     raw_transactions::{

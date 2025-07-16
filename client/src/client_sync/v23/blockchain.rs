@@ -25,6 +25,18 @@ macro_rules! impl_client_v23__get_block_from_peer {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `getdeploymentinfo`.
+#[macro_export]
+macro_rules! impl_client_v23__get_deployment_info {
+    () => {
+        impl Client {
+            pub fn get_deployment_info(&self, blockhash: &BlockHash) -> Result<GetDeploymentInfo> {
+                self.call("getdeploymentinfo", &[into_json(blockhash)?])
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `savemempool`
 #[macro_export]
 macro_rules! impl_client_v23__save_mempool {

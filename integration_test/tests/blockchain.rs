@@ -179,6 +179,17 @@ fn blockchain__get_chain_tx_stats__modelled() {
 }
 
 #[test]
+#[cfg(not(feature = "v22_and_below"))]
+fn blockchain__get_deployment_info__modelled() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+    let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+
+    let json: GetDeploymentInfo = node.client.get_deployment_info(&block_hash).expect("getdeploymentinfo");
+    let model: Result<mtype::GetDeploymentInfo, GetDeploymentInfoError> = json.into_model();
+    model.unwrap();
+}
+
+#[test]
 #[cfg(not(feature = "v28_and_below"))]
 fn blockchain__get_descriptor_activity__modelled() {
     let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);

@@ -38,6 +38,7 @@ crate::impl_client_v17__get_block_header!();
 crate::impl_client_v17__get_block_stats!();
 crate::impl_client_v17__get_chain_tips!();
 crate::impl_client_v17__get_chain_tx_stats!();
+crate::impl_client_v23__get_deployment_info!();
 crate::impl_client_v17__get_difficulty!();
 crate::impl_client_v17__get_mempool_ancestors!();
 crate::impl_client_v17__get_mempool_descendants!();

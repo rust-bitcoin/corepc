@@ -37,7 +37,7 @@
 //! | getblockstats                      | version + model |                                        |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdeploymentinfo                  | version + model | TODO                                   |
+//! | getdeploymentinfo                  | version + model |                                        |
 //! | getdifficulty                      | version + model |                                        |
 //! | getmempoolancestors                | version + model | UNTESTED (incl. verbose type)          |
 //! | getmempooldescendants              | version + model | UNTESTED (incl. verbose type)          |
@@ -316,6 +316,6 @@ pub use crate::{
     },
     v23::{
         CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, Logging, RestoreWallet,
-        SaveMempool,
+        SaveMempool, GetDeploymentInfo, GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics,
     },
 };

@@ -39,7 +39,7 @@
 //! | getchainstates                     | version + model | TODO                                   |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdeploymentinfo                  | version + model | TODO                                   |
+//! | getdeploymentinfo                  | version + model |                                        |
 //! | getdifficulty                      | version + model |                                        |
 //! | getmempoolancestors                | version + model | UNTESTED (incl. verbose type)          |
 //! | getmempooldescendants              | version + model | UNTESTED (incl. verbose type)          |
@@ -326,7 +326,7 @@ pub use crate::{
     v22::{Banned, EnumerateSigners, ListBanned, ScriptPubkey, WalletDisplayAddress},
     v23::{
         CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, RestoreWallet,
-        SaveMempool,
+        SaveMempool, GetDeploymentInfo, GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics,
     },
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GetTransactionDetail,

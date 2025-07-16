@@ -29,6 +29,7 @@ pub use self::{
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutSetInfo, MempoolEntry,
         MempoolEntryFees, ReceiveActivity, Softfork, SoftforkType, SpendActivity, VerifyTxOutProof,
+        GetDeploymentInfo, DeploymentInfo, Bip9Info, Bip9Statistics,
     },
     generating::{Generate, GenerateBlock, GenerateToAddress, GenerateToDescriptor},
     mining::{
