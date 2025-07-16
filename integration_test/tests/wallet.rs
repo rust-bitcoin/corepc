@@ -573,6 +573,14 @@ fn wallet__lock_unspent() {
     assert!(json.0);
 }
 
+#[cfg(not(feature = "v22_and_below"))]
+#[test]
+fn wallet__new_keypool() {
+    let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+    node.client.create_legacy_wallet("legacy_wallet").expect("createlegacywallet");
+    let _: () = node.client.new_keypool().expect("newkeypool");
+}
+
 #[cfg(not(feature = "v20_and_below"))]
 #[test]
 fn wallet__psbt_bump_fee__modelled() {

@@ -168,6 +168,7 @@ crate::impl_client_v18__list_wallet_dir!();
 crate::impl_client_v17__list_wallets!();
 crate::impl_client_v22__load_wallet!();
 crate::impl_client_v17__lock_unspent!();
+crate::impl_client_v23__new_keypool!();
 crate::impl_client_v21__psbt_bump_fee!();
 crate::impl_client_v17__remove_pruned_funds!();
 crate::impl_client_v17__rescan_blockchain!();

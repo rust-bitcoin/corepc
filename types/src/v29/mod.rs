@@ -206,7 +206,7 @@
 //! | listlabels                         | version + model | UNTESTED                               |
 //! | listlockunspent                    | version + model | UNTESTED                               |
 //! | migratewallet                      | version + model | TODO                                   |
-//! | newkeypool                         | version + model | TODO                                   |
+//! | newkeypool                         | returns nothing |                                        |
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model | UNTESTED                               |
 //! | listreceivedbylabel                | version + model |                                        |

@@ -192,7 +192,7 @@
 //! | listdescriptors                    | version         |                                        |
 //! | listlabels                         | version + model | UNTESTED                               |
 //! | listlockunspent                    | version + model | UNTESTED                               |
-//! | newkeypool                         | version + model | TODO                                   |
+//! | newkeypool                         | returns nothing |                                        |
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model | UNTESTED                               |
 //! | listreceivedbylabel                | version + model |                                        |
