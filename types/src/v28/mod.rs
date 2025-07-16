@@ -322,8 +322,10 @@ pub use crate::{
         PsbtBumpFeeError, Send, SendError, UpgradeWallet,
     },
     v22::{Banned, EnumerateSigners, ListBanned, ScriptPubkey, WalletDisplayAddress},
-    v23::{CreateMultisig, DecodeScript, DecodeScriptError, RestoreWallet, SaveMempool,
-        GetDeploymentInfo, GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics},
+    v23::{
+        Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError, DeploymentInfo,
+        GetDeploymentInfo, GetDeploymentInfoError, RestoreWallet, SaveMempool,
+    },
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GetTransactionDetail,
         GlobalXpub, ListUnspent, ListUnspentItem, Proprietary, PsbtInput, PsbtOutput,

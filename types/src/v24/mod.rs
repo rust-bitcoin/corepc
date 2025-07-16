@@ -315,7 +315,8 @@ pub use crate::{
         Banned, EnumerateSigners, ListBanned, ListDescriptors, ScriptPubkey, WalletDisplayAddress,
     },
     v23::{
-        CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, Logging, RestoreWallet,
-        SaveMempool, GetDeploymentInfo, GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics,
+        Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError, DeploymentInfo,
+        GetBlockchainInfo, GetDeploymentInfo, GetDeploymentInfoError, Logging, RestoreWallet,
+        SaveMempool,
     },
 };

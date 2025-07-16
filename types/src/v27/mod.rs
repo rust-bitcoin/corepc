@@ -302,8 +302,8 @@ pub use crate::{
     },
     v22::{Banned, EnumerateSigners, ListBanned, ScriptPubkey, WalletDisplayAddress},
     v23::{
-        CreateMultisig, DecodeScript, DecodeScriptError, GetBlockchainInfo, RestoreWallet,
-        SaveMempool, GetDeploymentInfo, GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics,
+        Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError, DeploymentInfo,
+        GetBlockchainInfo, GetDeploymentInfo, GetDeploymentInfoError, RestoreWallet, SaveMempool,
     },
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolEntry, GetMempoolInfo, GetTransactionDetail,

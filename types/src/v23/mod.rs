@@ -246,8 +246,8 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        GetBlockchainInfo, GetMempoolEntry, SaveMempool, GetDeploymentInfo,
-        GetDeploymentInfoError, DeploymentInfo, Bip9Info, Bip9Statistics
+        Bip9Info, Bip9Statistics, DeploymentInfo, GetBlockchainInfo, GetDeploymentInfo,
+        GetDeploymentInfoError, GetMempoolEntry, SaveMempool,
     },
     control::Logging,
     network::GetPeerInfo,
