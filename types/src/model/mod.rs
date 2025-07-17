@@ -41,10 +41,10 @@ pub use self::{
     raw_transactions::{
         AnalyzePsbt, AnalyzePsbtInput, AnalyzePsbtInputMissing, CombinePsbt, CombineRawTransaction,
         ConvertToPsbt, CreatePsbt, CreateRawTransaction, DecodePsbt, DecodeRawTransaction,
-        DecodeScript, DescriptorProcessPsbt, FinalizePsbt, FundRawTransaction, GetRawTransaction,
-        GetRawTransactionVerbose, JoinPsbts, MempoolAcceptance, SendRawTransaction, SignFail,
-        SignRawTransaction, SubmitPackage, SubmitPackageTxResult, SubmitPackageTxResultFees,
-        TestMempoolAccept, UtxoUpdatePsbt,
+        DecodeScript, DecodeScriptSegwit, DescriptorProcessPsbt, FinalizePsbt, FundRawTransaction,
+        GetRawTransaction, GetRawTransactionVerbose, JoinPsbts, MempoolAcceptance,
+        SendRawTransaction, SignFail, SignRawTransaction, SubmitPackage, SubmitPackageTxResult,
+        SubmitPackageTxResultFees, TestMempoolAccept, UtxoUpdatePsbt,
     },
     util::{
         CreateMultisig, DeriveAddresses, EstimateSmartFee, SignMessageWithPrivKey, ValidateAddress,
