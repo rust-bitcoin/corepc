@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `analyzepsbt`
+/// Implements Bitcoin Core JSON-RPC API method `analyzepsbt`.
 #[macro_export]
 macro_rules! impl_client_v18__analyze_psbt {
     () => {
@@ -22,7 +22,7 @@ macro_rules! impl_client_v18__analyze_psbt {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `joinpsbts`
+/// Implements Bitcoin Core JSON-RPC API method `joinpsbts`.
 #[macro_export]
 macro_rules! impl_client_v18__join_psbts {
     () => {
@@ -35,7 +35,7 @@ macro_rules! impl_client_v18__join_psbts {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `uxtoupdatepsbt`
+/// Implements Bitcoin Core JSON-RPC API method `uxtoupdatepsbt`.
 #[macro_export]
 macro_rules! impl_client_v18__utxo_update_psbt {
     () => {

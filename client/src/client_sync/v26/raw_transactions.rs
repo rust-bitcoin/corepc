@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `submitpackage`
+/// Implements Bitcoin Core JSON-RPC API method `submitpackage`.
 #[macro_export]
 macro_rules! impl_client_v26__submit_package {
     () => {

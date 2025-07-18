@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `getprioritisedtransactions`
+/// Implements Bitcoin Core JSON-RPC API method `getprioritisedtransactions`.
 #[macro_export]
 macro_rules! impl_client_v26__get_prioritised_transactions {
     () => {

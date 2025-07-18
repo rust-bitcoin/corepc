@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `deriveaddresses`
+/// Implements Bitcoin Core JSON-RPC API method `deriveaddresses`.
 #[macro_export]
 macro_rules! impl_client_v18__derive_addresses {
     () => {
@@ -21,7 +21,7 @@ macro_rules! impl_client_v18__derive_addresses {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getdescriptorinfo`
+/// Implements Bitcoin Core JSON-RPC API method `getdescriptorinfo`.
 #[macro_export]
 macro_rules! impl_client_v18__get_descriptor_info {
     () => {

@@ -20,7 +20,7 @@ pub enum Error {
     Returned(String),
     /// The server version did not match what was expected.
     ServerVersion(UnexpectedServerVersionError),
-    /// Missing user/password
+    /// Missing user/password.
     MissingUserPassword,
 }
 

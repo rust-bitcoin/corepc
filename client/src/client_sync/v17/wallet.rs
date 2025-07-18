@@ -298,7 +298,7 @@ macro_rules! impl_client_v17__import_address {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `importmulti`
+/// Implements Bitcoin Core JSON-RPC API method `importmulti`.
 #[macro_export]
 macro_rules! impl_client_v17__import_multi {
     () => {
@@ -608,7 +608,7 @@ macro_rules! impl_client_v17__set_hd_seed {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `settxfee`
+/// Implements Bitcoin Core JSON-RPC API method `settxfee`.
 #[macro_export]
 macro_rules! impl_client_v17__set_tx_fee {
     () => {
@@ -666,7 +666,7 @@ macro_rules! impl_client_v17__unload_wallet {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `walletpassphrase`
+/// Implements Bitcoin Core JSON-RPC API method `walletpassphrase`.
 #[macro_export]
 macro_rules! impl_client_v17__wallet_passphrase {
     () => {
@@ -714,7 +714,7 @@ macro_rules! impl_client_v17__wallet_lock {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `walletpassphrasechange`
+/// Implements Bitcoin Core JSON-RPC API method `walletpassphrasechange`.
 #[macro_export]
 macro_rules! impl_client_v17__wallet_passphrase_change {
     () => {

@@ -9,7 +9,7 @@
 //!
 //! See, or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `addnode`
+/// Implements Bitcoin Core JSON-RPC API method `addnode`.
 #[macro_export]
 macro_rules! impl_client_v17__add_node {
     () => {
@@ -25,7 +25,7 @@ macro_rules! impl_client_v17__add_node {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `clearbanned`
+/// Implements Bitcoin Core JSON-RPC API method `clearbanned`.
 #[macro_export]
 macro_rules! impl_client_v17__clear_banned {
     () => {
@@ -41,7 +41,7 @@ macro_rules! impl_client_v17__clear_banned {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `disconnectnode`
+/// Implements Bitcoin Core JSON-RPC API method `disconnectnode`.
 #[macro_export]
 macro_rules! impl_client_v17__disconnect_node {
     () => {
@@ -57,7 +57,7 @@ macro_rules! impl_client_v17__disconnect_node {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getaddednodeinfo`
+/// Implements Bitcoin Core JSON-RPC API method `getaddednodeinfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_added_node_info {
     () => {
@@ -69,7 +69,7 @@ macro_rules! impl_client_v17__get_added_node_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getconnectioncount`
+/// Implements Bitcoin Core JSON-RPC API method `getconnectioncount`.
 #[macro_export]
 macro_rules! impl_client_v17__get_connection_count {
     () => {
@@ -81,7 +81,7 @@ macro_rules! impl_client_v17__get_connection_count {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getnettotals`
+/// Implements Bitcoin Core JSON-RPC API method `getnettotals`.
 #[macro_export]
 macro_rules! impl_client_v17__get_net_totals {
     () => {
@@ -91,7 +91,7 @@ macro_rules! impl_client_v17__get_net_totals {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getnetworkinfo`
+/// Implements Bitcoin Core JSON-RPC API method `getnetworkinfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_network_info {
     () => {
@@ -109,7 +109,7 @@ macro_rules! impl_client_v17__get_network_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getpeerinfo`
+/// Implements Bitcoin Core JSON-RPC API method `getpeerinfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_peer_info {
     () => {
@@ -119,7 +119,7 @@ macro_rules! impl_client_v17__get_peer_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `listbanned`
+/// Implements Bitcoin Core JSON-RPC API method `listbanned`.
 #[macro_export]
 macro_rules! impl_client_v17__list_banned {
     () => {
@@ -129,7 +129,7 @@ macro_rules! impl_client_v17__list_banned {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `ping`
+/// Implements Bitcoin Core JSON-RPC API method `ping`.
 #[macro_export]
 macro_rules! impl_client_v17__ping {
     () => {
@@ -145,7 +145,7 @@ macro_rules! impl_client_v17__ping {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `setban`
+/// Implements Bitcoin Core JSON-RPC API method `setban`.
 #[macro_export]
 macro_rules! impl_client_v17__set_ban {
     () => {
@@ -161,7 +161,7 @@ macro_rules! impl_client_v17__set_ban {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `setnetworkactive`
+/// Implements Bitcoin Core JSON-RPC API method `setnetworkactive`.
 #[macro_export]
 macro_rules! impl_client_v17__set_network_active {
     () => {

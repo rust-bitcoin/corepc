@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `getblocktemplate`
+/// Implements Bitcoin Core JSON-RPC API method `getblocktemplate`.
 #[macro_export]
 macro_rules! impl_client_v17__get_block_template {
     () => {
@@ -24,7 +24,7 @@ macro_rules! impl_client_v17__get_block_template {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getmininginfo`
+/// Implements Bitcoin Core JSON-RPC API method `getmininginfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_mining_info {
     () => {
@@ -36,7 +36,7 @@ macro_rules! impl_client_v17__get_mining_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getnetworkhashps`
+/// Implements Bitcoin Core JSON-RPC API method `getnetworkhashps`.
 #[macro_export]
 macro_rules! impl_client_v17__get_network_hashes_per_second {
     () => {
@@ -46,7 +46,7 @@ macro_rules! impl_client_v17__get_network_hashes_per_second {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `prioritisetransaction`
+/// Implements Bitcoin Core JSON-RPC API method `prioritisetransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__prioritise_transaction {
     () => {
@@ -63,7 +63,7 @@ macro_rules! impl_client_v17__prioritise_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `submitblock`
+/// Implements Bitcoin Core JSON-RPC API method `submitblock`.
 #[macro_export]
 macro_rules! impl_client_v17__submit_block {
     () => {
