@@ -19,7 +19,7 @@ pub use self::error::*;
 /// > getaddednodeinfo ( "node" )
 /// >
 /// > Returns information about the given added node, or all added nodes
-/// > (note that onetry addnodes are not listed here)
+/// > (note that onetry addnodes are not listed here).
 /// >
 /// > Arguments:
 /// > 1. "node"   (string, optional) If provided, return information about this specific node, otherwise all nodes are returned.
@@ -54,7 +54,7 @@ pub struct AddedNodeAddress {
 ///
 /// > getconnectioncount
 /// >
-/// > Returns n (numeric) The connection count
+/// > Returns n (numeric) The connection count.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetConnectionCount(pub u64);
@@ -273,7 +273,7 @@ pub struct PeerInfo {
 #[serde(deny_unknown_fields)]
 pub struct ListBanned(pub Vec<Banned>);
 
-/// An item from the list returned by the JSON-RPC method `listbanned`
+/// An item from the list returned by the JSON-RPC method `listbanned`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Banned {

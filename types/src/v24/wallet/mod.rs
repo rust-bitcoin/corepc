@@ -19,10 +19,10 @@ pub use super::{
 ///
 /// > gettransaction "txid" ( include_watchonly )
 /// >
-/// > Get detailed information about in-wallet transaction `<txid>`
+/// > Get detailed information about in-wallet transaction `<txid>`.
 /// >
 /// > Arguments:
-/// > 1. txid                 (string, required) The transaction id
+/// > 1. txid                 (string, required) The transaction id.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetTransaction {
@@ -122,7 +122,7 @@ pub struct GetTransactionDetail {
 ///
 /// > listunspent ( minconf maxconf  ["addresses",...] `[include_unsafe]` `[query_options]`)
 /// >
-/// > Returns array of unspent transaction outputs
+/// > Returns array of unspent transaction outputs.
 /// > with between minconf and maxconf (inclusive) confirmations.
 /// > Optionally filter to only include txouts paid to specified addresses.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

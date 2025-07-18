@@ -59,10 +59,10 @@ pub struct GetBalancesWatchOnly {
 ///
 /// > gettransaction "txid" ( include_watchonly )
 /// >
-/// > Get detailed information about in-wallet transaction `<txid>`
+/// > Get detailed information about in-wallet transaction `<txid>`.
 /// >
 /// > Arguments:
-/// > 1. txid                 (string, required) The transaction id
+/// > 1. txid                 (string, required) The transaction id.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetTransaction {
@@ -114,7 +114,7 @@ pub struct GetTransaction {
 /// > Change the state of the given wallet flag for a wallet.
 /// >
 /// > Arguments:
-/// > 1. flag     (string, required) The name of the flag to change. Current available flags: avoid_reuse
+/// > 1. flag     (string, required) The name of the flag to change. Current available flags: avoid_reuse.
 /// > 2. value    (boolean, optional, default=true) The new state.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

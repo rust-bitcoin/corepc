@@ -25,11 +25,11 @@ pub struct GetReceivedByLabel(pub f64);
 /// > importmulti requests ( options )
 /// >
 /// > Arguments:
-/// > 1. requests                                                         (json array, required) Data to be imported
+/// > 1. requests                                                         (json array, required) Data to be imported.
 /// >   [
-/// >   {                                                            (json object)
-/// >   "desc": "str",                                             (string, optional) Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys
-/// >   "scriptPubKey": "script" | { "address":"address" },    (string / json, required) Type of scriptPubKey (string for script, json for address). Should not be provided if using a descriptor
+/// >   {                                                            (json object).
+/// >   "desc": "str",                                             (string, optional) Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys.
+/// >   "scriptPubKey": "script" | { "address":"address" },    (string / json, required) Type of scriptPubKey (string for script, json for address). Should not be provided if using a descriptor.
 /// >   "timestamp": timestamp | "now",                            (integer / string, required) Creation time of the key expressed in UNIX epoch time,or the string "now" to substitute the current synced blockchain time. The timestamp of the oldest key will determine how far back blockchain rescans need to begin for missing wallet transactions. "now" can be specified to bypass scanning, for keys which are known to never have been used, and 0 can be specified to scan the entire blockchain. Blocks up to 2 hours before the earliest key creation time of all keys being imported by the importmulti call will be scanned.
 /// >   },
 /// >   ...

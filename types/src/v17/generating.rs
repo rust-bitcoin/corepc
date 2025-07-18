@@ -36,7 +36,7 @@ impl Generate {
 ///
 /// > generatetoaddress nblocks "address" ( maxtries )
 /// >
-/// > Mine blocks immediately to a specified address (before the RPC call returns)
+/// > Mine blocks immediately to a specified address (before the RPC call returns).
 /// >
 /// > Arguments:
 /// > 1. nblocks     (numeric, required) How many blocks are generated immediately.

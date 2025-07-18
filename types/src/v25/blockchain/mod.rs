@@ -22,7 +22,7 @@ pub use super::GetBlockStatsError;
 /// > It won't work without -txindex for utxo_size_inc, *fee or *feerate stats.
 /// >
 /// > Arguments:
-/// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block
+/// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockStats {

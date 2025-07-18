@@ -21,7 +21,7 @@ pub use self::error::{PsbtBumpFeeError, SendError};
 /// > related transactions are still missing.
 /// >
 /// > Arguments:
-/// > 1. requests (json array, required) Data to be imported
+/// > 1. requests (json array, required) Data to be imported.
 /// >    [
 /// >      { (json object)
 /// >        "desc": "str", (string, required) Descriptor to import.
@@ -71,7 +71,7 @@ pub struct ImportDescriptorsResult {
 /// > See Bitcoin Core RPC documentation for full details.
 ///
 /// Arguments:
-/// 1. txid    (string, required) The txid to be bumped
+/// 1. txid    (string, required) The txid to be bumped.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct PsbtBumpFee {

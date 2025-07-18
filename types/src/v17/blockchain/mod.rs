@@ -35,8 +35,8 @@ pub struct GetBestBlockHash(pub String);
 /// > If verbosity is 2, returns an Object with information about block `<hash>` and information about each transaction.
 /// >
 /// > Arguments:
-/// > 1. "blockhash"          (string, required) The block hash
-/// > 2. verbosity              (numeric, optional, default=1) 0 for hex encoded data, 1 for a json object, and 2 for json object with transaction data
+/// > 1. "blockhash"          (string, required) The block hash.
+/// > 2. verbosity              (numeric, optional, default=1) 0 for hex encoded data, 1 for a json object, and 2 for json object with transaction data.
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockVerboseZero(
@@ -213,7 +213,7 @@ pub struct GetBlockCount(pub u64);
 /// > Returns hash of block in best-block-chain at height provided.
 /// >
 /// > Arguments:
-/// > 1. height         (numeric, required) The height index
+/// > 1. height         (numeric, required) The height index.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockHash(pub String);
@@ -224,7 +224,7 @@ pub struct GetBlockHash(pub String);
 /// > If verbose is true, returns an Object with information about blockheader 'hash'.
 /// >
 /// > Arguments:
-/// > 1. "hash"          (string, required) The block hash
+/// > 1. "hash"          (string, required) The block hash.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockHeader(pub String);
@@ -235,7 +235,7 @@ pub struct GetBlockHeader(pub String);
 /// > If verbose is true, returns an Object with information about blockheader `<hash>`.
 /// >
 /// > Arguments:
-/// > 1. "hash"          (string, required) The block hash
+/// > 1. "hash"          (string, required) The block hash.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockHeaderVerbose {
@@ -283,14 +283,14 @@ pub struct GetBlockHeaderVerbose {
 /// > getblockstats hash_or_height ( stats )
 ///
 /// > Returns the number of blocks in the longest blockchain.
-/// > getblockstats hash_or_height ( stats )
+/// > getblockstats hash_or_height ( stats ).
 /// >
 /// > Compute per block statistics for a given window. All amounts are in satoshis.
 /// > It won't work for some heights with pruning.
 /// > It won't work without -txindex for utxo_size_inc, *fee or *feerate stats.
 /// >
 /// > Arguments:
-/// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block
+/// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockStats {
@@ -460,7 +460,7 @@ pub struct GetDifficulty(pub f64);
 /// > If txid is in the mempool, returns all in-mempool ancestors.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolAncestors(pub Vec<String>);
@@ -479,7 +479,7 @@ pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > If txid is in the mempool, returns all in-mempool descendants.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolDescendants(pub Vec<String>);
@@ -495,10 +495,10 @@ pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 ///
 /// > getmempoolentry txid
 /// >
-/// > Returns mempool data for given transaction
+/// > Returns mempool data for given transaction.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolEntry(pub MempoolEntry);
@@ -616,8 +616,8 @@ pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Returns details about an unspent transaction output.
 /// >
 /// > Arguments:
-/// > 1. txid               (string, required) The transaction id
-/// > 2. n                  (numeric, required) vout number
+/// > 1. txid               (string, required) The transaction id.
+/// > 2. n                  (numeric, required) vout number.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetTxOut {
@@ -670,7 +670,7 @@ pub struct GetTxOutSetInfo {
 /// > pruneblockchain height
 /// >
 /// > Arguments:
-/// > 1. "height"       (numeric, required) The block height to prune up to. May be set to a discrete height, or a unix timestamp
+/// > 1. "height"       (numeric, required) The block height to prune up to. May be set to a discrete height, or a unix timestamp.
 /// >                   to prune blocks whose block time is at least 2 hours older than the provided timestamp.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -689,10 +689,10 @@ pub struct VerifyChain(pub bool);
 /// > verifytxoutproof "proof"
 /// >
 /// > Verifies that a proof points to a transaction in a block, returning the transaction it commits to
-/// > and throwing an RPC error if the block is not in our best chain
+/// > and throwing an RPC error if the block is not in our best chain.
 /// >
 /// > Arguments:
-/// > 1. "proof"    (string, required) The hex-encoded proof generated by gettxoutproof
+/// > 1. "proof"    (string, required) The hex-encoded proof generated by gettxoutproof.
 ///
 /// Inner field is the txid(s) which the proof commits to, or empty array if the proof can not be validated.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

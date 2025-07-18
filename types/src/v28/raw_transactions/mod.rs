@@ -20,7 +20,7 @@ use crate::model;
 /// > submitpackage ["rawtx",...] ( maxfeerate maxburnamount )
 /// >
 /// > Submit a package of raw transactions (serialized, hex-encoded) to local node.
-/// > The package will be validated according to consensus and mempool policy rules. If any transaction passes, it will be accepted to mempool.
+/// > The package will be validated according to consensus and mempool policy rules. If any transaction passes, it will be accepted to the mempool.
 /// > This RPC is experimental and the interface may be unstable. Refer to doc/policy/packages.md for documentation on package policies.
 /// > Warning: successful submission does not mean the transactions will propagate throughout the network.
 /// >
@@ -29,7 +29,7 @@ use crate::model;
 /// >                     The package must solely consist of a child and its parents. None of the parents may depend on each other.
 /// >                     The package must be topologically sorted, with the child being the last element in the array.
 /// >      [
-/// >        "rawtx",     (string)
+/// >        "rawtx",     (string).
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -62,7 +62,7 @@ pub struct SubmitPackageTxResult {
     pub vsize: Option<i64>,
     /// Transaction fees.
     pub fees: Option<SubmitPackageTxResultFees>,
-    /// The transaction error string, if it was rejected by the mempool
+    /// The transaction error string, if it was rejected by the mempool.
     pub error: Option<String>,
 }
 
@@ -79,7 +79,7 @@ pub struct SubmitPackageTxResultFees {
     /// feerate and/or feerate with modified fees from the `prioritisetransaction` JSON-RPC method.
     #[serde(rename = "effective-feerate")]
     pub effective_fee_rate: Option<f64>,
-    /// If [`Self::effective_fee_rate`] is provided, this holds the wtxid's of the transactions
+    /// If [`Self::effective_fee_rate`] is provided, this holds the wtxids of the transactions
     /// whose fees and vsizes are included in effective-feerate.
     #[serde(rename = "effective-includes")]
     pub effective_includes: Vec<String>,

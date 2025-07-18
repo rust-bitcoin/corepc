@@ -21,7 +21,7 @@ pub use self::error::GenerateBlockError;
 /// >                        Txids must reference transactions currently in the mempool.
 /// >                        All transactions must be valid and in valid order, otherwise the block will be rejected.
 /// >      [
-/// >        "rawtx/txid",    (string)
+/// >        "rawtx/txid",    (string).
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

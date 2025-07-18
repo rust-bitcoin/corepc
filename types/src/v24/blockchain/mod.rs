@@ -14,10 +14,10 @@ pub use super::{GetMempoolInfoError, MempoolEntryError, MempoolEntryFees};
 ///
 /// > getmempoolentry txid
 /// >
-/// > Returns mempool data for given transaction
+/// > Returns mempool data for given transaction.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolEntry(pub MempoolEntry);

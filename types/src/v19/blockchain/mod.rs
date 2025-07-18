@@ -150,8 +150,8 @@ pub struct Bip9SoftforkStatistics {
 /// > Retrieve a BIP 157 content filter for a particular block.
 /// >
 /// > Arguments:
-/// > 1. blockhash     (string, required) The hash of the block
-/// > 2. filtertype    (string, optional, default=basic) The type name of the filter
+/// > 1. blockhash     (string, required) The hash of the block.
+/// > 2. filtertype    (string, optional, default=basic) The type name of the filter.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockFilter {
@@ -196,7 +196,7 @@ pub struct GetChainTxStats {
 /// > If txid is in the mempool, returns all in-mempool ancestors.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolAncestors(pub Vec<String>);
@@ -215,7 +215,7 @@ pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > If txid is in the mempool, returns all in-mempool descendants.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolDescendants(pub Vec<String>);
@@ -231,10 +231,10 @@ pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 ///
 /// > getmempoolentry txid
 /// >
-/// > Returns mempool data for given transaction
+/// > Returns mempool data for given transaction.
 /// >
 /// > Arguments:
-/// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
+/// > 1. "txid"                 (string, required) The transaction id (must be in mempool).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMempoolEntry(pub MempoolEntry);

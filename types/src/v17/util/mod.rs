@@ -21,9 +21,9 @@ pub use self::error::{CreateMultisigError, ValidateAddressError};
 /// >
 /// > Arguments:
 /// > 1. nrequired                    (numeric, required) The number of required signatures out of the n keys.
-/// > 2. "keys"                       (string, required) A json array of hex-encoded public keys
+/// > 2. "keys"                       (string, required) A json array of hex-encoded public keys.
 /// >      [
-/// >        "key"                    (string) The hex-encoded public key
+/// >        "key"                    (string) The hex-encoded public key.
 /// >        ,...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -46,7 +46,7 @@ pub struct CreateMultisig {
 /// > in BIP 141 (witness data is discounted).
 /// >
 /// > Arguments:
-/// > 1. conf_target     (numeric) Confirmation target in blocks (1 - 1008)
+/// > 1. conf_target     (numeric) Confirmation target in blocks (1 - 1008).
 /// > 2. "estimate_mode" (string, optional, default=CONSERVATIVE) The fee estimate mode.
 /// >                    Whether to return a more conservative estimate which also satisfies
 /// >                    a longer history. A conservative estimate potentially returns a
@@ -72,7 +72,7 @@ pub struct EstimateSmartFee {
 ///
 /// > signmessagewithprivkey "privkey" "message"
 /// >
-/// > Sign a message with the private key of an address
+/// > Sign a message with the private key of an address.
 /// >
 /// > Arguments:
 /// > 1. "privkey"         (string, required) The private key to sign the message with.
@@ -92,7 +92,7 @@ pub struct SignMessageWithPrivKey(pub String);
 /// > script, hex, pubkeys, sigsrequired, pubkey, addresses, embedded, iscompressed, account, timestamp, hdkeypath, kdmasterkeyid.
 /// >
 /// > Arguments:
-/// > 1. "address"                    (string, required) The bitcoin address to validate
+/// > 1. "address"                    (string, required) The bitcoin address to validate.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ValidateAddress {
@@ -120,7 +120,7 @@ pub struct ValidateAddress {
 ///
 /// > verifymessage "address" "signature" "message"
 /// >
-/// > Verify a signed message
+/// > Verify a signed message.
 /// >
 /// > Arguments:
 /// > 1. "address"         (string, required) The bitcoin address to use for the signature.

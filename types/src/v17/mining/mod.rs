@@ -26,20 +26,20 @@ pub use self::error::{BlockTemplateTransactionError, GetBlockTemplateError};
 /// >     <https://github.com/bitcoin/bips/blob/master/bip-0145.mediawiki>
 /// >
 /// > Arguments:
-/// > 1. template_request            (json object, required) Format of the template
+/// > 1. template_request            (json object, required) Format of the template.
 /// >      {
-/// >        "mode": "str",          (string, optional) This must be set to "template", "proposal" (see BIP 23), or omitted
-/// >        "capabilities": [       (json array, optional) A list of strings
-/// >          "str",                (string) client side supported feature, 'longpoll', 'coinbasevalue', 'proposal', 'serverlist', 'workid'
+/// >        "mode": "str",          (string, optional) This must be set to "template", "proposal" (see BIP 23), or omitted.
+/// >        "capabilities": [       (json array, optional) A list of strings.
+/// >          "str",                (string) client side supported feature, 'longpoll', 'coinbasevalue', 'proposal', 'serverlist', 'workid'.
 /// >          ...
 /// >        ],
-/// >        "rules": [              (json array, required) A list of strings
-/// >          "segwit",             (string, required) (literal) indicates client side segwit support
-/// >          "str",                (string) other client side supported softfork deployment
+/// >        "rules": [              (json array, required) A list of strings.
+/// >          "segwit",             (string, required) (literal) indicates client side segwit support.
+/// >          "str",                (string) other client side supported softfork deployment.
 /// >          ...
 /// >        ],
-/// >        "longpollid": "str",    (string, optional) delay processing request until the result would vary significantly from the "longpollid" of a prior template
-/// >        "data": "hex",          (string, optional) proposed block data to check, encoded in hexadecimal; valid only for mode="proposal"
+/// >        "longpollid": "str",    (string, optional) delay processing request until the result would vary significantly from the "longpollid" of a prior template.
+/// >        "data": "hex",          (string, optional) proposed block data to check, encoded in hexadecimal; valid only for mode="proposal".
 /// >      }
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

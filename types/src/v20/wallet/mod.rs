@@ -17,10 +17,10 @@ pub use super::{
 ///
 /// > gettransaction "txid" ( include_watchonly )
 /// >
-/// > Get detailed information about in-wallet transaction `<txid>`
+/// > Get detailed information about in-wallet transaction `<txid>`.
 /// >
 /// > Arguments:
-/// > 1. txid                 (string, required) The transaction id
+/// > 1. txid                 (string, required) The transaction id.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetTransaction {

@@ -13,7 +13,7 @@ use crate::model;
 ///
 /// > getmininginfo
 /// >
-/// > Returns a json object containing mining-related information.
+/// > Returns a JSON object containing mining-related information.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetMiningInfo {

@@ -14,7 +14,7 @@ use crate::model;
 
 /// Result of JSON-RPC method `getblockchaininfo`.
 ///
-/// Method call: `getblockchaininfo`
+/// Method call: `getblockchaininfo`.
 ///
 /// > Returns an object containing various state info regarding blockchain processing.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

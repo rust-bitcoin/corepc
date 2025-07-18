@@ -18,7 +18,7 @@ pub use self::error::DecodeScriptError;
 /// > Decode a hex-encoded script.
 /// >
 /// > Arguments:
-/// > 1. "hexstring"     (string) the hex encoded script
+/// > 1. "hexstring"     (string) the hex encoded script.
 // The docs on Core v0.17 appear to be way off what is actually returned.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
