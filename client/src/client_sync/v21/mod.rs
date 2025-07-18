@@ -188,7 +188,8 @@ crate::impl_client_v17__wallet_process_psbt!();
 #[serde(deny_unknown_fields)]
 pub struct ImportDescriptorsRequest {
     /// Descriptor to import.
-    pub desc: String,
+    #[serde(rename = "desc")]
+    pub descriptor: String,
     /// Time from which to start rescanning the blockchain for this descriptor, in UNIX epoch time or "now".
     pub timestamp: serde_json::Value,
 }

@@ -164,7 +164,8 @@ pub struct TaprootScript {
     /// A leaf script.
     pub script: String,
     /// The version number for the leaf script.
-    pub leaf_ver: u32,
+    #[serde(rename = "leaf_ver")]
+    pub leaf_version: u32,
     /// The control blocks for this script.
     pub control_blocks: Vec<String>,
 }
@@ -190,7 +191,8 @@ pub struct TaprootLeaf {
     /// The depth of this element in the tree.
     pub depth: u32,
     /// The version of this leaf.
-    pub leaf_ver: u32,
+    #[serde(rename = "leaf_ver")]
+    pub leaf_version: u32,
     /// The hex-encoded script itself.
     pub script: String,
 }

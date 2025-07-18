@@ -323,7 +323,7 @@ fn wallet__import_descriptors() {
     let descriptor = format!("addr({})", address);
 
     let request = ImportDescriptorsRequest {
-        desc: descriptor,
+        descriptor,
         timestamp: serde_json::Value::String("now".to_string()),
     };
 
@@ -413,14 +413,14 @@ fn wallet__import_multi() {
     // NOTE: On v17, use a wallet-generated address (not raw script)
     // to ensure import succeeds, since the wallet already knows the key.
     let req1 = ImportMultiRequest {
-        desc: None,
+        descriptor: None,
         script_pubkey: Some(ImportMultiScriptPubKey::Script(dummy_script_hex.to_string())),
         timestamp: ImportMultiTimestamp::Now,
     };
 
     // Uses an address (valid): success - false, with JSON-RPC error.
     let req2 = ImportMultiRequest {
-        desc: None,
+        descriptor: None,
         script_pubkey: Some(ImportMultiScriptPubKey::Address {
             address: addr.to_string(),
         }),
@@ -431,7 +431,7 @@ fn wallet__import_multi() {
     // on v18 onwards, it will return a watch-only warning.
     // NOTE: Works only for v18 onwards, as v17 doesn't support descriptors.
     let req3 = ImportMultiRequest {
-        desc: Some(dummy_desc.to_string()),
+        descriptor: Some(dummy_desc.to_string()),
         script_pubkey: None,
         timestamp: ImportMultiTimestamp::Time(1_700_000_000),
     };

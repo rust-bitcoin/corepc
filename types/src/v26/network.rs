@@ -103,12 +103,15 @@ pub struct PeerInfo {
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Option<Vec<u64>>,
     /// Whether we participate in address relay with this peer. v23 and later only.
-    pub addr_relay_enabled: Option<bool>,
+    #[serde(rename = "addr_relay_enabled")]
+    pub addresses_relay_enabled: Option<bool>,
     /// The total number of addresses processed, excluding those dropped due to rate limiting. v21 and
     /// later only.
-    pub addr_processed: Option<usize>,
+    #[serde(rename = "addr_processed")]
+    pub addresses_processed: Option<usize>,
     /// The total number of addresses dropped due to rate limiting. v21 and later only.
-    pub addr_rate_limited: Option<usize>,
+    #[serde(rename = "addr_rate_limited")]
+    pub addresses_rate_limited: Option<usize>,
     /// Any special permissions that have been granted to this peer. v0.19 and later only.
     pub permissions: Vec<String>,
     /// The minimum fee rate for transactions this peer accepts. v0.19 and later only.
