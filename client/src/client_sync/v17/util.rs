@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `createmultisig`
+/// Implements Bitcoin Core JSON-RPC API method `createmultisig`.
 #[macro_export]
 macro_rules! impl_client_v17__create_multisig {
     () => {
@@ -25,7 +25,7 @@ macro_rules! impl_client_v17__create_multisig {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `estimatesmartfee`
+/// Implements Bitcoin Core JSON-RPC API method `estimatesmartfee`.
 #[macro_export]
 macro_rules! impl_client_v17__estimate_smart_fee {
     () => {
@@ -37,7 +37,7 @@ macro_rules! impl_client_v17__estimate_smart_fee {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `signmessagewithprivkey`
+/// Implements Bitcoin Core JSON-RPC API method `signmessagewithprivkey`.
 #[macro_export]
 macro_rules! impl_client_v17__sign_message_with_priv_key {
     () => {
@@ -53,7 +53,7 @@ macro_rules! impl_client_v17__sign_message_with_priv_key {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `validateaddress`
+/// Implements Bitcoin Core JSON-RPC API method `validateaddress`.
 #[macro_export]
 macro_rules! impl_client_v17__validate_address {
     () => {
@@ -68,7 +68,7 @@ macro_rules! impl_client_v17__validate_address {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `verifymessage`
+/// Implements Bitcoin Core JSON-RPC API method `verifymessage`.
 #[macro_export]
 macro_rules! impl_client_v17__verify_message {
     () => {

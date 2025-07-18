@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `combinepsbt`
+/// Implements Bitcoin Core JSON-RPC API method `combinepsbt`.
 #[macro_export]
 macro_rules! impl_client_v17__combine_psbt {
     () => {
@@ -22,7 +22,7 @@ macro_rules! impl_client_v17__combine_psbt {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `combinerawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `combinerawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__combine_raw_transaction {
     () => {
@@ -41,7 +41,7 @@ macro_rules! impl_client_v17__combine_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `converttopsbt`
+/// Implements Bitcoin Core JSON-RPC API method `converttopsbt`.
 #[macro_export]
 macro_rules! impl_client_v17__convert_to_psbt {
     () => {
@@ -54,7 +54,7 @@ macro_rules! impl_client_v17__convert_to_psbt {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `createpsbt`
+/// Implements Bitcoin Core JSON-RPC API method `createpsbt`.
 #[macro_export]
 macro_rules! impl_client_v17__create_psbt {
     () => {
@@ -66,7 +66,7 @@ macro_rules! impl_client_v17__create_psbt {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `createrawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `createrawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__create_raw_transaction {
     () => {
@@ -82,7 +82,7 @@ macro_rules! impl_client_v17__create_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `decodepsbt`
+/// Implements Bitcoin Core JSON-RPC API method `decodepsbt`.
 #[macro_export]
 macro_rules! impl_client_v17__decode_psbt {
     () => {
@@ -94,7 +94,7 @@ macro_rules! impl_client_v17__decode_psbt {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `finalizepsbt`
+/// Implements Bitcoin Core JSON-RPC API method `finalizepsbt`.
 #[macro_export]
 macro_rules! impl_client_v17__finalize_psbt {
     () => {
@@ -107,7 +107,7 @@ macro_rules! impl_client_v17__finalize_psbt {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `decoderawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `decoderawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__decode_raw_transaction {
     () => {
@@ -123,7 +123,7 @@ macro_rules! impl_client_v17__decode_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `decodescript`
+/// Implements Bitcoin Core JSON-RPC API method `decodescript`.
 #[macro_export]
 macro_rules! impl_client_v17__decode_script {
     () => {
@@ -136,7 +136,7 @@ macro_rules! impl_client_v17__decode_script {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `fundrawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `fundrawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__fund_raw_transaction {
     () => {
@@ -152,7 +152,7 @@ macro_rules! impl_client_v17__fund_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getrawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `getrawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__get_raw_transaction {
     () => {
@@ -171,7 +171,7 @@ macro_rules! impl_client_v17__get_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `sendrawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `sendrawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__send_raw_transaction {
     () => {
@@ -187,7 +187,7 @@ macro_rules! impl_client_v17__send_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `signrawtransaction`
+/// Implements Bitcoin Core JSON-RPC API method `signrawtransaction`.
 #[macro_export]
 macro_rules! impl_client_v17__sign_raw_transaction {
     () => {
@@ -203,7 +203,7 @@ macro_rules! impl_client_v17__sign_raw_transaction {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `signrawtransactionwithkey`
+/// Implements Bitcoin Core JSON-RPC API method `signrawtransactionwithkey`.
 #[macro_export]
 macro_rules! impl_client_v17__sign_raw_transaction_with_key {
     () => {
@@ -221,7 +221,7 @@ macro_rules! impl_client_v17__sign_raw_transaction_with_key {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `testmempoolaccept`
+/// Implements Bitcoin Core JSON-RPC API method `testmempoolaccept`.
 #[macro_export]
 macro_rules! impl_client_v17__test_mempool_accept {
     () => {

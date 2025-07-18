@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `getblockfilter`
+/// Implements Bitcoin Core JSON-RPC API method `getblockfilter`.
 #[macro_export]
 macro_rules! impl_client_v19__get_block_filter {
     () => {

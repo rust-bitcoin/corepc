@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `savemempool`
+/// Implements Bitcoin Core JSON-RPC API method `savemempool`.
 #[macro_export]
 macro_rules! impl_client_v23__save_mempool {
     () => {

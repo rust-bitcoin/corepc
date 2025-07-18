@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `generatetoaddress`
+/// Implements Bitcoin Core JSON-RPC API method `generatetoaddress`.
 #[macro_export]
 macro_rules! impl_client_v17__generate_to_address {
     () => {
@@ -25,7 +25,7 @@ macro_rules! impl_client_v17__generate_to_address {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `generate`
+/// Implements Bitcoin Core JSON-RPC API method `generate`.
 #[macro_export]
 macro_rules! impl_client_v17__generate {
     () => {
@@ -37,7 +37,7 @@ macro_rules! impl_client_v17__generate {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `invalidateblock`
+/// Implements Bitcoin Core JSON-RPC API method `invalidateblock`.
 // This method does not appear in the output of `bitcoin-cli help`.
 #[macro_export]
 macro_rules! impl_client_v17__invalidate_block {

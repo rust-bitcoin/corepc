@@ -133,7 +133,7 @@ macro_rules! define_jsonrpc_minreq_client {
 ///
 /// # Parameters
 ///
-/// - `$expected_versions`: An vector of expected server versions e.g., `[230100, 230200]`.
+/// - `$expected_versions`: A vector of expected server versions e.g., `[230100, 230200]`.
 #[macro_export]
 macro_rules! impl_client_check_expected_server_version {
     ($expected_versions:expr) => {

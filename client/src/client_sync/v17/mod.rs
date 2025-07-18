@@ -241,7 +241,7 @@ pub struct WalletCreateFundedPsbtInput {
     vout: u32,
 }
 
-/// Args for the `addnode` method
+/// Args for the `addnode` method.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum AddNodeCommand {
@@ -250,7 +250,7 @@ pub enum AddNodeCommand {
     OneTry,
 }
 
-/// Args for the `setban` method
+/// Args for the `setban` method.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SetBanCommand {
@@ -258,10 +258,10 @@ pub enum SetBanCommand {
     Remove,
 }
 
-/// Args for the `importmulti` method
+/// Args for the `importmulti` method.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct ImportMultiRequest {
-    /// Descriptor to import. If using descriptor, donot also provide address/scriptPubKey, scripts, or pubkeys.
+    /// Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub desc: Option<String>, // from core v18 onwards.
     /// Type of scriptPubKey (string for script, json for address). Should not be provided if using descriptor.
@@ -281,7 +281,7 @@ pub enum ImportMultiScriptPubKey {
     Address { address: String },
 }
 
-/// `timestamp` can be a number (UNIX epoch time) or the string `"now"`
+/// `timestamp` can be a number (UNIX epoch time) or the string `"now"`.
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum ImportMultiTimestamp {

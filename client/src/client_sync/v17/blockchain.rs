@@ -9,7 +9,7 @@
 //!
 //! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
 
-/// Implements Bitcoin Core JSON-RPC API method `getblockchaininfo`
+/// Implements Bitcoin Core JSON-RPC API method `getblockchaininfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_blockchain_info {
     () => {
@@ -21,7 +21,7 @@ macro_rules! impl_client_v17__get_blockchain_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getbestblockhash`
+/// Implements Bitcoin Core JSON-RPC API method `getbestblockhash`.
 #[macro_export]
 macro_rules! impl_client_v17__get_best_block_hash {
     () => {
@@ -39,7 +39,7 @@ macro_rules! impl_client_v17__get_best_block_hash {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getblock`
+/// Implements Bitcoin Core JSON-RPC API method `getblock`.
 #[macro_export]
 macro_rules! impl_client_v17__get_block {
     () => {
@@ -63,7 +63,7 @@ macro_rules! impl_client_v17__get_block {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getblockcount`
+/// Implements Bitcoin Core JSON-RPC API method `getblockcount`.
 #[macro_export]
 macro_rules! impl_client_v17__get_block_count {
     () => {
@@ -75,7 +75,7 @@ macro_rules! impl_client_v17__get_block_count {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getblockhash`
+/// Implements Bitcoin Core JSON-RPC API method `getblockhash`.
 #[macro_export]
 macro_rules! impl_client_v17__get_block_hash {
     () => {
@@ -87,7 +87,7 @@ macro_rules! impl_client_v17__get_block_hash {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getblockheader`
+/// Implements Bitcoin Core JSON-RPC API method `getblockheader`.
 #[macro_export]
 macro_rules! impl_client_v17__get_block_header {
     () => {
@@ -107,7 +107,7 @@ macro_rules! impl_client_v17__get_block_header {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getblockstats`
+/// Implements Bitcoin Core JSON-RPC API method `getblockstats`.
 #[macro_export]
 macro_rules! impl_client_v17__get_block_stats {
     () => {
@@ -123,7 +123,7 @@ macro_rules! impl_client_v17__get_block_stats {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getchaintips`
+/// Implements Bitcoin Core JSON-RPC API method `getchaintips`.
 #[macro_export]
 macro_rules! impl_client_v17__get_chain_tips {
     () => {
@@ -133,7 +133,7 @@ macro_rules! impl_client_v17__get_chain_tips {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getchaintxstats`
+/// Implements Bitcoin Core JSON-RPC API method `getchaintxstats`.
 #[macro_export]
 macro_rules! impl_client_v17__get_chain_tx_stats {
     () => {
@@ -145,7 +145,7 @@ macro_rules! impl_client_v17__get_chain_tx_stats {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getdifficulty`
+/// Implements Bitcoin Core JSON-RPC API method `getdifficulty`.
 #[macro_export]
 macro_rules! impl_client_v17__get_difficulty {
     () => {
@@ -157,13 +157,13 @@ macro_rules! impl_client_v17__get_difficulty {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getmempoolancestors`
+/// Implements Bitcoin Core JSON-RPC API method `getmempoolancestors`.
 #[macro_export]
 macro_rules! impl_client_v17__get_mempool_ancestors {
     () => {
         impl Client {
             pub fn get_mempool_ancestors(&self, txid: Txid) -> Result<GetMempoolAncestors> {
-                // Equivalent to self.call("getmempoolancestors", &[into_json(txid)?, into_json(false)?])
+                // Equivalent to self.call("getmempoolancestors", &[into_json(txid)?, into_json(false)?]).
                 self.call("getmempoolancestors", &[into_json(txid)?])
             }
 
@@ -177,13 +177,13 @@ macro_rules! impl_client_v17__get_mempool_ancestors {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getmempooldescendants`
+/// Implements Bitcoin Core JSON-RPC API method `getmempooldescendants`.
 #[macro_export]
 macro_rules! impl_client_v17__get_mempool_descendants {
     () => {
         impl Client {
             pub fn get_mempool_descendants(&self, txid: Txid) -> Result<GetMempoolDescendants> {
-                // Equivalent to self.call("getmempooldescendants", &[into_json(txid)?, into_json(false)?])
+                // Equivalent to self.call("getmempooldescendants", &[into_json(txid)?, into_json(false)?]).
                 self.call("getmempooldescendants", &[into_json(txid)?])
             }
 
@@ -197,7 +197,7 @@ macro_rules! impl_client_v17__get_mempool_descendants {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getmempoolentry`
+/// Implements Bitcoin Core JSON-RPC API method `getmempoolentry`.
 #[macro_export]
 macro_rules! impl_client_v17__get_mempool_entry {
     () => {
@@ -209,7 +209,7 @@ macro_rules! impl_client_v17__get_mempool_entry {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getmempoolinfo`
+/// Implements Bitcoin Core JSON-RPC API method `getmempoolinfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_mempool_info {
     () => {
@@ -221,13 +221,13 @@ macro_rules! impl_client_v17__get_mempool_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `getrawmempool`
+/// Implements Bitcoin Core JSON-RPC API method `getrawmempool`.
 #[macro_export]
 macro_rules! impl_client_v17__get_raw_mempool {
     () => {
         impl Client {
             pub fn get_raw_mempool(&self) -> Result<GetRawMempool> {
-                // Equivalent to self.call("getrawmempool", &[into_json(false)?])
+                // Equivalent to self.call("getrawmempool", &[into_json(false)?]).
                 self.call("getrawmempool", &[])
             }
             pub fn get_raw_mempool_verbose(&self) -> Result<GetRawMempool> {
@@ -237,7 +237,7 @@ macro_rules! impl_client_v17__get_raw_mempool {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `gettxout`
+/// Implements Bitcoin Core JSON-RPC API method `gettxout`.
 #[macro_export]
 macro_rules! impl_client_v17__get_tx_out {
     () => {
@@ -249,7 +249,7 @@ macro_rules! impl_client_v17__get_tx_out {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `gettxoutproof`
+/// Implements Bitcoin Core JSON-RPC API method `gettxoutproof`.
 #[macro_export]
 macro_rules! impl_client_v17__get_tx_out_proof {
     () => {
@@ -261,7 +261,7 @@ macro_rules! impl_client_v17__get_tx_out_proof {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `gettxoutsetinfo`
+/// Implements Bitcoin Core JSON-RPC API method `gettxoutsetinfo`.
 #[macro_export]
 macro_rules! impl_client_v17__get_tx_out_set_info {
     () => {
@@ -273,7 +273,7 @@ macro_rules! impl_client_v17__get_tx_out_set_info {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `preciousblock`
+/// Implements Bitcoin Core JSON-RPC API method `preciousblock`.
 #[macro_export]
 macro_rules! impl_client_v17__precious_block {
     () => {
@@ -289,7 +289,7 @@ macro_rules! impl_client_v17__precious_block {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `pruneblockchain`
+/// Implements Bitcoin Core JSON-RPC API method `pruneblockchain`.
 #[macro_export]
 macro_rules! impl_client_v17__prune_blockchain {
     () => {
@@ -302,7 +302,7 @@ macro_rules! impl_client_v17__prune_blockchain {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `savemempool`
+/// Implements Bitcoin Core JSON-RPC API method `savemempool`.
 #[macro_export]
 macro_rules! impl_client_v17__save_mempool {
     () => {
@@ -318,7 +318,7 @@ macro_rules! impl_client_v17__save_mempool {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `verifychain`
+/// Implements Bitcoin Core JSON-RPC API method `verifychain`.
 #[macro_export]
 macro_rules! impl_client_v17__verify_chain {
     () => {
@@ -328,7 +328,7 @@ macro_rules! impl_client_v17__verify_chain {
     };
 }
 
-/// Implements Bitcoin Core JSON-RPC API method `verifytxoutproof`
+/// Implements Bitcoin Core JSON-RPC API method `verifytxoutproof`.
 #[macro_export]
 macro_rules! impl_client_v17__verify_tx_out_proof {
     () => {
