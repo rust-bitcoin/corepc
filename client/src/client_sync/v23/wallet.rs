@@ -15,6 +15,9 @@ macro_rules! impl_client_v23__create_wallet {
     () => {
         impl Client {
             /// Calls `createwallet` with `wallet` as the only argument.
+            ///
+            /// In v23 and later this creates a descriptor wallet. Use `create_legacy_wallet` to create
+            /// a legacy wallet.
             pub fn create_wallet(&self, wallet: &str) -> Result<CreateWallet> {
                 self.call("createwallet", &[wallet.into()])
             }

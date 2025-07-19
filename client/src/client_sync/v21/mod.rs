@@ -128,8 +128,7 @@ crate::impl_client_v17__abort_rescan!();
 crate::impl_client_v17__add_multisig_address!();
 crate::impl_client_v17__backup_wallet!();
 crate::impl_client_v17__bump_fee!();
-crate::impl_client_v17__create_wallet!();
-crate::impl_client_v21__create_wallet_with_descriptors!();
+crate::impl_client_v21__create_wallet!();
 crate::impl_client_v17__dump_priv_key!();
 crate::impl_client_v17__dump_wallet!();
 crate::impl_client_v17__encrypt_wallet!();
@@ -191,4 +190,11 @@ pub struct ImportDescriptorsRequest {
     pub desc: String,
     /// Time from which to start rescanning the blockchain for this descriptor, in UNIX epoch time or "now".
     pub timestamp: serde_json::Value,
+}
+
+impl ImportDescriptorsRequest {
+    /// Constructs a new ImportDescriptorsRequest.
+    pub fn new(desc: impl Into<String>, timestamp: impl Into<serde_json::Value>) -> Self {
+        ImportDescriptorsRequest { desc: desc.into(), timestamp: timestamp.into() }
+    }
 }
