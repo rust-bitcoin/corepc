@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 #[serde(deny_unknown_fields)]
 pub struct ListBanned(pub Vec<Banned>);
 
-/// An item from the list returned by the JSON-RPC method `listbanned`
+/// An item from the list returned by the JSON-RPC method `listbanned`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Banned {

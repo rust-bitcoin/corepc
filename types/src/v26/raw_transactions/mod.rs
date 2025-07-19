@@ -23,13 +23,13 @@ use crate::model;
 /// > Then, sign the inputs we are able to with information from the output descriptors.
 /// >
 /// > Arguments:
-/// > 1. psbt                          (string, required) The transaction base64 string
-/// > 2. descriptors                   (json array, required) An array of either strings or objects
+/// > 1. psbt                          (string, required) The transaction base64 string.
+/// > 2. descriptors                   (json array, required) An array of either strings or objects.
 /// >      [
-/// >        "",                       (string) An output descriptor
-/// >        {                         (json object) An object with an output descriptor and extra information
-/// >          "desc": "str",          (string, required) An output descriptor
-/// >          "range": n or [n, n],    (numeric or array, optional, default=1000) Up to what index HD chains should be explored (either end or [begin, end])
+/// >        "",                       (string) An output descriptor.
+/// >        {                         (json object) An object with an output descriptor and extra information.
+/// >          "desc": "str",          (string, required) An output descriptor.
+/// >          "range": n or [n, n],    (numeric or array, optional, default=1000) Up to what index HD chains should be explored (either end or [begin, end]).
 /// >        },
 /// >        ...
 /// >      ]
@@ -58,7 +58,7 @@ pub struct DescriptorProcessPsbt {
 /// >                     The package must solely consist of a child and its parents. None of the parents may depend on each other.
 /// >                     The package must be topologically sorted, with the child being the last element in the array.
 /// >      [
-/// >        "rawtx",     (string)
+/// >        "rawtx",     (string).
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

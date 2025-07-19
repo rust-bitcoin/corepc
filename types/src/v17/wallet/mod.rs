@@ -24,7 +24,7 @@ pub use self::error::*;
 // - ListSinceBlockTransaction
 // - ListTransactionsItem
 
-/// Returned as part of `getaddressesbylabel` and `getaddressinfo`
+/// Returned as part of `getaddressesbylabel` and `getaddressinfo`.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum AddressPurpose {
@@ -83,7 +83,7 @@ pub struct AbortRescan(pub bool);
 ///
 /// > Arguments:
 /// > 1. nrequired                      (numeric, required) The number of required signatures out of the n keys or addresses.
-/// > 2. "keys"                         (string, required) A json array of bitcoin addresses or hex-encoded public keys
+/// > 2. "keys"                         (string, required) A json array of bitcoin addresses or hex-encoded public keys.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct AddMultisigAddress {
@@ -111,7 +111,7 @@ pub struct AddMultisigAddress {
 /// > returned by getnetworkinfo) to enter the node's mempool.
 /// >
 /// > Arguments:
-/// > 1. txid                  (string, required) The txid to be bumped
+/// > 1. txid                  (string, required) The txid to be bumped.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct BumpFee {
@@ -158,7 +158,7 @@ impl CreateWallet {
 /// > Then the importprivkey can be used with this output
 /// >
 /// > Arguments:
-/// > 1. "address"   (string, required) The bitcoin address for the private key
+/// > 1. "address"   (string, required) The bitcoin address for the private key.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct DumpPrivKey(pub String); // The private key.
@@ -178,7 +178,7 @@ impl DumpPrivKey {
 /// > only backing up the seed itself, and must be backed up too (e.g. ensure you back up the whole dumpfile).
 /// >
 /// > Arguments:
-/// > 1. "filename"    (string, required) The filename with path (either absolute or relative to bitcoind)
+/// > 1. "filename"    (string, required) The filename with path (either absolute or relative to bitcoind).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct DumpWallet {
@@ -438,10 +438,10 @@ pub struct GetReceivedByAddress(pub f64); // Amount in BTC.
 ///
 /// > gettransaction "txid" ( include_watchonly )
 /// >
-/// > Get detailed information about in-wallet transaction `<txid>`
+/// > Get detailed information about in-wallet transaction `<txid>`.
 /// >
 /// > Arguments:
-/// > 1. txid                 (string, required) The transaction id
+/// > 1. txid                 (string, required) The transaction id.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetTransaction {
@@ -514,7 +514,7 @@ pub struct GetTransactionDetail {
 /// Result of the JSON-RPC method `getunconfirmedbalance`.
 ///
 /// > getunconfirmedbalance
-/// > Returns the server's total unconfirmed balance
+/// > Returns the server's total unconfirmed balance.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetUnconfirmedBalance(pub f64); // Core docs are missing so this is just a guess.
@@ -572,11 +572,11 @@ pub struct GetWalletInfo {
 /// > importmulti requests ( options )
 /// >
 /// > Arguments:
-/// > 1. requests                                                         (json array, required) Data to be imported
+/// > 1. requests                                                         (json array, required) Data to be imported.
 /// >   [
-/// >   {                                                            (json object)
-/// >   "desc": "str",                                             (string, optional) Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys
-/// >   "scriptPubKey": "script" | { "address":"address" },    (string / json, required) Type of scriptPubKey (string for script, json for address). Should not be provided if using a descriptor
+/// >   {                                                            (json object).
+/// >   "desc": "str",                                             (string, optional) Descriptor to import. If using descriptor, do not also provide address/scriptPubKey, scripts, or pubkeys.
+/// >   "scriptPubKey": "script" | { "address":"address" },    (string / json, required) Type of scriptPubKey (string for script, json for address). Should not be provided if using a descriptor.
 /// >   "timestamp": timestamp | "now",                            (integer / string, required) Creation time of the key expressed in UNIX epoch time,or the string "now" to substitute the current synced blockchain time. The timestamp of the oldest key will determine how far back blockchain rescans need to begin for missing wallet transactions. "now" can be specified to bypass scanning, for keys which are known to never have been used, and 0 can be specified to scan the entire blockchain. Blocks up to 2 hours before the earliest key creation time of all keys being imported by the importmulti call will be scanned.
 /// >   },
 /// >   ...
@@ -610,7 +610,7 @@ pub struct JsonRpcError {
 /// >
 /// > Lists groups of addresses which have had their common ownership
 /// > made public by common use as inputs or as the resulting change
-/// > in past transactions
+/// > in past transactions.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ListAddressGroupings(pub Vec<Vec<ListAddressGroupingsItem>>);
@@ -791,7 +791,7 @@ pub struct ListSinceBlockTransaction {
 /// >
 /// > Returns up to 'count' most recent transactions skipping the first 'from' transactions.
 /// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
-/// > bitcoind with -deprecatedrpc=accounts
+/// > bitcoind with -deprecatedrpc=accounts.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ListTransactions(pub Vec<ListTransactionsItem>);
@@ -899,7 +899,7 @@ pub struct ListUnspentItem {
 ///
 /// > listwallets
 /// > Returns a list of currently loaded wallets.
-/// > For full information on the wallet, use "getwalletinfo"
+/// > For full information on the wallet, use "getwalletinfo".
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ListWallets(pub Vec<String>);
@@ -957,14 +957,14 @@ pub struct RescanBlockchain {
 /// >
 /// > Send multiple times. Amounts are double-precision floating point numbers.
 /// > Note that the "fromaccount" argument has been removed in V0.17. To use this RPC with a "fromaccount" argument, restart
-/// > bitcoind with -deprecatedrpc=accounts
+/// > bitcoind with -deprecatedrpc=accounts.
 /// >
 /// >
 /// > Arguments:
 /// > 1. "dummy"               (string, required) Must be set to "" for backwards compatibility.
-/// > 2. "amounts"             (string, required) A json object with addresses and amounts
+/// > 2. "amounts"             (string, required) A json object with addresses and amounts.
 /// >     {
-/// >       "address":amount   (numeric or string) The bitcoin address is the key, the numeric amount (can be string) in BTC is the value
+/// >       "address":amount   (numeric or string) The bitcoin address is the key, the numeric amount (can be string) in BTC is the value.
 /// >       ,...
 /// >     }
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -984,7 +984,7 @@ pub struct SendMany(
 /// >
 /// > Arguments:
 /// > 1. "address"            (string, required) The bitcoin address to send to.
-/// > 2. "amount"             (numeric or string, required) The amount in BTC to send. eg 0.1
+/// > 2. "amount"             (numeric or string, required) The amount in BTC to send. eg 0.1.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct SendToAddress(pub String);
@@ -999,7 +999,7 @@ impl SendToAddress {
 /// > settxfee
 /// >
 /// > Arguments:
-/// > 1. amount         (numeric or string, required) The transaction fee in BTC/kB
+/// > 1. amount         (numeric or string, required) The transaction fee in BTC/kB.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SetTxFee(pub bool);
 
@@ -1007,7 +1007,7 @@ pub struct SetTxFee(pub bool);
 ///
 /// > signmessage "address" "message"
 /// >
-/// > Sign a message with the private key of an address
+/// > Sign a message with the private key of an address.
 /// >
 /// > Arguments:
 /// > 1. "address"         (string, required) The bitcoin address to use for the private key.
@@ -1023,26 +1023,26 @@ pub struct SignMessage(
 ///
 /// > walletcreatefundedpsbt [{"txid":"id","vout":n},...] [{"address":amount},{"data":"hex"},...] ( locktime ) ( replaceable ) ( options bip32derivs )
 /// >
-/// > Creates and funds a transaction in the Partially Signed Transaction format. Inputs will be added if supplied inputs are not enough
+/// > Creates and funds a transaction in the Partially Signed Transaction format. Inputs will be added if supplied inputs are not enough.
 /// > Implements the Creator and Updater roles.
 /// >
 /// > Arguments:
-/// > 1. "inputs"                (array, required) A json array of json objects
+/// > 1. "inputs"                (array, required) A json array of json objects.
 /// >      [
 /// >        {
-/// >          "txid":"id",      (string, required) The transaction id
-/// >          "vout":n,         (numeric, required) The output number
-/// >          "sequence":n      (numeric, optional) The sequence number
+/// >          "txid":"id",      (string, required) The transaction id.
+/// >          "vout":n,         (numeric, required) The output number.
+/// >          "sequence":n      (numeric, optional) The sequence number.
 /// >        }
 /// >        ,...
 /// >      ]
-/// > 2. "outputs"               (array, required) a json array with outputs (key-value pairs)
+/// > 2. "outputs"               (array, required) a json array with outputs (key-value pairs).
 /// >    [
 /// >     {
-/// >       "address": x.xxx,    (obj, optional) A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in BTC
+/// >       "address": x.xxx,    (obj, optional) A key-value pair. The key (string) is the bitcoin address, the value (float or string) is the amount in BTC.
 /// >     },
 /// >     {
-/// >       "data": "hex"        (obj, optional) A key-value pair. The key must be "data", the value is hex encoded data
+/// >       "data": "hex"        (obj, optional) A key-value pair. The key must be "data", the value is hex encoded data.
 /// >     }
 /// >     ,...                     More key-value pairs of the above form. For compatibility reasons, a dictionary, which holds the key-value pairs directly, is also
 /// >                              accepted as second parameter.
@@ -1068,7 +1068,7 @@ pub struct WalletCreateFundedPsbt {
 /// >
 /// >
 /// > Arguments:
-/// > 1. "psbt"                      (string, required) The transaction base64 string
+/// > 1. "psbt"                      (string, required) The transaction base64 string.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct WalletProcessPsbt {

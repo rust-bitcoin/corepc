@@ -18,7 +18,7 @@ pub use self::error::{AnalyzePsbtError, AnalyzePsbtInputMissingError};
 /// Analyzes and provides information about the current status of a PSBT and its inputs
 ///
 /// Arguments:
-/// 1. psbt    (string, required) A base64 string of a PSBT
+/// 1. psbt    (string, required) A base64 string of a PSBT.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct AnalyzePsbt {
@@ -71,13 +71,13 @@ pub struct AnalyzePsbtInputMissing {
 ///
 /// > joinpsbts ["psbt",...]
 /// >
-/// > Joins multiple distinct PSBTs with different inputs and outputs into one PSBT with inputs and outputs from all of the PSBTs
+/// > Joins multiple distinct PSBTs with different inputs and outputs into one PSBT with inputs and outputs from all of the PSBTs.
 /// > No input in any of the PSBTs can be in more than one of the PSBTs.
 /// >
 /// > Arguments:
-/// > 1. txs            (json array, required) A json array of base64 strings of partially signed transactions
+/// > 1. txs            (json array, required) A json array of base64 strings of partially signed transactions.
 /// >      [
-/// >        "psbt",    (string, required) A base64 string of a PSBT
+/// >        "psbt",    (string, required) A base64 string of a PSBT.
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -94,7 +94,7 @@ pub struct JoinPsbts(
 /// > Updates a PSBT with witness UTXOs retrieved from the UTXO set or the mempool.
 /// >
 /// > Arguments:
-/// > 1. psbt    (string, required) A base64 string of a PSBT
+/// > 1. psbt    (string, required) A base64 string of a PSBT.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct UtxoUpdatePsbt(

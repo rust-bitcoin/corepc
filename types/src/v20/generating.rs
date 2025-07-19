@@ -13,7 +13,7 @@ use crate::model;
 ///
 /// > generatetodescriptor num_blocks "descriptor" ( maxtries )
 /// >
-/// > Mine blocks immediately to a specified descriptor (before the RPC call returns)
+/// > Mine blocks immediately to a specified descriptor (before the RPC call returns).
 /// >
 /// > Arguments:
 /// > 1. num_blocks    (numeric, required) How many blocks are generated immediately.

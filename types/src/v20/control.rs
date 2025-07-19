@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 /// Result of JSON-RPC method `logging`.
 ///
-/// > logging ( `<include>` `<exclude>` )
+/// > logging ( `<include>` `<exclude>` ).
 ///
 /// > Gets and sets the logging configuration.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

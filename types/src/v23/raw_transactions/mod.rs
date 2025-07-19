@@ -25,7 +25,7 @@ pub use crate::psbt::{Bip32Deriv, PsbtScript, RawTransaction, WitnessUtxo};
 /// > Return a JSON object representing the serialized, base64-encoded partially signed Bitcoin transaction.
 /// >
 /// > Arguments:
-/// > 1. "psbt"            (string, required) The PSBT base64 string
+/// > 1. "psbt"            (string, required) The PSBT base64 string.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct DecodePsbt {
@@ -134,7 +134,7 @@ pub struct PsbtOutput {
 /// > Decode a hex-encoded script.
 /// >
 /// > Arguments:
-/// > 1. "hexstring"     (string) the hex encoded script
+/// > 1. "hexstring"     (string) the hex encoded script.
 // The docs on Core v0.17 appear to be way off what is actually returned.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

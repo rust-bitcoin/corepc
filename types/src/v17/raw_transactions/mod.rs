@@ -32,9 +32,9 @@ pub use crate::psbt::{
 /// > Implements the Combiner role.
 /// >
 /// > Arguments:
-/// > 1. "txs"                   (string) A json array of base64 strings of partially signed transactions
+/// > 1. "txs"                   (string) A json array of base64 strings of partially signed transactions.
 /// >     [
-/// >       "psbt"             (string) A base64 string of a PSBT
+/// >       "psbt"             (string) A base64 string of a PSBT.
 /// >       ,...
 /// >     ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -52,9 +52,9 @@ pub struct CombinePsbt(
 /// > The combined transaction may be another partially signed transaction or a
 /// > fully signed transaction.
 /// > Arguments:
-/// > 1. "txs"         (string) A json array of hex strings of partially signed transactions
+/// > 1. "txs"         (string) A json array of hex strings of partially signed transactions.
 /// >     [
-/// >       "hexstring"     (string) A transaction hash
+/// >       "hexstring"     (string) A transaction hash.
 /// >       ,...
 /// >     ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -68,7 +68,7 @@ pub struct CombineRawTransaction(
 ///
 /// > converttopsbt "hexstring" ( permitsigdata iswitness )
 /// >
-/// > Converts a network serialized transaction to a PSBT. This should be used only with createrawtransaction and fundrawtransaction
+/// > Converts a network serialized transaction to a PSBT. This should be used only with createrawtransaction and fundrawtransaction.
 /// > createpsbt and walletcreatefundedpsbt should be used for new applications.
 /// >
 /// > Arguments:
@@ -88,11 +88,11 @@ pub struct ConvertToPsbt(
 /// > Implements the Creator role.
 /// >
 /// > Arguments:
-/// > 1. "inputs"                (array, required) A json array of json objects
+/// > 1. "inputs"                (array, required) A json array of json objects.
 /// >      [
 /// >        {
-/// >          "txid":"id",      (string, required) The transaction id
-/// >          "vout":n,         (numeric, required) The output number
+/// >          "txid":"id",      (string, required) The transaction id.
+/// >          "vout":n,         (numeric, required) The output number.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CreatePsbt(
@@ -111,11 +111,11 @@ pub struct CreatePsbt(
 /// > it is not stored in the wallet or transmitted to the network.
 /// >
 /// > Arguments:
-/// > 1. "inputs"                (array, required) A json array of json objects
+/// > 1. "inputs"                (array, required) A json array of json objects.
 /// >      [
 /// >        {
-/// >          "txid":"id",      (string, required) The transaction id
-/// >          "vout":n,         (numeric, required) The output number
+/// >          "txid":"id",      (string, required) The transaction id.
+/// >          "vout":n,         (numeric, required) The output number.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CreateRawTransaction(
@@ -130,7 +130,7 @@ pub struct CreateRawTransaction(
 /// > Return a JSON object representing the serialized, base64-encoded partially signed Bitcoin transaction.
 /// >
 /// > Arguments:
-/// > 1. "psbt"            (string, required) The PSBT base64 string
+/// > 1. "psbt"            (string, required) The PSBT base64 string.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct DecodePsbt {
@@ -196,7 +196,7 @@ pub struct PsbtOutput {
 /// > Return a JSON object representing the serialized, hex-encoded transaction.
 /// >
 /// > Arguments:
-/// > 1. "hexstring"      (string, required) The transaction hex string
+/// > 1. "hexstring"      (string, required) The transaction hex string.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct DecodeRawTransaction(pub RawTransaction);
@@ -208,7 +208,7 @@ pub struct DecodeRawTransaction(pub RawTransaction);
 /// > Decode a hex-encoded script.
 /// >
 /// > Arguments:
-/// > 1. "hexstring"     (string) the hex encoded script
+/// > 1. "hexstring"     (string) the hex encoded script.
 // The docs on Core v0.17 appear to be way off what is actually returned.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -265,7 +265,7 @@ pub struct DecodeScriptSegwit {
 /// > Implements the Finalizer and Extractor roles.
 /// >
 /// > Arguments:
-/// > 1. "psbt"                 (string) A base64 string of a PSBT
+/// > 1. "psbt"                 (string) A base64 string of a PSBT.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct FinalizePsbt {
@@ -293,7 +293,7 @@ pub struct FinalizePsbt {
 /// > Only pay-to-pubkey, multisig, and P2SH versions thereof are currently supported for watch-only
 /// >
 /// > Arguments:
-/// > 1. "hexstring"           (string, required) The hex string of the raw transaction
+/// > 1. "hexstring"           (string, required) The hex string of the raw transaction.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct FundRawTransaction {
@@ -323,9 +323,9 @@ pub struct FundRawTransaction {
 /// > If verbose is 'false' or omitted, returns a string that is serialized, hex-encoded data for 'txid'.
 /// >
 /// > Arguments:
-/// > 1. "txid"      (string, required) The transaction id
-/// > 2. verbose     (bool, optional, default=false) If false, return a string, otherwise return a json object
-/// > 3. "blockhash" (string, optional) The block in which to look for the transaction
+/// > 1. "txid"      (string, required) The transaction id.
+/// > 2. verbose     (bool, optional, default=false) If false, return a string, otherwise return a json object.
+/// > 3. "blockhash" (string, optional) The block in which to look for the transaction.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetRawTransaction(
@@ -385,8 +385,8 @@ pub struct GetRawTransactionVerbose {
 /// > Also see createrawtransaction and signrawtransactionwithkey calls.
 /// >
 /// > Arguments:
-/// > 1. hexstring        (string, required) The hex string of the raw transaction
-/// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees
+/// > 1. hexstring        (string, required) The hex string of the raw transaction.
+/// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct SendRawTransaction(
@@ -406,7 +406,7 @@ pub struct SendRawTransaction(
 /// >
 /// >
 /// > Arguments:
-/// > 1. "hexstring"     (string, required) The transaction hex string
+/// > 1. "hexstring"     (string, required) The transaction hex string.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct SignRawTransaction {
@@ -448,7 +448,7 @@ pub struct SignFail {
 /// > Arguments:
 /// > 1. ["rawtxs"]       (array, required) An array of hex strings of raw transactions.
 /// >                                         Length must be one for now.
-/// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees
+/// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TestMempoolAccept {

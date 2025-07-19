@@ -15,10 +15,10 @@ pub use super::{Bip125Replaceable, GetTransactionDetail, GetTransactionError, La
 ///
 /// > gettransaction "txid" ( include_watchonly )
 /// >
-/// > Get detailed information about in-wallet transaction `<txid>`
+/// > Get detailed information about in-wallet transaction `<txid>`.
 /// >
 /// > Arguments:
-/// > 1. txid                 (string, required) The transaction id
+/// > 1. txid                 (string, required) The transaction id.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetTransaction {
@@ -71,7 +71,7 @@ pub struct GetTransaction {
     /// If a comment is associated with the transaction, only present if not empty. v20 to v24 only.
     pub comment: Option<String>,
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
-    /// may be unknown for unconfirmed transactions not in the mempool
+    /// may be unknown for unconfirmed transactions not in the mempool.
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: Bip125Replaceable,
     /// Only if 'category' is 'received'. List of parent descriptors for the output script of this

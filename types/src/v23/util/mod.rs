@@ -21,7 +21,7 @@ pub use super::CreateMultisigError;
 /// > 1. nrequired                    (numeric, required) The number of required signatures out of the n keys.
 /// > 2. "keys"                       (string, required) A json array of hex-encoded public keys
 /// >      [
-/// >        "key"                    (string) The hex-encoded public key
+/// >        "key"                    (string) The hex-encoded public key.
 /// >        ,...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

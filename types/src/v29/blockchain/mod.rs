@@ -38,7 +38,7 @@ pub struct GetBlockVerboseOne {
     /// The block version formatted in hexadecimal.
     #[serde(rename = "versionHex")]
     pub version_hex: String,
-    /// The merkle root
+    /// The merkle root.
     #[serde(rename = "merkleroot")]
     pub merkle_root: String,
     /// The transaction ids.
@@ -118,7 +118,7 @@ pub struct GetBlockchainInfo {
     pub automatic_pruning: Option<bool>,
     /// The target size used by pruning (only present if automatic pruning is enabled).
     pub prune_target_size: Option<i64>,
-    /// The block challenge (aka. block script)
+    /// The block challenge (aka. block script).
     pub signet_challenge: Option<String>,
     /// Any network and blockchain warnings.
     pub warnings: Vec<String>,
@@ -127,7 +127,7 @@ pub struct GetBlockchainInfo {
 /// Result of JSON-RPC method `getblockheader` with verbosity set to `false`.
 ///
 /// > Arguments:
-/// > 1. "hash"          (string, required) The block hash
+/// > 1. "hash"          (string, required) The block hash.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockHeader(pub String);
@@ -138,7 +138,7 @@ pub struct GetBlockHeader(pub String);
 /// > If verbose is true, returns an Object with information about blockheader `<hash>`.
 /// >
 /// > Arguments:
-/// > 1. "hash"          (string, required) The block hash
+/// > 1. "hash"          (string, required) The block hash.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetBlockHeaderVerbose {
@@ -165,7 +165,7 @@ pub struct GetBlockHeaderVerbose {
     pub nonce: i64,
     /// The bits.
     pub bits: String,
-    /// The difficulty target (hex-encoded). From v29+
+    /// The difficulty target (hex-encoded). From v29+.
     pub target: String,
     /// The difficulty.
     pub difficulty: f64,
@@ -189,8 +189,8 @@ pub struct GetBlockHeaderVerbose {
 /// >
 /// > Arguments:
 /// > 1. blockhashes  (json array, optional) The list of blockhashes to examine for activity. Order doesn't matter. Must be along main chain or an error is thrown.
-/// > 2. scanobjects  (json array, optional) Array of scan objects. Required for "start" action
-/// > 3. include_mempool  (boolean, optional, default=true) Whether to include unconfirmed activitydata
+/// > 2. scanobjects  (json array, optional) Array of scan objects. Required for "start" action.
+/// > 3. include_mempool  (boolean, optional, default=true) Whether to include unconfirmed activity data.
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetDescriptorActivity {
@@ -238,19 +238,19 @@ pub struct SpendActivity {
 #[serde(deny_unknown_fields)]
 pub struct ReceiveActivity {
     // Note: 'type' field is used for deserialization tag, not included here explicitly.
-    /// The total amount in BTC of the new output
+    /// The total amount in BTC of the new output.
     pub amount: f64,
-    /// The block that this receive is in
+    /// The block that this receive is in.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "blockhash")]
     pub block_hash: Option<String>,
-    /// The height of the receive
+    /// The height of the receive.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    /// The txid of the receiving transaction
+    /// The txid of the receiving transaction.
     pub txid: String,
-    /// The vout of the receiving output
+    /// The vout of the receiving output.
     pub vout: u32,
-    /// The ScriptPubKey
+    /// The ScriptPubKey.
     pub output_spk: ScriptPubkey,
 }
