@@ -8,7 +8,7 @@ mod into;
 
 use serde::{Deserialize, Serialize};
 
-use super::{MempoolEntryError, MempoolEntryFees};
+use super::{MempoolEntryError, MempoolEntryFees, ScanTxOutSetError};
 
 /// Result of JSON-RPC method `getmempoolentry`.
 ///
@@ -69,4 +69,37 @@ pub struct MempoolEntry {
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee)
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: bool,
+}
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. "action"                       (string, required) The action to execute
+/// > 2. "scanobjects"                  (array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetStart {
+    /// The unspents
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC
+    pub total_amount: f64,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct ScanTxOutSetUnspent {
+    /// The transaction id
+    pub txid: String,
+    /// The vout value
+    pub vout: u32,
+    /// The script key
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: String,
+    /// A specialized descriptor for the matched scriptPubKey
+    #[serde(rename = "desc")]
+    pub descriptor: String,
+    /// The total amount in BTC of unspent output
+    pub amount: f64,
+    /// Height of the unspent transaction output
+    pub height: u64,
 }
