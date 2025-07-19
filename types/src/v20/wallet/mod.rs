@@ -77,7 +77,7 @@ pub struct GetTransaction {
 pub struct GetTransactionDetail {
     /// Only returns true if imported addresses were involved in transaction. v20 and later only.
     #[serde(rename = "involvesWatchonly")]
-    pub involves_watchonly: Option<bool>,
+    pub involves_watch_only: Option<bool>,
     /// DEPRECATED. The account name involved in the transaction, can be "" for the default account.
     pub account: Option<String>, // Docs are wrong, this is not documented as optional.
     /// The bitcoin address involved in the transaction.

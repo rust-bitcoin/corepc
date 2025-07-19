@@ -362,7 +362,7 @@ pub struct GetTransaction {
 #[serde(deny_unknown_fields)]
 pub struct GetTransactionDetail {
     /// Only returns true if imported addresses were involved in transaction. v20 and later only.
-    pub involves_watchonly: Option<bool>,
+    pub involves_watch_only: Option<bool>,
     /// DEPRECATED. The account name involved in the transaction, can be "" for the default account.
     pub account: Option<String>, // Docs are wrong, this is not documented as optional.
     /// The bitcoin address involved in the transaction.
@@ -787,7 +787,7 @@ pub struct WalletCreateFundedPsbt {
     #[serde(default, with = "bitcoin::amount::serde::as_btc")]
     pub fee: SignedAmount,
     /// The position of the added change output, or -1.
-    pub change_pos: u32,
+    pub change_position: u32,
 }
 
 /// Models the result of JSON-RPC method `walletdisplayaddress`.

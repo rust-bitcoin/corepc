@@ -72,7 +72,7 @@ impl GetTransactionDetail {
         let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
 
         Ok(model::GetTransactionDetail {
-            involves_watchonly: self.involves_watchonly,
+            involves_watch_only: self.involves_watch_only,
             account: self.account,
             address,
             category: self.category.into_model(),

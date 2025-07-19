@@ -262,8 +262,8 @@ pub enum SetBanCommand {
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct ImportMultiRequest {
     /// Descriptor to import. If using descriptor, donot also provide address/scriptPubKey, scripts, or pubkeys.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub desc: Option<String>, // from core v18 onwards.
+    #[serde(rename = "desc", skip_serializing_if = "Option::is_none")]
+    pub descriptor: Option<String>, // from core v18 onwards.
     /// Type of scriptPubKey (string for script, json for address). Should not be provided if using descriptor.
     #[serde(rename = "scriptPubKey", skip_serializing_if = "Option::is_none")]
     pub script_pubkey: Option<ImportMultiScriptPubKey>,

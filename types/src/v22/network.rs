@@ -126,9 +126,11 @@ pub struct PeerInfo {
     pub inflight: Vec<u64>,
     /// The total number of addresses processed, excluding those dropped due to rate limiting. v21 and
     /// later only.
-    pub addr_processed: usize,
+    #[serde(rename = "addr_processed")]
+    pub addresses_processed: usize,
     /// The total number of addresses dropped due to rate limiting. v21 and later only.
-    pub addr_rate_limited: usize,
+    #[serde(rename = "addr_rate_limited")]
+    pub addresses_rate_limited: usize,
     /// Any special permissions that have been granted to this peer. v0.19 and later only.
     pub permissions: Vec<String>,
     /// The minimum fee rate for transactions this peer accepts. v0.19 and later only.

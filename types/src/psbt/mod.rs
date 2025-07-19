@@ -173,7 +173,7 @@ pub struct PsbtScript {
     pub hex: String,
     /// The type, eg 'pubkeyhash'.
     #[serde(rename = "type")]
-    pub script_type: String,
+    pub type_: String,
 }
 
 impl PsbtScript {

@@ -390,7 +390,7 @@ impl GetTransactionDetail {
         let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
 
         Ok(model::GetTransactionDetail {
-            involves_watchonly: None, // v20 and later only.
+            involves_watch_only: None, // v20 and later only.
             account: self.account,
             address,
             category: self.category.into_model(),
@@ -742,8 +742,8 @@ impl WalletCreateFundedPsbt {
 
         let psbt = self.psbt.parse::<Psbt>().map_err(E::Psbt)?;
         let fee = SignedAmount::from_btc(self.fee).map_err(E::Fee)?;
-        let change_pos = crate::to_u32(self.change_pos, "change_pos")?;
-        Ok(model::WalletCreateFundedPsbt { psbt, fee, change_pos })
+        let change_position = crate::to_u32(self.change_position, "change_pos")?;
+        Ok(model::WalletCreateFundedPsbt { psbt, fee, change_position })
     }
 }
 

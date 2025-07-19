@@ -64,5 +64,5 @@ pub struct DecodeScriptSegwit {
     pub addresses: Option<Vec<String>>,
     /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
     #[serde(rename = "p2sh-segwit")]
-    pub p2sh_segtwit: Option<String>,
+    pub p2sh_segwit: Option<String>,
 }

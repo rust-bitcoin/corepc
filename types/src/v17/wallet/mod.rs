@@ -1056,7 +1056,7 @@ pub struct WalletCreateFundedPsbt {
     pub fee: f64,
     /// The position of the added change output, or -1.
     #[serde(rename = "changepos")]
-    pub change_pos: i64,
+    pub change_position: i64,
 }
 
 /// Result of the JSON-RPC method `walletprocesspsbt`.

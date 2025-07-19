@@ -194,7 +194,7 @@ pub struct ScriptPubkey {
     /// Only returned before in versions prior to 22 or for version 22 onwards if
     /// config option `-deprecatedrpc=addresses` is passed.
     #[serde(rename = "reqSigs")]
-    pub req_sigs: Option<i64>,
+    pub required_signatures: Option<i64>,
     /// The type, eg pubkeyhash.
     #[serde(rename = "type")]
     pub type_: String,

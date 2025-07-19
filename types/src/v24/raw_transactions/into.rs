@@ -397,8 +397,8 @@ impl TaprootScript {
 
         let script = ScriptBuf::from_hex(&self.script).map_err(E::Script)?;
 
-        let leaf_ver = self.leaf_ver as u8; // FIXME: Is this cast ok?
-        let version = LeafVersion::from_consensus(leaf_ver).map_err(E::LeafVer)?;
+        let leaf_version = self.leaf_version as u8; // FIXME: Is this cast ok?
+        let version = LeafVersion::from_consensus(leaf_version).map_err(E::LeafVer)?;
 
         let control_block = control_block(&self.control_blocks).map_err(E::ControlBlocks)?;
 
@@ -452,8 +452,8 @@ fn build_taproot_tree(leaves: Vec<TaprootLeaf>) -> Result<TapTree, TaprootLeafEr
         // Cast ok because depth can never exceed 128.
         let depth = leaf.depth as u8;
 
-        let leaf_ver = leaf.leaf_ver as u8; // FIXME: Is this cast ok?
-        let version = LeafVersion::from_consensus(leaf_ver).map_err(E::LeafVer)?;
+        let leaf_version = leaf.leaf_version as u8; // FIXME: Is this cast ok?
+        let version = LeafVersion::from_consensus(leaf_version).map_err(E::LeafVer)?;
 
         let script = ScriptBuf::from_hex(&leaf.script).map_err(E::Script)?;
 
