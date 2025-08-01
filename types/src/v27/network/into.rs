@@ -23,7 +23,7 @@ impl NodeAddress {
             services: self.services,
             address,
             port: self.port,
-            network: None,
+            network: Some(self.network),
         })
     }
 }
