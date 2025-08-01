@@ -918,10 +918,8 @@ mod test {
     }
 
     fn peers_connected(client: &Client) -> usize {
-        // FIXME: Once client implements get_peer_info use it.
-        // This is kinda cool, it shows we can call any RPC method using the client.
-        let result: Vec<serde_json::Value> = client.call("getpeerinfo", &[]).unwrap();
-        result.len()
+        let json = client.get_peer_info().expect("get_peer_info");
+        json.0.len()
     }
 
     fn init() -> String {

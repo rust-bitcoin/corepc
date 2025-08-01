@@ -30,7 +30,7 @@ pub struct GetNetworkInfo {
     /// The services we offer to the network (hex string).
     #[serde(rename = "localservices")]
     pub local_services: String,
-    /// The services we offer to the network. v0.19 and later only.
+    /// The services we offer to the network.
     #[serde(rename = "localservicesnames")]
     pub local_services_names: Vec<String>,
     /// `true` if transaction relay is requested from peers.
@@ -83,11 +83,9 @@ pub struct PeerInfo {
     /// Local address as reported by the peer.
     #[serde(rename = "addrlocal")]
     pub address_local: Option<String>,
-    /// Network (ipv4, ipv6, or onion) the peer connected through.
-    pub network: Option<String>,
     /// The services offered.
     pub services: String,
-    /// The services offered, in human-readable form. v0.19 and later only.
+    /// The services offered, in human-readable form.
     #[serde(rename = "servicesnames")]
     pub services_names: Vec<String>,
     /// Whether peer has asked us to relay transactions to it.
@@ -144,17 +142,15 @@ pub struct PeerInfo {
     pub inflight: Vec<u64>,
     /// Any special permissions that have been granted to this peer. v0.19 and later only.
     pub permissions: Vec<String>,
-    /// The minimum fee rate for transactions this peer accepts. v0.19 and later only.
-    #[serde(rename = "minfeefilter")]
-    pub minimum_fee_filter: f64,
-    /// Whether the peer is whitelisted (deprecated in v0.21).
+    /// Whether the peer is whitelisted.
     pub whitelisted: Option<bool>,
+    /// The minimum fee rate for transactions this peer accepts.
+    #[serde(rename = "minfeefilter")]
+    pub min_fee_filter: f64,
     /// The total bytes sent aggregated by message type.
     #[serde(rename = "bytessent_per_msg")]
     pub bytes_sent_per_message: BTreeMap<String, u64>,
     /// The total bytes received aggregated by message type.
     #[serde(rename = "bytesrecv_per_msg")]
     pub bytes_received_per_message: BTreeMap<String, u64>,
-    /// Type of connection.
-    pub connection_type: Option<String>,
 }

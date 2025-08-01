@@ -245,7 +245,7 @@ pub use self::{
         SoftforkType,
     },
     generating::GenerateBlock,
-    network::{GetNetworkInfo, GetPeerInfo},
+    network::{GetNetworkInfo, GetPeerInfo, PeerInfo},
     util::{GetIndexInfo, GetIndexInfoName},
     wallet::{
         ImportDescriptors, ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
@@ -298,8 +298,7 @@ pub use crate::{
         GetBalancesWatchOnly, GetBlockFilter, GetBlockFilterError, GetBlockchainInfoError,
         GetChainTxStats, GetDescriptorInfo, GetMempoolAncestors, GetMempoolAncestorsVerbose,
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetRpcInfo, MapMempoolEntryError,
-        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo,
-        SetWalletFlag,
+        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, SetWalletFlag,
     },
     v20::{
         Banned, CreateMultisig, GenerateToDescriptor, GetTransaction, GetTransactionDetail,

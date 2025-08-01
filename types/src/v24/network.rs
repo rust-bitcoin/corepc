@@ -91,7 +91,7 @@ pub struct PeerInfo {
     #[serde(rename = "startingheight")]
     pub starting_height: Option<i64>,
     /// The current height of header pre-synchronization with this peer, or -1 if no low-work sync is
-    /// in progress. v24 and later only.
+    /// in progress.
     pub presynced_headers: Option<i64>,
     /// The ban score.
     #[serde(rename = "banscore")]
@@ -102,23 +102,20 @@ pub struct PeerInfo {
     pub synced_blocks: Option<i64>,
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Option<Vec<u64>>,
-    /// Whether we participate in address relay with this peer. v23 and later only.
+    /// Whether we participate in address relay with this peer.
     #[serde(rename = "addr_relay_enabled")]
     pub addresses_relay_enabled: Option<bool>,
-    /// The total number of addresses processed, excluding those dropped due to rate limiting. v21 and
-    /// later only.
+    /// The total number of addresses processed, excluding those dropped due to rate limiting.
     #[serde(rename = "addr_processed")]
     pub addresses_processed: Option<usize>,
-    /// The total number of addresses dropped due to rate limiting. v21 and later only.
+    /// The total number of addresses dropped due to rate limiting.
     #[serde(rename = "addr_rate_limited")]
     pub addresses_rate_limited: Option<usize>,
-    /// Any special permissions that have been granted to this peer. v0.19 and later only.
+    /// Any special permissions that have been granted to this peer.
     pub permissions: Vec<String>,
-    /// The minimum fee rate for transactions this peer accepts. v0.19 and later only.
+    /// The minimum fee rate for transactions this peer accepts.
     #[serde(rename = "minfeefilter")]
     pub minimum_fee_filter: f64,
-    /// Whether the peer is whitelisted (deprecated in v0.21).
-    pub whitelisted: Option<bool>,
     /// The total bytes sent aggregated by message type.
     #[serde(rename = "bytessent_per_msg")]
     pub bytes_sent_per_message: BTreeMap<String, u64>,

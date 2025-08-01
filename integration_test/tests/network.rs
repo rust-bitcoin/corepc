@@ -120,6 +120,10 @@ fn get_peer_info_three_node_network() {
     node2.mine_a_block();
     node3.mine_a_block();
 
+    let json: GetPeerInfo = node1.client.get_peer_info().expect("getpeerinfo");
+    // This verifies that we re-exported the correct `PeerInfo` type at the module level.
+    let _: PeerInfo = json.0[0];
+
     // FIXME: Fails if we use equal to 2 ???
     assert!(node1.peers_connected() >= 1);
     assert!(node2.peers_connected() >= 1);

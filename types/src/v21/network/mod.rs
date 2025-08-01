@@ -91,7 +91,7 @@ pub struct PeerInfo {
     pub network: Option<String>,
     /// The services offered.
     pub services: String,
-    /// The services offered, in human-readable form. v0.19 and later only.
+    /// The services offered, in human-readable form.
     #[serde(rename = "servicesnames")]
     pub services_names: Vec<String>,
     /// Whether peer has asked us to relay transactions to it.
@@ -141,9 +141,6 @@ pub struct PeerInfo {
     /// The starting height (block) of the peer.
     #[serde(rename = "startingheight")]
     pub starting_height: i64,
-    /// The ban score.
-    #[serde(rename = "banscore")]
-    pub ban_score: Option<i64>,
     /// The last header we have in common with this peer.
     pub synced_headers: i64,
     /// The last block we have in common with this peer.
@@ -159,11 +156,11 @@ pub struct PeerInfo {
     pub addresses_rate_limited: usize,
     /// Any special permissions that have been granted to this peer. v0.19 and later only.
     pub permissions: Vec<String>,
-    /// The minimum fee rate for transactions this peer accepts. v0.19 and later only.
-    #[serde(rename = "minfeefilter")]
-    pub minimum_fee_filter: f64,
-    /// Whether the peer is whitelisted (deprecated in v0.21).
+    /// Whether the peer is whitelisted.
     pub whitelisted: Option<bool>,
+    /// The minimum fee rate for transactions this peer accepts.
+    #[serde(rename = "minfeefilter")]
+    pub min_fee_filter: Option<f64>, // Docs rekon this exists.
     /// The total bytes sent aggregated by message type.
     #[serde(rename = "bytessent_per_msg")]
     pub bytes_sent_per_message: BTreeMap<String, u64>,

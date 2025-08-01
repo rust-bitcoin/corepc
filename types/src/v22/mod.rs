@@ -254,7 +254,7 @@ mod wallet;
 pub use self::{
     blockchain::GetMempoolInfo,
     control::Logging,
-    network::{Banned, GetPeerInfo, ListBanned},
+    network::{Banned, GetPeerInfo, ListBanned, PeerInfo},
     raw_transactions::{DecodeScript, DecodeScriptError},
     signer::EnumerateSigners,
     wallet::{ListDescriptors, WalletDisplayAddress},
@@ -305,8 +305,7 @@ pub use crate::{
         GetBalancesWatchOnly, GetBlockFilter, GetBlockFilterError, GetBlockchainInfoError,
         GetChainTxStats, GetDescriptorInfo, GetMempoolAncestors, GetMempoolAncestorsVerbose,
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetRpcInfo, MapMempoolEntryError,
-        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo,
-        SetWalletFlag,
+        MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, SetWalletFlag,
     },
     v20::{CreateMultisig, GenerateToDescriptor, GetTransaction, GetTransactionDetail},
     v21::{

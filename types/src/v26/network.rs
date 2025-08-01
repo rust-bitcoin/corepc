@@ -59,7 +59,7 @@ pub struct PeerInfo {
     pub mapped_as: Option<u32>,
     /// The services offered.
     pub services: String,
-    /// The services offered, in human-readable form. v0.19 and later only.
+    /// The services offered, in human-readable form.
     #[serde(rename = "servicesnames")]
     pub services_names: Vec<String>,
     /// Whether peer has asked us to relay transactions to it.
@@ -71,9 +71,9 @@ pub struct PeerInfo {
     /// The time in seconds since epoch (Jan 1 1970 GMT) of the last receive.
     #[serde(rename = "lastrecv")]
     pub last_received: i64,
-    /// The UNIX epoch time of the last valid transaction received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last valid transaction received from this peer.
     pub last_transaction: i64,
-    /// The UNIX epoch time of the last block received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last block received from this peer.
     pub last_block: i64,
     /// The total bytes sent.
     #[serde(rename = "bytessent")]
@@ -103,9 +103,9 @@ pub struct PeerInfo {
     pub subversion: String,
     /// Inbound (true) or Outbound (false).
     pub inbound: bool,
-    /// Whether we selected peer as (compact blocks) high-bandwidth peer. v22 and later only.
+    /// Whether we selected peer as (compact blocks) high-bandwidth peer.
     pub bip152_hb_to: bool,
-    /// Whether peer selected us as (compact blocks) high-bandwidth peer. v22 and later only.
+    /// Whether peer selected us as (compact blocks) high-bandwidth peer.
     pub bip152_hb_from: bool,
     /// Whether connection was due to addnode/-connect or if it was an automatic/inbound connection.
     #[serde(rename = "addnode")]
@@ -114,7 +114,7 @@ pub struct PeerInfo {
     #[serde(rename = "startingheight")]
     pub starting_height: Option<i64>,
     /// The current height of header pre-synchronization with this peer, or -1 if no low-work sync is
-    /// in progress. v24 and later only.
+    /// in progress.
     pub presynced_headers: Option<i64>,
     /// The ban score.
     #[serde(rename = "banscore")]
@@ -125,19 +125,18 @@ pub struct PeerInfo {
     pub synced_blocks: Option<i64>,
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Option<Vec<u64>>,
-    /// Whether we participate in address relay with this peer. v23 and later only.
+    /// Whether we participate in address relay with this peer.
     #[serde(rename = "addr_relay_enabled")]
     pub addresses_relay_enabled: Option<bool>,
-    /// The total number of addresses processed, excluding those dropped due to rate limiting. v21 and
-    /// later only.
+    /// The total number of addresses processed, excluding those dropped due to rate limiting.
     #[serde(rename = "addr_processed")]
     pub addresses_processed: Option<usize>,
-    /// The total number of addresses dropped due to rate limiting. v21 and later only.
+    /// The total number of addresses dropped due to rate limiting.
     #[serde(rename = "addr_rate_limited")]
     pub addresses_rate_limited: Option<usize>,
-    /// Any special permissions that have been granted to this peer. v0.19 and later only.
+    /// Any special permissions that have been granted to this peer.
     pub permissions: Vec<String>,
-    /// The minimum fee rate for transactions this peer accepts. v0.19 and later only.
+    /// The minimum fee rate for transactions this peer accepts.
     #[serde(rename = "minfeefilter")]
     pub minimum_fee_filter: f64,
     /// Whether the peer is whitelisted (deprecated in v0.21).
@@ -150,7 +149,7 @@ pub struct PeerInfo {
     pub bytes_received_per_message: BTreeMap<String, u64>,
     /// Type of connection.
     pub connection_type: Option<String>,
-    /// Type of transport protocol. v0.26 and later only:
+    /// Type of transport protocol:
     /// detecting (peer could be v1 or v2),
     /// v1 (plaintext transport protocol),
     /// v2 (BIP324 encrypted transport protocol).

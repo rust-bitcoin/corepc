@@ -251,7 +251,7 @@ pub use self::{
         GetMempoolEntry, GetMempoolInfo, GetTxSpendingPrevout, GetTxSpendingPrevoutError,
         GetTxSpendingPrevoutItem,
     },
-    network::GetPeerInfo,
+    network::{GetPeerInfo, PeerInfo},
     raw_transactions::{
         DecodePsbt, DecodePsbtError, GlobalXpub, Proprietary, PsbtInput, PsbtOutput,
         TaprootBip32Deriv, TaprootLeaf, TaprootScript, TaprootScriptPathSig,
@@ -306,8 +306,8 @@ pub use crate::{
         GetBlockFilterError, GetBlockchainInfoError, GetChainTxStats, GetDescriptorInfo,
         GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetRpcInfo, MapMempoolEntryError, MempoolEntry,
-        MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo, SetWalletFlag,
-        Softfork, SoftforkType,
+        MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, SetWalletFlag, Softfork,
+        SoftforkType,
     },
     v20::GenerateToDescriptor,
     v21::{

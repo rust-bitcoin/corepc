@@ -196,8 +196,6 @@ pub struct PeerInfo {
     /// Local address as reported by the peer.
     #[serde(rename = "addrlocal")]
     pub address_local: Option<String>,
-    /// Network (ipv4, ipv6, or onion) the peer connected through.
-    pub network: Option<String>,
     /// The services offered.
     pub services: String,
     /// Whether peer has asked us to relay transactions to it.
@@ -252,7 +250,7 @@ pub struct PeerInfo {
     pub synced_blocks: i64,
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Vec<u64>,
-    /// Whether the peer is whitelisted (deprecated in v0.21).
+    /// Whether the peer is whitelisted.
     pub whitelisted: Option<bool>,
     /// The total bytes sent aggregated by message type.
     #[serde(rename = "bytessent_per_msg")]
@@ -260,8 +258,6 @@ pub struct PeerInfo {
     /// The total bytes received aggregated by message type.
     #[serde(rename = "bytesrecv_per_msg")]
     pub bytes_received_per_message: BTreeMap<String, u64>,
-    /// Type of connection.
-    pub connection_type: Option<String>,
 }
 
 /// Result of JSON-RPC method `listbanned`.

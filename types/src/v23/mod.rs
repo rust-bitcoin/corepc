@@ -250,7 +250,7 @@ pub use self::{
         GetDeploymentInfoError, GetMempoolEntry, SaveMempool,
     },
     control::Logging,
-    network::GetPeerInfo,
+    network::{GetPeerInfo, PeerInfo},
     raw_transactions::{
         DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, GlobalXpub, Proprietary,
         PsbtInput, PsbtOutput,
@@ -304,8 +304,8 @@ pub use crate::{
         GetBlockFilterError, GetBlockchainInfoError, GetChainTxStats, GetDescriptorInfo,
         GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetRpcInfo, MapMempoolEntryError, MempoolEntry,
-        MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, PeerInfo, SetWalletFlag,
-        Softfork, SoftforkType,
+        MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError, SetWalletFlag, Softfork,
+        SoftforkType,
     },
     v20::{GenerateToDescriptor, GetTransactionDetail},
     v21::{
