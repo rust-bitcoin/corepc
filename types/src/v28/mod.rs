@@ -304,9 +304,9 @@ pub use crate::{
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
-        AnalyzePsbtInputMissingError, DeriveAddresses, GetNodeAddresses, GetReceivedByLabel,
+        AnalyzePsbtInputMissingError, DeriveAddresses, GetReceivedByLabel,
         ImportMulti, ImportMultiEntry, JoinPsbts, JsonRpcError, ListReceivedByLabel,
-        ListReceivedByLabelError, ListWalletDir, ListWalletDirWallet, NodeAddress, UtxoUpdatePsbt,
+        ListReceivedByLabelError, ListWalletDir, ListWalletDirWallet, UtxoUpdatePsbt,
     },
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalancesMine,
@@ -344,5 +344,5 @@ pub use crate::{
         GetTxOutSetInfo, GetTxOutSetInfoError, LastProcessedBlock, LastProcessedBlockError,
         LoadTxOutSet, LoadTxOutSetError, LoadWallet, PeerInfo, UnloadWallet,
     },
-    v27::{GetPrioritisedTransactions, PrioritisedTransaction},
+    v27::{GetNodeAddresses, NodeAddress, GetPrioritisedTransactions, PrioritisedTransaction},
 };

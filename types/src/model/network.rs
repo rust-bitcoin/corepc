@@ -96,4 +96,6 @@ pub struct NodeAddress {
     pub address: Address<NetworkUnchecked>,
     /// The port of the node.
     pub port: u16,
+    /// The network (ipv4, ipv6, onion, i2p, cjdns) the node connected through. v27 and later only.
+    pub network: Option<String>,
 }

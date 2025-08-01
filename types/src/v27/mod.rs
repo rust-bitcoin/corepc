@@ -104,7 +104,7 @@
 //! | getconnectioncount                 | version         |                                        |
 //! | getnettotals                       | version         |                                        |
 //! | getnetworkinfo                     | version + model |                                        |
-//! | getnodeaddresses                   | version + model | TODO                                   |
+//! | getnodeaddresses                   | version + model |                                        |
 //! | getpeerinfo                        | version         |                                        |
 //! | listbanned                         | version         |                                        |
 //! | ping                               | returns nothing |                                        |
@@ -249,9 +249,13 @@
 //! </details>
 
 mod mining;
+mod network;
 
 #[doc(inline)]
-pub use self::mining::{GetPrioritisedTransactions, PrioritisedTransaction};
+pub use self::{
+    mining::{GetPrioritisedTransactions, PrioritisedTransaction},
+    network::{GetNodeAddresses, NodeAddress},
+};
 #[doc(inline)]
 pub use crate::{
     v17::{
@@ -287,9 +291,9 @@ pub use crate::{
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
-        AnalyzePsbtInputMissingError, DeriveAddresses, GetNodeAddresses, GetReceivedByLabel,
+        AnalyzePsbtInputMissingError, DeriveAddresses, GetReceivedByLabel,
         ImportMulti, ImportMultiEntry, JoinPsbts, JsonRpcError, ListReceivedByLabel,
-        ListReceivedByLabelError, ListWalletDir, ListWalletDirWallet, NodeAddress, UtxoUpdatePsbt,
+        ListReceivedByLabelError, ListWalletDir, ListWalletDirWallet, UtxoUpdatePsbt,
     },
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalancesMine,
