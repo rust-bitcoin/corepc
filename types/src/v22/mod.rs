@@ -254,8 +254,10 @@ mod wallet;
 pub use self::{
     blockchain::GetMempoolInfo,
     control::Logging,
-    network::{Banned, GetPeerInfo, ListBanned, PeerInfo},
-    raw_transactions::{DecodeScript, DecodeScriptError},
+    network::{Banned, GetPeerInfo, ListBanned},
+    raw_transactions::{
+        DecodeScript, DecodeScriptError, DecodeScriptSegwit, DecodeScriptSegwitError,
+    },
     signer::EnumerateSigners,
     wallet::{GetAddressInfo, GetAddressInfoEmbedded, ListDescriptors, WalletDisplayAddress},
 };
