@@ -871,7 +871,7 @@ pub struct ListUnspentItem {
     /// The associated label, or "" for the default label.
     pub label: String,
     /// DEPRECATED. The account name associated with the transaction. Will be "" for the default account.
-    pub account: String,
+    pub account: Option<String>,
     /// The script key.
     #[serde(rename = "scriptPubKey")]
     pub script_pubkey: String,

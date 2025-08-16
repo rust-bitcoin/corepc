@@ -504,12 +504,26 @@ macro_rules! impl_client_v17__load_wallet {
 macro_rules! impl_client_v17__lock_unspent {
     () => {
         impl Client {
-            pub fn lock_unspent(&self) -> Result<LockUnspent> {
-                self.call("lockunspent", &[into_json(false)?])
+            /// Lock the given list of transaction outputs. Returns true on success.
+            ///
+            /// This wraps Core RPC: `lockunspent false [{"txid":"..","vout":n},...]`.
+            pub fn lock_unspent(&self, outputs: &[(Txid, u32)]) -> Result<LockUnspent> {
+                let outs: Vec<_> = outputs
+                    .iter()
+                    .map(|(txid, vout)| serde_json::json!({"txid": txid, "vout": vout}))
+                    .collect();
+                self.call("lockunspent", &[into_json(false)?, outs.into()])
             }
 
-            pub fn unlock_unspent(&self) -> Result<LockUnspent> {
-                self.call("lockunspent", &[into_json(true)?])
+            /// Unlock the given list of transaction outputs. Returns true on success.
+            ///
+            /// This wraps Core RPC: `lockunspent true [{"txid":"..","vout":n},...]`.
+            pub fn unlock_unspent(&self, outputs: &[(Txid, u32)]) -> Result<LockUnspent> {
+                let outs: Vec<_> = outputs
+                    .iter()
+                    .map(|(txid, vout)| serde_json::json!({"txid": txid, "vout": vout}))
+                    .collect();
+                self.call("lockunspent", &[into_json(true)?, outs.into()])
             }
         }
     };

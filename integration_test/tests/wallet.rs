@@ -671,6 +671,24 @@ fn wallet__list_descriptors() {
 }
 
 #[test]
+fn wallet__list_lock_unspent__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
+    let json: ListUnspent = node.client.list_unspent().expect("listunspent");
+    let utxos = json.into_model().expect("listunspent into model");
+    let txid = utxos.0[0].txid;
+    let vout = utxos.0[0].vout;
+    node.client.lock_unspent(&[(txid, vout)]).expect("lockunspent");
+
+    let json: ListLockUnspent = node.client.list_lock_unspent().expect("listlockunspent");
+    let model: Result<mtype::ListLockUnspent, ListLockUnspentItemError> = json.into_model();
+    let model = model.unwrap();
+
+    assert!(model.0.iter().any(|o| o.txid == txid && o.vout == vout));
+}
+
+#[test]
 fn wallet__list_unspent__modelled() {
     let node = match () {
         #[cfg(feature = "v17")]
@@ -709,11 +727,16 @@ fn wallet__lock_unspent() {
     let node = Node::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
-    let json: LockUnspent = node.client.lock_unspent().expect("lockunspent");
-    assert!(json.0);
+    let json: ListUnspent = node.client.list_unspent().expect("listunspent");
+    let utxos = json.into_model().expect("listunspent into model");
+    let txid = utxos.0[0].txid;
+    let vout = utxos.0[0].vout;
 
-    let json: LockUnspent = node.client.unlock_unspent().expect("unlockunspent");
-    assert!(json.0);
+    let locked: LockUnspent = node.client.lock_unspent(&[(txid, vout)]).expect("lockunspent");
+    assert!(locked.0, "lock_unspent");
+
+    let unlocked: LockUnspent = node.client.unlock_unspent(&[(txid, vout)]).expect("unlockunspent");
+    assert!(unlocked.0, "unlock_unspent");
 }
 
 #[cfg(not(feature = "v23_and_below"))]
