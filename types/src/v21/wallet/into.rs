@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use super::{PsbtBumpFee, PsbtBumpFeeError, Send, SendError, UnloadWallet};
+use bitcoin::{hex, Txid};
+
+use super::{
+    PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany, SendManyVerbose, UnloadWallet,
+};
 use crate::model;
 
 impl UnloadWallet {
@@ -40,5 +44,21 @@ impl Send {
         let psbt = self.psbt.as_ref().map(|p| p.parse()).transpose().map_err(E::Psbt)?;
 
         Ok(model::Send { complete: self.complete, txid, hex, psbt })
+    }
+}
+
+impl SendMany {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::SendMany, hex::HexToArrayError> {
+        let txid = self.0.parse::<Txid>()?;
+        Ok(model::SendMany(txid))
+    }
+}
+
+impl SendManyVerbose {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::SendManyVerbose, hex::HexToArrayError> {
+        let txid = self.txid.parse::<Txid>()?;
+        Ok(model::SendManyVerbose { txid, fee_reason: self.fee_reason })
     }
 }

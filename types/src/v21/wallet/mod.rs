@@ -109,6 +109,36 @@ pub struct Send {
     pub psbt: Option<String>,
 }
 
+/// Result of JSON-RPC method `sendmany` when `verbose=false`.
+///
+/// > sendmany "" {"address":amount}
+/// >
+/// > Send multiple times. Amounts are double-precision floating point numbers.
+/// > Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
+/// >
+/// > Arguments:
+/// > 1. dummy   (string, required) Must be set to "" for backwards compatibility.
+/// > 2. amounts (json object, required) The addresses and amounts
+/// >    { "address": amount, (numeric or string, required) The bitcoin address is the key, the numeric amount (can be string) in BTC is the value }
+/// > ...
+/// > 10. verbose (boolean, optional, default=false) If true, return extra infomration about the transaction.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SendMany(
+    /// The transaction id for the send.
+    pub String,
+);
+
+/// Result of JSON-RPC method `sendmany` when `verbose=true`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SendManyVerbose {
+    /// The transaction id for the send. Only 1 transaction is created regardless of the number of addresses.
+    pub txid: String,
+    /// The transaction fee reason.
+    pub fee_reason: String,
+}
+
 /// Result of the JSON-RPC method `unloadwallet`.
 ///
 /// > unloadwallet ( "wallet_name" load_on_startup )

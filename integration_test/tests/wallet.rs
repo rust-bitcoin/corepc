@@ -857,6 +857,37 @@ fn wallet__unload_wallet() {
     create_load_unload_wallet();
 }
 
+#[test]
+fn wallet__send_many__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
+    let addr1 = node.client.new_address().expect("newaddress");
+    let addr2 = node.client.new_address().expect("newaddress");
+
+    let mut amounts = BTreeMap::new();
+    amounts.insert(addr1, Amount::from_sat(100_000));
+    amounts.insert(addr2, Amount::from_sat(100_000));
+
+    let json: SendMany = node.client.send_many(amounts.clone()).expect("sendmany");
+    let model: Result<mtype::SendMany, _> = json.into_model();
+    let txid = model.unwrap().0;
+
+    assert_eq!(txid.to_string().len(), 64);
+
+    #[cfg(not(feature = "v20_and_below"))]
+    {
+        let json_verbose: SendManyVerbose = node
+            .client
+            .send_many_verbose(amounts)
+            .expect("sendmany verbose");
+        let model_verbose: Result<mtype::SendManyVerbose, _> = json_verbose.into_model();
+        let verbose = model_verbose.unwrap();
+        assert_eq!(verbose.txid.to_string().len(), 64);
+        assert_eq!(verbose.fee_reason, "Fallback fee");
+    }
+}
+
 #[cfg(not(feature = "v20_and_below"))]
 #[test]
 fn wallet__send__modelled() {

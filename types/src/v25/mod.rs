@@ -211,7 +211,7 @@
 //! | restorewallet                      | version         |                                        |
 //! | send                               | version + model |                                        |
 //! | sendall                            | version + model |                                        |
-//! | sendmany                           | version + model | UNTESTED                               |
+//! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |
 //! | setlabel                           | returns nothing |                                        |
@@ -236,7 +236,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | getzmqnotifications                | version         | UNTESTED                               |
+//! | getzmqnotifications                | version         |                                        |
 //!
 //! </details>
 
@@ -277,25 +277,24 @@ pub use crate::{
         GetRawMempool, GetRawMempoolVerbose, GetRawTransaction, GetRawTransactionVerbose,
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError, GetTxOut,
         GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo,
-        GetWalletInfoError, GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsError,
+        GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
         ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
-        RawTransactionOutput, RescanBlockchain, ScriptType, SendMany, SendRawTransaction,
-        SendToAddress, SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey,
-        SignRawTransaction, SignRawTransactionError, SoftforkReject, TransactionCategory,
-        UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-        WitnessUtxo,
+        RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
+        SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+        SignRawTransactionError, SoftforkReject, TransactionCategory, UploadTarget,
+        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
         AnalyzePsbtInputMissingError, DeriveAddresses, GetAddressInfoError, GetReceivedByLabel,
-        ImportMulti, ImportMultiEntry, JoinPsbts, JsonRpcError, ListReceivedByAddress,
-        ListReceivedByAddressItem, ListReceivedByLabel, ListReceivedByLabelError, ListWalletDir,
-        ListWalletDirWallet, UtxoUpdatePsbt,
+        GetZmqNotifications, ImportMulti, ImportMultiEntry, JoinPsbts, JsonRpcError,
+        ListReceivedByAddress, ListReceivedByAddressItem, ListReceivedByLabel,
+        ListReceivedByLabelError, ListWalletDir, ListWalletDirWallet, UtxoUpdatePsbt,
     },
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalances,
@@ -307,7 +306,8 @@ pub use crate::{
     v20::GenerateToDescriptor,
     v21::{
         AddPeerAddress, GetIndexInfo, GetIndexInfoName, GetNetworkInfo, ImportDescriptors,
-        ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError, UpgradeWallet,
+        ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany,
+        SendManyVerbose, UpgradeWallet,
     },
     v22::{
         Banned, EnumerateSigners, GetAddressInfo, GetAddressInfoEmbedded, GetNodeAddresses,
