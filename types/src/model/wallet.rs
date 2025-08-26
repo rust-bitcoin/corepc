@@ -808,6 +808,16 @@ pub struct SendAll {
 #[serde(deny_unknown_fields)]
 pub struct SendMany(pub Txid);
 
+/// Models the verbose result of JSON-RPC method `sendmany` when `verbose=true`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SendManyVerbose {
+    /// The transaction id for the send. Only 1 transaction is created regardless of the number of addresses.
+    pub txid: Txid,
+    /// The transaction fee reason.
+    pub fee_reason: String,
+}
+
 /// Models the result of JSON-RPC method `sendtoaddress`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

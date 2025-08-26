@@ -214,7 +214,7 @@
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model |                                        |
 //! | send                               | version + model |                                        |
-//! | sendmany                           | version + model | UNTESTED                               |
+//! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |
 //! | setlabel                           | returns nothing |                                        |
@@ -287,7 +287,7 @@ pub use crate::{
         ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
         ListTransactions, ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError,
         ListWallets, LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError,
-        RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType, SendMany,
+        RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType,
         SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
         SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, SoftforkReject,
         TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
@@ -317,7 +317,7 @@ pub use crate::{
         GetIndexInfoName, GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetNetworkInfo, ImportDescriptors,
         ImportDescriptorsResult, MempoolEntry, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
-        Softfork, SoftforkType, UnloadWallet, UpgradeWallet,
+        SendMany, SendManyVerbose, Softfork, SoftforkType, UnloadWallet, UpgradeWallet,
     },
     ScriptPubkey,
 };

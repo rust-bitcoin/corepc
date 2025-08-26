@@ -186,6 +186,7 @@ crate::impl_client_v23__restore_wallet!();
 crate::impl_client_v21__send!();
 crate::impl_client_v24__send_all!();
 crate::impl_client_v17__send_many!();
+crate::impl_client_v21__send_many_verbose!();
 crate::impl_client_v17__send_to_address!();
 crate::impl_client_v17__set_hd_seed!();
 crate::impl_client_v17__set_tx_fee!();

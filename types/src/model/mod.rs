@@ -60,8 +60,8 @@ pub use self::{
         ListLockUnspentItem, ListReceivedByAddress, ListReceivedByAddressItem, ListReceivedByLabel,
         ListReceivedByLabelItem, ListSinceBlock, ListSinceBlockTransaction, ListTransactions,
         ListTransactionsItem, ListUnspent, ListUnspentItem, ListWallets, LoadWallet, PsbtBumpFee,
-        RescanBlockchain, ScriptType, Send, SendAll, SendMany, SendToAddress, SignMessage,
-        SimulateRawTransaction, TransactionCategory, UnloadWallet, WalletCreateFundedPsbt,
-        WalletDisplayAddress, WalletProcessPsbt,
+        RescanBlockchain, ScriptType, Send, SendAll, SendMany, SendManyVerbose, SendToAddress,
+        SignMessage, SimulateRawTransaction, TransactionCategory, UnloadWallet,
+        WalletCreateFundedPsbt, WalletDisplayAddress, WalletProcessPsbt,
     },
 };

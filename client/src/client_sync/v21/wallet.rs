@@ -98,6 +98,48 @@ macro_rules! impl_client_v21__send {
     };
 }
 
+/// Implements Bitcoin Core JSON-RPC API method `sendmany` with `verbose=true` (v21+).
+#[macro_export]
+macro_rules! impl_client_v21__send_many_verbose {
+    () => {
+        impl Client {
+            pub fn send_many_verbose(
+                &self,
+                amounts: BTreeMap<Address, Amount>,
+            ) -> Result<SendManyVerbose> {
+                let dummy = ""; // Backwards compatibility dummy.
+                let amount_btc: BTreeMap<String, f64> = amounts
+                    .into_iter()
+                    .map(|(addr, amount)| (addr.to_string(), amount.to_btc()))
+                    .collect();
+                let minconf = 1u64;
+                let comment = "";
+                let subtract_fee_from: Vec<String> = Vec::new();
+                let replaceable = true;
+                let conf_target = 1u64;
+                let estimate_mode = "unset";
+                let fee_rate = serde_json::Value::Null;
+                let verbose = true;
+                self.call(
+                    "sendmany",
+                    &[
+                        into_json(dummy)?,
+                        into_json(amount_btc)?,
+                        minconf.into(),
+                        comment.into(),
+                        into_json(subtract_fee_from)?,
+                        replaceable.into(),
+                        conf_target.into(),
+                        estimate_mode.into(),
+                        fee_rate,
+                        verbose.into(),
+                    ],
+                )
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `unloadwallet`.
 #[macro_export]
 macro_rules! impl_client_v21__unload_wallet {
