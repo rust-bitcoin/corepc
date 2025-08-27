@@ -136,7 +136,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | enumeratesigners                   | version         | UNTESTED                               |
+//! | enumeratesigners                   | version         |                                        |
 //!
 //! </details>
 //!
