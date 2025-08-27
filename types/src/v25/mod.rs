@@ -181,7 +181,7 @@
 //! | getreceivedbylabel                 | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importdescriptors                  | version         |                                        |
 //! | importmulti                        | version         |                                        |
@@ -276,7 +276,7 @@ pub use crate::{
         GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress, GetRawChangeAddress,
         GetRawMempool, GetRawMempoolVerbose, GetRawTransaction, GetRawTransactionVerbose,
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError, GetTxOut,
-        GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo,
+        GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
@@ -316,7 +316,7 @@ pub use crate::{
     v23::{
         AddMultisigAddress, Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript,
         DecodeScriptError, DeploymentInfo, GetBlockchainInfo, GetDeploymentInfo,
-        GetDeploymentInfoError, RestoreWallet, SaveMempool,
+        GetDeploymentInfoError, GetWalletInfo, GetWalletInfoScanning, RestoreWallet, SaveMempool,
     },
     v24::{
         DecodePsbt, DecodePsbtError, GetMempoolAncestors, GetMempoolAncestorsVerbose,

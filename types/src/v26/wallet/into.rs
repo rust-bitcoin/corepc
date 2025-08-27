@@ -5,8 +5,8 @@ use bitcoin::{BlockHash, Psbt, SignedAmount, Transaction, Txid};
 
 use super::{
     CreateWallet, GetBalances, GetBalancesError, GetTransaction, GetTransactionError,
-    LastProcessedBlock, LastProcessedBlockError, LoadWallet, UnloadWallet, WalletProcessPsbt,
-    WalletProcessPsbtError,
+    GetWalletInfo, GetWalletInfoError, GetWalletInfoScanning, LastProcessedBlock,
+    LastProcessedBlockError, LoadWallet, UnloadWallet, WalletProcessPsbt, WalletProcessPsbtError,
 };
 use crate::model;
 
@@ -105,6 +105,66 @@ impl GetTransaction {
             decoded: self.decoded,
             last_processed_block,
             tx,
+        })
+    }
+}
+
+impl GetWalletInfo {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetWalletInfo, GetWalletInfoError> {
+        use GetWalletInfoError as E;
+
+        let wallet_version = crate::to_u32(self.wallet_version, "wallet_version")?;
+        let balance = bitcoin::Amount::from_btc(self.balance).map_err(E::Balance)?;
+        let unconfirmed_balance =
+            bitcoin::Amount::from_btc(self.unconfirmed_balance).map_err(E::UnconfirmedBalance)?;
+        let immature_balance =
+            bitcoin::Amount::from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
+        let tx_count = crate::to_u32(self.tx_count, "tx_count")?;
+        let keypool_oldest =
+            self.keypool_oldest.map(|v| crate::to_u32(v, "keypool_oldest")).transpose()?;
+        let keypool_size = crate::to_u32(self.keypool_size, "keypool_size")?;
+        let keypool_size_hd_internal = self
+            .keypool_size_hd_internal
+            .map(|v| crate::to_u32(v, "keypool_size_hd_internal"))
+            .transpose()?;
+        let pay_tx_fee = crate::btc_per_kb(self.pay_tx_fee).map_err(E::PayTxFee)?;
+        let hd_seed_id = self.hd_seed_id.map(|s| s.parse()).transpose().map_err(E::HdSeedId)?;
+        let last_processed_block = self
+            .last_processed_block
+            .map(|l| l.into_model())
+            .transpose()
+            .map_err(E::LastProcessedBlock)?;
+
+        let scanning = match self.scanning {
+            GetWalletInfoScanning::Details { duration, progress } =>
+                Some(model::GetWalletInfoScanning::Details { duration, progress }),
+            GetWalletInfoScanning::NotScanning(b) =>
+                Some(model::GetWalletInfoScanning::NotScanning(b)),
+        };
+
+        Ok(model::GetWalletInfo {
+            wallet_name: self.wallet_name,
+            wallet_version,
+            format: Some(self.format),
+            balance,
+            unconfirmed_balance,
+            immature_balance,
+            tx_count,
+            keypool_oldest: keypool_oldest.unwrap_or(0),
+            keypool_size,
+            keypool_size_hd_internal: keypool_size_hd_internal.unwrap_or(0),
+            unlocked_until: self.unlocked_until,
+            pay_tx_fee,
+            hd_seed_id,
+            private_keys_enabled: self.private_keys_enabled,
+            avoid_reuse: Some(self.avoid_reuse),
+            scanning,
+            descriptors: Some(self.descriptors),
+            external_signer: Some(self.external_signer),
+            blank: Some(self.blank),
+            birthtime: self.birthtime,
+            last_processed_block,
         })
     }
 }

@@ -179,7 +179,7 @@
 //! | getreceivedbylabel                 | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importdescriptors                  | version         |                                        |
 //! | importmulti                        | version         |                                        |
@@ -258,7 +258,10 @@ pub use self::{
         PsbtInput, PsbtOutput,
     },
     util::CreateMultisig,
-    wallet::{AddMultisigAddress, GetTransaction, GetTransactionError, RestoreWallet},
+    wallet::{
+        AddMultisigAddress, GetTransaction, GetTransactionError, GetWalletInfo,
+        GetWalletInfoScanning, RestoreWallet,
+    },
 };
 #[doc(inline)]
 pub use crate::{
@@ -278,7 +281,7 @@ pub use crate::{
         GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress, GetRawChangeAddress,
         GetRawMempool, GetRawMempoolVerbose, GetRawTransaction, GetRawTransactionVerbose,
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError, GetTxOut,
-        GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo,
+        GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,

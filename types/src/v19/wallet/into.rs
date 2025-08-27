@@ -6,7 +6,7 @@ use bitcoin::{Amount, BlockHash, SignedAmount, Transaction, Txid};
 
 use super::{
     GetBalances, GetBalancesError, GetBalancesMine, GetBalancesWatchOnly, GetTransaction,
-    GetTransactionError,
+    GetTransactionError, GetWalletInfo, GetWalletInfoError, GetWalletInfoScanning,
 };
 use crate::model;
 
@@ -100,6 +100,62 @@ impl GetTransaction {
             decoded: self.decoded,
             last_processed_block: None, // v26 and later only.
             tx,
+        })
+    }
+}
+
+impl GetWalletInfo {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetWalletInfo, GetWalletInfoError> {
+        use GetWalletInfoError as E;
+
+        let wallet_version = crate::to_u32(self.wallet_version, "wallet_version")?;
+        let balance = Amount::from_btc(self.balance).map_err(E::Balance)?;
+        let unconfirmed_balance =
+            Amount::from_btc(self.unconfirmed_balance).map_err(E::UnconfirmedBalance)?;
+        let immature_balance =
+            Amount::from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
+        let tx_count = crate::to_u32(self.tx_count, "tx_count")?;
+        let keypool_oldest = crate::to_u32(self.keypool_oldest, "keypoo_oldest")?;
+        let keypool_size = crate::to_u32(self.keypool_size, "keypoo_size")?;
+        let keypool_size_hd_internal =
+            crate::to_u32(self.keypool_size_hd_internal, "keypoo_size_hd_internal")?;
+        let pay_tx_fee = crate::btc_per_kb(self.pay_tx_fee).map_err(E::PayTxFee)?;
+        let hd_seed_id = self
+            .hd_seed_id
+            .map(|s| s.parse::<bitcoin::hashes::hash160::Hash>())
+            .transpose()
+            .map_err(E::HdSeedId)?;
+
+        let scanning = match self.scanning {
+            GetWalletInfoScanning::Details { duration, progress } =>
+                Some(model::GetWalletInfoScanning::Details { duration, progress }),
+            GetWalletInfoScanning::NotScanning(b) =>
+                Some(model::GetWalletInfoScanning::NotScanning(b)),
+        };
+
+        Ok(model::GetWalletInfo {
+            wallet_name: self.wallet_name,
+            wallet_version,
+            format: None,
+            balance,
+            unconfirmed_balance,
+            immature_balance,
+            tx_count,
+            keypool_oldest,
+            keypool_size,
+            keypool_size_hd_internal,
+            unlocked_until: self.unlocked_until,
+            pay_tx_fee,
+            hd_seed_id,
+            private_keys_enabled: self.private_keys_enabled,
+            avoid_reuse: Some(self.avoid_reuse),
+            scanning,
+            descriptors: None,
+            external_signer: None,
+            blank: None,
+            birthtime: None,
+            last_processed_block: None,
         })
     }
 }
