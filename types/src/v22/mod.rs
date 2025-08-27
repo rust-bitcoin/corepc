@@ -188,7 +188,7 @@
 //! | getreceivedbylabel                 | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importdescriptors                  | version         |                                        |
 //! | importmulti                        | version         |                                        |
@@ -281,18 +281,17 @@ pub use crate::{
         GetRawMempool, GetRawMempoolVerbose, GetRawTransaction, GetRawTransactionVerbose,
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError,
         GetTransactionError, GetTxOut, GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError,
-        GetUnconfirmedBalance, GetWalletInfo, GetWalletInfoError, ListAddressGroupings,
-        ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
-        ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock,
-        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
-        ListTransactions, ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError,
-        ListWallets, LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError,
-        RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType,
-        SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
-        SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, SoftforkReject,
-        TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
-        VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo,
+        GetUnconfirmedBalance, GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
+        ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
+        ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
+        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
+        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
+        LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
+        RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
+        SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+        SignRawTransactionError, SoftforkReject, TransactionCategory, UploadTarget,
+        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -315,9 +314,10 @@ pub use crate::{
     v21::{
         AddPeerAddress, Bip9SoftforkInfo, GenerateBlock, GetBlockchainInfo, GetIndexInfo,
         GetIndexInfoName, GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
-        GetMempoolDescendantsVerbose, GetMempoolEntry, GetNetworkInfo, ImportDescriptors,
-        ImportDescriptorsResult, MempoolEntry, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
-        SendMany, SendManyVerbose, Softfork, SoftforkType, UnloadWallet, UpgradeWallet,
+        GetMempoolDescendantsVerbose, GetMempoolEntry, GetNetworkInfo, GetWalletInfo,
+        GetWalletInfoScanning, ImportDescriptors, ImportDescriptorsResult, MempoolEntry,
+        PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany, SendManyVerbose, Softfork,
+        SoftforkType, UnloadWallet, UpgradeWallet,
     },
     ScriptPubkey,
 };

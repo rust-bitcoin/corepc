@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 
 pub use self::error::{GetAddressInfoError, ListReceivedByLabelError};
 pub use super::{
-    GetAddressInfoEmbeddedError, GetAddressInfoLabel, ListReceivedByAddressError,
-    ListUnspentItemError, ScriptType,
+    GetAddressInfoEmbeddedError, GetAddressInfoLabel, GetWalletInfoError,
+    ListReceivedByAddressError, ListUnspentItemError, ScriptType,
 };
 
 /// Result of the JSON-RPC method `getaddressinfo`.
@@ -151,6 +151,51 @@ pub struct GetAddressInfoEmbedded {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct GetReceivedByLabel(pub f64);
+
+/// Result of the JSON-RPC method `getwalletinfo`.
+///
+/// > getwalletinfo
+/// > Returns an object containing various wallet state info.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct GetWalletInfo {
+    /// The wallet name.
+    #[serde(rename = "walletname")]
+    pub wallet_name: String,
+    /// The wallet version.
+    #[serde(rename = "walletversion")]
+    pub wallet_version: i64,
+    /// The total confirmed balance of the wallet in BTC.
+    pub balance: f64,
+    /// The total unconfirmed balance of the wallet in BTC.
+    pub unconfirmed_balance: f64,
+    /// The total immature balance of the wallet in BTC.
+    pub immature_balance: f64,
+    /// The total number of transactions in the wallet
+    #[serde(rename = "txcount")]
+    pub tx_count: i64,
+    /// The timestamp (seconds since Unix epoch) of the oldest pre-generated key in the key pool.
+    #[serde(rename = "keypoololdest")]
+    pub keypool_oldest: i64,
+    /// How many new keys are pre-generated (only counts external keys).
+    #[serde(rename = "keypoolsize")]
+    pub keypool_size: i64,
+    /// How many new keys are pre-generated for internal use (used for change outputs, only appears
+    /// if the wallet is using this feature, otherwise external keys are used).
+    #[serde(rename = "keypoolsize_hd_internal")]
+    pub keypool_size_hd_internal: i64,
+    /// The timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked
+    /// for transfers, or 0 if the wallet is locked.
+    pub unlocked_until: Option<u32>,
+    /// The transaction fee configuration, set in BTC/kB.
+    #[serde(rename = "paytxfee")]
+    pub pay_tx_fee: f64,
+    /// The Hash160 of the HD seed (only present when HD is enabled).
+    #[serde(rename = "hdseedid")]
+    pub hd_seed_id: Option<String>,
+    /// If privatekeys are disabled for this wallet (enforced watch-only wallet).
+    pub private_keys_enabled: bool,
+}
 
 /// Result of JSON-RPC method `importmulti`.
 ///

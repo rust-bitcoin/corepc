@@ -455,6 +455,8 @@ pub struct GetWalletInfo {
     pub wallet_name: String,
     /// The wallet version.
     pub wallet_version: u32,
+    /// Database format. v21 and later only.
+    pub format: Option<String>,
     /// The total confirmed balance of the wallet in BTC.
     pub balance: Amount,
     /// The total unconfirmed balance of the wallet in BTC.
@@ -472,13 +474,40 @@ pub struct GetWalletInfo {
     pub keypool_size_hd_internal: u32,
     /// The timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked
     /// for transfers, or 0 if the wallet is locked.
-    pub unlocked_until: u32,
+    pub unlocked_until: Option<u32>,
     /// The transaction fee configuration.
     pub pay_tx_fee: Option<FeeRate>,
     /// The Hash160 of the HD seed (only present when HD is enabled).
     pub hd_seed_id: Option<hash160::Hash>,
     /// If privatekeys are disabled for this wallet (enforced watch-only wallet).
     pub private_keys_enabled: bool,
+    /// Whether this wallet tracks clean/dirty coins in terms of reuse. v19 and later only.
+    pub avoid_reuse: Option<bool>,
+    /// Current scanning details, or false if no scan is in progress. v19 and later only.
+    pub scanning: Option<GetWalletInfoScanning>,
+    /// Whether wallet uses descriptors. v21 and later only.
+    pub descriptors: Option<bool>,
+    /// Whether this wallet is configured to use an external signer such as a hardware wallet. v23 and later only.
+    pub external_signer: Option<bool>,
+    /// Whether this wallet intentionally does not contain any keys, scripts, or descriptors. v26 and later only.
+    pub blank: Option<bool>,
+    /// The start time for blocks scanning. v26 and later only.
+    pub birthtime: Option<u32>,
+    /// Hash and height of the block this information was generated on. v26 and later only.
+    pub last_processed_block: Option<LastProcessedBlock>,
+}
+
+/// Models the `scanning` field of `getwalletinfo` (v19+). When not scanning Core returns `false`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum GetWalletInfoScanning {
+    Details {
+        /// Elapsed seconds since scan start.
+        duration: u64,
+        /// Scanning progress percentage [0.0, 1.0].
+        progress: f64,
+    },
+    NotScanning(bool),
 }
 
 /// Models the result of JSON-RPC method `listaddressgroupings`.

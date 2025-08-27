@@ -10,6 +10,7 @@ mod into;
 use serde::{Deserialize, Serialize};
 
 pub use self::error::{PsbtBumpFeeError, SendError};
+pub use super::GetWalletInfoError;
 
 /// Result of JSON-RPC method `importdescriptors`.
 ///
@@ -169,4 +170,67 @@ pub struct UpgradeWallet {
     pub result: Option<String>,
     /// Error message (if there is one)
     pub error: Option<String>,
+}
+
+/// Result of the JSON-RPC method `getwalletinfo`.
+///
+/// > getwalletinfo
+/// > Returns an object containing various wallet state info.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct GetWalletInfo {
+    /// The wallet name.
+    #[serde(rename = "walletname")]
+    pub wallet_name: String,
+    /// The wallet version.
+    #[serde(rename = "walletversion")]
+    pub wallet_version: i64,
+    /// The database format (bdb or sqlite).
+    pub format: String,
+    /// The total confirmed balance of the wallet in BTC. (DEPRECATED)
+    pub balance: f64,
+    /// The total unconfirmed balance of the wallet in BTC. (DEPRECATED)
+    pub unconfirmed_balance: f64,
+    /// The total immature balance of the wallet in BTC. (DEPRECATED)
+    pub immature_balance: f64,
+    /// The total number of transactions in the wallet
+    #[serde(rename = "txcount")]
+    pub tx_count: i64,
+    /// The UNIX epoch time of the oldest pre-generated key in the key pool. Legacy wallets only.
+    #[serde(rename = "keypoololdest")]
+    pub keypool_oldest: i64,
+    /// How many new keys are pre-generated (only counts external keys).
+    #[serde(rename = "keypoolsize")]
+    pub keypool_size: i64,
+    /// How many new keys are pre-generated for internal use (used for change outputs, only appears
+    /// if the wallet is using this feature, otherwise external keys are used).
+    #[serde(rename = "keypoolsize_hd_internal")]
+    pub keypool_size_hd_internal: i64,
+    /// The UNIX epoch time until which the wallet is unlocked for transfers, or 0 if the wallet is locked.
+    /// Only present for passphrase-encrypted wallets.
+    pub unlocked_until: Option<u32>,
+    /// The transaction fee configuration, set in BTC/kvB.
+    #[serde(rename = "paytxfee")]
+    pub pay_tx_fee: f64,
+    /// The Hash160 of the HD seed (only present when HD is enabled).
+    #[serde(rename = "hdseedid")]
+    pub hd_seed_id: Option<String>,
+    /// If privatekeys are disabled for this wallet (enforced watch-only wallet).
+    pub private_keys_enabled: bool,
+    /// Whether this wallet tracks clean/dirty coins in terms of reuse.
+    pub avoid_reuse: bool,
+    /// Current scanning details, or false if no scan is in progress.
+    pub scanning: GetWalletInfoScanning,
+    /// Whether this wallet uses descriptors for scriptPubKey management.
+    pub descriptors: bool,
+}
+
+/// The `scanning` field of the `getwalletinfo` RPC in v21.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum GetWalletInfoScanning {
+    /// Scanning details.
+    Details { duration: u64, progress: f64 },
+    /// Not scanning (false).
+    NotScanning(bool),
 }

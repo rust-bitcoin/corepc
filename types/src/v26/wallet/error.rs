@@ -132,6 +132,63 @@ impl From<NumericError> for GetTransactionError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
 
+/// Error when converting a `GetWalletInfo` type into the model type.
+#[derive(Debug)]
+pub enum GetWalletInfoError {
+    /// Conversion of numeric type to expected type failed.
+    Numeric(NumericError),
+    /// Conversion of the `balance` field failed.
+    Balance(ParseAmountError),
+    /// Conversion of the `unconfirmed_balance` field failed.
+    UnconfirmedBalance(ParseAmountError),
+    /// Conversion of the `immature_balance` field failed.
+    ImmatureBalance(ParseAmountError),
+    /// Conversion of the `pay_tx_fee` field failed.
+    PayTxFee(ParseAmountError),
+    /// Conversion of the `hd_seed_id` field failed.
+    HdSeedId(hex::HexToArrayError),
+    /// Conversion of the `last_processed_block` field failed.
+    LastProcessedBlock(LastProcessedBlockError),
+}
+
+impl fmt::Display for GetWalletInfoError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use GetWalletInfoError::*;
+        match *self {
+            Numeric(ref e) => write_err!(f, "numeric"; e),
+            Balance(ref e) => write_err!(f, "conversion of the `balance` field failed"; e),
+            UnconfirmedBalance(ref e) =>
+                write_err!(f, "conversion of the `unconfirmed_balance` field failed"; e),
+            ImmatureBalance(ref e) =>
+                write_err!(f, "conversion of the `immature_balance` field failed"; e),
+            PayTxFee(ref e) => write_err!(f, "conversion of the `pay_tx_fee` field failed"; e),
+            HdSeedId(ref e) => write_err!(f, "conversion of the `hd_seed_id` field failed"; e),
+            LastProcessedBlock(ref e) =>
+                write_err!(f, "conversion of the `last_processed_block` field failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for GetWalletInfoError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        use GetWalletInfoError::*;
+        match *self {
+            Numeric(ref e) => Some(e),
+            Balance(ref e) => Some(e),
+            UnconfirmedBalance(ref e) => Some(e),
+            ImmatureBalance(ref e) => Some(e),
+            PayTxFee(ref e) => Some(e),
+            HdSeedId(ref e) => Some(e),
+            LastProcessedBlock(ref e) => Some(e),
+        }
+    }
+}
+
+impl From<NumericError> for GetWalletInfoError {
+    fn from(e: NumericError) -> Self { Self::Numeric(e) }
+}
+
 /// Error when converting a `LastProcessedBlock` type into the model type.
 #[derive(Debug)]
 pub enum LastProcessedBlockError {

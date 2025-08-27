@@ -437,6 +437,7 @@ impl GetWalletInfo {
         Ok(model::GetWalletInfo {
             wallet_name: self.wallet_name,
             wallet_version,
+            format: None,
             balance,
             unconfirmed_balance,
             immature_balance,
@@ -448,6 +449,13 @@ impl GetWalletInfo {
             pay_tx_fee,
             hd_seed_id,
             private_keys_enabled: self.private_keys_enabled,
+            avoid_reuse: None,
+            scanning: None,
+            descriptors: None,
+            external_signer: None,
+            blank: None,
+            birthtime: None,
+            last_processed_block: None,
         })
     }
 }

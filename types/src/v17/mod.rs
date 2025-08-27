@@ -171,7 +171,7 @@
 //! | getreceivedbyaddress               | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |

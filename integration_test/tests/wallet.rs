@@ -391,6 +391,31 @@ fn wallet__get_unconfirmed_balance__modelled() {
 }
 
 #[test]
+fn wallet__get_wallet_info__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.mine_a_block();
+
+    let json: GetWalletInfo = node.client.get_wallet_info().expect("getwalletinfo");
+    let model: Result<mtype::GetWalletInfo, GetWalletInfoError> = json.into_model();
+    let wallet_info = model.unwrap();
+
+    assert!(!wallet_info.wallet_name.is_empty());
+
+    #[cfg(not(feature = "v18_and_below"))]
+    {
+        assert!(wallet_info.avoid_reuse.is_some());
+        assert!(wallet_info.scanning.is_some());
+    }
+
+    #[cfg(not(feature = "v25_and_below"))]
+    {
+        let last_processed = wallet_info.last_processed_block.as_ref().expect("last_processed_block");
+        let best_hash = node.client.best_block_hash().expect("best_block_hash");
+        assert_eq!(last_processed.hash, best_hash);
+    }
+}
+
+#[test]
 fn wallet__import_address() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
