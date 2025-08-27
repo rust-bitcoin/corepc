@@ -11,15 +11,17 @@ use serde::{Deserialize, Serialize};
 /// > Returns a list of external signers from -signer.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct EnumerateSigners(pub Vec<Signers>);
+pub struct EnumerateSigners {
+    /// List of external signers.
+    pub signers: Vec<Signers>,
+}
 
 /// An item from the list returned by the JSON-RPC method `enumeratesigners`
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Signers {
     /// Master key fingerprint.
-    pub hex: String,
+    pub fingerprint: String,
     /// Device name.
-    #[serde(rename = "str")]
-    pub device_name: String,
+    pub name: String,
 }
