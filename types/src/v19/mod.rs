@@ -190,7 +190,7 @@
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
 //! | listsinceblock                     | version + model |                                        |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
 //! | listwallets                        | version + model |                                        |

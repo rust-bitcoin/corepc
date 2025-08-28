@@ -210,7 +210,7 @@
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
 //! | listsinceblock                     | version + model |                                        |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
 //! | listwallets                        | version + model |                                        |
@@ -270,7 +270,7 @@ pub use self::{
     wallet::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
         GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock, ListSinceBlockError,
-        TransactionItem, TransactionItemError,
+        TransactionItem, TransactionItemError, ListTransactions,
     },
 };
 #[doc(inline)]
@@ -293,7 +293,7 @@ pub use crate::{
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError, GetTxOut,
         GetTxOutError, GetUnconfirmedBalance, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
+        ListLockUnspentItemError, ListReceivedByAddressError,
         ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,

@@ -6,7 +6,7 @@ use bitcoin::{Address, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
 use super::{
     AddMultisigAddress, AddMultisigAddressError, GetTransaction, GetTransactionError,
     GetWalletInfo, GetWalletInfoError, GetWalletInfoScanning, ListSinceBlock, ListSinceBlockError,
-    TransactionItem, TransactionItemError,
+    ListTransactions, TransactionItem, TransactionItemError,
 };
 use crate::model;
 
@@ -226,5 +226,14 @@ impl TransactionItem {
             abandoned: self.abandoned,
             label: self.label,
         })
+    }
+}
+
+impl ListTransactions {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::ListTransactions, TransactionItemError> {
+        let transactions =
+            self.0.into_iter().map(|tx| tx.into_model()).collect::<Result<Vec<_>, _>>()?;
+        Ok(model::ListTransactions(transactions))
     }
 }

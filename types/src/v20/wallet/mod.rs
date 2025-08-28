@@ -342,3 +342,16 @@ pub struct TransactionItem {
     /// If a comment to is associated with the transaction.
     pub to: Option<String>,
 }
+
+/// Result of the JSON-RPC method `listtransactions`.
+///
+/// > listtransactions (label count skip include_watchonly)
+/// >
+/// > If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.
+/// >
+/// > Returns up to 'count' most recent transactions skipping the first 'from' transactions.
+/// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
+/// > bitcoind with -deprecatedrpc=accounts
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ListTransactions(pub Vec<TransactionItem>);

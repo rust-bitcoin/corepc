@@ -208,7 +208,7 @@
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
 //! | listsinceblock                     | version + model |                                        |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
 //! | listwallets                        | version + model |                                        |
@@ -295,7 +295,7 @@ pub use crate::{
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError, GetTxOut,
         GetTxOutError, GetUnconfirmedBalance, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
+        ListLockUnspentItemError, ListReceivedByAddressError,
         ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
@@ -339,7 +339,7 @@ pub use crate::{
         ListSinceBlock, ListSinceBlockError, TransactionItem,
         TransactionItemError, ListUnspent, ListUnspentItem, MempoolEntry, MigrateWallet,
         Proprietary, PsbtInput, PsbtOutput, SendAll, SendAllError, SimulateRawTransaction,
-        TaprootBip32Deriv, TaprootLeaf, TaprootScript, TaprootScriptPathSig,
+        TaprootBip32Deriv, TaprootLeaf, TaprootScript, TaprootScriptPathSig, ListTransactions,
     },
     v25::{
         GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors, MempoolAcceptance,

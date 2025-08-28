@@ -186,7 +186,7 @@
 //! | listreceivedbyaccount              | returns nothing |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listsinceblock                     | version + model |                                        |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwallets                        | version + model |                                        |
 //! | loadwallet                         | version + model |                                        |

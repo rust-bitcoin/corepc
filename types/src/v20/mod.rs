@@ -191,7 +191,7 @@
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
 //! | listsinceblock                     | version + model |                                        |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
 //! | listwallets                        | version + model |                                        |
@@ -241,7 +241,7 @@ pub use self::{
     wallet::{
         AddMultisigAddress, GetAddressInfo, GetAddressInfoEmbedded, GetTransaction,
         GetTransactionDetail, ListSinceBlock, ListSinceBlockError, TransactionItem,
-        TransactionItemError,
+        TransactionItemError, ListTransactions,
     },
 };
 #[doc(inline)]
@@ -266,7 +266,7 @@ pub use crate::{
         GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfoError, ListAddressGroupings,
         ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
         ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError,
-        ListTransactions, ListUnspentItemError,
+        ListUnspentItemError,
         ListWallets, LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError,
         RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType, SendMany,
         SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
