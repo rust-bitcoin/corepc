@@ -12,7 +12,7 @@ use super::{
     AddMultisigAddress, AddMultisigAddressError, GetAddressInfo, GetAddressInfoEmbedded,
     GetAddressInfoEmbeddedError, GetAddressInfoError, GetTransaction, GetTransactionDetail,
     GetTransactionDetailError, GetTransactionError, ListSinceBlock, ListSinceBlockError,
-    ListSinceBlockTransaction, ListSinceBlockTransactionError,
+    TransactionItem, TransactionItemError,
 };
 use crate::model;
 
@@ -276,12 +276,10 @@ impl ListSinceBlock {
     }
 }
 
-impl ListSinceBlockTransaction {
+impl TransactionItem {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::ListSinceBlockTransaction, ListSinceBlockTransactionError> {
-        use ListSinceBlockTransactionError as E;
+    pub fn into_model(self) -> Result<model::TransactionItem, TransactionItemError> {
+        use TransactionItemError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let category = self.category.into_model();
@@ -303,7 +301,7 @@ impl ListSinceBlockTransaction {
             .collect::<Result<Vec<_>, _>>()?;
         let bip125_replaceable = self.bip125_replaceable.into_model();
 
-        Ok(model::ListSinceBlockTransaction {
+        Ok(model::TransactionItem {
             involves_watch_only: self.involves_watch_only,
             address: Some(address),
             category,

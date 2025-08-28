@@ -10,7 +10,7 @@ mod into;
 use bitcoin::Transaction;
 use serde::{Deserialize, Serialize};
 
-pub use self::error::{ListSinceBlockError, ListSinceBlockTransactionError};
+pub use self::error::{ListSinceBlockError, TransactionItemError};
 pub use super::{
     AddMultisigAddressError, Bip125Replaceable, GetAddressInfoEmbeddedError, GetAddressInfoError,
     GetTransactionDetailError, GetTransactionError, ScriptType, TransactionCategory,
@@ -263,12 +263,12 @@ pub struct GetTransactionDetail {
 #[serde(deny_unknown_fields)]
 pub struct ListSinceBlock {
     /// All the transactions.
-    pub transactions: Vec<ListSinceBlockTransaction>,
+    pub transactions: Vec<TransactionItem>,
     /// Only present if `include_removed=true`.
     ///
     /// Note: transactions that were re-added in the active chain will appear as-is in this array,
     /// and may thus have a positive confirmation count.
-    pub removed: Vec<ListSinceBlockTransaction>,
+    pub removed: Vec<TransactionItem>,
     /// The hash of the block (target_confirmations-1) from the best block on the main chain.
     ///
     /// This is typically used to feed back into listsinceblock the next time you call it. So you
@@ -281,7 +281,7 @@ pub struct ListSinceBlock {
 /// Transaction item returned as part of `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct ListSinceBlockTransaction {
+pub struct TransactionItem {
     /// Only returns true if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
     pub involves_watch_only: Option<bool>,

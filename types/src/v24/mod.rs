@@ -259,7 +259,7 @@ pub use self::{
     },
     wallet::{
         GetTransaction, GetTransactionDetail, GetTransactionError, ListSinceBlock,
-        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
+        ListSinceBlockError, TransactionItem, TransactionItemError,
         ListUnspent, ListUnspentItem, MigrateWallet, SendAll, SendAllError, SimulateRawTransaction,
     },
 };
@@ -285,7 +285,7 @@ pub use crate::{
         GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
+        ListUnspentItemError, ListWallets,
         LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
         SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,

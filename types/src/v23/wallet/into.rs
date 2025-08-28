@@ -6,7 +6,7 @@ use bitcoin::{Address, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
 use super::{
     AddMultisigAddress, AddMultisigAddressError, GetTransaction, GetTransactionError,
     GetWalletInfo, GetWalletInfoError, GetWalletInfoScanning, ListSinceBlock, ListSinceBlockError,
-    ListSinceBlockTransaction, ListSinceBlockTransactionError,
+    TransactionItem, TransactionItemError,
 };
 use crate::model;
 
@@ -165,11 +165,9 @@ impl ListSinceBlock {
         Ok(model::ListSinceBlock { transactions, removed, last_block })
     }
 }
-impl ListSinceBlockTransaction {
-    pub fn into_model(
-        self,
-    ) -> Result<model::ListSinceBlockTransaction, ListSinceBlockTransactionError> {
-        use ListSinceBlockTransactionError as E;
+impl TransactionItem {
+    pub fn into_model(self) -> Result<model::TransactionItem, TransactionItemError> {
+        use TransactionItemError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let category = self.category.into_model();
@@ -199,7 +197,7 @@ impl ListSinceBlockTransaction {
             self.replaces_txid.map(|s| s.parse::<Txid>().map_err(E::ReplacesTxid)).transpose()?;
         let bip125_replaceable = self.bip125_replaceable.into_model();
 
-        Ok(model::ListSinceBlockTransaction {
+        Ok(model::TransactionItem {
             involves_watch_only: self.involves_watch_only,
             address: Some(address),
             category,

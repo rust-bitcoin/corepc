@@ -284,7 +284,7 @@ pub use crate::{
         GetUnconfirmedBalance, GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
+        ListUnspentItemError, ListWallets,
         LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
         SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
@@ -308,8 +308,8 @@ pub use crate::{
     },
     v20::{
         AddMultisigAddress, CreateMultisig, GenerateToDescriptor, GetTransaction,
-        GetTransactionDetail, ListSinceBlock, ListSinceBlockError, ListSinceBlockTransaction,
-        ListSinceBlockTransactionError,
+        GetTransactionDetail, ListSinceBlock, ListSinceBlockError, TransactionItem,
+        TransactionItemError,
     },
     v21::{
         AddPeerAddress, Bip9SoftforkInfo, GenerateBlock, GetBlockchainInfo, GetIndexInfo,

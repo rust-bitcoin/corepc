@@ -12,7 +12,7 @@ use bitcoin::{
 use super::{
     GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoEmbeddedError, GetAddressInfoError,
     GetHdKeys, GetHdKeysError, GetTransaction, GetTransactionError, ListSinceBlock,
-    ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
+    ListSinceBlockError, TransactionItem, TransactionItemError,
 };
 use crate::model;
 
@@ -273,11 +273,9 @@ impl ListSinceBlock {
     }
 }
 
-impl ListSinceBlockTransaction {
-    pub fn into_model(
-        self,
-    ) -> Result<model::ListSinceBlockTransaction, ListSinceBlockTransactionError> {
-        use ListSinceBlockTransactionError as E;
+impl TransactionItem {
+    pub fn into_model(self) -> Result<model::TransactionItem, TransactionItemError> {
+        use TransactionItemError as E;
 
         let address =
             self.address.map(|s| s.parse::<Address<_>>().map_err(E::Address)).transpose()?;
@@ -312,7 +310,7 @@ impl ListSinceBlockTransaction {
             .map(|v| v.into_iter().filter_map(|s| s.parse::<Txid>().ok()).collect::<Vec<_>>());
         let bip125_replaceable = self.bip125_replaceable.into_model();
 
-        Ok(model::ListSinceBlockTransaction {
+        Ok(model::TransactionItem {
             involves_watch_only: self.involves_watch_only,
             address,
             category,

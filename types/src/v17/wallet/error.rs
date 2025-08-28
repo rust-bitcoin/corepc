@@ -496,9 +496,9 @@ impl std::error::Error for ListReceivedByAddressError {
 #[derive(Debug)]
 pub enum ListSinceBlockError {
     /// Conversion of item in `transactions` list failed.
-    Transactions(ListSinceBlockTransactionError),
+    Transactions(TransactionItemError),
     /// Conversion of item in `removed` list failed.
-    Removed(ListSinceBlockTransactionError),
+    Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
     LastBlock(hex::HexToArrayError),
 }
@@ -529,9 +529,9 @@ impl std::error::Error for ListSinceBlockError {
     }
 }
 
-/// Error when converting a `ListSinceBlockTransaction` type into the model type.
+/// Error when converting a `TransactionItem` type into the model type.
 #[derive(Debug)]
-pub enum ListSinceBlockTransactionError {
+pub enum TransactionItemError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `address` field failed.
@@ -546,9 +546,9 @@ pub enum ListSinceBlockTransactionError {
     Txid(hex::HexToArrayError),
 }
 
-impl fmt::Display for ListSinceBlockTransactionError {
+impl fmt::Display for TransactionItemError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use ListSinceBlockTransactionError as E;
+        use TransactionItemError as E;
 
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
@@ -562,9 +562,9 @@ impl fmt::Display for ListSinceBlockTransactionError {
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for ListSinceBlockTransactionError {
+impl std::error::Error for TransactionItemError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        use ListSinceBlockTransactionError as E;
+        use TransactionItemError as E;
 
         match *self {
             E::Numeric(ref e) => Some(e),
@@ -577,59 +577,7 @@ impl std::error::Error for ListSinceBlockTransactionError {
     }
 }
 
-impl From<NumericError> for ListSinceBlockTransactionError {
-    fn from(e: NumericError) -> Self { Self::Numeric(e) }
-}
-
-/// Error when converting a `ListTransactionsItem` type into the model type.
-#[derive(Debug)]
-pub enum ListTransactionsItemError {
-    /// Conversion of numeric type to expected type failed.
-    Numeric(NumericError),
-    /// Conversion of the `address` field failed.
-    Address(address::ParseError),
-    /// Conversion of the `amount` field failed.
-    Amount(ParseAmountError),
-    /// Conversion of the `fee` field failed.
-    Fee(ParseAmountError),
-    /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
-    /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
-}
-
-impl fmt::Display for ListTransactionsItemError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use ListTransactionsItemError as E;
-
-        match *self {
-            E::Numeric(ref e) => write_err!(f, "numeric"; e),
-            E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
-            E::Amount(ref e) => write_err!(f, "conversion of the `amount` field failed"; e),
-            E::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
-            E::BlockHash(ref e) => write_err!(f, "conversion of the `block_hash` field failed"; e),
-            E::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
-        }
-    }
-}
-
-#[cfg(feature = "std")]
-impl std::error::Error for ListTransactionsItemError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        use ListTransactionsItemError as E;
-
-        match *self {
-            E::Numeric(ref e) => Some(e),
-            E::Address(ref e) => Some(e),
-            E::Amount(ref e) => Some(e),
-            E::Fee(ref e) => Some(e),
-            E::BlockHash(ref e) => Some(e),
-            E::Txid(ref e) => Some(e),
-        }
-    }
-}
-
-impl From<NumericError> for ListTransactionsItemError {
+impl From<NumericError> for TransactionItemError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
 

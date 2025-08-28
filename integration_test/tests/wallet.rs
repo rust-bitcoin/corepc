@@ -606,7 +606,7 @@ fn wallet__list_since_block__modelled() {
     let model: Result<mtype::ListSinceBlock, ListSinceBlockError> = json.into_model();
     let model = model.unwrap();
 
-    let first_tx: mtype::ListSinceBlockTransaction = model.transactions[0].clone();
+    let first_tx: mtype::TransactionItem = model.transactions[0].clone();
     assert_eq!(first_tx.txid.unwrap().to_string().len(), 64);
 }
 

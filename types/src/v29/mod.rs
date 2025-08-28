@@ -290,7 +290,7 @@ pub use crate::{
         GetTxOutError, GetUnconfirmedBalance, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
+        ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
         SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
@@ -349,7 +349,7 @@ pub use crate::{
     v28::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
         GetNetworkInfo, GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock,
-        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError, Logging,
+        ListSinceBlockError, TransactionItem, TransactionItemError, Logging,
         SubmitPackage, SubmitPackageError, SubmitPackageTxResult, SubmitPackageTxResultError,
         SubmitPackageTxResultFees, SubmitPackageTxResultFeesError,
     },

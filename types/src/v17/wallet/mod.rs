@@ -21,8 +21,8 @@ pub use self::error::*;
 //
 // The following structs are very similar but have slightly different fields and docs.
 // - GetTransaction
-// - ListSinceBlockTransaction
-// - ListTransactionsItem
+// - TransactionItem
+// - TransactionItem
 
 /// Returned as part of `getaddressesbylabel` and `getaddressinfo`.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
@@ -695,12 +695,12 @@ pub struct ListReceivedByAddressItem {
 #[serde(deny_unknown_fields)]
 pub struct ListSinceBlock {
     /// All the transactions.
-    pub transactions: Vec<ListSinceBlockTransaction>,
+    pub transactions: Vec<TransactionItem>,
     /// Only present if `include_removed=true`.
     ///
     /// Note: transactions that were re-added in the active chain will appear as-is in this array,
     /// and may thus have a positive confirmation count.
-    pub removed: Vec<ListSinceBlockTransaction>,
+    pub removed: Vec<TransactionItem>,
     /// The hash of the block (target_confirmations-1) from the best block on the main chain.
     ///
     /// This is typically used to feed back into listsinceblock the next time you call it. So you
@@ -710,11 +710,10 @@ pub struct ListSinceBlock {
     pub last_block: String,
 }
 
-/// Transaction item returned as part of `listsinceblock`.
-// FIXME: These docs from Core seem to buggy, there is only partial mention of 'move' category?
+/// Transaction item returned as part of `listsinceblock` and `listtransactions`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct ListSinceBlockTransaction {
+pub struct TransactionItem {
     /// DEPRECATED. The account name associated with the transaction. Will be "" for the default account.
     pub account: Option<String>,
     /// The bitcoin address of the transaction.
@@ -796,61 +795,7 @@ pub struct ListSinceBlockTransaction {
 /// > bitcoind with -deprecatedrpc=accounts
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct ListTransactions(pub Vec<ListTransactionsItem>);
-
-/// Transaction item returned as part of `listtransactions`.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct ListTransactionsItem {
-    /// The bitcoin address of the transaction.
-    pub address: String,
-    /// The transaction category.
-    pub category: TransactionCategory, // FIXME: It appears ok to reuse this?
-    /// The amount in BTC.
-    ///
-    /// This is negative for the 'send' category, and is positive for the 'receive' category.
-    pub amount: f64,
-    /// A comment for the address/transaction, if any.
-    pub label: Option<String>,
-    /// The vout value.
-    pub vout: i64,
-    /// The amount of the fee in BTC.
-    ///
-    /// This is negative and only available for the 'send' category of transactions.
-    pub fee: f64,
-    /// The number of confirmations for the transaction.
-    ///
-    /// Negative confirmations indicate the transaction conflicts with the block chain.
-    pub confirmations: i64,
-    /// Whether we consider the outputs of this unconfirmed transaction safe to spend.
-    pub trusted: bool,
-    /// The block hash containing the transaction.
-    #[serde(rename = "blockhash")]
-    pub block_hash: String,
-    /// The index of the transaction in the block that includes it.
-    #[serde(rename = "blockindex")]
-    pub block_index: i64,
-    /// The block time in seconds since epoch (1 Jan 1970 GMT).
-    #[serde(rename = "blocktime")]
-    pub block_time: u32,
-    /// The transaction id.
-    pub txid: String,
-    /// The transaction time in seconds since epoch (Jan 1 1970 GMT).
-    pub time: u32,
-    /// The time received in seconds since epoch (Jan 1 1970 GMT).
-    #[serde(rename = "timereceived")]
-    pub time_received: u32,
-    /// If a comment is associated with the transaction.
-    pub comment: Option<String>,
-    /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
-    /// may be unknown for unconfirmed transactions not in the mempool
-    #[serde(rename = "bip125-replaceable")]
-    pub bip125_replaceable: Bip125Replaceable,
-    /// If the transaction has been abandoned (inputs are respendable).
-    ///
-    /// Only available for the 'send' category of transactions.
-    pub abandoned: Option<bool>,
-}
+pub struct ListTransactions(pub Vec<TransactionItem>);
 
 /// Result of the JSON-RPC method `listunspent`.
 ///

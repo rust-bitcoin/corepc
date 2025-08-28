@@ -270,7 +270,7 @@ pub use self::{
     wallet::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
         GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError,
+        TransactionItem, TransactionItemError,
     },
 };
 #[doc(inline)]
@@ -294,7 +294,7 @@ pub use crate::{
         GetTxOutError, GetUnconfirmedBalance, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
         ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
+        ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
         SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,

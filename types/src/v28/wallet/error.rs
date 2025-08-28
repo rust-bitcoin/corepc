@@ -50,9 +50,9 @@ impl From<NumericError> for GetHdKeysError {
 #[derive(Debug)]
 pub enum ListSinceBlockError {
     /// Conversion of the `transactions` field failed.
-    Transactions(ListSinceBlockTransactionError),
+    Transactions(TransactionItemError),
     /// Conversion of the `removed` field failed.
-    Removed(ListSinceBlockTransactionError),
+    Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
     LastBlock(hex::HexToArrayError),
 }
@@ -81,9 +81,9 @@ impl std::error::Error for ListSinceBlockError {
     }
 }
 
-/// Error when converting a `ListSinceBlockTransaction` type into the model type.
+/// Error when converting a `TransactionItem` type into the model type.
 #[derive(Debug)]
-pub enum ListSinceBlockTransactionError {
+pub enum TransactionItemError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `address` field failed.
@@ -106,9 +106,9 @@ pub enum ListSinceBlockTransactionError {
     ReplacesTxid(hex::HexToArrayError),
 }
 
-impl fmt::Display for ListSinceBlockTransactionError {
+impl fmt::Display for TransactionItemError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use ListSinceBlockTransactionError as E;
+        use TransactionItemError as E;
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
@@ -128,9 +128,9 @@ impl fmt::Display for ListSinceBlockTransactionError {
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for ListSinceBlockTransactionError {
+impl std::error::Error for TransactionItemError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        use ListSinceBlockTransactionError as E;
+        use TransactionItemError as E;
         match *self {
             E::Numeric(ref e) => Some(e),
             E::Address(ref e) => Some(e),
@@ -146,6 +146,6 @@ impl std::error::Error for ListSinceBlockTransactionError {
     }
 }
 
-impl From<NumericError> for ListSinceBlockTransactionError {
+impl From<NumericError> for TransactionItemError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }

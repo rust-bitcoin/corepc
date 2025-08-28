@@ -14,9 +14,9 @@ use crate::NumericError;
 #[derive(Debug)]
 pub enum ListSinceBlockError {
     /// Conversion of item in `transactions` list failed.
-    Transactions(ListSinceBlockTransactionError),
+    Transactions(TransactionItemError),
     /// Conversion of item in `removed` list failed.
-    Removed(ListSinceBlockTransactionError),
+    Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
     LastBlock(hex::HexToArrayError),
 }
@@ -47,13 +47,13 @@ impl std::error::Error for ListSinceBlockError {
     }
 }
 
-/// Error when converting a `ListSinceBlockTransaction` type into the model type.
+/// Error when converting a `TransactionItem` type into the model type.
 ///
 /// Note: Additional fields introduced in v20 (e.g. `generated`, `trusted`, `block_height`,
 /// `wallet_conflicts`, `involvesWatchonly`) are currently not modelled and therefore are
 /// intentionally ignored during conversion; as such they have no dedicated error variants.
 #[derive(Debug)]
-pub enum ListSinceBlockTransactionError {
+pub enum TransactionItemError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `address` field failed.
@@ -70,9 +70,9 @@ pub enum ListSinceBlockTransactionError {
     WalletConflicts(hex::HexToArrayError),
 }
 
-impl fmt::Display for ListSinceBlockTransactionError {
+impl fmt::Display for TransactionItemError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use ListSinceBlockTransactionError as E;
+        use TransactionItemError as E;
 
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
@@ -88,9 +88,9 @@ impl fmt::Display for ListSinceBlockTransactionError {
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for ListSinceBlockTransactionError {
+impl std::error::Error for TransactionItemError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        use ListSinceBlockTransactionError as E;
+        use TransactionItemError as E;
 
         match *self {
             E::Numeric(ref e) => Some(e),
@@ -104,6 +104,6 @@ impl std::error::Error for ListSinceBlockTransactionError {
     }
 }
 
-impl From<NumericError> for ListSinceBlockTransactionError {
+impl From<NumericError> for TransactionItemError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
