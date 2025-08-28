@@ -549,7 +549,7 @@ pub struct GetWalletInfo {
     pub keypool_size_hd_internal: i64,
     /// The timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked
     /// for transfers, or 0 if the wallet is locked.
-    pub unlocked_until: u32,
+    pub unlocked_until: Option<u32>,
     /// The transaction fee configuration, set in BTC/kB.
     #[serde(rename = "paytxfee")]
     pub pay_tx_fee: f64,

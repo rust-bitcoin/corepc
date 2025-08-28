@@ -172,3 +172,6 @@ crate::impl_client_v17__wallet_lock!();
 crate::impl_client_v17__wallet_passphrase!();
 crate::impl_client_v17__wallet_passphrase_change!();
 crate::impl_client_v17__wallet_process_psbt!();
+
+// == Zmq ==
+crate::impl_client_v17__get_zmq_notifications!();

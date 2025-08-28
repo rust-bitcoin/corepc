@@ -171,7 +171,7 @@
 //! | getreceivedbyaddress               | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |
@@ -195,7 +195,7 @@
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model |                                        |
 //! | sendfrom                           | returns nothing |                                        |
-//! | sendmany                           | version + model | UNTESTED                               |
+//! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | setaccount                         | returns nothing |                                        |
 //! | sethdseed                          | returns nothing |                                        |
@@ -216,7 +216,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | getzmqnotifications                | version         | UNTESTED                               |
+//! | getzmqnotifications                | version         |                                        |
 //!
 //! </details>
 
