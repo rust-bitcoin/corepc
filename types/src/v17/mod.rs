@@ -185,7 +185,7 @@
 //! | listlockunspent                    | version + model |                                        |
 //! | listreceivedbyaccount              | returns nothing |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
 //! | listtransactions                   | version + model | UNTESTED                               |
 //! | listunspent                        | version + model |                                        |
 //! | listwallets                        | version + model |                                        |

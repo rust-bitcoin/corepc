@@ -11,7 +11,8 @@ use bitcoin::{
 use super::{
     AddMultisigAddress, AddMultisigAddressError, GetAddressInfo, GetAddressInfoEmbedded,
     GetAddressInfoEmbeddedError, GetAddressInfoError, GetTransaction, GetTransactionDetail,
-    GetTransactionDetailError, GetTransactionError,
+    GetTransactionDetailError, GetTransactionError, ListSinceBlock, ListSinceBlockError,
+    ListSinceBlockTransaction, ListSinceBlockTransactionError,
 };
 use crate::model;
 
@@ -200,7 +201,7 @@ impl GetTransaction {
 
         Ok(model::GetTransaction {
             amount,
-            fee,
+            fee, // Option in model
             confirmations: self.confirmations,
             generated: self.generated,
             trusted: self.trusted,
@@ -248,6 +249,88 @@ impl GetTransactionDetail {
             fee,
             abandoned: self.abandoned,
             parent_descriptors: None, // v24 and later only.
+        })
+    }
+}
+
+impl ListSinceBlock {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::ListSinceBlock, ListSinceBlockError> {
+        use ListSinceBlockError as E;
+
+        let transactions = self
+            .transactions
+            .into_iter()
+            .map(|tx| tx.into_model())
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(E::Transactions)?;
+        let removed = self
+            .removed
+            .into_iter()
+            .map(|tx| tx.into_model())
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(E::Removed)?;
+        let last_block = self.last_block.parse::<BlockHash>().map_err(E::LastBlock)?;
+
+        Ok(model::ListSinceBlock { transactions, removed, last_block })
+    }
+}
+
+impl ListSinceBlockTransaction {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(
+        self,
+    ) -> Result<model::ListSinceBlockTransaction, ListSinceBlockTransactionError> {
+        use ListSinceBlockTransactionError as E;
+
+        let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
+        let category = self.category.into_model();
+        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let vout = crate::to_u32(self.vout, "vout")?;
+        let fee = self
+            .fee
+            .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
+            .transpose()? // optional historically
+            .unwrap_or_else(|| SignedAmount::from_sat(0));
+        let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
+        let block_height = crate::to_u32(self.block_height, "block_height")?;
+        let block_index = crate::to_u32(self.block_index, "block_index")?;
+        let txid = Some(self.txid.parse::<Txid>().map_err(E::Txid)?);
+        let wallet_conflicts = self
+            .wallet_conflicts
+            .into_iter()
+            .map(|s| s.parse::<Txid>().map_err(E::WalletConflicts))
+            .collect::<Result<Vec<_>, _>>()?;
+        let bip125_replaceable = self.bip125_replaceable.into_model();
+
+        Ok(model::ListSinceBlockTransaction {
+            involves_watch_only: self.involves_watch_only,
+            address: Some(address),
+            category,
+            amount,
+            vout,
+            fee,
+            confirmations: self.confirmations,
+            generated: self.generated,
+            trusted: self.trusted,
+            block_hash: Some(block_hash),
+            block_height: Some(block_height),
+            block_index: Some(block_index),
+            block_time: Some(self.block_time),
+            txid,
+            wtxid: None,
+            wallet_conflicts: Some(wallet_conflicts),
+            replaced_by_txid: None,
+            replaces_txid: None,
+            mempool_conflicts: None,
+            to: self.to,
+            time: self.time,
+            time_received: self.time_received,
+            comment: self.comment,
+            bip125_replaceable,
+            parent_descriptors: None,
+            abandoned: self.abandoned,
+            label: self.label,
         })
     }
 }

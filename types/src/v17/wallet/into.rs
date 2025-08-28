@@ -589,30 +589,44 @@ impl ListSinceBlockTransaction {
         let category = self.category.into_model();
         let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
         let vout = crate::to_u32(self.vout, "vout")?;
-        let fee = SignedAmount::from_btc(self.fee).map_err(E::Fee)?;
+        let fee = self
+            .fee
+            .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
+            .transpose()? // optional historically
+            .unwrap_or_else(|| SignedAmount::from_sat(0));
         let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
         let block_index = crate::to_u32(self.block_index, "block_index")?;
         let txid = self.txid.map(|s| s.parse::<Txid>().map_err(E::Txid)).transpose()?;
         let bip125_replaceable = self.bip125_replaceable.into_model();
 
         Ok(model::ListSinceBlockTransaction {
+            involves_watch_only: None,
             address: Some(address),
             category,
             amount,
             vout,
             fee,
             confirmations: self.confirmations,
-            block_hash,
-            block_index,
-            block_time: self.block_time,
+            block_hash: Some(block_hash),
+            block_index: Some(block_index),
+            block_time: Some(self.block_time),
             txid,
+            wtxid: None,
             time: self.time,
             time_received: self.time_received,
             bip125_replaceable,
+            generated: None,
+            trusted: None,
             abandoned: self.abandoned,
             comment: self.comment,
             label: self.label,
             to: self.to,
+            block_height: None,
+            wallet_conflicts: None,
+            replaced_by_txid: None,
+            replaces_txid: None,
+            mempool_conflicts: None,
+            parent_descriptors: None,
         })
     }
 }

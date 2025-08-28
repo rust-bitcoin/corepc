@@ -210,7 +210,7 @@
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
 //! | listtransactions                   | version + model | UNTESTED                               |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
@@ -289,8 +289,7 @@ pub use crate::{
         GetRawTransactionVerboseError, GetReceivedByAddress, GetTransactionDetailError, GetTxOut,
         GetTxOutError, GetUnconfirmedBalance, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
+        ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
@@ -349,8 +348,9 @@ pub use crate::{
     v27::{GetPrioritisedTransactions, PrioritisedTransaction},
     v28::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
-        GetNetworkInfo, GetTransaction, HdKey, HdKeyDescriptor, Logging, SubmitPackage,
-        SubmitPackageError, SubmitPackageTxResult, SubmitPackageTxResultError,
+        GetNetworkInfo, GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock,
+        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError, Logging,
+        SubmitPackage, SubmitPackageError, SubmitPackageTxResult, SubmitPackageTxResultError,
         SubmitPackageTxResultFees, SubmitPackageTxResultFeesError,
     },
 };

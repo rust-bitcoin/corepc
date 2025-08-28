@@ -609,6 +609,8 @@ pub struct ListSinceBlock {
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ListSinceBlockTransaction {
+    /// Only returns true if imported addresses were involved in transaction.
+    pub involves_watch_only: Option<bool>,
     /// The bitcoin address of the transaction.
     pub address: Option<Address<NetworkUnchecked>>,
     /// The transaction category.
@@ -631,39 +633,58 @@ pub struct ListSinceBlockTransaction {
     /// Available for 'send' and 'receive' category of transactions. When it's < 0, it means the
     /// transaction conflicted that many blocks ago.
     pub confirmations: i64,
+    /// Only present if the transaction's only input is a coinbase one. Only documented from v0.20 and later.
+    pub generated: Option<bool>,
+    /// Whether we consider the transaction to be trusted and safe to spend from. Only present
+    /// when the transaction has 0 confirmations (or negative confirmations, if conflicted). v0.20 and later only.
+    pub trusted: Option<bool>,
     /// The block hash containing the transaction.
     ///
     /// Available for 'send' and 'receive' category of transactions.
-    pub block_hash: BlockHash,
+    pub block_hash: Option<BlockHash>,
+    /// The block height containing the transaction. v20 and later only.
+    pub block_height: Option<u32>,
     /// The index of the transaction in the block that includes it.
     ///
     /// Available for 'send' and 'receive' category of transactions.
-    pub block_index: u32,
+    pub block_index: Option<u32>,
     /// The block time in seconds since epoch (1 Jan 1970 GMT).
-    pub block_time: u32,
+    pub block_time: Option<u32>,
     /// The transaction id.
     ///
     /// Available for 'send' and 'receive' category of transactions.
     pub txid: Option<Txid>,
+    /// The hash of serialized transaction, including witness data. v24 and later only.
+    pub wtxid: Option<Txid>,
+    /// Conflicting transaction ids. Only documented from v0.20 and later.
+    pub wallet_conflicts: Option<Vec<Txid>>,
+    /// The txid if this tx was replaced. v23 and later only.
+    pub replaced_by_txid: Option<Txid>,
+    /// The txid if this tx replaces one. v23 and later only.
+    pub replaces_txid: Option<Txid>,
+    /// Transactions in the mempool that directly conflict with either this transaction or an ancestor transaction. v28 and later only.
+    pub mempool_conflicts: Option<Vec<Txid>>,
+    /// If a comment to is associated with the transaction.
+    pub to: Option<String>,
     /// The transaction time in seconds since epoch (Jan 1 1970 GMT).
     pub time: u32,
     /// The time received in seconds since epoch (Jan 1 1970 GMT).
     ///
     /// Available for 'send' and 'receive' category of transactions.
     pub time_received: u32,
+    /// If a comment is associated with the transaction.
+    pub comment: Option<String>,
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
     /// may be unknown for unconfirmed transactions not in the mempool
     pub bip125_replaceable: Bip125Replaceable,
+    /// Only if 'category' is 'received'. List of parent descriptors for the scriptPubKey of this coin. v24 and later only.
+    pub parent_descriptors: Option<Vec<String>>,
     /// If the transaction has been abandoned (inputs are respendable).
     ///
     /// Only available for the 'send' category of transactions.
     pub abandoned: Option<bool>,
-    /// If a comment is associated with the transaction.
-    pub comment: Option<String>,
     /// A comment for the address/transaction, if any.
     pub label: Option<String>,
-    /// If a comment to is associated with the transaction.
-    pub to: Option<String>,
 }
 
 /// Models the result of JSON-RPC method `listtransactions`.

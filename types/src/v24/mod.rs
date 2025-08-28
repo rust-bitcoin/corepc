@@ -198,7 +198,7 @@
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
 //! | listtransactions                   | version + model | UNTESTED                               |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
@@ -258,8 +258,9 @@ pub use self::{
         TaprootBip32Deriv, TaprootLeaf, TaprootScript, TaprootScriptPathSig,
     },
     wallet::{
-        GetTransaction, GetTransactionDetail, GetTransactionError, ListUnspent, ListUnspentItem,
-        MigrateWallet, SendAll, SendAllError, SimulateRawTransaction,
+        GetTransaction, GetTransactionDetail, GetTransactionError, ListSinceBlock,
+        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
+        ListUnspent, ListUnspentItem, MigrateWallet, SendAll, SendAllError, SimulateRawTransaction,
     },
 };
 #[doc(inline)]
@@ -283,8 +284,7 @@ pub use crate::{
         GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
+        ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
         LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,

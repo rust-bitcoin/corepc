@@ -190,7 +190,7 @@
 //! | listlockunspent                    | version + model |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
 //! | listtransactions                   | version + model | UNTESTED                               |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
@@ -240,7 +240,8 @@ pub use self::{
     util::CreateMultisig,
     wallet::{
         AddMultisigAddress, GetAddressInfo, GetAddressInfoEmbedded, GetTransaction,
-        GetTransactionDetail,
+        GetTransactionDetail, ListSinceBlock, ListSinceBlockError, ListSinceBlockTransaction,
+        ListSinceBlockTransactionError,
     },
 };
 #[doc(inline)]
@@ -264,8 +265,7 @@ pub use crate::{
         GetTransactionDetailError, GetTransactionError, GetTxOut, GetTxOutError, GetTxOutSetInfo,
         GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfoError, ListAddressGroupings,
         ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
-        ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock,
-        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
+        ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError,
         ListTransactions, ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError,
         ListWallets, LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError,
         RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType, SendMany,

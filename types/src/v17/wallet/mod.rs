@@ -716,7 +716,7 @@ pub struct ListSinceBlock {
 #[serde(deny_unknown_fields)]
 pub struct ListSinceBlockTransaction {
     /// DEPRECATED. The account name associated with the transaction. Will be "" for the default account.
-    pub account: String,
+    pub account: Option<String>,
     /// The bitcoin address of the transaction.
     ///
     /// Not present for move transactions (category = move).
@@ -734,12 +734,14 @@ pub struct ListSinceBlockTransaction {
     /// The amount of the fee in BTC.
     ///
     /// This is negative and only available for the 'send' category of transactions.
-    pub fee: f64,
+    pub fee: Option<f64>,
     /// The number of confirmations for the transaction.
     ///
     /// Available for 'send' and 'receive' category of transactions. When it's < 0, it means the
     /// transaction conflicted that many blocks ago.
     pub confirmations: i64,
+    /// Only present if transaction only input is a coinbase one.
+    pub generated: Option<bool>,
     /// The block hash containing the transaction.
     ///
     /// Available for 'send' and 'receive' category of transactions.
@@ -757,6 +759,9 @@ pub struct ListSinceBlockTransaction {
     ///
     /// Available for 'send' and 'receive' category of transactions.
     pub txid: Option<String>,
+    /// Conflicting transaction ids.
+    #[serde(rename = "walletconflicts")]
+    pub wallet_conflicts: Vec<String>,
     /// The transaction time in seconds since epoch (Jan 1 1970 GMT).
     pub time: u32,
     /// The time received in seconds since epoch (Jan 1 1970 GMT).

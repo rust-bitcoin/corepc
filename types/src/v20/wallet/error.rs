@@ -1,57 +1,21 @@
 // SPDX-License-Identifier: CC0-1.0
 
+//! Errors for wallet types newly (re)defined in v20.
+
 use core::fmt;
 
 use bitcoin::amount::ParseAmountError;
-use bitcoin::{bip32, hex};
+use bitcoin::{address, hex};
 
 use crate::error::write_err;
 use crate::NumericError;
 
-/// Error when converting a `GetHdKeys` type into the model type.
-#[derive(Debug)]
-pub enum GetHdKeysError {
-    /// Conversion of the `xpub` field failed.
-    Xpub(bip32::Error),
-    /// Conversion of the `xpriv` field failed.
-    Xpriv(bip32::Error),
-    /// Conversion of numeric type to expected type failed.
-    Numeric(NumericError),
-}
-
-impl fmt::Display for GetHdKeysError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        use GetHdKeysError::*;
-        match *self {
-            Xpub(ref e) => write_err!(f, "conversion of the `xpub` field failed"; e),
-            Xpriv(ref e) => write_err!(f, "conversion of the `xpriv` field failed"; e),
-            Numeric(ref e) => write_err!(f, "numeric"; e),
-        }
-    }
-}
-
-#[cfg(feature = "std")]
-impl std::error::Error for GetHdKeysError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        use GetHdKeysError::*;
-        match *self {
-            Xpub(ref e) => Some(e),
-            Xpriv(ref e) => Some(e),
-            Numeric(ref e) => Some(e),
-        }
-    }
-}
-
-impl From<NumericError> for GetHdKeysError {
-    fn from(e: NumericError) -> Self { Self::Numeric(e) }
-}
-
 /// Error when converting a `ListSinceBlock` type into the model type.
 #[derive(Debug)]
 pub enum ListSinceBlockError {
-    /// Conversion of the `transactions` field failed.
+    /// Conversion of item in `transactions` list failed.
     Transactions(ListSinceBlockTransactionError),
-    /// Conversion of the `removed` field failed.
+    /// Conversion of item in `removed` list failed.
     Removed(ListSinceBlockTransactionError),
     /// Conversion of the `last_block` field failed.
     LastBlock(hex::HexToArrayError),
@@ -60,6 +24,7 @@ pub enum ListSinceBlockError {
 impl fmt::Display for ListSinceBlockError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use ListSinceBlockError::*;
+
         match *self {
             Transactions(ref e) =>
                 write_err!(f, "conversion of the `transactions` field failed"; e),
@@ -73,6 +38,7 @@ impl fmt::Display for ListSinceBlockError {
 impl std::error::Error for ListSinceBlockError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         use ListSinceBlockError::*;
+
         match *self {
             Transactions(ref e) => Some(e),
             Removed(ref e) => Some(e),
@@ -82,12 +48,16 @@ impl std::error::Error for ListSinceBlockError {
 }
 
 /// Error when converting a `ListSinceBlockTransaction` type into the model type.
+///
+/// Note: Additional fields introduced in v20 (e.g. `generated`, `trusted`, `block_height`,
+/// `wallet_conflicts`, `involvesWatchonly`) are currently not modelled and therefore are
+/// intentionally ignored during conversion; as such they have no dedicated error variants.
 #[derive(Debug)]
 pub enum ListSinceBlockTransactionError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `address` field failed.
-    Address(bitcoin::address::ParseError),
+    Address(address::ParseError),
     /// Conversion of the `amount` field failed.
     Amount(ParseAmountError),
     /// Conversion of the `fee` field failed.
@@ -96,19 +66,14 @@ pub enum ListSinceBlockTransactionError {
     BlockHash(hex::HexToArrayError),
     /// Conversion of the `txid` field failed.
     Txid(hex::HexToArrayError),
-    /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
-    /// Conversion of the `wallet_conflicts` field failed.
+    /// Conversion of an item in the `wallet_conflicts` list failed.
     WalletConflicts(hex::HexToArrayError),
-    /// Conversion of the `replaced_by_txid` field failed.
-    ReplacedByTxid(hex::HexToArrayError),
-    /// Conversion of the `replaces_txid` field failed.
-    ReplacesTxid(hex::HexToArrayError),
 }
 
 impl fmt::Display for ListSinceBlockTransactionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use ListSinceBlockTransactionError as E;
+
         match *self {
             E::Numeric(ref e) => write_err!(f, "numeric"; e),
             E::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
@@ -116,13 +81,8 @@ impl fmt::Display for ListSinceBlockTransactionError {
             E::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
             E::BlockHash(ref e) => write_err!(f, "conversion of the `block_hash` field failed"; e),
             E::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
-            E::Wtxid(ref e) => write_err!(f, "conversion of the `wtxid` field failed"; e),
             E::WalletConflicts(ref e) =>
-                write_err!(f, "conversion of the `wallet_conflicts` field failed"; e),
-            E::ReplacedByTxid(ref e) =>
-                write_err!(f, "conversion of the `replaced_by_txid` field failed"; e),
-            E::ReplacesTxid(ref e) =>
-                write_err!(f, "conversion of the `replaces_txid` field failed"; e),
+                write_err!(f, "conversion of an item in the `wallet_conflicts` list failed"; e),
         }
     }
 }
@@ -131,6 +91,7 @@ impl fmt::Display for ListSinceBlockTransactionError {
 impl std::error::Error for ListSinceBlockTransactionError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         use ListSinceBlockTransactionError as E;
+
         match *self {
             E::Numeric(ref e) => Some(e),
             E::Address(ref e) => Some(e),
@@ -138,10 +99,7 @@ impl std::error::Error for ListSinceBlockTransactionError {
             E::Fee(ref e) => Some(e),
             E::BlockHash(ref e) => Some(e),
             E::Txid(ref e) => Some(e),
-            E::Wtxid(ref e) => Some(e),
             E::WalletConflicts(ref e) => Some(e),
-            E::ReplacedByTxid(ref e) => Some(e),
-            E::ReplacesTxid(ref e) => Some(e),
         }
     }
 }

@@ -199,7 +199,7 @@
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
 //! | listtransactions                   | version + model | UNTESTED                               |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
@@ -279,8 +279,7 @@ pub use crate::{
         GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
+        ListLockUnspentItemError, ListReceivedByAddressError, ListTransactions,
         ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
         LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
@@ -322,9 +321,10 @@ pub use crate::{
         DecodePsbt, DecodePsbtError, GetMempoolAncestors, GetMempoolAncestorsVerbose,
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
         GetPeerInfo, GetTransaction, GetTransactionDetail, GetTransactionError,
-        GetTxSpendingPrevout, GetTxSpendingPrevoutError, GlobalXpub, ListUnspent, ListUnspentItem,
-        MempoolEntry, MigrateWallet, PeerInfo, Proprietary, PsbtInput, PsbtOutput, SendAll,
-        SendAllError, SimulateRawTransaction, TaprootBip32Deriv, TaprootLeaf, TaprootScript,
-        TaprootScriptPathSig,
+        GetTxSpendingPrevout, GetTxSpendingPrevoutError, GlobalXpub, ListSinceBlock,
+        ListSinceBlockError, ListSinceBlockTransaction, ListSinceBlockTransactionError,
+        ListUnspent, ListUnspentItem, MempoolEntry, MigrateWallet, PeerInfo, Proprietary,
+        PsbtInput, PsbtOutput, SendAll, SendAllError, SimulateRawTransaction, TaprootBip32Deriv,
+        TaprootLeaf, TaprootScript, TaprootScriptPathSig,
     },
 };

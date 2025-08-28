@@ -594,6 +594,23 @@ fn wallet__list_received_by_address__modelled() {
 }
 
 #[test]
+fn wallet__list_since_block__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    let amount = Amount::from_sat(5_000);
+    node.client.send_to_address(&addr, amount).expect("sendtoaddress");
+    node.mine_a_block();
+
+    let json: ListSinceBlock = node.client.list_since_block().expect("listsinceblock");
+    let model: Result<mtype::ListSinceBlock, ListSinceBlockError> = json.into_model();
+    let model = model.unwrap();
+
+    let first_tx: mtype::ListSinceBlockTransaction = model.transactions[0].clone();
+    assert_eq!(first_tx.txid.unwrap().to_string().len(), 64);
+}
+
+#[test]
 fn wallet__import_multi() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
