@@ -391,6 +391,31 @@ fn wallet__get_unconfirmed_balance__modelled() {
 }
 
 #[test]
+fn wallet__get_wallet_info__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.mine_a_block();
+
+    let json: GetWalletInfo = node.client.get_wallet_info().expect("getwalletinfo");
+    let model: Result<mtype::GetWalletInfo, GetWalletInfoError> = json.into_model();
+    let wallet_info = model.unwrap();
+
+    assert!(!wallet_info.wallet_name.is_empty());
+
+    #[cfg(not(feature = "v18_and_below"))]
+    {
+        assert!(wallet_info.avoid_reuse.is_some());
+        assert!(wallet_info.scanning.is_some());
+    }
+
+    #[cfg(not(feature = "v25_and_below"))]
+    {
+        let last_processed = wallet_info.last_processed_block.as_ref().expect("last_processed_block");
+        let best_hash = node.client.best_block_hash().expect("best_block_hash");
+        assert_eq!(last_processed.hash, best_hash);
+    }
+}
+
+#[test]
 fn wallet__import_address() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
@@ -566,6 +591,41 @@ fn wallet__list_received_by_address__modelled() {
 
     let unchecked_addr = address.as_unchecked();
     assert!(model.0.iter().any(|item| &item.address == unchecked_addr));
+}
+
+#[test]
+fn wallet__list_since_block__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    let amount = Amount::from_sat(5_000);
+    node.client.send_to_address(&addr, amount).expect("sendtoaddress");
+    node.mine_a_block();
+
+    let json: ListSinceBlock = node.client.list_since_block().expect("listsinceblock");
+    let model: Result<mtype::ListSinceBlock, ListSinceBlockError> = json.into_model();
+    let model = model.unwrap();
+
+    let first_tx: mtype::TransactionItem = model.transactions[0].clone();
+    assert_eq!(first_tx.txid.unwrap().to_string().len(), 64);
+}
+
+#[test]
+fn wallet__list_transactions__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    let amount = Amount::from_sat(5_000);
+    node.client.send_to_address(&addr, amount).expect("sendtoaddress");
+    node.mine_a_block();
+
+    let json: ListTransactions = node.client.list_transactions().expect("listtransactions");
+    let model: Result<mtype::ListTransactions, TransactionItemError> = json.into_model();
+    let model = model.unwrap();
+
+    let first_tx: mtype::TransactionItem = model.0[0].clone();
+    assert_eq!(first_tx.txid.unwrap().to_string().len(), 64);
 }
 
 #[test]
@@ -855,6 +915,37 @@ fn wallet__sign_raw_transaction_with_wallet__modelled() {}
 #[test]
 fn wallet__unload_wallet() {
     create_load_unload_wallet();
+}
+
+#[test]
+fn wallet__send_many__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
+    let addr1 = node.client.new_address().expect("newaddress");
+    let addr2 = node.client.new_address().expect("newaddress");
+
+    let mut amounts = BTreeMap::new();
+    amounts.insert(addr1, Amount::from_sat(100_000));
+    amounts.insert(addr2, Amount::from_sat(100_000));
+
+    let json: SendMany = node.client.send_many(amounts.clone()).expect("sendmany");
+    let model: Result<mtype::SendMany, _> = json.into_model();
+    let txid = model.unwrap().0;
+
+    assert_eq!(txid.to_string().len(), 64);
+
+    #[cfg(not(feature = "v20_and_below"))]
+    {
+        let json_verbose: SendManyVerbose = node
+            .client
+            .send_many_verbose(amounts)
+            .expect("sendmany verbose");
+        let model_verbose: Result<mtype::SendManyVerbose, _> = json_verbose.into_model();
+        let verbose = model_verbose.unwrap();
+        assert_eq!(verbose.txid.to_string().len(), 64);
+        assert_eq!(verbose.fee_reason, "Fallback fee");
+    }
 }
 
 #[cfg(not(feature = "v20_and_below"))]

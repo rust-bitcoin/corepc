@@ -179,6 +179,7 @@ crate::impl_client_v17__rescan_blockchain!();
 crate::impl_client_v23__restore_wallet!();
 crate::impl_client_v21__send!();
 crate::impl_client_v17__send_many!();
+crate::impl_client_v21__send_many_verbose!();
 crate::impl_client_v17__send_to_address!();
 crate::impl_client_v17__set_hd_seed!();
 crate::impl_client_v17__set_tx_fee!();
@@ -193,6 +194,9 @@ crate::impl_client_v17__wallet_lock!();
 crate::impl_client_v17__wallet_passphrase!();
 crate::impl_client_v17__wallet_passphrase_change!();
 crate::impl_client_v17__wallet_process_psbt!();
+
+// == Zmq ==
+crate::impl_client_v17__get_zmq_notifications!();
 
 /// Argument to the `Client::get_new_address_with_type` function.
 ///

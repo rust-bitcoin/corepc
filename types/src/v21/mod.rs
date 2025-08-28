@@ -179,7 +179,7 @@
 //! | getreceivedbylabel                 | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importdescriptors                  | version         |                                        |
 //! | importmulti                        | version         |                                        |
@@ -194,8 +194,8 @@
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwalletdir                      | version         |                                        |
 //! | listwallets                        | version + model |                                        |
@@ -204,7 +204,7 @@
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model |                                        |
 //! | send                               | version + model |                                        |
-//! | sendmany                           | version + model | UNTESTED                               |
+//! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |
 //! | setlabel                           | returns nothing |                                        |
@@ -227,7 +227,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | getzmqnotifications                | version         | UNTESTED                               |
+//! | getzmqnotifications                | version         |                                        |
 //!
 //! </details>
 
@@ -255,8 +255,9 @@ pub use self::{
     },
     util::{GetIndexInfo, GetIndexInfoName},
     wallet::{
-        ImportDescriptors, ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
-        UnloadWallet, UpgradeWallet,
+        GetWalletInfo, GetWalletInfoScanning, ImportDescriptors, ImportDescriptorsResult,
+        PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany, SendManyVerbose, UnloadWallet,
+        UpgradeWallet,
     },
 };
 #[doc(inline)]
@@ -278,25 +279,22 @@ pub use crate::{
         GetNewAddress, GetRawChangeAddress, GetRawMempool, GetRawMempoolVerbose, GetRawTransaction,
         GetRawTransactionVerbose, GetRawTransactionVerboseError, GetReceivedByAddress,
         GetTransactionDetailError, GetTransactionError, GetTxOut, GetTxOutError, GetTxOutSetInfo,
-        GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfo, GetWalletInfoError,
-        GetZmqNotifications, ListAddressGroupings, ListAddressGroupingsError,
-        ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspentItemError, ListWallets,
-        LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
-        RawTransactionOutput, RescanBlockchain, ScriptType, SendMany, SendRawTransaction,
-        SendToAddress, SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey,
-        SignRawTransaction, SignRawTransactionError, SoftforkReject, TransactionCategory,
-        UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-        WitnessUtxo,
+        GetTxOutSetInfoError, GetUnconfirmedBalance, GetWalletInfoError, ListAddressGroupings,
+        ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
+        ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError,
+        ListUnspentItemError, ListWallets, LoadWallet, LockUnspent, Locked, PruneBlockchain,
+        RawTransactionError, RawTransactionInput, RawTransactionOutput, RescanBlockchain,
+        ScriptType, SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
+        SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, SoftforkReject,
+        TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
+        VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
         AnalyzePsbtInputMissingError, DeriveAddresses, GetAddressInfoError, GetNodeAddresses,
-        GetReceivedByLabel, ImportMulti, ImportMultiEntry, JoinPsbts, JsonRpcError,
-        ListReceivedByAddress, ListReceivedByAddressItem, ListReceivedByLabel,
+        GetReceivedByLabel, GetZmqNotifications, ImportMulti, ImportMultiEntry, JoinPsbts,
+        JsonRpcError, ListReceivedByAddress, ListReceivedByAddressItem, ListReceivedByLabel,
         ListReceivedByLabelError, ListUnspent, ListUnspentItem, ListWalletDir, ListWalletDirWallet,
         NodeAddress, UtxoUpdatePsbt,
     },
@@ -308,6 +306,7 @@ pub use crate::{
     },
     v20::{
         AddMultisigAddress, Banned, CreateMultisig, GenerateToDescriptor, GetAddressInfo,
-        GetAddressInfoEmbedded, GetTransaction, GetTransactionDetail, ListBanned, Logging,
+        GetAddressInfoEmbedded, GetTransaction, GetTransactionDetail, ListBanned, ListSinceBlock,
+        ListSinceBlockError, ListTransactions, Logging, TransactionItem, TransactionItemError,
     },
 };

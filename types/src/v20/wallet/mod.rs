@@ -4,11 +4,13 @@
 //!
 //! Types for methods found under the `== Wallet ==` section of the API docs.
 
+mod error;
 mod into;
 
 use bitcoin::Transaction;
 use serde::{Deserialize, Serialize};
 
+pub use self::error::{ListSinceBlockError, TransactionItemError};
 pub use super::{
     AddMultisigAddressError, Bip125Replaceable, GetAddressInfoEmbeddedError, GetAddressInfoError,
     GetTransactionDetailError, GetTransactionError, ScriptType, TransactionCategory,
@@ -249,3 +251,107 @@ pub struct GetTransactionDetail {
     /// Only available for the 'send' category of transactions.
     pub abandoned: Option<bool>,
 }
+
+/// Result of the JSON-RPC method `listsinceblock`.
+///
+/// > listsinceblock ( "blockhash" target_confirmations include_watchonly include_removed )
+/// >
+/// > Get all transactions in blocks since block `blockhash`, or all transactions if omitted.
+/// > If "blockhash" is no longer a part of the main chain, transactions from the fork point onward are included.
+/// > Additionally, if include_removed is set, transactions affecting the wallet which were removed are returned in the "removed" array.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ListSinceBlock {
+    /// All the transactions.
+    pub transactions: Vec<TransactionItem>,
+    /// Only present if `include_removed=true`.
+    ///
+    /// Note: transactions that were re-added in the active chain will appear as-is in this array,
+    /// and may thus have a positive confirmation count.
+    pub removed: Vec<TransactionItem>,
+    /// The hash of the block (target_confirmations-1) from the best block on the main chain.
+    ///
+    /// This is typically used to feed back into listsinceblock the next time you call it. So you
+    /// would generally use a target_confirmations of say 6, so you will be continually
+    /// re-notified of transactions until they've reached 6 confirmations plus any new ones.
+    #[serde(rename = "lastblock")]
+    pub last_block: String,
+}
+
+/// Transaction item returned as part of `listsinceblock`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct TransactionItem {
+    /// Only returns true if imported addresses were involved in transaction.
+    #[serde(rename = "involvesWatchonly")]
+    pub involves_watch_only: Option<bool>,
+    /// The bitcoin address of the transaction.
+    pub address: String,
+    /// The transaction category.
+    pub category: TransactionCategory,
+    /// The amount in BTC.
+    ///
+    /// This is negative for the 'send' category, and is positive for all other categories.
+    pub amount: f64,
+    /// The vout value.
+    pub vout: i64,
+    /// The amount of the fee in BTC.
+    ///
+    /// This is negative and only available for the 'send' category of transactions.
+    pub fee: Option<f64>,
+    /// The number of confirmations for the transaction. Negative confirmations means the
+    /// transaction conflicted that many blocks ago.
+    pub confirmations: i64,
+    /// Only present if transaction only input is a coinbase one.
+    pub generated: Option<bool>,
+    /// Only present if we consider transaction to be trusted and so safe to spend from.
+    pub trusted: Option<bool>,
+    /// The block hash containing the transaction.
+    #[serde(rename = "blockhash")]
+    pub block_hash: String,
+    /// The block height containing the transaction.
+    #[serde(rename = "blockheight")]
+    pub block_height: i64,
+    /// The index of the transaction in the block that includes it.
+    #[serde(rename = "blockindex")]
+    pub block_index: i64,
+    /// The block time expressed in UNIX epoch time.
+    #[serde(rename = "blocktime")]
+    pub block_time: u32,
+    /// The transaction id.
+    pub txid: String,
+    /// Conflicting transaction ids.
+    #[serde(rename = "walletconflicts")]
+    pub wallet_conflicts: Vec<String>,
+    /// The transaction time expressed in UNIX epoch time.
+    pub time: u32,
+    /// The time received expressed in UNIX epoch time.
+    #[serde(rename = "timereceived")]
+    pub time_received: u32,
+    /// If a comment is associated with the transaction, only present if not empty.
+    pub comment: Option<String>,
+    /// ("yes|no|unknown") Whether this transaction could be replaced due to BIP125 (replace-by-fee);
+    /// may be unknown for unconfirmed transactions not in the mempool
+    #[serde(rename = "bip125-replaceable")]
+    pub bip125_replaceable: Bip125Replaceable,
+    /// 'true' if the transaction has been abandoned (inputs are respendable). Only available for the
+    /// 'send' category of transactions.
+    pub abandoned: Option<bool>,
+    /// A comment for the address/transaction, if any.
+    pub label: Option<String>,
+    /// If a comment to is associated with the transaction.
+    pub to: Option<String>,
+}
+
+/// Result of the JSON-RPC method `listtransactions`.
+///
+/// > listtransactions (label count skip include_watchonly)
+/// >
+/// > If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.
+/// >
+/// > Returns up to 'count' most recent transactions skipping the first 'from' transactions.
+/// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
+/// > bitcoind with -deprecatedrpc=accounts
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct ListTransactions(pub Vec<TransactionItem>);

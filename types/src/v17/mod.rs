@@ -171,7 +171,7 @@
 //! | getreceivedbyaddress               | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
-//! | getwalletinfo                      | version + model | UNTESTED                               |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importaddress                      | returns nothing |                                        |
 //! | importmulti                        | version         |                                        |
 //! | importprivkey                      | returns nothing |                                        |
@@ -185,8 +185,8 @@
 //! | listlockunspent                    | version + model |                                        |
 //! | listreceivedbyaccount              | returns nothing |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
-//! | listsinceblock                     | version + model | UNTESTED                               |
-//! | listtransactions                   | version + model | UNTESTED                               |
+//! | listsinceblock                     | version + model |                                        |
+//! | listtransactions                   | version + model |                                        |
 //! | listunspent                        | version + model |                                        |
 //! | listwallets                        | version + model |                                        |
 //! | loadwallet                         | version + model |                                        |
@@ -195,7 +195,7 @@
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model |                                        |
 //! | sendfrom                           | returns nothing |                                        |
-//! | sendmany                           | version + model | UNTESTED                               |
+//! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | setaccount                         | returns nothing |                                        |
 //! | sethdseed                          | returns nothing |                                        |
@@ -216,7 +216,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | getzmqnotifications                | version         | UNTESTED                               |
+//! | getzmqnotifications                | version         |                                        |
 //!
 //! </details>
 
@@ -281,10 +281,9 @@ pub use self::{
         ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels, ListLockUnspent,
         ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddress,
         ListReceivedByAddressError, ListReceivedByAddressItem, ListSinceBlock, ListSinceBlockError,
-        ListSinceBlockTransaction, ListSinceBlockTransactionError, ListTransactions,
-        ListTransactionsItem, ListTransactionsItemError, ListUnspent, ListUnspentItem,
-        ListUnspentItemError, ListWallets, LoadWallet, LockUnspent, RescanBlockchain, ScriptType,
-        SendMany, SendToAddress, SetTxFee, SignMessage, TransactionCategory,
+        ListTransactions, ListUnspent, ListUnspentItem, ListUnspentItemError, ListWallets,
+        LoadWallet, LockUnspent, RescanBlockchain, ScriptType, SendMany, SendToAddress, SetTxFee,
+        SignMessage, TransactionCategory, TransactionItem, TransactionItemError,
         WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
     },
     zmq::GetZmqNotifications,

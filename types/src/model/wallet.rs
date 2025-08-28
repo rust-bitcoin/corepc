@@ -455,6 +455,8 @@ pub struct GetWalletInfo {
     pub wallet_name: String,
     /// The wallet version.
     pub wallet_version: u32,
+    /// Database format. v21 and later only.
+    pub format: Option<String>,
     /// The total confirmed balance of the wallet in BTC.
     pub balance: Amount,
     /// The total unconfirmed balance of the wallet in BTC.
@@ -472,13 +474,40 @@ pub struct GetWalletInfo {
     pub keypool_size_hd_internal: u32,
     /// The timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked
     /// for transfers, or 0 if the wallet is locked.
-    pub unlocked_until: u32,
+    pub unlocked_until: Option<u32>,
     /// The transaction fee configuration.
     pub pay_tx_fee: Option<FeeRate>,
     /// The Hash160 of the HD seed (only present when HD is enabled).
     pub hd_seed_id: Option<hash160::Hash>,
     /// If privatekeys are disabled for this wallet (enforced watch-only wallet).
     pub private_keys_enabled: bool,
+    /// Whether this wallet tracks clean/dirty coins in terms of reuse. v19 and later only.
+    pub avoid_reuse: Option<bool>,
+    /// Current scanning details, or false if no scan is in progress. v19 and later only.
+    pub scanning: Option<GetWalletInfoScanning>,
+    /// Whether wallet uses descriptors. v21 and later only.
+    pub descriptors: Option<bool>,
+    /// Whether this wallet is configured to use an external signer such as a hardware wallet. v23 and later only.
+    pub external_signer: Option<bool>,
+    /// Whether this wallet intentionally does not contain any keys, scripts, or descriptors. v26 and later only.
+    pub blank: Option<bool>,
+    /// The start time for blocks scanning. v26 and later only.
+    pub birthtime: Option<u32>,
+    /// Hash and height of the block this information was generated on. v26 and later only.
+    pub last_processed_block: Option<LastProcessedBlock>,
+}
+
+/// Models the `scanning` field of `getwalletinfo` (v19+). When not scanning Core returns `false`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum GetWalletInfoScanning {
+    Details {
+        /// Elapsed seconds since scan start.
+        duration: u64,
+        /// Scanning progress percentage [0.0, 1.0].
+        progress: f64,
+    },
+    NotScanning(bool),
 }
 
 /// Models the result of JSON-RPC method `listaddressgroupings`.
@@ -561,12 +590,12 @@ pub struct ListReceivedByLabelItem {
 #[serde(deny_unknown_fields)]
 pub struct ListSinceBlock {
     /// All the transactions.
-    pub transactions: Vec<ListSinceBlockTransaction>,
+    pub transactions: Vec<TransactionItem>,
     /// Only present if `include_removed=true`.
     ///
     /// Note: transactions that were re-added in the active chain will appear as-is in this array,
     /// and may thus have a positive confirmation count.
-    pub removed: Vec<ListSinceBlockTransaction>,
+    pub removed: Vec<TransactionItem>,
     /// The hash of the block (target_confirmations-1) from the best block on the main chain.
     ///
     /// This is typically used to feed back into listsinceblock the next time you call it. So you
@@ -575,11 +604,12 @@ pub struct ListSinceBlock {
     pub last_block: BlockHash,
 }
 
-/// Transaction list item, part of `ListSinceBlock`.
-// https://github.com/rust-bitcoin/rust-bitcoin/issues/3516
+/// Transaction item, part of `listsinceblock` and `listtransactions`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct ListSinceBlockTransaction {
+pub struct TransactionItem {
+    /// Only returns true if imported addresses were involved in transaction.
+    pub involves_watch_only: Option<bool>,
     /// The bitcoin address of the transaction.
     pub address: Option<Address<NetworkUnchecked>>,
     /// The transaction category.
@@ -602,96 +632,64 @@ pub struct ListSinceBlockTransaction {
     /// Available for 'send' and 'receive' category of transactions. When it's < 0, it means the
     /// transaction conflicted that many blocks ago.
     pub confirmations: i64,
+    /// Only present if the transaction's only input is a coinbase one. Only documented from v0.20 and later.
+    pub generated: Option<bool>,
+    /// Whether we consider the transaction to be trusted and safe to spend from. Only present
+    /// when the transaction has 0 confirmations (or negative confirmations, if conflicted). v0.20 and later only.
+    pub trusted: Option<bool>,
     /// The block hash containing the transaction.
     ///
     /// Available for 'send' and 'receive' category of transactions.
-    pub block_hash: BlockHash,
+    pub block_hash: Option<BlockHash>,
+    /// The block height containing the transaction. v20 and later only.
+    pub block_height: Option<u32>,
     /// The index of the transaction in the block that includes it.
     ///
     /// Available for 'send' and 'receive' category of transactions.
-    pub block_index: u32,
+    pub block_index: Option<u32>,
     /// The block time in seconds since epoch (1 Jan 1970 GMT).
-    pub block_time: u32,
+    pub block_time: Option<u32>,
     /// The transaction id.
     ///
     /// Available for 'send' and 'receive' category of transactions.
     pub txid: Option<Txid>,
+    /// The hash of serialized transaction, including witness data. v24 and later only.
+    pub wtxid: Option<Txid>,
+    /// Conflicting transaction ids. Only documented from v0.20 and later.
+    pub wallet_conflicts: Option<Vec<Txid>>,
+    /// The txid if this tx was replaced. v23 and later only.
+    pub replaced_by_txid: Option<Txid>,
+    /// The txid if this tx replaces one. v23 and later only.
+    pub replaces_txid: Option<Txid>,
+    /// Transactions in the mempool that directly conflict with either this transaction or an ancestor transaction. v28 and later only.
+    pub mempool_conflicts: Option<Vec<Txid>>,
+    /// If a comment to is associated with the transaction.
+    pub to: Option<String>,
     /// The transaction time in seconds since epoch (Jan 1 1970 GMT).
     pub time: u32,
     /// The time received in seconds since epoch (Jan 1 1970 GMT).
     ///
     /// Available for 'send' and 'receive' category of transactions.
     pub time_received: u32,
+    /// If a comment is associated with the transaction.
+    pub comment: Option<String>,
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
     /// may be unknown for unconfirmed transactions not in the mempool
     pub bip125_replaceable: Bip125Replaceable,
+    /// Only if 'category' is 'received'. List of parent descriptors for the scriptPubKey of this coin. v24 and later only.
+    pub parent_descriptors: Option<Vec<String>>,
     /// If the transaction has been abandoned (inputs are respendable).
     ///
     /// Only available for the 'send' category of transactions.
     pub abandoned: Option<bool>,
-    /// If a comment is associated with the transaction.
-    pub comment: Option<String>,
     /// A comment for the address/transaction, if any.
     pub label: Option<String>,
-    /// If a comment to is associated with the transaction.
-    pub to: Option<String>,
 }
 
 /// Models the result of JSON-RPC method `listtransactions`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct ListTransactions(pub Vec<ListTransactionsItem>);
-
-/// Transaction list item, part of `ListTransactions`.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct ListTransactionsItem {
-    /// The bitcoin address of the transaction.
-    pub address: Address<NetworkUnchecked>,
-    /// The transaction category.
-    pub category: TransactionCategory,
-    /// The amount.
-    ///
-    /// This is negative for the 'send' category, and is positive for the 'receive' category.
-    #[serde(default, with = "bitcoin::amount::serde::as_btc")]
-    pub amount: SignedAmount,
-    /// A comment for the address/transaction, if any.
-    pub label: Option<String>,
-    /// The vout value.
-    pub vout: u32,
-    /// The amount of the fee in BTC.
-    ///
-    /// This is negative and only available for the 'send' category of transactions.
-    #[serde(default, with = "bitcoin::amount::serde::as_btc")]
-    pub fee: SignedAmount,
-    /// The number of confirmations for the transaction.
-    ///
-    /// Negative confirmations indicate the transaction conflicts with the block chain.
-    pub confirmations: i64,
-    /// Whether we consider the outputs of this unconfirmed transaction safe to spend.
-    pub trusted: bool,
-    /// The block hash containing the transaction.
-    pub block_hash: BlockHash,
-    /// The index of the transaction in the block that includes it.
-    pub block_index: u32,
-    /// The block time in seconds since epoch (1 Jan 1970 GMT).
-    pub block_time: u32,
-    /// The transaction id.
-    pub txid: Txid,
-    /// The transaction time in seconds since epoch (Jan 1 1970 GMT).
-    pub time: u32,
-    /// The time received in seconds since epoch (Jan 1 1970 GMT).
-    pub time_received: u32,
-    /// If a comment is associated with the transaction.
-    pub comment: Option<String>,
-    /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
-    /// may be unknown for unconfirmed transactions not in the mempool
-    pub bip125_replaceable: Bip125Replaceable,
-    /// If the transaction has been abandoned (inputs are respendable).
-    ///
-    /// Only available for the 'send' category of transactions.
-    pub abandoned: Option<bool>,
-}
+pub struct ListTransactions(pub Vec<TransactionItem>);
 
 /// Models the result of JSON-RPC method `listunspent`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -807,6 +805,16 @@ pub struct SendAll {
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct SendMany(pub Txid);
+
+/// Models the verbose result of JSON-RPC method `sendmany` when `verbose=true`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SendManyVerbose {
+    /// The transaction id for the send. Only 1 transaction is created regardless of the number of addresses.
+    pub txid: Txid,
+    /// The transaction fee reason.
+    pub fee_reason: String,
+}
 
 /// Models the result of JSON-RPC method `sendtoaddress`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]

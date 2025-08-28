@@ -560,7 +560,11 @@ macro_rules! impl_client_v17__send_many {
         impl Client {
             pub fn send_many(&self, amounts: BTreeMap<Address, Amount>) -> Result<SendMany> {
                 let dummy = ""; // Must be set to "" for backwards compatibility.
-                self.call("sendmany", &[into_json(dummy)?, into_json(amounts)?])
+                let amount_btc: BTreeMap<String, f64> = amounts
+                    .into_iter()
+                    .map(|(addr, amount)| (addr.to_string(), amount.to_btc()))
+                    .collect();
+                self.call("sendmany", &[into_json(dummy)?, into_json(amount_btc)?])
             }
         }
     };

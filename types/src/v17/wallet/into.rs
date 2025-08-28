@@ -437,6 +437,7 @@ impl GetWalletInfo {
         Ok(model::GetWalletInfo {
             wallet_name: self.wallet_name,
             wallet_version,
+            format: None,
             balance,
             unconfirmed_balance,
             immature_balance,
@@ -448,6 +449,13 @@ impl GetWalletInfo {
             pay_tx_fee,
             hd_seed_id,
             private_keys_enabled: self.private_keys_enabled,
+            avoid_reuse: None,
+            scanning: None,
+            descriptors: None,
+            external_signer: None,
+            blank: None,
+            birthtime: None,
+            last_processed_block: None,
         })
     }
 }
@@ -570,88 +578,63 @@ impl ListSinceBlock {
     }
 }
 
-impl ListSinceBlockTransaction {
+impl TransactionItem {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::ListSinceBlockTransaction, ListSinceBlockTransactionError> {
-        use ListSinceBlockTransactionError as E;
+    pub fn into_model(self) -> Result<model::TransactionItem, TransactionItemError> {
+        use TransactionItemError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let category = self.category.into_model();
         let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
         let vout = crate::to_u32(self.vout, "vout")?;
-        let fee = SignedAmount::from_btc(self.fee).map_err(E::Fee)?;
+        let fee = self
+            .fee
+            .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
+            .transpose()? // optional historically
+            .unwrap_or_else(|| SignedAmount::from_sat(0));
         let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
         let block_index = crate::to_u32(self.block_index, "block_index")?;
         let txid = self.txid.map(|s| s.parse::<Txid>().map_err(E::Txid)).transpose()?;
         let bip125_replaceable = self.bip125_replaceable.into_model();
 
-        Ok(model::ListSinceBlockTransaction {
+        Ok(model::TransactionItem {
+            involves_watch_only: None,
             address: Some(address),
             category,
             amount,
             vout,
             fee,
             confirmations: self.confirmations,
-            block_hash,
-            block_index,
-            block_time: self.block_time,
+            block_hash: Some(block_hash),
+            block_index: Some(block_index),
+            block_time: Some(self.block_time),
             txid,
+            wtxid: None,
             time: self.time,
             time_received: self.time_received,
             bip125_replaceable,
+            generated: None,
+            trusted: None,
             abandoned: self.abandoned,
             comment: self.comment,
             label: self.label,
             to: self.to,
+            block_height: None,
+            wallet_conflicts: None,
+            replaced_by_txid: None,
+            replaces_txid: None,
+            mempool_conflicts: None,
+            parent_descriptors: None,
         })
     }
 }
 
 impl ListTransactions {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::ListTransactions, ListTransactionsItemError> {
+    pub fn into_model(self) -> Result<model::ListTransactions, TransactionItemError> {
         let transactions =
             self.0.into_iter().map(|tx| tx.into_model()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::ListTransactions(transactions))
-    }
-}
-
-impl ListTransactionsItem {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::ListTransactionsItem, ListTransactionsItemError> {
-        use ListTransactionsItemError as E;
-
-        let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let category = self.category.into_model();
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let vout = crate::to_u32(self.vout, "vout")?;
-        let fee = SignedAmount::from_btc(self.fee).map_err(E::Fee)?;
-        let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
-        let block_index = crate::to_u32(self.block_index, "block_index")?;
-        let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
-        let bip125_replaceable = self.bip125_replaceable.into_model();
-
-        Ok(model::ListTransactionsItem {
-            address,
-            category,
-            amount,
-            label: self.label,
-            vout,
-            fee,
-            confirmations: self.confirmations,
-            trusted: self.trusted,
-            block_hash,
-            block_index,
-            block_time: self.block_time,
-            txid,
-            time: self.time,
-            time_received: self.time_received,
-            comment: self.comment,
-            bip125_replaceable,
-            abandoned: self.abandoned,
-        })
     }
 }
 
