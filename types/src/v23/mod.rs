@@ -260,8 +260,8 @@ pub use self::{
     util::CreateMultisig,
     wallet::{
         AddMultisigAddress, GetTransaction, GetTransactionError, GetWalletInfo,
-        GetWalletInfoScanning, ListSinceBlock, ListSinceBlockError, TransactionItem,
-        TransactionItemError, RestoreWallet, ListTransactions,
+        GetWalletInfoScanning, ListSinceBlock, ListSinceBlockError, ListTransactions,
+        RestoreWallet, TransactionItem, TransactionItemError,
     },
 };
 #[doc(inline)]
@@ -285,8 +285,7 @@ pub use crate::{
         GetTxOutError, GetTxOutSetInfo, GetTxOutSetInfoError, GetUnconfirmedBalance,
         GetWalletInfoError, ListAddressGroupings, ListAddressGroupingsError,
         ListAddressGroupingsItem, ListLabels, ListLockUnspent, ListLockUnspentItem,
-        ListLockUnspentItemError, ListReceivedByAddressError,
-        ListUnspentItemError, ListWallets,
+        ListLockUnspentItemError, ListReceivedByAddressError, ListUnspentItemError, ListWallets,
         LoadWallet, LockUnspent, Locked, PruneBlockchain, RawTransactionError, RawTransactionInput,
         RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
         SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
