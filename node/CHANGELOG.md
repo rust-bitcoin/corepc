@@ -1,3 +1,14 @@
+# 0.9.0 2025-09-11
+
+The `types v0.9.0` release adds support for **all** remaining
+documented Core RPC methods. We update `client` to pick up the new
+release of `types`.
+
+- Update to use the new `client v0.9.0`.
+- Fix race condition in node start up [#213](https://github.com/rust-bitcoin/corepc/pull/213)
+- Fix build on macOS. Only codesign bitcoind if necessary [#309](https://github.com/rust-bitcoin/corepc/pull/309)
+- Add support for Core `v28.2` [#279](https://github.com/rust-bitcoin/corepc/pull/279)
+
 # 0.8.0 2025-05-21
 
 - Add support for Bitcoin Core 29.0 [#131](https://github.com/rust-bitcoin/corepc/pull/131)

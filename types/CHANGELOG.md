@@ -1,3 +1,18 @@
+# 0.9.0 2025-09-11
+
+This release is massive, it delivers support for **all** documented Core RPC
+methods. It also adds integration testing for all the new ones and many that
+were previously untested.
+
+Props to Jamil Lambert for grinding this out.
+
+There are a set of undocumented methods that we will be adding support
+for also shortly, stay tuned.
+
+- Implement all remaining non-hidden RPC methods.
+- Integration test all methods (excl. two that have open issues).
+- Add support for Core `v28.2` [#279](https://github.com/rust-bitcoin/corepc/pull/279)
+
 # 0.8.0 2025-05-21
 
 - doc: update docs for now explicit download feature flag [#177](https://github.com/rust-bitcoin/corepc/pull/177)
