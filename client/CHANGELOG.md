@@ -1,3 +1,12 @@
+# 0.9.0 2025-09-11
+
+Add support for all the new methods added as part of the `types v0.9.0` 
+release - that  means **all** of the documented Core RPC methods.
+
+- Implement all remaining non-hidden RPC methods.
+- Integration test all methods (excl. two that have open issues).
+- Add support for Core `v28.2` [#279](https://github.com/rust-bitcoin/corepc/pull/279)
+
 # 0.8.0 2025-05-21
 
 - Add support for Bitcoin Core 29.0 [#131](https://github.com/rust-bitcoin/corepc/pull/131)

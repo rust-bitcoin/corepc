@@ -1,35 +1,33 @@
 # Bitcoin Core JSON-RPC types
 
-This crate provides data types return by Bitcoin Core's JSON-RPC API. Each type is specific to the
+This crate provides data types returned by Bitcoin Core's JSON-RPC API. Each type is specific to the
 version of Core e.g., if you run the `getblockchaininfo` method against a Bitcoin Core v28 instance
 you will get back the data described by `types::v28::GetBlockChainInfo`. In a similar fashion any
 method `corerpcmethod` will return type `CoreRpcMethod` - snake-case as is conventional in Rust.
 
-## Status
+The version specific structs _do not_ use types form `rust-bitcoin`. For any type that can be
+represented using types from `rust-bitcoin` we provide a version non-specific type in 
+`model::CoreRpcMethod` and an `into_model()` method on the version specific type.
 
-This crate is Work In Progress - not all methods for all Core versions are done yet. The single
-source of truth (SSOT) for a methods status can be found in the version specific module e.g.,
-`types/src/v17/mod.rs`. The HTML version can be found online and has nice drop down menus.
+The crate supports **all** documented Core RPC methods.
 
-See for example: https://docs.rs/corepc-types/0.5.0/corepc_types/v18/index.html
+(Note there are a bunch of undocumented methods that are not yet supported, coming soon.)
 
-### As of `v0.5.0`
+## Known issues
 
-- All types to support `rust-miniscript` exist for Core versions 17-28 inclusive.
-- Support for Core Versions v17 and v18 is more fully fleshed out.
-- Nice docs and `verify` tool for v17 and v18 only.
+The types include docs from Core however the docs used are from the _first_ Core version in which
+the method appeared. As an example, this means if you look at docs for v29 `createwallet` you will
+see docs that originate in Core v17 so may or may not be stale. We hope to fix this at some stage.
+For accurate documentation of the method you are best to run `bitcoin-cli help createwallet` against
+a Core node of the desired version.
 
 ### Testing and Verification
 
-In order to prove the data structures we do integration testing in `integration_test`. The tests are
-version specific e.g., `cargo test --features=0_18_1`. In CI we test against all supported versions.
-If you are using this crate in CI you may want to imitate the job structure. See the `Integration`
-job in `.github/workflows/rust.yaml`.
+Each type is integration tested, however only typically with a single test. We hope to improve
+test coverage by using test vectors taken from Core source code ... at some stage.
 
-In order to back up method status our claims we provide the `verify` tool that parses the SSOT and
-checks the claims. Run it using `verify v17` (also `verify all`).
-
-The tool only currently verifies the `v17` and `v18` modules.
+If you experience any issues please let us know, we have done our best but this crate needs battle
+testing in the wild.
 
 ## Minimum Supported Rust Version (MSRV)
 
