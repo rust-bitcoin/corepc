@@ -396,7 +396,7 @@ pub struct SendRawTransaction(
     pub String,
 );
 
-/// Result of JSON-RPC method `signrawtransactionwithkey` (and deprecated `signrawtransaction`).
+/// Result of JSON-RPC method `signrawtransaction`.
 ///
 /// > signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
 /// >
@@ -419,6 +419,24 @@ pub struct SignRawTransaction {
     /// Script verification errors (if there are any).
     pub errors: Option<Vec<SignFail>>,
 }
+
+/// Result of JSON-RPC method `signrawtransactionwithkey`.
+///
+/// > signrawtransactionwithkey "hexstring" ["privatekey1",...] ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] sighashtype )
+/// >
+/// > Sign inputs for raw transaction (serialized, hex-encoded).
+/// > The second argument is an array of base58-encoded private
+/// > keys that will be the only keys used to sign the transaction.
+/// > The third optional argument (may be null) is an array of previous transaction outputs that
+/// > this transaction depends on but may not yet be in the block chain.
+/// >
+/// > Arguments:
+/// > 1. "hexstring"                      (string, required) The transaction hex string
+/// > 2. "privkeys"                       (string, required) A json array of base58-encoded private keys for signing
+///
+/// **Note:** This is a type alias of [`SignRawTransaction`] because the RPC response
+/// shape is identical, and our policy is to have a return type for every RPC method.
+pub type SignRawTransactionWithKey = SignRawTransaction;
 
 /// A script verification error. Part of `signrawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

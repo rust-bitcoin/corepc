@@ -213,7 +213,7 @@ macro_rules! impl_client_v17__sign_raw_transaction_with_key {
                 &self,
                 tx: &bitcoin::Transaction,
                 keys: &[bitcoin::PrivateKey],
-            ) -> Result<SignRawTransaction> {
+            ) -> Result<SignRawTransactionWithKey> {
                 let hex = bitcoin::consensus::encode::serialize_hex(tx);
                 let keys = keys.iter().map(|k| format!("{}", k)).collect::<Vec<String>>();
                 self.call("signrawtransactionwithkey", &[hex.into(), into_json(keys)?])

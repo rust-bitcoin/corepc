@@ -202,6 +202,12 @@ pub struct SignRawTransaction {
     pub errors: Vec<SignFail>,
 }
 
+/// Models the result of JSON-RPC method `signrawtransactionwithkey`.
+///
+/// **Note:** This is a type alias of [`SignRawTransaction`] because the RPC response
+/// shape is identical, and our policy is to have a return type for every RPC method.
+pub type SignRawTransactionWithKey = SignRawTransaction;
+
 /// A script verification error. Part of `signrawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]

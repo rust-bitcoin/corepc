@@ -399,9 +399,9 @@ fn raw_transactions__test_mempool_accept__modelled() {
     let tx = create_a_raw_transaction(&node);
 
     // Sign (but don't broadcast).
-    let signed: SignRawTransaction =
+    let signed: SignRawTransactionWithWallet =
         node.client.sign_raw_transaction_with_wallet(&tx).expect("signrawtransactionwithwallet");
-    let signed_model: mtype::SignRawTransaction =
+    let signed_model: mtype::SignRawTransactionWithWallet =
         signed.into_model().expect("SignRawTransaction into model");
     let signed_tx = signed_model.tx;
 
@@ -474,10 +474,11 @@ fn create_sign_send(node: &Node) {
 
     // wallet.rs expects this call to exist, if you change it then you'll need to update the test
     // `wallet__sign_raw_transaction_with_wallet__modelled`.
-    let json: SignRawTransaction =
+    let json: SignRawTransactionWithWallet =
         node.client.sign_raw_transaction_with_wallet(&tx).expect("signrawtransactionwithwallet");
 
-    let model: Result<mtype::SignRawTransaction, SignRawTransactionError> = json.into_model();
+    let model: Result<mtype::SignRawTransactionWithWallet, SignRawTransactionError> =
+        json.into_model();
     let sign_raw_transaction = model.unwrap();
 
     // The proves we did everything correctly.
@@ -533,9 +534,10 @@ fn create_sign_with_key_send(node: &Node) {
     let model: mtype::DumpPrivKey = json.into_model().expect("DumpPrivKey");
     let key = model.0;
 
-    let json: SignRawTransaction =
+    let json: SignRawTransactionWithKey =
         node.client.sign_raw_transaction_with_key(&tx, &[key]).expect("signrawtransactionwithkey");
-    let model: Result<mtype::SignRawTransaction, SignRawTransactionError> = json.into_model();
+    let model: Result<mtype::SignRawTransactionWithKey, SignRawTransactionError> =
+        json.into_model();
     let sign_raw_transaction = model.unwrap();
 
     // The proves we did everything correctly.
@@ -580,12 +582,13 @@ fn create_fund_sign_send(node: &Node) {
     let funded = json.transaction().unwrap();
 
     // This method is from the wallet section.
-    let json: SignRawTransaction = node
+    let json: SignRawTransactionWithWallet = node
         .client
         .sign_raw_transaction_with_wallet(&funded)
         .expect("signrawtransactionwithwallet");
     // This proves we did everything correctly.
-    let model: Result<mtype::SignRawTransaction, SignRawTransactionError> = json.into_model();
+    let model: Result<mtype::SignRawTransactionWithWallet, SignRawTransactionError> =
+        json.into_model();
     let sign_raw_transaction = model.unwrap();
     let _ =
         node.client.send_raw_transaction(&sign_raw_transaction.tx).expect("createrawtransaction");

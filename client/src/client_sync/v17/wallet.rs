@@ -660,7 +660,7 @@ macro_rules! impl_client_v17__sign_raw_transaction_with_wallet {
             pub fn sign_raw_transaction_with_wallet(
                 &self,
                 tx: &bitcoin::Transaction,
-            ) -> Result<SignRawTransaction> {
+            ) -> Result<SignRawTransactionWithWallet> {
                 let hex = bitcoin::consensus::encode::serialize_hex(tx);
                 self.call("signrawtransactionwithwallet", &[into_json(hex)?])
             }

@@ -16,6 +16,8 @@ use bitcoin::{
 };
 use serde::{Deserialize, Serialize};
 
+use super::SignRawTransaction;
+
 /// The purpose of an address. Part of `getaddressesbylabel`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum AddressPurpose {
@@ -827,6 +829,12 @@ pub struct SendToAddress {
 /// Models the result of JSON-RPC method `signmessage`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SignMessage(pub sign_message::MessageSignature);
+
+/// Models the result of JSON-RPC method `signrawtransactionwithwallet`.
+///
+/// **Note:** This is a type alias of [`SignRawTransaction`] because the RPC response
+/// shape is identical, and our policy is to have a return type for every RPC method.
+pub type SignRawTransactionWithWallet = SignRawTransaction;
 
 /// Models the result of JSON-RPC method `simulaterawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

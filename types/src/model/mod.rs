@@ -43,8 +43,8 @@ pub use self::{
         ConvertToPsbt, CreatePsbt, CreateRawTransaction, DecodePsbt, DecodeRawTransaction,
         DecodeScript, DescriptorProcessPsbt, FinalizePsbt, FundRawTransaction, GetRawTransaction,
         GetRawTransactionVerbose, JoinPsbts, MempoolAcceptance, MempoolAcceptanceFees,
-        SendRawTransaction, SignFail, SignRawTransaction, SubmitPackage, SubmitPackageTxResult,
-        SubmitPackageTxResultFees, TestMempoolAccept, UtxoUpdatePsbt,
+        SendRawTransaction, SignFail, SignRawTransaction, SignRawTransactionWithKey, SubmitPackage,
+        SubmitPackageTxResult, SubmitPackageTxResultFees, TestMempoolAccept, UtxoUpdatePsbt,
     },
     util::{
         CreateMultisig, DeriveAddresses, DeriveAddressesMultipath, EstimateSmartFee,
@@ -61,7 +61,7 @@ pub use self::{
         ListReceivedByLabel, ListReceivedByLabelItem, ListSinceBlock, ListTransactions,
         ListUnspent, ListUnspentItem, ListWallets, LoadWallet, PsbtBumpFee, RescanBlockchain,
         ScriptType, Send, SendAll, SendMany, SendManyVerbose, SendToAddress, SignMessage,
-        SimulateRawTransaction, TransactionCategory, TransactionItem, UnloadWallet,
-        WalletCreateFundedPsbt, WalletDisplayAddress, WalletProcessPsbt,
+        SignRawTransactionWithWallet, SimulateRawTransaction, TransactionCategory, TransactionItem,
+        UnloadWallet, WalletCreateFundedPsbt, WalletDisplayAddress, WalletProcessPsbt,
     },
 };

@@ -16,6 +16,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
 pub use self::error::*;
+use super::SignRawTransaction;
 
 /// Result of JSON-RPC method `abortrescan`.
 ///
@@ -960,6 +961,21 @@ pub struct SignMessage(
     /// The signature of the message encoded in base 64.
     pub String,
 );
+
+/// Result of JSON-RPC method `signrawtransactionwithwallet`.
+///
+/// > signrawtransactionwithwallet "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] sighashtype )
+/// >
+/// > Sign inputs for raw transaction (serialized, hex-encoded).
+/// > The second optional argument (may be null) is an array of previous transaction outputs that
+/// > this transaction depends on but may not yet be in the block chain.
+/// >
+/// > Arguments:
+/// > 1. "hexstring"                      (string, required) The transaction hex string
+///
+/// **Note:** This is a type alias of [`SignRawTransaction`] because the RPC response
+/// shape is identical, and our policy is to have a return type for every RPC method.
+pub type SignRawTransactionWithWallet = SignRawTransaction;
 
 /// Result of the JSON-RPC method `walletcreatefundedpsbt`.
 ///

@@ -290,9 +290,10 @@ pub use crate::{
         LockUnspent, Locked, NumericError, PruneBlockchain, RawTransactionError,
         RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType,
         SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignMessage,
-        SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError, TransactionCategory,
-        UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-        VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo,
+        SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
+        SignRawTransactionWithKey, SignRawTransactionWithWallet, TransactionCategory, UploadTarget,
+        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

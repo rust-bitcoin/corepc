@@ -281,8 +281,9 @@ pub use crate::v17::{
     PsbtScript, RawTransaction, RawTransactionError, RawTransactionInput, RawTransactionOutput,
     RescanBlockchain, ScriptType, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive,
     SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
-    SignRawTransactionError, Softfork, SoftforkReject, TestMempoolAccept, TransactionCategory,
-    TransactionItem, TransactionItemError, UploadTarget, ValidateAddress, ValidateAddressError,
-    VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
-    WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+    SignRawTransactionError, SignRawTransactionWithKey, SignRawTransactionWithWallet, Softfork,
+    SoftforkReject, TestMempoolAccept, TransactionCategory, TransactionItem, TransactionItemError,
+    UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
+    VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
+    WitnessUtxo,
 };
