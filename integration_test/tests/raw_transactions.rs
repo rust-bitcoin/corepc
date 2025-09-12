@@ -406,8 +406,10 @@ fn raw_transactions__test_mempool_accept__modelled() {
     let signed_tx = signed_model.tx;
 
     // Call testmempoolaccept with the valid (not yet broadcast) transaction.
-    let json: TestMempoolAccept =
-        node.client.test_mempool_accept(&[signed_tx.clone()]).expect("testmempoolaccept");
+    let json: TestMempoolAccept = node
+        .client
+        .test_mempool_accept(std::slice::from_ref(&signed_tx))
+        .expect("testmempoolaccept");
     #[cfg(feature = "v20_and_below")]
     type TestMempoolAcceptError = hex::HexToArrayError;
     let model: Result<mtype::TestMempoolAccept, TestMempoolAcceptError> = json.into_model();
