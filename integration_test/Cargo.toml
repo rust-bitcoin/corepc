@@ -13,6 +13,8 @@ edition = "2021"
 [features]
 download = ["node/download"]
 
+latest = ["29_0"]
+
 # Enable the same feature in `node` and the version feature here.
 # All minor releases of the latest three versions.
 29_0 = ["v29_and_below", "node/29_0"]

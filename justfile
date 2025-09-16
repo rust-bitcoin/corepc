@@ -12,6 +12,7 @@ default:
 
 # Cargo build everything.
 build:
+<<<<<<< HEAD
   cargo build --workspace --all-targets --all-features
 
 # Cargo check everything.
@@ -21,6 +22,29 @@ check:
 # Lint everything.
 lint: lint-verify lint-integration-tests
   cargo +$(cat ./nightly-version) clippy --workspace --all-targets --all-features -- --deny warnings
+=======
+  cargo build -p corepc-client --all-targets --all-features
+  cargo build -p corepc-types --all-targets --all-features
+  cargo build -p jsonrpc --all-targets --all-features
+  cargo build -p corepc-node --all-targets --features=latest
+  cargo build --manifest-path verify/Cargo.toml --all-targets
+
+# Cargo check everything.
+check:
+  cargo check -p corepc-client --all-targets --all-features
+  cargo check -p corepc-types --all-targets --all-features
+  cargo check -p jsonrpc --all-targets --all-features
+  cargo check -p corepc-node --all-targets --features=latest
+  cargo check --manifest-path verify/Cargo.toml --all-targets
+
+# Lint everything.
+lint: lint-verify lint-integration-tests
+  cargo +$(cat ./nightly-version) clippy -p corepc-client --all-targets --all-features -- --deny warnings
+  cargo +$(cat ./nightly-version) clippy -p corepc-types --all-targets --all-features -- --deny warnings
+  cargo +$(cat ./nightly-version) clippy -p jsonrpc --all-targets --all-features -- --deny warnings
+  cargo +$(cat ./nightly-version) clippy -p corepc-node --all-targets --features=latest -- --deny warnings
+  cargo +$(cat ./nightly-version) clippy --manifest-path verify/Cargo.toml --all-targets -- --deny warnings
+>>>>>>> 2d0ee43 (Add latest feature to avoid hardcoded versions in build scripts)
 
 lint-verify:
   $REPO_DIR/contrib/lint-verify.sh
