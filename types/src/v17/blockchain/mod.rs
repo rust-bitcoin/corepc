@@ -23,7 +23,7 @@ use crate::{model, ScriptPubkey};
 /// >
 /// > Returns the hash of the best (tip) block in the most-work fully-validated chain.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBestBlockHash(pub String);
 
 /// Result of JSON-RPC method `getblock` with verbosity set to 0.
@@ -38,7 +38,7 @@ pub struct GetBestBlockHash(pub String);
 /// > 1. "blockhash"          (string, required) The block hash
 /// > 2. verbosity              (numeric, optional, default=1) 0 for hex encoded data, 1 for a json object, and 2 for json object with transaction data
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockVerboseZero(
     /// A string that is serialized, hex-encoded data for block 'hash'.
     pub String,
@@ -46,7 +46,7 @@ pub struct GetBlockVerboseZero(
 
 /// Result of JSON-RPC method `getblock` with verbosity set to 1.
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockVerboseOne {
     /// The block hash (same as provided) in RPC call.
     pub hash: String,
@@ -102,7 +102,7 @@ pub struct GetBlockVerboseOne {
 /// >
 /// > Returns an object containing various state info regarding blockchain processing.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockchainInfo {
     /// Current network name as defined in BIP70 (main, test, signet, regtest).
     pub chain: String,
@@ -148,7 +148,7 @@ pub struct GetBlockchainInfo {
 
 /// Softfork status. Part of `getblockchaininfo`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Softfork {
     /// Name of softfork.
     pub id: String,
@@ -160,7 +160,7 @@ pub struct Softfork {
 
 /// Progress toward rejecting pre-softfork blocks. Part of `getblockchaininfo`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SoftforkReject {
     /// `true` if threshold reached.
     pub status: bool,
@@ -168,7 +168,7 @@ pub struct SoftforkReject {
 
 /// Status of BIP-9 softforks in progress. Part of `getblockchaininfo`.
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Bip9Softfork {
     /// One of "defined", "started", "locked_in", "active", "failed".
     pub status: Bip9SoftforkStatus,
@@ -205,7 +205,7 @@ pub enum Bip9SoftforkStatus {
 /// >
 /// > Returns the number of blocks in the longest blockchain.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockCount(pub u64);
 
 /// Result of JSON-RPC method `getblockhash`.
@@ -215,7 +215,7 @@ pub struct GetBlockCount(pub u64);
 /// > Arguments:
 /// > 1. height         (numeric, required) The height index
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockHash(pub String);
 
 /// Result of JSON-RPC method `getblockheader` with verbosity set to `false`.
@@ -226,7 +226,7 @@ pub struct GetBlockHash(pub String);
 /// > Arguments:
 /// > 1. "hash"          (string, required) The block hash
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockHeader(pub String);
 
 /// Result of JSON-RPC method `getblockheader` with verbosity set to `true`.
@@ -237,7 +237,7 @@ pub struct GetBlockHeader(pub String);
 /// > Arguments:
 /// > 1. "hash"          (string, required) The block hash
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockHeaderVerbose {
     /// The block hash (same as provided).
     pub hash: String,
@@ -292,7 +292,7 @@ pub struct GetBlockHeaderVerbose {
 /// > Arguments:
 /// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockStats {
     /// Average fee in the block.
     #[serde(rename = "avgfee")]
@@ -381,12 +381,12 @@ pub struct GetBlockStats {
 ///
 /// > Return information about all known tips in the block tree, including the main chain as well as orphaned branches.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetChainTips(pub Vec<ChainTips>);
 
 /// Chain tip item. Part of `getchaintips`.
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ChainTips {
     /// Height of the chain tip.
     pub height: i64,
@@ -421,7 +421,7 @@ pub enum ChainTipsStatus {
 /// >
 /// > Compute statistics about the total number and rate of transactions in the chain.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetChainTxStats {
     /// The timestamp for the final block in the window in UNIX format.
     pub time: i64,
@@ -450,7 +450,7 @@ pub struct GetChainTxStats {
 /// > Result:
 /// > n.nnn       (numeric) the proof-of-work difficulty as a multiple of the minimum difficulty.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetDifficulty(pub f64);
 
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to `false`.
@@ -462,14 +462,14 @@ pub struct GetDifficulty(pub f64);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolAncestors(pub Vec<String>);
 
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to true.
 ///
 /// Map of txid to [`MempoolEntry`] i.e., an ancestor.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `getmempooldescendants` with verbose set to `false`.
@@ -481,14 +481,14 @@ pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolDescendants(pub Vec<String>);
 
 /// Result of JSON-RPC method `getmempooldescendants` with verbose set to true.
 ///
 /// Map of txid to [`MempoolEntry`] i.e., a descendant.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `getmempoolentry`.
@@ -500,12 +500,12 @@ pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolEntry(pub MempoolEntry);
 
 /// Mempool data. Part of `getmempoolentry`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolEntry {
     /// Virtual transaction size as defined in BIP 141.
     ///
@@ -551,7 +551,7 @@ pub struct MempoolEntry {
 
 /// Fee object. Part of `getmempoolentry`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolEntryFees {
     /// Transaction fee in BTC.
     pub base: f64,
@@ -569,7 +569,7 @@ pub struct MempoolEntryFees {
 /// >
 /// > Returns details on the active state of the TX memory pool.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolInfo {
     /// Current transaction count.
     pub size: i64,
@@ -599,14 +599,14 @@ pub struct GetMempoolInfo {
 /// >
 /// > Hint: use getmempoolentry to fetch a specific transaction from the mempool.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawMempool(pub Vec<String>);
 
 /// Result of JSON-RPC method `getrawmempool` with verbose set to `true`.
 ///
 /// Map of txid to [`MempoolEntry`].
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `gettxout`.
@@ -619,7 +619,7 @@ pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > 1. txid               (string, required) The transaction id
 /// > 2. n                  (numeric, required) vout number
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTxOut {
     /// The hash of the block at the tip of the chain.
     #[serde(rename = "bestblock")]
@@ -642,7 +642,7 @@ pub struct GetTxOut {
 /// > Returns statistics about the unspent transaction output set.
 /// > Note this call may take some time.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTxOutSetInfo {
     /// The current block height (index).
     pub height: i64,
@@ -673,7 +673,7 @@ pub struct GetTxOutSetInfo {
 /// > 1. "height"       (numeric, required) The block height to prune up to. May be set to a discrete height, or a unix timestamp
 /// >                   to prune blocks whose block time is at least 2 hours older than the provided timestamp.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PruneBlockchain(
     /// The height of the last block pruned.
     pub i64,
@@ -681,7 +681,7 @@ pub struct PruneBlockchain(
 
 /// Result of JSON-RPC method `verifychain`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct VerifyChain(pub bool);
 
 /// Result of JSON-RPC method `verifytxoutproof`.
@@ -696,5 +696,5 @@ pub struct VerifyChain(pub bool);
 ///
 /// Inner field is the txid(s) which the proof commits to, or empty array if the proof can not be validated.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct VerifyTxOutProof(pub Vec<String>);

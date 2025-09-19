@@ -20,7 +20,7 @@ pub use super::{GetAddressInfoEmbeddedError, GetAddressInfoError, ScriptType};
 /// > Arguments:
 /// > 1. "address"                    (string, required) The bitcoin address to get the information of.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfo {
     /// The bitcoin address validated.
     pub address: String,
@@ -92,7 +92,7 @@ pub struct GetAddressInfo {
 /// It includes all getaddressinfo output fields for the embedded address, excluding metadata
 /// ("timestamp", "hdkeypath", "hdseedid") and relation to the wallet ("ismine", "iswatchonly").
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfoEmbedded {
     /// The bitcoin address validated.
     pub address: String,
@@ -144,7 +144,7 @@ pub struct GetAddressInfoEmbedded {
 ///
 /// > List descriptors imported into a descriptor-enabled wallet.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListDescriptors {
     /// Name of wallet this operation was performed on.
     pub wallet_name: String,
@@ -154,7 +154,7 @@ pub struct ListDescriptors {
 
 /// A descriptor object from `listdescriptors`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DescriptorInfo {
     /// Descriptor string representation.
     #[serde(rename = "desc")]
@@ -175,7 +175,7 @@ pub struct DescriptorInfo {
 ///
 /// > Display address on an external signer for verification.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct WalletDisplayAddress {
     /// The address as confirmed by the signer
     pub address: String,

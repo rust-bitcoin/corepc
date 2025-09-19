@@ -35,7 +35,7 @@ pub use super::{
 /// > 7. load_on_startup         (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
 /// > 8. external_signer         (boolean, optional, default=false) Use an external signer such as a hardware wallet. Requires -signer to be configured. Wallet creation will fail if keys cannot be fetched. Requires disable_private_keys and descriptors set to true.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateWallet {
     /// The wallet name if created successfully.
     ///
@@ -51,7 +51,7 @@ pub struct CreateWallet {
 /// >
 /// > Returns an object with all balances in BTC.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalances {
     /// Balances from outputs that the wallet can sign.
     pub mine: GetBalancesMine,
@@ -71,7 +71,7 @@ pub struct GetBalances {
 /// > Arguments:
 /// > 1. txid                 (string, required) The transaction id
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount in BTC.
     pub amount: f64,
@@ -138,7 +138,7 @@ pub struct GetTransaction {
 
 /// Last processed block item. Part of of `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct LastProcessedBlock {
     /// Hash of the block this information was generated on.
     pub hash: String,
@@ -152,7 +152,7 @@ pub struct LastProcessedBlock {
 /// >
 /// > Returns an object containing various wallet state info.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetWalletInfo {
     /// the wallet name
     #[serde(rename = "walletname")]
@@ -229,7 +229,7 @@ pub enum GetWalletInfoScanning {
 /// > 1. filename           (string, required) The wallet directory or .dat file.
 /// > 2. load_on_startup    (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct LoadWallet {
     /// The wallet name if loaded successfully.
     pub name: String,
@@ -248,7 +248,7 @@ pub struct LoadWallet {
 /// > 1. wallet_name        (string, optional, default=the wallet name from the RPC endpoint) The name of the wallet to unload. If provided both here and in the RPC endpoint, the two must be identical.
 /// > 2. load_on_startup    (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UnloadWallet {
     /// Warning messages, if any, related to loading the wallet.
     pub warnings: Option<Vec<String>>,
@@ -265,7 +265,7 @@ pub struct UnloadWallet {
 /// > Arguments:
 /// > 1. "psbt"                      (string, required) The transaction base64 string
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct WalletProcessPsbt {
     /// The base64-encoded partially signed transaction.
     pub psbt: String,

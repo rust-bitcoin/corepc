@@ -26,7 +26,7 @@ pub use super::{
 /// > Arguments:
 /// > 1. type       (string, required) The address type the descriptor will produce. Options are "legacy", "p2sh-segwit", "bech32", and "bech32m".
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateWalletDescriptor {
     /// The public descriptors that were added to the wallet.
     #[serde(rename = "descs")]
@@ -43,7 +43,7 @@ pub struct CreateWalletDescriptor {
 /// > Arguments:
 /// > 1. "address"                    (string, required) The bitcoin address to get the information of.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfo {
     /// The bitcoin address validated.
     pub address: String,
@@ -115,7 +115,7 @@ pub struct GetAddressInfo {
 /// It includes all getaddressinfo output fields for the embedded address, excluding metadata
 /// ("timestamp", "hdkeypath", "hdseedid") and relation to the wallet ("ismine", "iswatchonly").
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfoEmbedded {
     /// The bitcoin address validated.
     pub address: String,
@@ -169,12 +169,12 @@ pub struct GetAddressInfoEmbedded {
 /// >
 /// > List all BIP 32 HD keys in the wallet and which descriptors use them.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetHdKeys(pub Vec<HdKey>);
 
 /// HD key entry. Part of `gethdkeys`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct HdKey {
     /// The extended public key.
     pub xpub: String,
@@ -189,7 +189,7 @@ pub struct HdKey {
 
 /// Descriptor object. Part of `gethdkeys`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct HdKeyDescriptor {
     /// Descriptor string representation.
     #[serde(rename = "desc")]
@@ -207,7 +207,7 @@ pub struct HdKeyDescriptor {
 /// > Arguments:
 /// > 1. txid                 (string, required) The transaction id
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount in BTC.
     pub amount: f64,
@@ -278,7 +278,7 @@ pub struct GetTransaction {
 
 /// Result of the JSON-RPC method `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListSinceBlock {
     /// All the transactions.
     pub transactions: Vec<TransactionItem>,
@@ -298,7 +298,7 @@ pub struct ListSinceBlock {
 
 /// Transaction item. Part of `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TransactionItem {
     /// Only returns true if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
@@ -383,5 +383,5 @@ pub struct TransactionItem {
 /// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
 /// > bitcoind with -deprecatedrpc=accounts
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListTransactions(pub Vec<TransactionItem>);

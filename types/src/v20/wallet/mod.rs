@@ -30,7 +30,7 @@ pub use super::{
 /// > 1. nrequired                      (numeric, required) The number of required signatures out of the n keys or addresses.
 /// > 2. "keys"                         (string, required) A json array of bitcoin addresses or hex-encoded public keys
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddMultisigAddress {
     /// The value of the new multisig address.
     pub address: String,
@@ -51,7 +51,7 @@ pub struct AddMultisigAddress {
 /// > Arguments:
 /// > 1. "address"                    (string, required) The bitcoin address to get the information of.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfo {
     /// The bitcoin address validated.
     pub address: String,
@@ -120,7 +120,7 @@ pub struct GetAddressInfo {
 /// It includes all getaddressinfo output fields for the embedded address, excluding metadata
 /// ("timestamp", "hdkeypath", "hdseedid") and relation to the wallet ("ismine", "iswatchonly").
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfoEmbedded {
     /// The bitcoin address validated.
     pub address: String,
@@ -174,7 +174,7 @@ pub struct GetAddressInfoEmbedded {
 /// > Arguments:
 /// > 1. txid                 (string, required) The transaction id
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount in BTC.
     pub amount: f64,
@@ -226,7 +226,7 @@ pub struct GetTransaction {
 
 /// Transaction detail. Part of the `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransactionDetail {
     /// Only returns true if imported addresses were involved in transaction. v20 and later only.
     #[serde(rename = "involvesWatchonly")]
@@ -261,7 +261,7 @@ pub struct GetTransactionDetail {
 /// > If "blockhash" is no longer a part of the main chain, transactions from the fork point onward are included.
 /// > Additionally, if include_removed is set, transactions affecting the wallet which were removed are returned in the "removed" array.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListSinceBlock {
     /// All the transactions.
     pub transactions: Vec<TransactionItem>,
@@ -281,7 +281,7 @@ pub struct ListSinceBlock {
 
 /// Transaction item. Part of `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TransactionItem {
     /// Only returns true if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
@@ -354,5 +354,5 @@ pub struct TransactionItem {
 /// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
 /// > bitcoind with -deprecatedrpc=accounts
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListTransactions(pub Vec<TransactionItem>);

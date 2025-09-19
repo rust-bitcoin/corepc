@@ -192,7 +192,7 @@ crate::impl_client_v17__get_zmq_notifications!();
 
 /// Request object for the `importdescriptors` method.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ImportDescriptorsRequest {
     /// Descriptor to import.
     #[serde(rename = "desc")]

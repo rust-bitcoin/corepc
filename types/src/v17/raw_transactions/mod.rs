@@ -38,7 +38,7 @@ pub use crate::psbt::{
 /// >       ,...
 /// >     ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CombinePsbt(
     /// The base64-encoded partially signed transaction.
     pub String,
@@ -58,7 +58,7 @@ pub struct CombinePsbt(
 /// >       ,...
 /// >     ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CombineRawTransaction(
     /// The hex-encoded raw transaction with signature(s).
     pub String,
@@ -74,7 +74,7 @@ pub struct CombineRawTransaction(
 /// > Arguments:
 /// > 1. "hexstring"              (string, required) The hex string of a raw transaction
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ConvertToPsbt(
     /// The resulting raw transaction (base64-encoded string).
     pub String,
@@ -94,7 +94,7 @@ pub struct ConvertToPsbt(
 /// >          "txid":"id",      (string, required) The transaction id
 /// >          "vout":n,         (numeric, required) The output number
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreatePsbt(
     /// The resulting raw transaction (base64-encoded string).
     pub String,
@@ -117,7 +117,7 @@ pub struct CreatePsbt(
 /// >          "txid":"id",      (string, required) The transaction id
 /// >          "vout":n,         (numeric, required) The output number
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateRawTransaction(
     /// hex string of the transaction.
     pub String,
@@ -132,7 +132,7 @@ pub struct CreateRawTransaction(
 /// > Arguments:
 /// > 1. "psbt"            (string, required) The PSBT base64 string
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodePsbt {
     /// The decoded network-serialized unsigned transaction.
     pub tx: RawTransaction,
@@ -148,7 +148,7 @@ pub struct DecodePsbt {
 
 /// An input in a partially signed Bitcoin transaction. Part of `decodepsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PsbtInput {
     /// Decoded network transaction for non-witness UTXOs.
     pub non_witness_utxo: Option<RawTransaction>,
@@ -177,7 +177,7 @@ pub struct PsbtInput {
 
 /// An output in a partially signed Bitcoin transaction. Part of `decodepsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PsbtOutput {
     /// The redeem script.
     pub redeem_script: Option<PsbtScript>,
@@ -198,7 +198,7 @@ pub struct PsbtOutput {
 /// > Arguments:
 /// > 1. "hexstring"      (string, required) The transaction hex string
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodeRawTransaction(pub RawTransaction);
 
 /// Result of JSON-RPC method `decodescript`.
@@ -211,7 +211,7 @@ pub struct DecodeRawTransaction(pub RawTransaction);
 /// > 1. "hexstring"     (string) the hex encoded script
 // The docs on Core v0.17 appear to be way off what is actually returned.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodeScript {
     /// Script public key.
     pub asm: String,
@@ -239,7 +239,7 @@ pub struct DecodeScript {
 /// Seemingly undocumented data returned in the `segwit` field of `DecodeScript`.
 // This seems to be the same as `DecodeScript` except the `p2sh` field is called `p2sh-segwit`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodeScriptSegwit {
     /// Script public key.
     pub asm: String,
@@ -269,7 +269,7 @@ pub struct DecodeScriptSegwit {
 /// > Arguments:
 /// > 1. "psbt"                 (string) A base64 string of a PSBT
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct FinalizePsbt {
     /// The base64-encoded partially signed transaction if not extracted.
     pub psbt: Option<String>,
@@ -297,7 +297,7 @@ pub struct FinalizePsbt {
 /// > Arguments:
 /// > 1. "hexstring"           (string, required) The hex string of the raw transaction
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct FundRawTransaction {
     /// The resulting raw transaction (hex-encoded string).
     pub hex: String,
@@ -329,7 +329,7 @@ pub struct FundRawTransaction {
 /// > 2. verbose     (bool, optional, default=false) If false, return a string, otherwise return a json object
 /// > 3. "blockhash" (string, optional) The block in which to look for the transaction
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawTransaction(
     /// The serialized, hex-encoded data for 'txid'.
     pub String,
@@ -337,7 +337,7 @@ pub struct GetRawTransaction(
 
 /// Result of JSON-RPC method `getrawtransaction` with verbose set to `true`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawTransactionVerbose {
     /// Whether specified block is in the active chain or not (only present with explicit "blockhash" argument).
     pub in_active_chain: Option<bool>,
@@ -390,7 +390,7 @@ pub struct GetRawTransactionVerbose {
 /// > 1. hexstring        (string, required) The hex string of the raw transaction
 /// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendRawTransaction(
     /// The transaction hash in hex.
     pub String,
@@ -410,7 +410,7 @@ pub struct SendRawTransaction(
 /// > Arguments:
 /// > 1. "hexstring"     (string, required) The transaction hex string
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SignRawTransaction {
     /// The hex-encoded raw transaction with signature(s).
     pub hex: String,
@@ -440,7 +440,7 @@ pub type SignRawTransactionWithKey = SignRawTransaction;
 
 /// A script verification error. Part of `signrawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SignFail {
     /// The hash of the referenced, previous transaction.
     pub txid: String,
@@ -470,12 +470,12 @@ pub struct SignFail {
 /// >                                         Length must be one for now.
 /// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TestMempoolAccept(pub Vec<MempoolAcceptance>);
 
 /// A single mempool acceptance test result. Part of `testmempoolaccept`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolAcceptance {
     /// The transaction hash in hex.
     pub txid: String,

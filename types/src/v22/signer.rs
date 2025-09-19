@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// > Returns a list of external signers from -signer.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct EnumerateSigners {
     /// List of external signers.
     pub signers: Vec<Signers>,
@@ -18,7 +18,7 @@ pub struct EnumerateSigners {
 
 /// An signer item. Part of `enumeratesigners`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Signers {
     /// Master key fingerprint.
     pub fingerprint: String,

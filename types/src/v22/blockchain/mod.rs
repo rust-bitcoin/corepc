@@ -16,7 +16,7 @@ pub use super::GetMempoolInfoError;
 /// >
 /// > Returns details on the active state of the TX memory pool.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolInfo {
     /// True if the mempool is fully loaded. v0.19 and later only.
     pub loaded: bool,

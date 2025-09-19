@@ -23,14 +23,14 @@ pub use super::{GetMempoolInfoError, MapMempoolEntryError, MempoolEntryError, Me
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolAncestors(pub Vec<String>);
 
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to true.
 ///
 /// Map of txid to `MempoolEntry` i.e., an ancestor.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `getmempooldescendants` with verbose set to `false`.
@@ -42,14 +42,14 @@ pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolDescendants(pub Vec<String>);
 
 /// Result of JSON-RPC method `getmempooldescendants` with verbose set to true.
 ///
 /// Map of txid to [`MempoolEntry`] i.e., a descendant.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `getmempoolentry`.
@@ -61,12 +61,12 @@ pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolEntry(pub MempoolEntry);
 
 /// Mempool data. Part of `getmempoolentry`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolEntry {
     /// Virtual transaction size as defined in BIP 141.
     ///
@@ -115,7 +115,7 @@ pub struct MempoolEntry {
 /// >
 /// > Returns details on the active state of the TX memory pool.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolInfo {
     /// True if the mempool is fully loaded. v0.19 and later only.
     pub loaded: bool,
@@ -162,12 +162,12 @@ pub struct GetMempoolInfo {
 /// > Arguments:
 /// > 1. outputs                 (json array, required) The transaction outputs that we want to check, and within each, the txid (string) vout (numeric).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTxSpendingPrevout(pub Vec<GetTxSpendingPrevoutItem>);
 
 /// A transaction item. Part of `gettxspendingprevout`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTxSpendingPrevoutItem {
     /// The transaction id of the checked output
     pub txid: String,

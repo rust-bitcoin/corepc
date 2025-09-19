@@ -26,7 +26,7 @@ pub use super::GetBlockStatsError;
 /// > Arguments:
 /// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockStats {
     /// Average fee in the block.
     #[serde(rename = "avgfee")]

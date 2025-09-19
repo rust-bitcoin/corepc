@@ -22,7 +22,7 @@ pub use super::{
 /// >
 /// > Returns an object containing various state info regarding blockchain processing.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockchainInfo {
     /// Current network name as defined in BIP70 (main, test, signet, regtest).
     pub chain: String,
@@ -73,7 +73,7 @@ pub struct GetBlockchainInfo {
 /// >
 /// > Returns an object containing various state info regarding deployments of consensus changes.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetDeploymentInfo {
     /// Requested block hash (or tip).
     pub hash: String,
@@ -85,7 +85,7 @@ pub struct GetDeploymentInfo {
 
 /// Deployment info. Part of `getdeploymentinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DeploymentInfo {
     /// One of "buried", "bip9".
     #[serde(rename = "type")]
@@ -100,7 +100,7 @@ pub struct DeploymentInfo {
 
 /// Status of bip9 softforks. Part of `getdeploymentinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Bip9Info {
     /// The bit (0-28) in the block version field used to signal this softfork (only for "started" and "locked_in" status).
     pub bit: Option<u8>,
@@ -124,7 +124,7 @@ pub struct Bip9Info {
 
 /// Numeric statistics about signalling for a softfork. Part of `getdeploymentinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Bip9Statistics {
     /// The length in blocks of the signalling period.
     pub period: u32,
@@ -147,14 +147,14 @@ pub struct Bip9Statistics {
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolAncestors(pub Vec<String>);
 
 /// Result of JSON-RPC method `getmempoolancestors` with verbose set to true.
 ///
 /// Map of txid to `MempoolEntry` i.e., an ancestor.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `getmempooldescendants` with verbose set to `false`.
@@ -166,14 +166,14 @@ pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolDescendants(pub Vec<String>);
 
 /// Result of JSON-RPC method `getmempooldescendants` with verbose set to true.
 ///
 /// Map of txid to [`MempoolEntry`] i.e., a descendant.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 
 /// Result of JSON-RPC method `getmempoolentry`.
@@ -185,12 +185,12 @@ pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
 /// > Arguments:
 /// > 1. "txid"                 (string, required) The transaction id (must be in mempool)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolEntry(pub MempoolEntry);
 
 /// Mempool data. Part of `getmempoolentry`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolEntry {
     /// Virtual transaction size as defined in BIP 141.
     ///
@@ -255,7 +255,7 @@ pub struct MempoolEntry {
 ///
 /// > Dumps the mempool to disk. It will fail until the previous dump is fully loaded.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SaveMempool {
     /// The directory and file where the mempool was saved.
     pub filename: String,

@@ -56,7 +56,7 @@ pub enum Bip125Replaceable {
 
 /// Models the result of JSON-RPC method `addmultisigaddress`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddMultisigAddress {
     /// The new multisig address.
     pub address: Address<NetworkUnchecked>,
@@ -70,7 +70,7 @@ pub struct AddMultisigAddress {
 
 /// Models the result of JSON-RPC method `bumpfee`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct BumpFee {
     /// The id of the new transaction.
     pub txid: Txid,
@@ -84,7 +84,7 @@ pub struct BumpFee {
 
 /// Models the result of JSON-RPC method `createwallet`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateWallet {
     /// The wallet name if created successfully.
     ///
@@ -96,17 +96,17 @@ pub struct CreateWallet {
 
 /// Models the result of JSON-RPC method `dumpprivkey`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DumpPrivKey(pub PrivateKey);
 
 /// Models the result of JSON-RPC method `getaddressesbylabel`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressesByLabel(pub BTreeMap<Address<NetworkUnchecked>, AddressInformation>);
 
 /// Address information. Part of `getaddressesbylabel`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddressInformation {
     /// Purpose of address.
     pub purpose: AddressPurpose,
@@ -246,14 +246,14 @@ pub struct GetAddressInfoEmbedded {
 
 /// Models the result of JSON-RPC method `getbalance`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalance(pub Amount);
 
 /// Models the result of JSON-RPC method `getbalances`.
 ///
 /// Core version 0.19 onwards.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalances {
     /// Balances from outputs that the wallet can sign.
     pub mine: GetBalancesMine,
@@ -266,7 +266,7 @@ pub struct GetBalances {
 
 /// Balances from outputs that the wallet can sign. Part of `getbalances`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalancesMine {
     /// Trusted balance (outputs created by the wallet or confirmed outputs).
     pub trusted: Amount,
@@ -282,7 +282,7 @@ pub struct GetBalancesMine {
 
 /// Hash and height of the block this information was generated on. Part of `getbalances`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalancesWatchOnly {
     /// Trusted balance (outputs created by the wallet or confirmed outputs).
     pub trusted: Amount,
@@ -294,12 +294,12 @@ pub struct GetBalancesWatchOnly {
 
 /// Models the result of JSON-RPC method `gethdkeys`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetHdKeys(pub Vec<HdKey>);
 
 /// An HD key entry. Part of `gethdkeys`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct HdKey {
     /// The extended public key.
     pub xpub: Xpub,
@@ -313,7 +313,7 @@ pub struct HdKey {
 
 /// Descriptor object. Part of `gethdkeys`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct HdKeyDescriptor {
     /// Descriptor string representation.
     pub descriptor: String,
@@ -323,27 +323,27 @@ pub struct HdKeyDescriptor {
 
 /// Models the result of JSON-RPC method `getnewaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNewAddress(pub Address<NetworkUnchecked>);
 
 /// Models the result of JSON-RPC method `getrawchangeaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawChangeAddress(pub Address<NetworkUnchecked>);
 
 /// Models the result of JSON-RPC method `getreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetReceivedByAddress(pub Amount);
 
 /// Models the result of JSON-RPC method `getreceivedbylabel`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetReceivedByLabel(pub Amount);
 
 /// Models the result of JSON-RPC method `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount.
     #[serde(default, with = "bitcoin::amount::serde::as_btc")]
@@ -404,7 +404,7 @@ pub struct GetTransaction {
 
 /// Transaction detail. Part of the `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransactionDetail {
     /// Only returns true if imported addresses were involved in transaction. v20 and later only.
     pub involves_watch_only: Option<bool>,
@@ -437,7 +437,7 @@ pub struct GetTransactionDetail {
 
 /// Last processed block item. Part of of `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct LastProcessedBlock {
     /// Hash of the block this information was generated on.
     pub hash: BlockHash,
@@ -447,12 +447,12 @@ pub struct LastProcessedBlock {
 
 /// Models the result of JSON-RPC method `getunconfirmedbalance`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetUnconfirmedBalance(pub Amount);
 
 /// Models the result of JSON-RPC method `getwalletinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetWalletInfo {
     /// The wallet name.
     pub wallet_name: String,
@@ -515,13 +515,13 @@ pub enum GetWalletInfoScanning {
 
 /// Models the result of JSON-RPC method `listaddressgroupings`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListAddressGroupings(pub Vec<Vec<ListAddressGroupingsItem>>);
 
 /// List address item. Part of `listaddressgroupings`.
 // FIXME: The Core docs seem wrong, not sure what shape this should be?
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListAddressGroupingsItem {
     /// The bitcoin address.
     pub address: Address<NetworkUnchecked>,
@@ -533,12 +533,12 @@ pub struct ListAddressGroupingsItem {
 
 /// Models the result of JSON-RPC method `listlockunspent`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListLockUnspent(pub Vec<ListLockUnspentItem>);
 
 /// List lock unspent item. Part of of `listlockunspent`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListLockUnspentItem {
     /// The transaction id locked.
     pub txid: Txid,
@@ -548,12 +548,12 @@ pub struct ListLockUnspentItem {
 
 /// Models the result of JSON-RPC method `listreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByAddress(pub Vec<ListReceivedByAddressItem>);
 
 /// List received by address item. Part of of `listreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByAddressItem {
     /// Only returned if imported addresses were involved in transaction.
     pub involves_watch_only: Option<bool>,
@@ -571,12 +571,12 @@ pub struct ListReceivedByAddressItem {
 
 /// Models the result of JSON-RPC method `listreceivedbylabel`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByLabel(pub Vec<ListReceivedByLabelItem>);
 
 /// List received by label item. Part of of `listreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByLabelItem {
     /// Only returned if imported addresses were involved in transaction.
     pub involves_watch_only: Option<bool>,
@@ -590,7 +590,7 @@ pub struct ListReceivedByLabelItem {
 
 /// Models the result of JSON-RPC method `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListSinceBlock {
     /// All the transactions.
     pub transactions: Vec<TransactionItem>,
@@ -609,7 +609,7 @@ pub struct ListSinceBlock {
 
 /// Transaction item. Part of `listsinceblock` and `listtransactions`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TransactionItem {
     /// Only returns true if imported addresses were involved in transaction.
     pub involves_watch_only: Option<bool>,
@@ -691,17 +691,17 @@ pub struct TransactionItem {
 
 /// Models the result of JSON-RPC method `listtransactions`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListTransactions(pub Vec<TransactionItem>);
 
 /// Models the result of JSON-RPC method `listunspent`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListUnspent(pub Vec<ListUnspentItem>);
 
 /// Unspent transaction output. Part of `listunspent`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListUnspentItem {
     /// The transaction id.
     pub txid: Txid,
@@ -737,12 +737,12 @@ pub struct ListUnspentItem {
 
 /// Models the result of JSON-RPC method `listwallets`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListWallets(pub Vec<String>);
 
 /// Models the result of JSON-RPC method `loadwallet`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct LoadWallet {
     /// The wallet name if loaded successfully.
     pub name: String,
@@ -752,7 +752,7 @@ pub struct LoadWallet {
 
 /// Models the result of JSON-RPC method `psbtbumpfee`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PsbtBumpFee {
     /// The base64-encoded unsigned PSBT of the new transaction.
     pub psbt: Psbt,
@@ -766,7 +766,7 @@ pub struct PsbtBumpFee {
 
 /// Models the result of JSON-RPC method `rescanblockchain`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RescanBlockchain {
     /// The block height where the rescan has started.
     pub start_height: u32,
@@ -776,7 +776,7 @@ pub struct RescanBlockchain {
 
 /// Models the result of JSON-RPC method `send`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Send {
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
@@ -791,7 +791,7 @@ pub struct Send {
 
 /// Models the result of JSON-RPC method `sendall`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendAll {
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
@@ -806,12 +806,12 @@ pub struct SendAll {
 
 /// Models the result of JSON-RPC method `sendmany`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendMany(pub Txid);
 
 /// Models the verbose result of JSON-RPC method `sendmany` when `verbose=true`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendManyVerbose {
     /// The transaction id for the send. Only 1 transaction is created regardless of the number of addresses.
     pub txid: Txid,
@@ -821,7 +821,7 @@ pub struct SendManyVerbose {
 
 /// Models the result of JSON-RPC method `sendtoaddress`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendToAddress {
     pub txid: Txid,
 }
@@ -838,7 +838,7 @@ pub type SignRawTransactionWithWallet = SignRawTransaction;
 
 /// Models the result of JSON-RPC method `simulaterawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SimulateRawTransaction {
     /// The wallet balance change (negative means decrease).
     #[serde(default, with = "bitcoin::amount::serde::as_btc")]
@@ -849,7 +849,7 @@ pub struct SimulateRawTransaction {
 ///
 /// Core version v0.21 onwards.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UnloadWallet {
     /// Warning messages, if any, related to unloading the wallet.
     // Changes from single string to vector in Core v25
@@ -858,7 +858,7 @@ pub struct UnloadWallet {
 
 /// Models the result of JSON-RPC method `walletcreatefundedpsbt`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct WalletCreateFundedPsbt {
     /// The resulting PSBT.
     pub psbt: Psbt,
@@ -871,7 +871,7 @@ pub struct WalletCreateFundedPsbt {
 
 /// Models the result of JSON-RPC method `walletdisplayaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct WalletDisplayAddress {
     /// The address as confirmed by the signer
     pub address: Address<NetworkUnchecked>,
@@ -879,7 +879,7 @@ pub struct WalletDisplayAddress {
 
 /// Models the result of JSON-RPC method `walletprocesspsbt`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct WalletProcessPsbt {
     /// The partially signed transaction.
     pub psbt: Psbt,

@@ -24,12 +24,12 @@ pub use self::error::*;
 /// > Arguments:
 /// > 1. "node"   (string, optional) If provided, return information about this specific node, otherwise all nodes are returned.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddedNodeInfo(pub Vec<AddedNode>);
 
 /// An added node item. Part of `getaddednodeinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddedNode {
     /// The node IP address or name (as provided to addnode).
     #[serde(rename = "addednode")]
@@ -42,7 +42,7 @@ pub struct AddedNode {
 
 /// An added node address item. Part of `getaddednodeinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddedNodeAddress {
     /// The bitcoin server IP and port we're connected to.
     pub address: String,
@@ -56,7 +56,7 @@ pub struct AddedNodeAddress {
 /// >
 /// > Returns n (numeric) The connection count
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetConnectionCount(pub u64);
 
 /// Result of JSON-RPC method `getnettotals`.
@@ -66,7 +66,7 @@ pub struct GetConnectionCount(pub u64);
 /// > Returns information about network traffic, including bytes in, bytes out,
 /// > and current time.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetTotals {
     /// Total bytes received.
     #[serde(rename = "totalbytesrecv")]
@@ -84,7 +84,7 @@ pub struct GetNetTotals {
 
 /// The upload target totals. Part of `getnettotals`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UploadTarget {
     /// Length of the measuring timeframe in seconds.
     pub timeframe: u64,
@@ -106,7 +106,7 @@ pub struct UploadTarget {
 ///
 /// > Returns an object containing various state info regarding P2P networking.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfo {
     /// The server version.
     pub version: usize,
@@ -146,7 +146,7 @@ pub struct GetNetworkInfo {
 
 /// Information per network. Part of `getnetworkinfo`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfoNetwork {
     /// Network (ipv4, ipv6, onion, i2p, cjdns).
     pub name: String,
@@ -162,7 +162,7 @@ pub struct GetNetworkInfoNetwork {
 
 /// Local address info. Part of `getnetworkinfo`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfoAddress {
     /// Network address.
     pub address: String,
@@ -178,12 +178,12 @@ pub struct GetNetworkInfoAddress {
 /// >
 /// > Returns data about each connected network node as a json array of objects.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetPeerInfo(pub Vec<PeerInfo>);
 
 /// A peer info item. Part of `getpeerinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PeerInfo {
     /// Peer index.
     pub id: u32,
@@ -266,12 +266,12 @@ pub struct PeerInfo {
 ///
 /// > List all banned IPs/Subnets.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListBanned(pub Vec<Banned>);
 
 /// An banned item. Part of `listbanned`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Banned {
     // NOTE: Shape taken from Core source code,as method is undocumented in the Bitcoin RPC CLI for version 17 to 20.
     /// The IP/Subnet of the banned node.
@@ -290,5 +290,5 @@ pub struct Banned {
 /// >
 /// > Disable/enable all p2p network activity.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SetNetworkActive(pub bool);

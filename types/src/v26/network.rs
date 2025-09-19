@@ -14,12 +14,12 @@ use serde::{Deserialize, Serialize};
 /// >
 /// > Provides information about the node's address manager by returning the number of addresses in the `new` and `tried` tables and their sum for all networks.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddrManInfo(pub BTreeMap<String, AddrManInfoNetwork>);
 
 /// Address manager information. Part of `getaddrmaninfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddrManInfoNetwork {
     /// Number of addresses in the new table, which represent potential peers the node has discovered but hasn't yet successfully connected to.
     pub new: u64,
@@ -35,12 +35,12 @@ pub struct AddrManInfoNetwork {
 /// >
 /// > Returns data about each connected network node as a json array of objects.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetPeerInfo(pub Vec<PeerInfo>);
 
 /// A peer info item. Part of `getpeerinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PeerInfo {
     /// Peer index.
     pub id: u32,

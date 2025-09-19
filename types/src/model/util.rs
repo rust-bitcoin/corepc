@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 /// Models the result of JSON-RPC method `createmultisig`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateMultisig {
     /// The value of the new multisig address.
     pub address: Address<NetworkUnchecked>,
@@ -30,7 +30,7 @@ pub struct CreateMultisig {
 /// > Derives one or more addresses corresponding to an output descriptor.
 /// > Returns an array of derived addresses.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DeriveAddresses {
     /// The derived addresses.
     pub addresses: Vec<Address<NetworkUnchecked>>,
@@ -38,7 +38,7 @@ pub struct DeriveAddresses {
 
 /// Models the result of JSON-RPC method `deriveaddresses` for multipath descriptors.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DeriveAddressesMultipath {
     /// The derived addresses for each of the multipath expansions of the descriptor, in multipath specifier order.
     pub addresses: Vec<DeriveAddresses>,
@@ -46,7 +46,7 @@ pub struct DeriveAddressesMultipath {
 
 /// Models the result of JSON-RPC method `estimatesmartfee`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct EstimateSmartFee {
     /// Estimate fee rate in BTC/kB.
     pub fee_rate: Option<FeeRate>,

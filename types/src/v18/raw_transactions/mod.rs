@@ -20,7 +20,7 @@ pub use self::error::{AnalyzePsbtError, AnalyzePsbtInputMissingError};
 /// Arguments:
 /// 1. psbt    (string, required) A base64 string of a PSBT
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AnalyzePsbt {
     /// Array of input objects.
     pub inputs: Vec<AnalyzePsbtInput>,
@@ -39,7 +39,7 @@ pub struct AnalyzePsbt {
 
 /// Represents an input in a PSBT operation. Part of `analyzepsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AnalyzePsbtInput {
     /// Whether a UTXO is provided.
     pub has_utxo: bool,
@@ -53,7 +53,7 @@ pub struct AnalyzePsbtInput {
 
 /// Represents missing elements required to complete an input. Part of `analyzepsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AnalyzePsbtInputMissing {
     /// Public key ID, hash160 of the public key, of a public key whose BIP 32 derivation path is missing.
     pub pubkeys: Option<Vec<String>>,
@@ -81,7 +81,7 @@ pub struct AnalyzePsbtInputMissing {
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct JoinPsbts(
     /// The base64-encoded partially signed transaction.
     pub String,
@@ -96,7 +96,7 @@ pub struct JoinPsbts(
 /// > Arguments:
 /// > 1. psbt    (string, required) A base64 string of a PSBT
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UtxoUpdatePsbt(
     /// The base64-encoded partially signed transaction with inputs updated.
     pub String,

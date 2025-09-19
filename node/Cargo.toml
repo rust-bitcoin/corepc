@@ -41,7 +41,7 @@ zip = { version = "0.6.6", default-features = false, features = ["bzip2", "defla
 # - `cargo test --no-default-features` does not work, you MUST enable a version feature.
 [features]
 default = ["0_17_2"]
-
+serde-deny-unknown-fields = ["corepc-client/serde-deny-unknown-fields"]
 download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "minreq", "zip"]
 
 # We support all minor releases of the latest three versions.

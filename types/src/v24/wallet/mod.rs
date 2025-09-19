@@ -26,7 +26,7 @@ pub use super::{
 /// > Arguments:
 /// > 1. txid                 (string, required) The transaction id
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount in BTC.
     pub amount: f64,
@@ -90,7 +90,7 @@ pub struct GetTransaction {
 
 /// Transaction detail. Part of the `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransactionDetail {
     /// Only returns true if imported addresses were involved in transaction. v20 and later only.
     #[serde(rename = "involvesWatchonly")]
@@ -123,7 +123,7 @@ pub struct GetTransactionDetail {
 
 /// Result of the JSON-RPC method `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListSinceBlock {
     /// All the transactions.
     pub transactions: Vec<TransactionItem>,
@@ -143,7 +143,7 @@ pub struct ListSinceBlock {
 
 /// Transaction item. Part of `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TransactionItem {
     /// Only returns true if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
@@ -225,7 +225,7 @@ pub struct TransactionItem {
 /// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
 /// > bitcoind with -deprecatedrpc=accounts
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListTransactions(pub Vec<TransactionItem>);
 
 /// Result of the JSON-RPC method `listunspent`.
@@ -236,12 +236,12 @@ pub struct ListTransactions(pub Vec<TransactionItem>);
 /// > with between minconf and maxconf (inclusive) confirmations.
 /// > Optionally filter to only include txouts paid to specified addresses.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListUnspent(pub Vec<ListUnspentItem>);
 
 /// Unspent transaction output, part of `listunspent`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListUnspentItem {
     /// The transaction id.
     pub txid: String,
@@ -295,7 +295,7 @@ pub struct ListUnspentItem {
 /// > 1. wallet_name    (string, optional, default=the wallet name from the RPC endpoint) The name of the wallet to migrate. If provided both here and in the RPC endpoint, the two must be identical.
 /// > 2. passphrase     (string) The wallet passphrase
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MigrateWallet {
     /// The name of the primary migrated wallet
     pub wallet_name: String,
@@ -321,7 +321,7 @@ pub struct MigrateWallet {
 /// > 1. recipients                       (json array, required) The sendall destinations. Each address may only appear once.
 /// >                                     Optionally some recipients can be specified with an amount to perform payments, but at least one address must appear without a specified amount.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendAll {
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
@@ -342,7 +342,7 @@ pub struct SendAll {
 /// > Arguments:
 /// > 1. rawtxs                            (json array, optional) An array of hex strings of raw transactions.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SimulateRawTransaction {
     /// The wallet balance change (negative means decrease).
     pub balance_change: f64,

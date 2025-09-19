@@ -19,7 +19,7 @@ use super::{Bip125Replaceable, GetTransactionDetail, GetTransactionError, GetWal
 /// >
 /// > Returns an object with all balances in BTC.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalances {
     /// Balances from outputs that the wallet can sign.
     pub mine: GetBalancesMine,
@@ -29,7 +29,7 @@ pub struct GetBalances {
 
 /// Balances from outputs that the wallet can sign. Part of `getbalances`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalancesMine {
     /// Trusted balance (outputs created by the wallet or confirmed outputs).
     pub trusted: f64,
@@ -45,7 +45,7 @@ pub struct GetBalancesMine {
 
 /// Hash and height of the block this information was generated on. Part of `getbalances`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBalancesWatchOnly {
     /// Trusted balance (outputs created by the wallet or confirmed outputs).
     pub trusted: f64,
@@ -64,7 +64,7 @@ pub struct GetBalancesWatchOnly {
 /// > Arguments:
 /// > 1. txid                 (string, required) The transaction id
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount in BTC.
     pub amount: f64,
@@ -112,7 +112,7 @@ pub struct GetTransaction {
 /// > getwalletinfo
 /// > Returns an object containing various wallet state info.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetWalletInfo {
     /// The wallet name.
     #[serde(rename = "walletname")]
@@ -176,7 +176,7 @@ pub enum GetWalletInfoScanning {
 /// > 1. flag     (string, required) The name of the flag to change. Current available flags: avoid_reuse
 /// > 2. value    (boolean, optional, default=true) The new state.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SetWalletFlag {
     /// The name of the flag that was modified.
     pub flag_name: String,

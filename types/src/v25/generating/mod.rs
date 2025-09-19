@@ -25,7 +25,7 @@ pub use self::error::GenerateBlockError;
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GenerateBlock {
     /// Hash of generated block
     pub hash: String,

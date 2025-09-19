@@ -22,7 +22,7 @@ use crate::{ScriptPubkey, ScriptSig};
 /// Part of `decoderawtransaction` and `decodepsbt`.
 // This JSON data can be encapsulated by a `bitcoin::Transaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RawTransaction {
     /// The transaction id.
     pub txid: String,
@@ -74,7 +74,7 @@ impl RawTransaction {
 /// Represents a transaction input.
 // This JSON data can be encapsulated by a `bitcoin::TxIn`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RawTransactionInput {
     /// The transaction id.
     pub txid: String,
@@ -115,7 +115,7 @@ impl RawTransactionInput {
 /// Represents a transaction output.
 // This JSON data can be encapsulated by a `bitcoin::TxOut` + index.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RawTransactionOutput {
     /// The value in BTC.
     pub value: f64,
@@ -142,7 +142,7 @@ impl RawTransactionOutput {
 /// Transaction output for witness UTXOs.
 // This JSON data can be encapsulated by a `bitcoin::TxOut`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct WitnessUtxo {
     /// The value in BTC.
     pub amount: f64,
@@ -165,7 +165,7 @@ impl WitnessUtxo {
 
 /// A script part of a PSBT input or output.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PsbtScript {
     /// The asm.
     pub asm: String,
@@ -191,7 +191,7 @@ impl PsbtScript {
 // bip32_derivation: BTreeMap<secp256k1::PublicKey, KeySource>,
 // KeySource = (Fingerprint, DerivationPath);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Bip32Deriv {
     /// The public key this path corresponds to.
     pub pubkey: String,
@@ -204,7 +204,7 @@ pub struct Bip32Deriv {
 /// The key source data for a BIP-32 derivation.
 // In v0.17 the BIP-32 derivation for inputs is a map of pubkey to this type.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct InputKeySource {
     /// The fingerprint of the master key.
     pub master_fingerprint: String,
@@ -214,7 +214,7 @@ pub struct InputKeySource {
 
 /// Final script data.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct FinalScript {
     /// The asm.
     pub asm: String,

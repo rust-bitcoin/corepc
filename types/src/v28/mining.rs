@@ -15,7 +15,7 @@ use crate::model;
 /// >
 /// > Returns a json object containing mining-related information.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMiningInfo {
     /// The current block.
     pub blocks: u64,

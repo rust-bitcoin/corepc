@@ -33,7 +33,7 @@ use crate::model;
 /// >        ...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SubmitPackage {
     /// The transaction package result message.
     ///
@@ -49,7 +49,7 @@ pub struct SubmitPackage {
 
 /// The per-transaction result. Part of `submitpackage`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SubmitPackageTxResult {
     /// The transaction id.
     pub txid: String,
@@ -68,7 +68,7 @@ pub struct SubmitPackageTxResult {
 
 /// The fees included in the per-transaction result. Part of `submitpackage`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SubmitPackageTxResultFees {
     /// Transaction fee.
     #[serde(rename = "base")]

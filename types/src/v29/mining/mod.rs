@@ -17,7 +17,7 @@ pub use self::error::{GetMiningInfoError, NextBlockInfoError};
 /// >
 /// > Returns a json object containing mining-related information.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMiningInfo {
     /// The current block.
     pub blocks: u64,
@@ -54,7 +54,7 @@ pub struct GetMiningInfo {
 
 /// Represents the `next` block information. Part of `getmininginfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct NextBlockInfo {
     /// The next height.
     pub height: u64,

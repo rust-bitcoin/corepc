@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 /// > Derives one or more addresses corresponding to an output descriptor.
 /// > Returns an array of derived addresses.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DeriveAddresses(pub Vec<String>);
 
 /// Result of JSON-RPC method `getdescriptorinfo`.
@@ -25,7 +25,7 @@ pub struct DeriveAddresses(pub Vec<String>);
 /// > Analyses a descriptor.
 /// > Returns information about the descriptor.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetDescriptorInfo {
     /// The descriptor in canonical form, without private keys.
     pub descriptor: String,

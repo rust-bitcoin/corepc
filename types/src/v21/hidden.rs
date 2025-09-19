@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 /// > 1. address    (string, required) The IP address of the peer
 /// > 2. port       (numeric, required) The port of the peer
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddPeerAddress {
     /// Whether the peer address was successfully added to the address manager.
     pub success: bool,

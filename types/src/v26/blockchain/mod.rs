@@ -22,7 +22,7 @@ pub use self::error::{
 /// > Arguments:
 /// > 1. path    (string, required) Path to the output file. If relative, will be prefixed by datadir.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DumpTxOutSet {
     /// The number of coins written in the snapshot.
     pub coins_written: f64,
@@ -46,7 +46,7 @@ pub struct DumpTxOutSet {
 /// >
 /// > Return information about chainstates.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetChainStates {
     /// The number of headers seen so far.
     pub headers: i64,
@@ -57,7 +57,7 @@ pub struct GetChainStates {
 
 /// A single chainstate. Part of `getchainstates`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ChainState {
     /// Number of blocks in this chainstate.
     pub blocks: i64,
@@ -87,7 +87,7 @@ pub struct ChainState {
 /// > Returns statistics about the unspent transaction output set.
 /// > Note this call may take some time.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTxOutSetInfo {
     /// The current block height (index).
     pub height: i64,
@@ -121,7 +121,7 @@ pub struct GetTxOutSetInfo {
 /// > Arguments:
 /// > 1. path    (string, required) path to the snapshot file. If relative, will be prefixed by datadir.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct LoadTxOutSet {
     /// The number of coins loaded from the snapshot.
     pub coins_loaded: f64,

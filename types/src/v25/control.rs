@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// > Gets and sets the logging configuration.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Logging {
     pub addrman: bool,
     pub bench: bool,

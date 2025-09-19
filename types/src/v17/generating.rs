@@ -18,7 +18,7 @@ use crate::model;
 /// > Arguments:
 /// > 1. nblocks      (numeric, required) How many blocks are generated immediately.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Generate(
     /// Hashes of blocks generated.
     pub Vec<String>,
@@ -42,7 +42,7 @@ impl Generate {
 /// > 1. nblocks     (numeric, required) How many blocks are generated immediately.
 /// > 2. address     (string, required) The address to send the newly generated bitcoin to.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GenerateToAddress(
     /// Hashes of blocks generated.
     pub Vec<String>,

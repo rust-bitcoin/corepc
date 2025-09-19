@@ -14,7 +14,7 @@ use super::ActiveCommand;
 /// >
 /// > Returns details of the RPC server.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRpcInfo {
     /// All active commands
     pub active_commands: Vec<ActiveCommand>,

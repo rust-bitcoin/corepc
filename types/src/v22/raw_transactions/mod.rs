@@ -21,7 +21,7 @@ pub use self::error::{DecodeScriptError, MempoolAcceptanceError, TestMempoolAcce
 /// > 1. "hexstring"     (string) the hex encoded script
 // The docs on Core v0.17 appear to be way off what is actually returned.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodeScript {
     /// Script public key.
     pub asm: String,
@@ -46,7 +46,7 @@ pub struct DecodeScript {
 
 /// Segwit data. Part of `decodescript`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodeScriptSegwit {
     /// Script public key.
     pub asm: String,
@@ -82,12 +82,12 @@ pub struct DecodeScriptSegwit {
 /// >                                         Length must be one for now.
 /// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TestMempoolAccept(pub Vec<MempoolAcceptance>);
 
 /// A single mempool acceptance test result. Part of `testmempoolaccept`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolAcceptance {
     /// The transaction hash in hex.
     pub txid: String,
@@ -106,7 +106,7 @@ pub struct MempoolAcceptance {
 
 /// Wrapper for the fees field. Part of `testmempoolaccept`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolAcceptanceFees {
     /// Transaction fee in BTC.
     pub base: f64,

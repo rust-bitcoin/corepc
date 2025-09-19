@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 /// Models the result of JSON-RPC method `getnetworkinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfo {
     /// The server version.
     pub version: usize,
@@ -48,7 +48,7 @@ pub struct GetNetworkInfo {
 
 /// Information per network. Part of `getnetworkinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfoNetwork {
     /// Network (ipv4, ipv6, onion, i2p, cjdns).
     pub name: String,
@@ -64,7 +64,7 @@ pub struct GetNetworkInfoNetwork {
 
 /// Local address info. Part of `getnetworkinfo`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfoAddress {
     /// Network address.
     pub address: String,

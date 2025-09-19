@@ -14,12 +14,12 @@ use serde::{Deserialize, Serialize};
 /// >
 /// > Return known addresses which can potentially be used to find new nodes in the network.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNodeAddresses(pub Vec<NodeAddress>);
 
 /// An item from the list returned by the JSON-RPC method `getnodeaddresses`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct NodeAddress {
     /// Timestamp in seconds since epoch (Jan 1 1970 GMT) when the node was last seen.
     pub time: u64,
@@ -37,12 +37,12 @@ pub struct NodeAddress {
 /// >
 /// > Returns data about each connected network node as a json array of objects.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetPeerInfo(pub Vec<PeerInfo>);
 
 /// A peer info item. Part of `getpeerinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PeerInfo {
     /// Peer index.
     pub id: u32,

@@ -18,7 +18,7 @@ use super::{GetNetworkInfoAddress, GetNetworkInfoError, GetNetworkInfoNetwork};
 ///
 /// > Returns an object containing various state info regarding P2P networking.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfo {
     /// The server version.
     pub version: usize,
@@ -65,12 +65,12 @@ pub struct GetNetworkInfo {
 /// >
 /// > Returns data about each connected network node as a json array of objects.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetPeerInfo(pub Vec<PeerInfo>);
 
 /// A peer info item. Part of `getpeerinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PeerInfo {
     /// Peer index.
     pub id: u32,

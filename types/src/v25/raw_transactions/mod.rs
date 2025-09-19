@@ -26,12 +26,12 @@ pub use self::error::{MempoolAcceptanceError, TestMempoolAcceptError};
 /// >                                         Length must be one for now.
 /// > 2. allowhighfees    (boolean, optional, default=false) Allow high fees
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TestMempoolAccept(pub Vec<MempoolAcceptance>);
 
 /// A single mempool acceptance test result. Part of `testmempoolaccept`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolAcceptance {
     /// The transaction hash in hex.
     pub txid: String,
@@ -50,7 +50,7 @@ pub struct MempoolAcceptance {
 
 /// Wrapper for the fees field. Part of `testmempoolaccept`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct MempoolAcceptanceFees {
     /// Transaction fee in BTC.
     pub base: f64,

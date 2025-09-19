@@ -27,7 +27,7 @@ pub use self::error::{CreateMultisigError, ValidateAddressError};
 /// >        ,...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateMultisig {
     /// The value of the new multisig address.
     pub address: String,
@@ -57,7 +57,7 @@ pub struct CreateMultisig {
 /// >        "ECONOMICAL"
 /// >        "CONSERVATIVE"
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct EstimateSmartFee {
     /// Estimate fee rate in BTC/kB.
     #[serde(rename = "feerate")]
@@ -78,7 +78,7 @@ pub struct EstimateSmartFee {
 /// > 1. "privkey"         (string, required) The private key to sign the message with.
 /// > 2. "message"         (string, required) The message to create a signature of.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SignMessageWithPrivKey(pub String);
 
 /// Result of JSON-RPC method `validateaddress`.
@@ -94,7 +94,7 @@ pub struct SignMessageWithPrivKey(pub String);
 /// > Arguments:
 /// > 1. "address"                    (string, required) The bitcoin address to validate
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ValidateAddress {
     /// If the address is valid or not. If not, this is the only property returned.
     #[serde(rename = "isvalid")]
@@ -127,5 +127,5 @@ pub struct ValidateAddress {
 /// > 2. "signature"       (string, required) The signature provided by the signer in base 64 encoding (see signmessage).
 /// > 3. "message"         (string, required) The message that was signed.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct VerifyMessage(pub bool);

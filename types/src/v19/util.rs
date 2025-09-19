@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 /// > Analyses a descriptor.
 /// > Returns information about the descriptor.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetDescriptorInfo {
     /// The descriptor in canonical form, without private keys.
     pub descriptor: String,

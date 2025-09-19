@@ -24,7 +24,7 @@ use serde::{Deserialize, Serialize};
 /// > 7. load_on_startup         (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
 /// > 8. external_signer         (boolean, optional, default=false) Use an external signer such as a hardware wallet. Requires -signer to be configured. Wallet creation will fail if keys cannot be fetched. Requires disable_private_keys and descriptors set to true.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateWallet {
     /// The wallet name if created successfully.
     ///
@@ -43,7 +43,7 @@ pub struct CreateWallet {
 ///
 /// > List descriptors imported into a descriptor-enabled wallet.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListDescriptors {
     /// Name of wallet this operation was performed on.
     pub wallet_name: String,
@@ -53,7 +53,7 @@ pub struct ListDescriptors {
 
 /// A descriptor object. Part of `listdescriptors`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DescriptorInfo {
     /// Descriptor string representation.
     #[serde(rename = "desc")]
@@ -84,7 +84,7 @@ pub struct DescriptorInfo {
 /// > 1. filename           (string, required) The wallet directory or .dat file.
 /// > 2. load_on_startup    (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct LoadWallet {
     /// The wallet name if loaded successfully.
     pub name: String,
@@ -108,7 +108,7 @@ pub struct LoadWallet {
 /// > 1. wallet_name        (string, optional, default=the wallet name from the RPC endpoint) The name of the wallet to unload. If provided both here and in the RPC endpoint, the two must be identical.
 /// > 2. load_on_startup    (boolean, optional) Save wallet name to persistent settings and load on startup. True to add wallet to startup list, false to remove, null to leave unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UnloadWallet {
     /// Warning messages, if any, related to unloading the wallet. Multiple messages will be delimited by newlines.
     ///

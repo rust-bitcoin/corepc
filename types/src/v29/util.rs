@@ -17,7 +17,7 @@ use crate::model;
 /// > Derives one or more addresses corresponding to an output descriptor.
 /// > Returns an array of derived addresses.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DeriveAddressesMultipath(pub Vec<DeriveAddresses>);
 
 impl DeriveAddressesMultipath {
@@ -39,7 +39,7 @@ impl DeriveAddressesMultipath {
 /// > Analyses a descriptor.
 /// > Returns information about the descriptor.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetDescriptorInfo {
     /// The descriptor in canonical form, without private keys. For a multipath descriptor, only the
     /// first will be returned.

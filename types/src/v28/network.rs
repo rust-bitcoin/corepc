@@ -14,7 +14,7 @@ use crate::model;
 ///
 /// > Returns an object containing various state info regarding P2P networking.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetNetworkInfo {
     /// The server version.
     pub version: usize,

@@ -20,7 +20,7 @@ use crate::model;
 /// > 2. descriptor    (string, required) The descriptor to send the newly generated bitcoin to.
 /// > 3. maxtries      (numeric, optional, default=1000000) How many iterations to try.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GenerateToDescriptor(
     /// Hashes of blocks generated.
     pub Vec<String>,

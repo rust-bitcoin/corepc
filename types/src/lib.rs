@@ -180,7 +180,7 @@ pub fn compact_size_decode(slice: &mut &[u8]) -> u64 {
 /// backwards compatible so we only provide it not a v0.17 specific type. The `mtype::ScriptPubkey`
 /// mirrors this design (but with concrete `rust-bitcoin` types).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ScriptPubkey {
     /// Script assembly.
     pub asm: String,
@@ -219,7 +219,7 @@ impl ScriptPubkey {
 
 /// Data returned by Core for a script signature.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ScriptSig {
     /// Assembly representation of the script.
     pub asm: String,

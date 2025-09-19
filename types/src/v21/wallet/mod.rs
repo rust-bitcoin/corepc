@@ -17,7 +17,7 @@ pub use super::GetWalletInfoError;
 /// > getwalletinfo
 /// > Returns an object containing various wallet state info.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetWalletInfo {
     /// The wallet name.
     #[serde(rename = "walletname")]
@@ -110,7 +110,7 @@ pub enum GetWalletInfoScanning {
 /// >      ...
 /// >    ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ImportDescriptors(
     /// Response is an array with the same size as the input that has the execution result.
     pub Vec<ImportDescriptorsResult>,
@@ -118,7 +118,7 @@ pub struct ImportDescriptors(
 
 /// Result object for each descriptor import. Part of `importdescriptors`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ImportDescriptorsResult {
     /// Whether the import was successful.
     pub success: bool,
@@ -137,7 +137,7 @@ pub struct ImportDescriptorsResult {
 /// Arguments:
 /// 1. txid    (string, required) The txid to be bumped
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PsbtBumpFee {
     /// The base64-encoded unsigned PSBT of the new transaction.
     pub psbt: String,
@@ -161,7 +161,7 @@ pub struct PsbtBumpFee {
 /// >    That is, each address can only appear once and there can only be one 'data' object.
 /// >    For convenience, a dictionary, which holds the key-value pairs directly, is also accepted.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Send {
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
@@ -187,7 +187,7 @@ pub struct Send {
 /// > ...
 /// > 10. verbose (boolean, optional, default=false) If true, return extra infomration about the transaction.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendMany(
     /// The transaction id for the send.
     pub String,
@@ -195,7 +195,7 @@ pub struct SendMany(
 
 /// Result of JSON-RPC method `sendmany` when `verbose=true`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct SendManyVerbose {
     /// The transaction id for the send. Only 1 transaction is created regardless of the number of addresses.
     pub txid: String,
@@ -210,7 +210,7 @@ pub struct SendManyVerbose {
 /// > Unloads the wallet referenced by the request endpoint, otherwise unloads the wallet specified in the argument.
 /// > Specifying the wallet name on a wallet endpoint is invalid.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UnloadWallet {
     /// Warning messages, if any, related to unloading the wallet.
     pub warning: String,
@@ -221,7 +221,7 @@ pub struct UnloadWallet {
 /// > Upgrade the wallet. Upgrades to the latest version if no version number is specified.
 /// > New keys may be generated and a new wallet backup will need to be made.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct UpgradeWallet {
     /// Name of wallet this operation was performed on
     pub wallet_name: String,

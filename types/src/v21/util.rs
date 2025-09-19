@@ -12,12 +12,12 @@ use serde::{Deserialize, Serialize};
 ///
 /// > Returns the status of one or all available indices currently running in the node.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetIndexInfo(pub BTreeMap<String, GetIndexInfoName>);
 
 /// Index info details. Part of `getindexinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetIndexInfoName {
     /// Whether the index is synced or not.
     pub synced: bool,

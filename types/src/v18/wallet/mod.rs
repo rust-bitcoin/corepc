@@ -25,7 +25,7 @@ pub use super::{
 /// > Arguments:
 /// > 1. "address"                    (string, required) The bitcoin address to get the information of.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfo {
     /// The bitcoin address validated.
     pub address: String,
@@ -96,7 +96,7 @@ pub struct GetAddressInfo {
 /// It includes all getaddressinfo output fields for the embedded address, excluding metadata
 /// ("timestamp", "hdkeypath", "hdseedid") and relation to the wallet ("ismine", "iswatchonly").
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetAddressInfoEmbedded {
     /// The bitcoin address validated.
     pub address: String,
@@ -149,7 +149,7 @@ pub struct GetAddressInfoEmbedded {
 /// >
 /// > Returns the total amount received by addresses with `<label>` in transactions with at least `[minconf]` confirmations.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetReceivedByLabel(pub f64);
 
 /// Result of the JSON-RPC method `getwalletinfo`.
@@ -157,7 +157,7 @@ pub struct GetReceivedByLabel(pub f64);
 /// > getwalletinfo
 /// > Returns an object containing various wallet state info.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetWalletInfo {
     /// The wallet name.
     #[serde(rename = "walletname")]
@@ -242,12 +242,12 @@ pub struct JsonRpcError {
 /// >
 /// > List balances by receiving address.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByAddress(pub Vec<ListReceivedByAddressItem>);
 
 /// List received by address item. Part of of `listreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByAddressItem {
     /// Only returned if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
@@ -270,12 +270,12 @@ pub struct ListReceivedByAddressItem {
 /// >
 /// > List received transactions by label.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByLabel(pub Vec<ListReceivedByLabelItem>);
 
 /// List received by label item. Part of of `listreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListReceivedByLabelItem {
     /// Only returned if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
@@ -296,12 +296,12 @@ pub struct ListReceivedByLabelItem {
 /// > with between minconf and maxconf (inclusive) confirmations.
 /// > Optionally filter to only include txouts paid to specified addresses.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListUnspent(pub Vec<ListUnspentItem>);
 
 /// Unspent transaction output. Part of `listunspent`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListUnspentItem {
     /// The transaction id.
     pub txid: String,
@@ -340,7 +340,7 @@ pub struct ListUnspentItem {
 /// >
 /// > Returns a list of wallets in the wallet directory.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListWalletDir {
     /// The list of wallets in the wallet directory.
     pub wallets: Vec<ListWalletDirWallet>,
@@ -348,7 +348,7 @@ pub struct ListWalletDir {
 
 /// Wallet entry. Part of `listwalletdir`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListWalletDirWallet {
     /// The wallet name.
     pub name: String,

@@ -19,6 +19,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 # Enable this feature to get a blocking JSON-RPC client.
 client-sync = ["jsonrpc"]
+serde-deny-unknown-fields = ["types/serde-deny-unknown-fields"]
 
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }

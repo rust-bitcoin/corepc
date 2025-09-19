@@ -23,12 +23,12 @@ use serde::{Deserialize, Serialize};
 // This just mimics the map returned by my instance of Core `v0.17`, I don't know how
 // to handle other map values or if they exist?
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMemoryInfoStats(pub BTreeMap<String, Locked>);
 
 /// Information about locked memory manager. Part of `getmemoryinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Locked {
     /// Number of bytes used.
     pub used: u64,
@@ -53,7 +53,7 @@ pub struct Locked {
 ///
 /// > Gets and sets the logging configuration.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Logging {
     pub addrman: bool,
     pub bench: bool,

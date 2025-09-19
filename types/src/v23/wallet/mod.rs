@@ -30,7 +30,7 @@ pub use super::{
 /// > 1. nrequired                      (numeric, required) The number of required signatures out of the n keys or addresses.
 /// > 2. "keys"                         (string, required) A json array of bitcoin addresses or hex-encoded public keys
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct AddMultisigAddress {
     /// The value of the new multisig address.
     pub address: String,
@@ -52,7 +52,7 @@ pub struct AddMultisigAddress {
 /// > Arguments:
 /// > 1. txid                 (string, required) The transaction id
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransaction {
     /// The transaction amount in BTC.
     pub amount: f64,
@@ -114,7 +114,7 @@ pub struct GetTransaction {
 /// >
 /// > Returns an object containing various wallet state info.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetWalletInfo {
     /// the wallet name
     #[serde(rename = "walletname")]
@@ -174,7 +174,7 @@ pub enum GetWalletInfoScanning {
 
 /// Result of the JSON-RPC method `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListSinceBlock {
     /// All the transactions.
     pub transactions: Vec<TransactionItem>,
@@ -194,7 +194,7 @@ pub struct ListSinceBlock {
 
 /// Transaction item. Part of `listsinceblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct TransactionItem {
     /// Only returns true if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
@@ -271,7 +271,7 @@ pub struct TransactionItem {
 /// > Note that the "account" argument and "otheraccount" return value have been removed in V0.17. To use this RPC with an "account" argument, restart
 /// > bitcoind with -deprecatedrpc=accounts
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListTransactions(pub Vec<TransactionItem>);
 
 /// Result of the JSON-RPC method `restorewallet`.
@@ -284,7 +284,7 @@ pub struct ListTransactions(pub Vec<TransactionItem>);
 /// > 1. wallet_name        (string, required) The name that will be applied to the restored wallet
 /// > 2. backup_file        (string, required) The backup file that will be used to restore the wallet.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RestoreWallet {
     /// The wallet name if restored successfully.
     pub name: String,

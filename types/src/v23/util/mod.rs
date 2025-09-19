@@ -25,7 +25,7 @@ pub use super::CreateMultisigError;
 /// >        ,...
 /// >      ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct CreateMultisig {
     /// The value of the new multisig address.
     pub address: String,

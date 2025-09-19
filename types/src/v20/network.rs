@@ -12,12 +12,12 @@ use serde::{Deserialize, Serialize};
 ///
 /// > List all banned IPs/Subnets.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ListBanned(pub Vec<Banned>);
 
 /// An banned item. Part of `listbanned`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Banned {
     /// The IP/Subnet of the banned node.
     pub address: String,

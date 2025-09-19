@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 /// Models the result of JSON-RPC method `generate`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Generate(pub Vec<BlockHash>);
 
 impl Generate {
@@ -23,7 +23,7 @@ impl Generate {
 
 /// Models the result of JSON-RPC method `generateblock`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GenerateBlock {
     /// Hash of generated block.
     pub hash: BlockHash,
@@ -33,7 +33,7 @@ pub struct GenerateBlock {
 
 /// Models the result of JSON-RPC method `generatetoaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GenerateToAddress(pub Vec<BlockHash>);
 
 impl GenerateToAddress {
@@ -46,7 +46,7 @@ impl GenerateToAddress {
 
 /// Models the result of JSON-RPC method `generatetodescriptor`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GenerateToDescriptor(pub Vec<BlockHash>);
 
 impl GenerateToDescriptor {
