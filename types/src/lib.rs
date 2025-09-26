@@ -208,11 +208,11 @@ pub struct ScriptPubkey {
 }
 
 impl ScriptPubkey {
-    fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
+    pub fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
         ScriptBuf::from_hex(&self.hex)
     }
 
-    fn address(&self) -> Option<Result<Address<NetworkUnchecked>, address::ParseError>> {
+    pub fn address(&self) -> Option<Result<Address<NetworkUnchecked>, address::ParseError>> {
         self.address.as_ref().map(|addr| addr.parse::<Address<_>>())
     }
 }
