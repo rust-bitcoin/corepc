@@ -10,6 +10,45 @@ use serde::{Deserialize, Serialize};
 
 pub use super::{MempoolAcceptanceError, TestMempoolAcceptError};
 
+/// Arguments of JSON-RPC method `createrawtransaction`.
+///
+/// # Note
+///
+/// Assumes that the transaction is always "replaceable" by default and has a locktime of 0.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct CreateRawTransactionArguments {
+    pub inputs: Vec<CreateRawTransactionInput>,
+    pub outputs: Vec<CreateRawTransactionOutput>,
+}
+
+/// Inputs of JSON-RPC method `createrawtransaction`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CreateRawTransactionInput {
+    pub txid: String,
+    pub vout: u32,
+}
+
+/// Transaction outputs for Bitcoin RPC methods.
+///
+/// Used by various RPC methods such as `createrawtransaction`, `psbtbumpfee`,
+/// and `walletcreatefundedpsbt`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum CreateRawTransactionOutput {
+    /// A pair of an address and an amount in BTC float.
+    AddressAmount {
+        /// Address to sent to.
+        address: String,
+        /// Amount to send in BTC float
+        amount: f64,
+    },
+    /// A payload such as in `OP_RETURN` transactions.
+    Data {
+        /// The payload.
+        data: String,
+    },
+}
+
 /// Result of JSON-RPC method `testmempoolaccept`.
 ///
 /// > testmempoolaccept ["rawtxs"] ( allowhighfees )

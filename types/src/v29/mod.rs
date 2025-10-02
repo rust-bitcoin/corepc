@@ -255,6 +255,7 @@ mod blockchain;
 mod mining;
 mod raw_transactions;
 mod util;
+mod wallet;
 
 #[doc(inline)]
 pub use self::{
@@ -265,8 +266,15 @@ pub use self::{
         GetDescriptorActivityError, ReceiveActivity, SpendActivity,
     },
     mining::{GetMiningInfo, GetMiningInfoError, NextBlockInfo, NextBlockInfoError},
-    raw_transactions::{MempoolAcceptance, TestMempoolAccept},
+    raw_transactions::{
+        CreateRawTransactionArguments, CreateRawTransactionInput, CreateRawTransactionOutput,
+        MempoolAcceptance, TestMempoolAccept,
+    },
     util::{DeriveAddressesMultipath, GetDescriptorInfo},
+    wallet::{
+        CreateWalletArguments, ImportDescriptorInput, ListUnspentQueryOptions,
+        PreviousTransactionOutput, PsbtBumpFeeOptions, WalletCreateFundedPsbtOptions,
+    },
 };
 #[doc(inline)]
 pub use crate::{
