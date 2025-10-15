@@ -529,6 +529,61 @@ fn blockchain__verify_tx_out_proof__modelled() {
     assert_eq!(txids.0.len(), 1);
 }
 
+#[test]
+fn blockchain__wait_for_block__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _tx) = node.create_mined_transaction();
+    let block_hash = node.client.best_block_hash().expect("bestblockhash");
+
+    let json: WaitForBlock = node.client.wait_for_block(&block_hash).expect("waitforblock");
+    let model: Result<mtype::WaitForBlock, WaitForBlockError> = json.into_model();
+    let block = model.unwrap();
+    assert_eq!(block.hash, block_hash);
+}
+
+#[test]
+fn blockchain__wait_for_block_height__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _tx) = node.create_mined_transaction();
+    let height = node.client.get_block_count().expect("getblockcount").0;
+    let block_hash = node.client.best_block_hash().expect("bestblockhash");
+    let target_height = height;
+
+    let json: WaitForBlockHeight =
+        node.client.wait_for_block_height(target_height).expect("waitforblockheight");
+    let model: Result<mtype::WaitForBlockHeight, WaitForBlockHeightError> = json.into_model();
+    let block = model.unwrap();
+    assert_eq!(block.height, target_height as u32);
+    assert_eq!(block.hash, block_hash);
+}
+
+#[test]
+fn blockchain__wait_for_new_block__modelled() {
+    let (node1, node2, _node3) = integration_test::three_node_network();
+    node1.fund_wallet();
+    node1.mine_a_block();
+
+    let prev_hash = node1.client.best_block_hash().expect("bestblockhash");
+    let prev_height = node1.client.get_block_count().expect("getblockcount").0;
+
+    // Start waiting for a new block on node1 in a separate thread.
+    let handle = std::thread::spawn(move || {
+        let json: WaitForNewBlock = node1.client.wait_for_new_block().expect("waitfornewblock");
+        let model: Result<mtype::WaitForNewBlock, WaitForNewBlockError> = json.into_model();
+        model.unwrap()
+    });
+    std::thread::sleep(std::time::Duration::from_millis(200));
+
+    // Trigger a new block on node2.
+    node2.mine_a_block();
+
+    let block = handle.join().expect("waitfornewblock thread panicked");
+    assert_eq!(block.height, (prev_height + 1) as u32);
+    assert_ne!(block.hash, prev_hash);
+}
+
 /// Create and broadcast a child transaction spending vout 0 of the given parent mempool txid.
 /// Returns the child's txid.
 fn create_child_spending_parent(node: &Node, parent_txid: bitcoin::Txid) -> bitcoin::Txid {

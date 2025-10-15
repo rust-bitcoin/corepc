@@ -224,6 +224,7 @@
 mod blockchain;
 mod control;
 mod generating;
+mod hidden;
 mod mining;
 mod network;
 pub(crate) mod raw_transactions;
@@ -248,6 +249,10 @@ pub use self::{
     },
     control::{GetMemoryInfoStats, Locked, Logging},
     generating::{Generate, GenerateToAddress},
+    hidden::{
+        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
+        WaitForNewBlock, WaitForNewBlockError,
+    },
     mining::{
         BlockTemplateTransaction, BlockTemplateTransactionError, GetBlockTemplate,
         GetBlockTemplateError, GetMiningInfo,

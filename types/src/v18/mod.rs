@@ -284,6 +284,7 @@ pub use crate::v17::{
     SignRawTransactionError, SignRawTransactionWithKey, SignRawTransactionWithWallet, Softfork,
     SoftforkReject, TestMempoolAccept, TransactionCategory, TransactionItem, TransactionItemError,
     UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
-    VerifyTxOutProof, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt,
-    WitnessUtxo,
+    VerifyTxOutProof, WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
+    WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+    WalletProcessPsbt, WitnessUtxo,
 };
