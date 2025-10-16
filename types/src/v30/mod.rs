@@ -60,9 +60,9 @@
 //! | scantxoutset                       | omitted         | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
-//! | waitforblock                       | version + model | TODO                                   |
-//! | waitforblockheight                 | version + model | TODO                                   |
-//! | waitfornewblock                    | version + model | TODO                                   |
+//! | waitforblock                       | version + model |                                        |
+//! | waitforblockheight                 | version + model |                                        |
+//! | waitfornewblock                    | version + model |                                        |
 //!
 //! </details>
 //!
@@ -265,7 +265,9 @@ pub use crate::{
         SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
         SignRawTransactionWithKey, SignRawTransactionWithWallet, TransactionCategory, UploadTarget,
         ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
-        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo,
+        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
+        WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

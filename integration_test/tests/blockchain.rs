@@ -7,7 +7,6 @@
 use bitcoin::consensus::encode;
 use bitcoin::hex;
 use integration_test::{Node, NodeExt as _, Wallet};
-use node::client::client_sync;
 use node::vtype::*; // All the version specific types.
 use node::{mtype, Input, Output};
 
@@ -506,40 +505,83 @@ fn blockchain__scan_blocks_modelled() {
 }
 
 #[test]
-fn blockchain__verify_tx_out_proof__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
-    node.fund_wallet();
-    verify_tx_out_proof(&node).unwrap();
-}
-
-#[test]
-fn blockchain__get_tx_out_proof__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
-    node.fund_wallet();
-    verify_tx_out_proof(&node).unwrap();
-}
-
-#[test]
 fn blockchain__verify_chain() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
     let _: Result<VerifyChain, _> = node.client.verify_chain();
 }
 
-fn verify_tx_out_proof(node: &Node) -> Result<(), client_sync::Error> {
+#[test]
+fn blockchain__verify_tx_out_proof__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
     let (_address, tx) = node.create_mined_transaction();
     let txid = tx.compute_txid();
 
-    let proof = node.client.get_tx_out_proof(&[txid])?;
+    let proof = node.client.get_tx_out_proof(&[txid]).expect("gettxoutproof");
 
-    let json: VerifyTxOutProof = node.client.verify_tx_out_proof(&proof)?;
+    let json: VerifyTxOutProof = node.client.verify_tx_out_proof(&proof).expect("verifytxoutproof");
     let model: Result<mtype::VerifyTxOutProof, hex::HexToArrayError> = json.into_model();
     let txids = model.unwrap();
 
     // sanity check
     assert_eq!(txids.0.len(), 1);
+}
 
-    Ok(())
+#[test]
+fn blockchain__wait_for_block__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _tx) = node.create_mined_transaction();
+    let block_hash = node.client.best_block_hash().expect("bestblockhash");
+
+    let json: WaitForBlock = node.client.wait_for_block(&block_hash).expect("waitforblock");
+    let model: Result<mtype::WaitForBlock, WaitForBlockError> = json.into_model();
+    let block = model.unwrap();
+    assert_eq!(block.hash, block_hash);
+}
+
+#[test]
+fn blockchain__wait_for_block_height__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _tx) = node.create_mined_transaction();
+    let height = node.client.get_block_count().expect("getblockcount").0;
+    let block_hash = node.client.best_block_hash().expect("bestblockhash");
+    let target_height = height;
+
+    let json: WaitForBlockHeight =
+        node.client.wait_for_block_height(target_height).expect("waitforblockheight");
+    let model: Result<mtype::WaitForBlockHeight, WaitForBlockHeightError> = json.into_model();
+    let block = model.unwrap();
+    assert_eq!(block.height, target_height as u32);
+    assert_eq!(block.hash, block_hash);
+}
+
+#[test]
+fn blockchain__wait_for_new_block__modelled() {
+    let (node1, node2, _node3) = integration_test::three_node_network();
+    node1.fund_wallet();
+    node1.mine_a_block();
+
+    let prev_hash = node1.client.best_block_hash().expect("bestblockhash");
+    let prev_height = node1.client.get_block_count().expect("getblockcount").0;
+
+    // Start waiting for a new block on node1 in a separate thread.
+    let handle = std::thread::spawn(move || {
+        let json: WaitForNewBlock = node1.client.wait_for_new_block().expect("waitfornewblock");
+        let model: Result<mtype::WaitForNewBlock, WaitForNewBlockError> = json.into_model();
+        model.unwrap()
+    });
+    std::thread::sleep(std::time::Duration::from_millis(200));
+
+    // Trigger a new block on node2.
+    node2.mine_a_block();
+
+    let block = handle.join().expect("waitfornewblock thread panicked");
+    assert_eq!(block.height, (prev_height + 1) as u32);
+    assert_ne!(block.hash, prev_hash);
 }
 
 /// Create and broadcast a child transaction spending vout 0 of the given parent mempool txid.

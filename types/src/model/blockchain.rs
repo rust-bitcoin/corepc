@@ -739,3 +739,30 @@ pub struct ScanBlocksStart {
 /// Models the result of JSON-RPC method `verifytxoutproof`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct VerifyTxOutProof(pub Vec<Txid>);
+
+/// Models the result of JSON-RPC method `waitforblock`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct WaitForBlock {
+    /// The blockhash.
+    pub hash: BlockHash,
+    /// Block height.
+    pub height: u32,
+}
+
+/// Models the result of JSON-RPC method `waitforblockheight`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct WaitForBlockHeight {
+    /// The blockhash.
+    pub hash: BlockHash,
+    /// Block height.
+    pub height: u32,
+}
+
+/// Models the result of JSON-RPC method `waitfornewblock`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct WaitForNewBlock {
+    /// The blockhash.
+    pub hash: BlockHash,
+    /// Block height.
+    pub height: u32,
+}

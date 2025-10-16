@@ -2,7 +2,7 @@
 
 //! Macros for implementing JSON-RPC methods on a client.
 //!
-//! Specifically this is methods found under the `== Generating ==` section of the
+//! Specifically this is `== Hidden ==` methods that are not listed in the
 //! API docs of Bitcoin Core `v0.21`.
 //!
 //! All macros require `Client` to be in scope.

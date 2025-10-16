@@ -293,7 +293,9 @@ pub use crate::{
         SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
         SignRawTransactionWithKey, SignRawTransactionWithWallet, TransactionCategory, UploadTarget,
         ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
-        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo,
+        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
+        WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

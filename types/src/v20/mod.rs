@@ -272,8 +272,10 @@ pub use crate::{
         SetNetworkActive, SetTxFee, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
         SignRawTransactionError, SignRawTransactionWithKey, SignRawTransactionWithWallet,
         SoftforkReject, TestMempoolAccept, TransactionCategory, UploadTarget, ValidateAddress,
-        ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+        ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock,
+        WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock,
+        WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WalletProcessPsbt, WitnessUtxo,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
