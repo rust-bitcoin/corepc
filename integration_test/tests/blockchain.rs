@@ -7,7 +7,6 @@
 use bitcoin::consensus::encode;
 use bitcoin::hex;
 use integration_test::{Node, NodeExt as _, Wallet};
-use node::client::client_sync;
 use node::vtype::*; // All the version specific types.
 use node::{mtype, Input, Output};
 
@@ -506,33 +505,28 @@ fn blockchain__scan_blocks_modelled() {
 }
 
 #[test]
-fn blockchain__verify_tx_out_proof__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
-    node.fund_wallet();
-    verify_tx_out_proof(&node).unwrap();
-}
-
-#[test]
 fn blockchain__verify_chain() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
     let _: Result<VerifyChain, _> = node.client.verify_chain();
 }
 
-fn verify_tx_out_proof(node: &Node) -> Result<(), client_sync::Error> {
+#[test]
+fn blockchain__verify_tx_out_proof__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
     let (_address, tx) = node.create_mined_transaction();
     let txid = tx.compute_txid();
 
-    let proof = node.client.get_tx_out_proof(&[txid])?;
+    let proof = node.client.get_tx_out_proof(&[txid]).expect("gettxoutproof");
 
-    let json: VerifyTxOutProof = node.client.verify_tx_out_proof(&proof)?;
+    let json: VerifyTxOutProof = node.client.verify_tx_out_proof(&proof).expect("verifytxoutproof");
     let model: Result<mtype::VerifyTxOutProof, hex::HexToArrayError> = json.into_model();
     let txids = model.unwrap();
 
     // sanity check
     assert_eq!(txids.0.len(), 1);
-
-    Ok(())
 }
 
 /// Create and broadcast a child transaction spending vout 0 of the given parent mempool txid.
