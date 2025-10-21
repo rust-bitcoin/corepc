@@ -9,6 +9,8 @@ mod into;
 
 use std::collections::HashMap;
 
+use bitcoin::address::{Address, NetworkUnchecked};
+use bitcoin::ScriptBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::ScriptSig;
@@ -17,6 +19,7 @@ use crate::ScriptSig;
 pub use self::error::{
     DecodePsbtError, DecodeScriptError, FundRawTransactionError, GetRawTransactionVerboseError,
     PsbtInputError, PsbtOutputError, SignFailError, SignRawTransactionError, FinalizePsbtError,
+    DecodeScriptSegwitError,
 };
 // Re-export types that appear in the public API of this module.
 pub use crate::psbt::{
@@ -227,11 +230,8 @@ pub struct DecodeScript {
     pub addresses: Option<Vec<String>>,
     /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
     pub p2sh: Option<String>,
-    /// Segwit data (see `DecodeScriptSegwit` for explanation).
+    /// Result of a witness output script wrapping this redeem script (not returned for types that should not be wrapped).
     pub segwit: Option<DecodeScriptSegwit>,
-    /// Address of the P2SH script wrapping this witness redeem script
-    #[serde(rename = "p2sh-segwit")]
-    pub p2sh_segwit: Option<String>,
 }
 
 /// Segwit data. Part of `decodescript`.
@@ -241,11 +241,11 @@ pub struct DecodeScript {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct DecodeScriptSegwit {
-    /// Script public key.
+    /// Disassembly of the script.
     pub asm: String,
-    /// Hex encoded public key.
-    pub hex: String,
-    /// The output type.
+    /// The raw output script bytes, hex-encoded.
+    pub hex: ScriptBuf,
+    /// The type of the output script (e.g. witness_v0_keyhash or witness_v0_scripthash).
     #[serde(rename = "type")]
     pub type_: String,
     /// The required signatures.
@@ -253,9 +253,9 @@ pub struct DecodeScriptSegwit {
     pub required_signatures: Option<u64>,
     /// List of bitcoin addresses.
     pub addresses: Option<Vec<String>>,
-    /// Address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
+    /// Address of the P2SH script wrapping this witness redeem script.
     #[serde(rename = "p2sh-segwit")]
-    pub p2sh_segwit: Option<String>,
+    pub p2sh_segwit: Option<Address<NetworkUnchecked>>,
 }
 
 /// Result of JSON-RPC method `finalizepsbt`.
