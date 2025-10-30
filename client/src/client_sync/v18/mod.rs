@@ -29,7 +29,7 @@ pub use crate::client_sync::{
 };
 
 // This publicly re-exports `Client`.
-crate::define_jsonrpc_minreq_client!("v18");
+crate::define_jsonrpc_bitreq_client!("v18");
 crate::impl_client_check_expected_server_version!({ [180100] });
 
 // == Blockchain ==

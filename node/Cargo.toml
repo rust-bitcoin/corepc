@@ -27,7 +27,7 @@ env_logger = { version = "0.9.3", default-features = false }
 anyhow = { version = "1.0.66", optional = true }
 bitcoin_hashes = { version = ">= 0.13, <= 0.14", optional = true }
 flate2 = { version = "1.0", optional = true }
-minreq = { version = "2.9.1", default-features = false, features = ["https"], optional = true }
+bitreq = { version = "0.1.0", path = "../bitreq", features = ["https"], optional = true }
 tar = { version = "0.4", optional = true }
 zip = { version = "0.6.6", default-features = false, features = ["bzip2", "deflate"], optional = true }
 
@@ -42,7 +42,7 @@ zip = { version = "0.6.6", default-features = false, features = ["bzip2", "defla
 [features]
 default = ["0_17_2"]
 
-download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "minreq", "zip"]
+download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "bitreq", "zip"]
 
 # We support all minor releases of the latest four versions.
 30_0 = ["29_0"]

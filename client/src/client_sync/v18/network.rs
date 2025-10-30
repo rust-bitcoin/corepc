@@ -7,7 +7,7 @@
 //! Specifically this is methods found under the `== Network ==` section of the
 //! API docs of Bitcoin Core `v0.18`.
 //!
-//! See, or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
+//! See, or use the `define_jsonrpc_bitreq_client!` macro to define a `Client`.
 
 /// Implements Bitcoin Core JSON-RPC API method `getnodeaddresses`.
 #[macro_export]

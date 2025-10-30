@@ -28,7 +28,7 @@ pub use crate::client_sync::{
     v23::AddressType,
 };
 
-crate::define_jsonrpc_minreq_client!("v26");
+crate::define_jsonrpc_bitreq_client!("v26");
 crate::impl_client_check_expected_server_version!({ [260000, 260100, 260200] });
 
 // == Blockchain ==

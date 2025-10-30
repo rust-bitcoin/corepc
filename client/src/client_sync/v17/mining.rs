@@ -7,7 +7,7 @@
 //!
 //! All macros require `Client` to be in scope.
 //!
-//! See or use the `define_jsonrpc_minreq_client!` macro to define a `Client`.
+//! See or use the `define_jsonrpc_bitreq_client!` macro to define a `Client`.
 
 /// Implements Bitcoin Core JSON-RPC API method `getblocktemplate`.
 #[macro_export]

@@ -20,8 +20,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 default = [ "simple_http", "simple_tcp" ]
 # A bare-minimum HTTP transport.
 simple_http = [ "base64" ]
-# A transport that uses `minreq` as the HTTP client.
-minreq_http = [ "base64", "minreq" ]
+# A transport that uses `bitreq` as the HTTP client.
+bitreq_http = [ "base64", "bitreq" ]
 # Basic transport over a raw TcpListener
 simple_tcp = []
 # Basic transport over a raw UnixStream
@@ -34,7 +34,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = [ "raw_value" ] }
 
 base64 = { version = "0.22.1", optional = true }
-minreq = { version = "2.7.0", features = ["json-using-serde"], optional = true }
+bitreq = { version = "0.1.0", path = "../bitreq", features = ["json-using-serde"], optional = true }
 socks = { version = "0.3.4", optional = true}
 
 [lints.rust]

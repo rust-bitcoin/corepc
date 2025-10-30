@@ -281,11 +281,11 @@ version = "0.10.0"
 dependencies = [
  "anyhow",
  "bitcoin_hashes",
+ "bitreq",
  "corepc-client",
  "env_logger",
  "flate2",
  "log",
- "minreq",
  "serde_json",
  "tar",
  "tempfile",
@@ -458,7 +458,7 @@ name = "jsonrpc"
 version = "0.18.0"
 dependencies = [
  "base64 0.22.1",
- "minreq",
+ "bitreq",
  "serde",
  "serde_json",
  "socks",
@@ -506,21 +506,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3b1c9bd4fe1f0f8b387f6eb9eb3b4a1aa26185e5750efb9140301703f62cd1b"
 dependencies = [
  "adler2",
-]
-
-[[package]]
-name = "minreq"
-version = "2.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da0c420feb01b9fb5061f8c8f452534361dd783756dcf38ec45191ce55e7a161"
-dependencies = [
- "log",
- "once_cell",
- "rustls",
- "rustls-webpki",
- "serde",
- "serde_json",
- "webpki-roots",
 ]
 
 [[package]]
