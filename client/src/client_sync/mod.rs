@@ -55,9 +55,9 @@ impl Auth {
     }
 }
 
-/// Defines a `jsonrpc::Client` using `minreq`.
+/// Defines a `jsonrpc::Client` using `bitreq`.
 #[macro_export]
-macro_rules! define_jsonrpc_minreq_client {
+macro_rules! define_jsonrpc_bitreq_client {
     ($version:literal) => {
         use std::fmt;
 
@@ -81,9 +81,9 @@ macro_rules! define_jsonrpc_minreq_client {
         impl Client {
             /// Creates a client to a bitcoind JSON-RPC server without authentication.
             pub fn new(url: &str) -> Self {
-                let transport = jsonrpc::http::minreq_http::Builder::new()
+                let transport = jsonrpc::http::bitreq_http::Builder::new()
                     .url(url)
-                    .expect("jsonrpc v0.18, this function does not error")
+                    .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .build();
                 let inner = jsonrpc::client::Client::with_transport(transport);
@@ -98,9 +98,9 @@ macro_rules! define_jsonrpc_minreq_client {
                 }
                 let (user, pass) = auth.get_user_pass()?;
 
-                let transport = jsonrpc::http::minreq_http::Builder::new()
+                let transport = jsonrpc::http::bitreq_http::Builder::new()
                     .url(url)
-                    .expect("jsonrpc v0.18, this function does not error")
+                    .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .basic_auth(user.unwrap(), pass)
                     .build();

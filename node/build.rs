@@ -90,7 +90,7 @@ mod download {
                         "{}/bitcoin-core-{}/{}",
                         download_endpoint, VERSION, download_filename
                     );
-                    let resp = minreq::get(&url)
+                    let resp = bitreq::get(&url)
                         .send()
                         .with_context(|| format!("cannot reach url {}", url))?;
                     assert_eq!(resp.status_code, 200, "url {} didn't return 200", url);

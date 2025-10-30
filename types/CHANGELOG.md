@@ -1,14 +1,14 @@
-# 0.10.1 2025-10-10
+# 0.10.1 - 2025-10-10
 
 - v24+ should use the correct `GetRawMempoolVerbose` [#381](https://github.com/rust-bitcoin/corepc/pull/381)
 
-# 0.10.0 2025-10-07
+# 0.10.0 - 2025-10-07
 
 - Add `ScriptPubKey` model [#370](https://github.com/rust-bitcoin/corepc/pull/370)
 - Add a feature for `serde` deny unknown fields [#367](https://github.com/rust-bitcoin/corepc/pull/367)
 - Fix a few of type fields in v24 and v28 fixes [#375](https://github.com/rust-bitcoin/corepc/pull/375)
 
-# 0.9.0 2025-09-11
+# 0.9.0 - 2025-09-11
 
 This release is massive, it delivers support for **all** documented Core RPC
 methods. It also adds integration testing for all the new ones and many that
@@ -23,7 +23,7 @@ for also shortly, stay tuned.
 - Integration test all methods (excl. two that have open issues).
 - Add support for Core `v28.2` [#279](https://github.com/rust-bitcoin/corepc/pull/279)
 
-# 0.8.0 2025-05-21
+# 0.8.0 - 2025-05-21
 
 - doc: update docs for now explicit download feature flag [#177](https://github.com/rust-bitcoin/corepc/pull/177)
 - Implement all v17 util functions [#163](https://github.com/rust-bitcoin/corepc/pull/163)
@@ -37,7 +37,7 @@ for also shortly, stay tuned.
 - Change `signmessage` returned signature type [#179](https://github.com/rust-bitcoin/corepc/pull/179)
 - Add model for `getnodeaddresses` [#191](https://github.com/rust-bitcoin/corepc/pull/191)
 
-# 0.7.0 2025-04-04
+# 0.7.0 - 2025-04-04
 
 - Fix `{create,load}wallet` on `v25` [#108](https://github.com/rust-bitcoin/corepc/pull/108)
 - Fix unloadwallet method [#110](https://github.com/rust-bitcoin/corepc/pull/110)

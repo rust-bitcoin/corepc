@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize, Serializer};
 use crate::client_sync::into_json;
 use crate::types::v17::*;
 
-crate::define_jsonrpc_minreq_client!("v17");
+crate::define_jsonrpc_bitreq_client!("v17");
 crate::impl_client_check_expected_server_version!({ [170200] });
 
 // == Blockchain ==

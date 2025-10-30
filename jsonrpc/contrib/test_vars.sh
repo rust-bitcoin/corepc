@@ -4,7 +4,7 @@
 FEATURES_WITH_STD=""
 
 # So this is the var to use for all tests.
-FEATURES_WITHOUT_STD="simple_http minreq_http simple_tcp simple_uds proxy"
+FEATURES_WITHOUT_STD="simple_http bitreq_http simple_tcp simple_uds proxy"
 
 # Run these examples.
 EXAMPLES=""

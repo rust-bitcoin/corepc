@@ -1,8 +1,8 @@
-# 0.10.0 2025-10-07
+# 0.10.0 - 2025-10-07
 
 - Update to use latest `client v0.10.0`.
 
-# 0.9.0 2025-09-11
+# 0.9.0 - 2025-09-11
 
 The `types v0.9.0` release adds support for **all** remaining documented
 Core RPC methods. These are then pickup up in the update of `client`.
@@ -12,7 +12,7 @@ Core RPC methods. These are then pickup up in the update of `client`.
 - Fix build on macOS. Only codesign bitcoind if necessary [#309](https://github.com/rust-bitcoin/corepc/pull/309)
 - Add support for Core `v28.2` [#279](https://github.com/rust-bitcoin/corepc/pull/279)
 
-# 0.8.0 2025-05-21
+# 0.8.0 - 2025-05-21
 
 - Add support for Bitcoin Core 29.0 [#131](https://github.com/rust-bitcoin/corepc/pull/131)
 - Add support for Core version 28.1 [#184](https://github.com/rust-bitcoin/corepc/pull/184)
@@ -20,11 +20,11 @@ Core RPC methods. These are then pickup up in the update of `client`.
 - Upgrade `zip` in light of RUSTSEC-2020-0071 [#143](https://github.com/rust-bitcoin/corepc/pull/143)
 - Drop default features for `zip` [#130](https://github.com/rust-bitcoin/corepc/pull/130)
 
-# 0.7.1 2025-05-05
+# 0.7.1 - 2025-05-05
 
 - backport: bump zip in light of RUSTSEC-2020-0071 [#145](https://github.com/rust-bitcoin/corepc/pull/145)
 
-# 0.7.0 2025-04-04
+# 0.7.0 - 2025-04-04
 
 - Retry initial client connections [#111](https://github.com/rust-bitcoin/corepc/pull/111)
 

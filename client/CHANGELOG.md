@@ -1,8 +1,8 @@
-# 0.10.0 2025-10-07
+# 0.10.0 - 2025-10-07
 
 - Update to use latest `types v0.10.0`.
 
-# 0.9.0 2025-09-11
+# 0.9.0 - 2025-09-11
 
 Add support for all the new methods added as part of the `types v0.9.0`
 release - that  means **all** of the documented Core RPC methods.
@@ -11,7 +11,7 @@ release - that  means **all** of the documented Core RPC methods.
 - Integration test all methods (excl. two that have open issues).
 - Add support for Core `v28.2` [#279](https://github.com/rust-bitcoin/corepc/pull/279)
 
-# 0.8.0 2025-05-21
+# 0.8.0 - 2025-05-21
 
 - Add support for Bitcoin Core 29.0 [#131](https://github.com/rust-bitcoin/corepc/pull/131)
 - Add support for Bitcoin Core 28.1 [#184](https://github.com/rust-bitcoin/corepc/pull/184)
@@ -24,7 +24,7 @@ release - that  means **all** of the documented Core RPC methods.
 - Implement `verifychain` method and test [#155](https://github.com/rust-bitcoin/corepc/pull/155)
 - Implement `getnodeaddresses` method and test [#154](https://github.com/rust-bitcoin/corepc/pull/154)
 
-# 0.7.0 2025-04-04
+# 0.7.0 - 2025-04-04
 
 - Fix unloadwallet method [#110](https://github.com/rust-bitcoin/corepc/pull/110)
 - Implement methods from the mining section [#106](https://github.com/rust-bitcoin/corepc/pull/106)

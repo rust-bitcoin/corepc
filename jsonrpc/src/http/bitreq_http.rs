@@ -1,7 +1,7 @@
-//! This module implements the [`crate::client::Transport`] trait using [`minreq`]
+//! This module implements the [`crate::client::Transport`] trait using [`bitreq`]
 //! as the underlying HTTP transport.
 //!
-//! [minreq]: <https://github.com/neonmoe/minreq>
+//! [bitreq]: <https://github.com/rust-bitcoin/corepc/bitreq>
 
 #[cfg(jsonrpc_fuzz)]
 use std::io::{self, Read, Write};
@@ -23,9 +23,9 @@ const DEFAULT_TIMEOUT_SECONDS: u64 = 15;
 #[cfg(jsonrpc_fuzz)]
 const DEFAULT_TIMEOUT_SECONDS: u64 = 1;
 
-/// An HTTP transport that uses [`minreq`] and is useful for running a bitcoind RPC client.
+/// An HTTP transport that uses [`bitreq`] and is useful for running a bitcoind RPC client.
 #[derive(Clone, Debug)]
-pub struct MinreqHttpTransport {
+pub struct BitreqHttpTransport {
     /// URL of the RPC server.
     url: String,
     /// Timeout only supports second granularity.
@@ -34,9 +34,9 @@ pub struct MinreqHttpTransport {
     basic_auth: Option<String>,
 }
 
-impl Default for MinreqHttpTransport {
+impl Default for BitreqHttpTransport {
     fn default() -> Self {
-        MinreqHttpTransport {
+        BitreqHttpTransport {
             url: format!("{}:{}", DEFAULT_URL, DEFAULT_PORT),
             timeout: Duration::from_secs(DEFAULT_TIMEOUT_SECONDS),
             basic_auth: None,
@@ -44,11 +44,11 @@ impl Default for MinreqHttpTransport {
     }
 }
 
-impl MinreqHttpTransport {
-    /// Constructs a new [`MinreqHttpTransport`] with default parameters.
-    pub fn new() -> Self { MinreqHttpTransport::default() }
+impl BitreqHttpTransport {
+    /// Constructs a new [`BitreqHttpTransport`] with default parameters.
+    pub fn new() -> Self { BitreqHttpTransport::default() }
 
-    /// Returns a builder for [`MinreqHttpTransport`].
+    /// Returns a builder for [`BitreqHttpTransport`].
     pub fn builder() -> Builder { Builder::new() }
 
     fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
@@ -56,11 +56,11 @@ impl MinreqHttpTransport {
         R: for<'a> serde::de::Deserialize<'a>,
     {
         let req = match &self.basic_auth {
-            Some(auth) => minreq::Request::new(minreq::Method::Post, &self.url)
+            Some(auth) => bitreq::Request::new(bitreq::Method::Post, &self.url)
                 .with_timeout(self.timeout.as_secs())
                 .with_header("Authorization", auth)
                 .with_json(&req)?,
-            None => minreq::Request::new(minreq::Method::Post, &self.url)
+            None => bitreq::Request::new(bitreq::Method::Post, &self.url)
                 .with_timeout(self.timeout.as_secs())
                 .with_json(&req)?,
         };
@@ -71,20 +71,20 @@ impl MinreqHttpTransport {
         let resp = req.send()?;
         match resp.json() {
             Ok(json) => Ok(json),
-            Err(minreq_err) =>
+            Err(bitreq_err) =>
                 if resp.status_code != 200 {
                     Err(Error::Http(HttpError {
                         status_code: resp.status_code,
                         body: resp.as_str().unwrap_or("").to_string(),
                     }))
                 } else {
-                    Err(Error::Minreq(minreq_err))
+                    Err(Error::Bitreq(bitreq_err))
                 },
         }
     }
 }
 
-impl Transport for MinreqHttpTransport {
+impl Transport for BitreqHttpTransport {
     fn send_request(&self, req: Request) -> Result<Response, crate::Error> {
         Ok(self.request(req)?)
     }
@@ -96,15 +96,15 @@ impl Transport for MinreqHttpTransport {
     fn fmt_target(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.url) }
 }
 
-/// Builder for simple bitcoind [`MinreqHttpTransport`].
+/// Builder for simple bitcoind [`BitreqHttpTransport`].
 #[derive(Clone, Debug)]
 pub struct Builder {
-    tp: MinreqHttpTransport,
+    tp: BitreqHttpTransport,
 }
 
 impl Builder {
     /// Constructs a new [`Builder`] with default configuration and the URL to use.
-    pub fn new() -> Builder { Builder { tp: MinreqHttpTransport::new() } }
+    pub fn new() -> Builder { Builder { tp: BitreqHttpTransport::new() } }
 
     /// Sets the timeout after which requests will abort if they aren't finished.
     pub fn timeout(mut self, timeout: Duration) -> Self {
@@ -137,22 +137,22 @@ impl Builder {
     /// # Examples
     ///
     /// ```no_run
-    /// # use jsonrpc::minreq_http::MinreqHttpTransport;
+    /// # use jsonrpc::bitreq_http::BitreqHttpTransport;
     /// # use std::fs::{self, File};
     /// # use std::path::Path;
     /// # let cookie_file = Path::new("~/.bitcoind/.cookie");
     /// let mut file = File::open(cookie_file).expect("couldn't open cookie file");
     /// let mut cookie = String::new();
     /// fs::read_to_string(&mut cookie).expect("couldn't read cookie file");
-    /// let client = MinreqHttpTransport::builder().cookie_auth(cookie);
+    /// let client = BitreqHttpTransport::builder().cookie_auth(cookie);
     /// ```
     pub fn cookie_auth<S: AsRef<str>>(mut self, cookie: S) -> Self {
         self.tp.basic_auth = Some(format!("Basic {}", &BASE64.encode(cookie.as_ref().as_bytes())));
         self
     }
 
-    /// Builds the final [`MinreqHttpTransport`].
-    pub fn build(self) -> MinreqHttpTransport { self.tp }
+    /// Builds the final [`BitreqHttpTransport`].
+    pub fn build(self) -> BitreqHttpTransport { self.tp }
 }
 
 impl Default for Builder {
@@ -185,8 +185,8 @@ impl error::Error for HttpError {}
 pub enum Error {
     /// JSON parsing error.
     Json(serde_json::Error),
-    /// Minreq error.
-    Minreq(minreq::Error),
+    /// Bitreq error.
+    Bitreq(bitreq::Error),
     /// HTTP error that does not contain valid JSON as body.
     Http(HttpError),
 }
@@ -195,7 +195,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             Error::Json(ref e) => write!(f, "parsing JSON failed: {}", e),
-            Error::Minreq(ref e) => write!(f, "minreq: {}", e),
+            Error::Bitreq(ref e) => write!(f, "bitreq: {}", e),
             Error::Http(ref e) => write!(f, "http ({})", e),
         }
     }
@@ -207,7 +207,7 @@ impl error::Error for Error {
 
         match *self {
             Json(ref e) => Some(e),
-            Minreq(ref e) => Some(e),
+            Bitreq(ref e) => Some(e),
             Http(ref e) => Some(e),
         }
     }
@@ -217,8 +217,8 @@ impl From<serde_json::Error> for Error {
     fn from(e: serde_json::Error) -> Self { Error::Json(e) }
 }
 
-impl From<minreq::Error> for Error {
-    fn from(e: minreq::Error) -> Self { Error::Minreq(e) }
+impl From<bitreq::Error> for Error {
+    fn from(e: bitreq::Error) -> Self { Error::Bitreq(e) }
 }
 
 impl From<Error> for crate::Error {

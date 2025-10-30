@@ -17,16 +17,16 @@ pub extern crate serde_json;
 #[cfg(feature = "base64")]
 pub extern crate base64;
 
-/// Re-export `minreq` crate if the feature is set.
-#[cfg(feature = "minreq")]
-pub extern crate minreq;
+/// Re-export `bitreq` crate if the feature is set.
+#[cfg(feature = "bitreq")]
+pub extern crate bitreq;
 
 pub mod client;
 pub mod error;
 pub mod http;
 
-#[cfg(feature = "minreq_http")]
-pub use http::minreq_http;
+#[cfg(feature = "bitreq_http")]
+pub use http::bitreq_http;
 #[cfg(feature = "simple_http")]
 pub use http::simple_http;
 
