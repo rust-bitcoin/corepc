@@ -1,4 +1,4 @@
-//! # Minreq
+//! # Bitreq
 //!
 //! Simple, minimal-dependency HTTP client.  The library has a very
 //! minimal API, so you'll probably know everything you need to after
@@ -207,16 +207,16 @@
 //!   ```text,ignore
 //!   bitreq::get("/").with_timeout(8).send();
 //!   ```
-//! - Set the environment variable `MINREQ_TIMEOUT` to the desired
+//! - Set the environment variable `BITREQ_TIMEOUT` to the desired
 //!   amount of seconds until timeout. Ie. if you have a program called
 //!   `foo` that uses bitreq, and you want all the requests made by that
 //!   program to timeout in 8 seconds, you launch the program like so:
 //!   ```text,ignore
-//!   $ MINREQ_TIMEOUT=8 ./foo
+//!   $ BITREQ_TIMEOUT=8 ./foo
 //!   ```
 //!   Or add the following somewhere before the requests in the code.
 //!   ```
-//!   std::env::set_var("MINREQ_TIMEOUT", "8");
+//!   std::env::set_var("BITREQ_TIMEOUT", "8");
 //!   ```
 //! If the timeout is set with `with_timeout`, the environment
 //! variable will be ignored.

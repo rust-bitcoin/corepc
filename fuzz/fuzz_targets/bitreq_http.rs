@@ -8,12 +8,12 @@ fn do_test(data: &[u8]) {
     {
         use std::io;
 
-        use jsonrpc::minreq_http::{MinreqHttpTransport, FUZZ_TCP_SOCK};
+        use jsonrpc::bitreq_http::{BitreqHttpTransport, FUZZ_TCP_SOCK};
         use jsonrpc::Client;
 
         *FUZZ_TCP_SOCK.lock().unwrap() = Some(io::Cursor::new(data.to_vec()));
 
-        let t = MinreqHttpTransport::builder()
+        let t = BitreqHttpTransport::builder()
             .url("localhost:123")
             .expect("parse url")
             .basic_auth("".to_string(), None)

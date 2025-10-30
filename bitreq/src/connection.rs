@@ -87,7 +87,7 @@ pub struct AsyncConnection {
 impl AsyncConnection {
     /// Creates a new `AsyncConnection`.
     pub(crate) fn new(request: ParsedRequest) -> AsyncConnection {
-        let timeout = request.config.timeout.or_else(|| match env::var("MINREQ_TIMEOUT") {
+        let timeout = request.config.timeout.or_else(|| match env::var("BITREQ_TIMEOUT") {
             Ok(t) => t.parse::<u64>().ok(),
             Err(_) => None,
         });
@@ -128,7 +128,7 @@ impl Connection {
     /// Creates a new `Connection`. See [Request] and [ParsedRequest]
     /// for specifics about *what* is being sent.
     pub(crate) fn new(request: ParsedRequest) -> Connection {
-        let timeout = request.config.timeout.or_else(|| match env::var("MINREQ_TIMEOUT") {
+        let timeout = request.config.timeout.or_else(|| match env::var("BITREQ_TIMEOUT") {
             Ok(t) => t.parse::<u64>().ok(),
             Err(_) => None,
         });
