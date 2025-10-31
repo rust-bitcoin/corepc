@@ -1,8 +1,6 @@
 # bitreq - forked from minreq
 [![Crates.io](https://img.shields.io/crates/d/bitreq.svg)](https://crates.io/crates/bitreq)
 [![Documentation](https://docs.rs/bitreq/badge.svg)](https://docs.rs/bitreq)
-![Unit tests](https://github.com/tcharding/bitreq/actions/workflows/unit-tests.yml/badge.svg)
-![MSRV](https://github.com/tcharding/bitreq/actions/workflows/msrv.yml/badge.svg)
 
 This crate is a fork for the very nice
 [minreq](https://github.com/neonmoe/minreq). I chose to fork and

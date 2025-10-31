@@ -2,4 +2,4 @@
 # shellcheck disable=SC2148
 
 # Crates in this workspace to test.
-CRATES=("types" "client" "jsonrpc")
+CRATES=("bitreq" "client" "jsonrpc" "types")

@@ -50,7 +50,7 @@ https = ["https-rustls"]
 https-rustls = ["rustls", "webpki-roots", "rustls-webpki"]
 https-rustls-probe = ["rustls", "rustls-native-certs"]
 json-using-serde = ["serde", "serde_json"]
-proxy = ["base64"]
+proxy = ["base64", "std"]
 async = ["tokio", "std"]
 async-https = ["async", "https-rustls", "tokio-rustls"]
 

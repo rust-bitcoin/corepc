@@ -5,6 +5,7 @@ use alloc::sync::Arc;
 use core::convert::TryFrom;
 use std::io::{self, Write};
 use std::net::TcpStream;
+use std::sync::OnceLock;
 
 use rustls::{self, ClientConfig, ClientConnection, RootCertStore, ServerName, StreamOwned};
 #[cfg(feature = "rustls-webpki")]
@@ -15,8 +16,9 @@ use crate::Error;
 
 pub type SecuredStream = StreamOwned<ClientConnection, TcpStream>;
 
-#[allow(clippy::incompatible_msrv)] // We only guarantee MSRV for a subset of features.
-static CONFIG: std::sync::LazyLock<Arc<ClientConfig>> = std::sync::LazyLock::new(|| {
+static CONFIG: OnceLock<Arc<ClientConfig>> = OnceLock::new();
+
+fn build_client_config() -> Arc<ClientConfig> {
     let mut root_certificates = RootCertStore::empty();
 
     // Try to load native certs
@@ -44,7 +46,7 @@ static CONFIG: std::sync::LazyLock<Arc<ClientConfig>> = std::sync::LazyLock::new
         .with_root_certificates(root_certificates)
         .with_no_client_auth();
     Arc::new(config)
-});
+}
 
 pub fn create_secured_stream(conn: &Connection) -> Result<HttpStream, Error> {
     // Rustls setup
@@ -54,8 +56,8 @@ pub fn create_secured_stream(conn: &Connection) -> Result<HttpStream, Error> {
         Ok(result) => result,
         Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
     };
-    let sess =
-        ClientConnection::new(CONFIG.clone(), dns_name).map_err(Error::RustlsCreateConnection)?;
+    let sess = ClientConnection::new(CONFIG.get_or_init(build_client_config).clone(), dns_name)
+        .map_err(Error::RustlsCreateConnection)?;
 
     // Connect
     #[cfg(feature = "log")]

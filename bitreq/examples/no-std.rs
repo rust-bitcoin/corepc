@@ -1,7 +1,5 @@
 //! This is a simple example to demonstrate the usage of this library.
 
-#![cfg(feature = "std")]
-
 const _RESPONSE: &str = r#"<!doctype html>
 <html>
 <head>
@@ -16,7 +14,7 @@ const _RESPONSE: &str = r#"<!doctype html>
         margin: 0;
         padding: 0;
         font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        
+
     }
     div {
         width: 600px;
@@ -36,7 +34,7 @@ const _RESPONSE: &str = r#"<!doctype html>
             width: auto;
         }
     }
-    </style>    
+    </style>
 </head>
 
 <body>
