@@ -1,9 +1,9 @@
 [package]
 name = "jsonrpc"
-version = "0.18.0"
+version = "0.19.0"
 authors = ["Andrew Poelstra <apoelstra@wpsoftware.net>"]
 license = "CC0-1.0"
-repository = "https://github.com/rust-bitcoin/rust-bitcoind-json-rpc/"
+repository = "https://github.com/rust-bitcoin/corepc/"
 documentation = "https://docs.rs/jsonrpc/"
 description = "Rust support for the JSON-RPC 2.0 protocol"
 keywords = [ "protocol", "json", "http", "jsonrpc" ]
