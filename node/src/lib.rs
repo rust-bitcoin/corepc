@@ -1,4 +1,9 @@
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+// SPDX-License-Identifier: CC0-1.0
+
+//! # Rust Bitcoin Core node harness
+//!
+//! Utilities used to spin up, configure and drive `bitcoind` instances.
+
 #![cfg_attr(docsrs, cfg_attr(all(), doc = include_str!("../README.md")))]
 
 pub extern crate corepc_client as client;

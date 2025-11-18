@@ -4,7 +4,6 @@
 //!
 //! Rust support for the JSON-RPC 2.0 protocol.
 
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 // Coding conventions
 #![warn(missing_docs)]
 
