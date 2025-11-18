@@ -1,3 +1,7 @@
+# 0.10.1 2025-11-18
+
+- Remove `doc_auto_cfg` to fix build on docs.rs
+
 # 0.10.0 2025-10-07
 
 - Update to use latest `client v0.10.0`.

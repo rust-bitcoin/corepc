@@ -1,6 +1,6 @@
 [package]
 name = "corepc-node"
-version = "0.10.0"
+version = "0.10.1"
 authors = ["Riccardo Casatta <riccardo@casatta.it>", "Tobin C. Harding <me@tobin.cc>"]
 license = "MIT"
 repository = "https://github.com/rust-bitcoin/corepc"
