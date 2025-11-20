@@ -1,5 +1,5 @@
 [workspace]
-members = [ "bitreq", "client", "jsonrpc", "node", "types"]
+members = [ "bitreq", "client", "jsonrpc", "node", "types", "electrsd"]
 exclude = ["integration_test", "verify"]
 resolver = "2"
 

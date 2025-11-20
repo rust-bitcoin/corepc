@@ -1,0 +1,58 @@
+[package]
+name = "electrsd"
+version = "0.36.1"
+authors = ["Riccardo Casatta <riccardo@casatta.it>"]
+description = "Utility to run a regtest electrs process, useful in integration testing environment"
+repository = "https://github.com/RCasatta/electrsd"
+documentation = "https://docs.rs/elecrtsd/"
+license = "MIT"
+edition = "2018"
+categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
+
+[dependencies]
+corepc-node = { version = "0.10.0" }
+corepc-client = { version = "0.10.0" }
+electrum-client = { version = "0.24.0", default-features = false }
+log = { version = "0.4" }
+
+[target.'cfg(not(windows))'.dependencies]
+nix = { version = "0.25.0" }
+
+[dev-dependencies]
+env_logger = { version = "0.10" }
+
+[build-dependencies]
+bitcoin_hashes = { version = "0.14", optional = true }
+zip = { version = "0.6", default-features = false, optional = true, features = [
+  "bzip2",
+  "deflate",
+] }
+minreq = { version = "2.9.0", default-features = false, optional = true, features = [
+  "https",
+] }
+
+[features]
+legacy = []
+
+# download is not supposed to be used directly only through selecting one of the version feature
+download = ["bitcoin_hashes", "zip", "minreq"]
+
+esplora_a33e97e1 = ["download", "legacy"]
+electrs_0_8_10 = ["download"]
+electrs_0_9_1 = ["download"]
+electrs_0_9_11 = ["download"]
+electrs_0_10_6 = ["download"]
+
+corepc-node_29_0 = ["corepc-node/download", "corepc-node/29_0"]
+corepc-node_28_2 = ["corepc-node/download", "corepc-node/28_2"]
+corepc-node_27_2 = ["corepc-node/download", "corepc-node/27_2"]
+corepc-node_26_2 = ["corepc-node/download", "corepc-node/26_2"]
+corepc-node_25_2 = ["corepc-node/download", "corepc-node/25_2"]
+corepc-node_24_2 = ["corepc-node/download", "corepc-node/24_2"]
+corepc-node_23_1 = ["corepc-node/download", "corepc-node/23_2"]
+corepc-node_22_1 = ["corepc-node/download", "corepc-node/22_1"]
+corepc-node_0_21_2 = ["corepc-node/download", "corepc-node/0_21_2"]
+corepc-node_0_20_2 = ["corepc-node/download", "corepc-node/0_20_2"]
+corepc-node_0_19_1 = ["corepc-node/download", "corepc-node/0_19_1"]
+corepc-node_0_18_1 = ["corepc-node/download", "corepc-node/0_18_1"]
+corepc-node_0_17_2 = ["corepc-node/download", "corepc-node/0_17_2"]
