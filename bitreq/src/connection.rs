@@ -150,10 +150,8 @@ impl Connection {
     /// Sends the [`Request`](struct.Request.html), consumes this
     /// connection, and returns a [`Response`](struct.Response.html).
     #[cfg(feature = "rustls")]
-    pub(crate) fn send_https(mut self) -> Result<ResponseLazy, Error> {
+    pub(crate) fn send_https(self) -> Result<ResponseLazy, Error> {
         enforce_timeout(self.timeout_at, move || {
-            self.request.url.host = ensure_ascii_host(self.request.url.host)?;
-
             let secured_stream = rustls_stream::create_secured_stream(&self)?;
 
             #[cfg(feature = "log")]
@@ -170,9 +168,8 @@ impl Connection {
 
     /// Sends the [`Request`](struct.Request.html), consumes this
     /// connection, and returns a [`Response`](struct.Response.html).
-    pub(crate) fn send(mut self) -> Result<ResponseLazy, Error> {
+    pub(crate) fn send(self) -> Result<ResponseLazy, Error> {
         enforce_timeout(self.timeout_at, move || {
-            self.request.url.host = ensure_ascii_host(self.request.url.host)?;
             let bytes = self.request.as_bytes();
 
             #[cfg(feature = "log")]
@@ -310,35 +307,6 @@ fn get_redirect(mut connection: Connection, status_code: i32, url: Option<&Strin
             }
         }
         _ => NextHop::Destination(connection),
-    }
-}
-
-fn ensure_ascii_host(host: String) -> Result<String, Error> {
-    if host.is_ascii() {
-        Ok(host)
-    } else {
-        #[cfg(not(feature = "punycode"))]
-        {
-            Err(Error::PunycodeFeatureNotEnabled)
-        }
-
-        #[cfg(feature = "punycode")]
-        {
-            let mut result = String::with_capacity(host.len() * 2);
-            for s in host.split('.') {
-                if s.is_ascii() {
-                    result += s;
-                } else {
-                    match punycode::encode(s) {
-                        Ok(s) => result = result + "xn--" + &s,
-                        Err(_) => return Err(Error::PunycodeConversionFailed),
-                    }
-                }
-                result += ".";
-            }
-            result.truncate(result.len() - 1); // Remove the trailing dot
-            Ok(result)
-        }
     }
 }
 

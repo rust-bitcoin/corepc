@@ -21,7 +21,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! bitreq = { version = "2.13.5-alpha", features = ["punycode"] }
+//! bitreq = { version = "2.13.5-alpha", features = ["https"] }
 //! ```
 //!
 //! Below is the list of all available features.
@@ -44,17 +44,6 @@
 //! [`rustls-native-certs`](https://crates.io/crates/rustls-native-certs)
 //! crate to auto-detect root certificates installed in common
 //! locations.
-//!
-//! ## `punycode`
-//!
-//! This feature enables requests to non-ascii domains: the
-//! [`punycode`](https://crates.io/crates/punycode) crate is used to
-//! convert the non-ascii parts into their punycode representations
-//! before making the request. If you try to make a request to 㯙㯜㯙
-//! 㯟.net or i❤.ws for example, with this feature disabled (as it is
-//! by default), your request will fail with a
-//! [`PunycodeFeatureNotEnabled`](enum.Error.html#variant.PunycodeFeatureNotEnabled)
-//! error.
 //!
 //! ## `async`
 //!

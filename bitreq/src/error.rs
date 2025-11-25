@@ -52,18 +52,10 @@ pub enum Error {
     /// The response contained invalid UTF-8 where it should be valid
     /// (eg. headers), so the response cannot interpreted correctly.
     InvalidUtf8InResponse,
-    /// The provided url contained a domain that has non-ASCII
-    /// characters, and could not be converted into punycode. It is
-    /// probably not an actual domain.
-    PunycodeConversionFailed,
     /// Tried to send a secure request (ie. the url started with
     /// `https://`), but the crate's `https` feature was not enabled,
     /// and as such, a connection cannot be made.
     HttpsFeatureNotEnabled,
-    /// The provided url contained a domain that has non-ASCII
-    /// characters, but it could not be converted into punycode
-    /// because the `punycode` feature was not enabled.
-    PunycodeFeatureNotEnabled,
     /// The provided proxy information was not properly formatted. See
     /// [Proxy::new](crate::Proxy::new) for the valid format.
     BadProxy,
@@ -110,8 +102,6 @@ impl fmt::Display for Error {
             TooManyRedirections => write!(f, "too many redirections (over the max)"),
             InvalidUtf8InResponse => write!(f, "response contained invalid utf-8 where valid utf-8 was expected"),
             HttpsFeatureNotEnabled => write!(f, "request url contains https:// but the https feature is not enabled"),
-            PunycodeFeatureNotEnabled => write!(f, "non-ascii urls needs to be converted into punycode, and the feature is missing"),
-            PunycodeConversionFailed => write!(f, "non-ascii url conversion to punycode failed"),
             BadProxy => write!(f, "the provided proxy information is malformed"),
             BadProxyCreds => write!(f, "the provided proxy credentials are malformed"),
             ProxyConnect => write!(f, "could not connect to the proxy server"),
