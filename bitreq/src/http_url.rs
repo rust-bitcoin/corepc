@@ -1,7 +1,10 @@
+#[cfg(feature = "std")]
 use core::fmt::{self, Write};
 
+#[cfg(feature = "std")]
 use crate::Error;
 
+#[cfg(feature = "std")]
 #[derive(Clone, Copy, PartialEq)]
 pub(crate) enum Port {
     ImplicitHttp,
@@ -9,6 +12,7 @@ pub(crate) enum Port {
     Explicit(u32),
 }
 
+#[cfg(feature = "std")]
 impl Port {
     pub(crate) fn port(self) -> u32 {
         match self {
@@ -27,6 +31,7 @@ impl Port {
 /// ```text
 /// scheme "://" host [ ":" port ] path [ "?" query ] [ "#" fragment ]
 /// ```
+#[cfg(feature = "std")]
 #[derive(Clone, PartialEq)]
 pub(crate) struct HttpUrl {
     /// If scheme is "https", true, if "http", false.
@@ -41,6 +46,7 @@ pub(crate) struct HttpUrl {
     pub(crate) fragment: Option<String>,
 }
 
+#[cfg(feature = "std")]
 impl HttpUrl {
     pub(crate) fn parse(url: &str, redirected_from: Option<&HttpUrl>) -> Result<HttpUrl, Error> {
         enum UrlParseStatus {
@@ -96,9 +102,6 @@ impl HttpUrl {
                     path_and_query = Some(resource);
                     resource = String::new();
                 }
-                #[cfg(not(feature = "urlencoding"))]
-                UrlParseStatus::PathAndQuery | UrlParseStatus::Fragment => resource.push(c),
-                #[cfg(feature = "urlencoding")]
                 UrlParseStatus::PathAndQuery | UrlParseStatus::Fragment => match c {
                     // All URL-'safe' characters, plus URL 'special
                     // characters' like &, #, =, / ,?
@@ -116,25 +119,8 @@ impl HttpUrl {
                     | '?' => {
                         resource.push(c);
                     }
-                    // There is probably a simpler way to do this, but this
-                    // method avoids any heap allocations (except extending
-                    // `resource`)
-                    _ => {
-                        // Any UTF-8 character can fit in 4 bytes
-                        let mut utf8_buf = [0u8; 4];
-                        // Bytes fill buffer from the front
-                        c.encode_utf8(&mut utf8_buf);
-                        // Slice disregards the unused portion of the buffer
-                        utf8_buf[..c.len_utf8()].iter().for_each(|byte| {
-                            // Convert byte to URL escape, e.g. %21 for b'!'
-                            let rem = *byte % 16;
-                            let right_char = to_hex_digit(rem);
-                            let left_char = to_hex_digit((*byte - rem) >> 4);
-                            resource.push('%');
-                            resource.push(left_char);
-                            resource.push(right_char);
-                        });
-                    }
+                    // Every other character gets percent-encoded.
+                    _ => percent_encode_char(c, &mut resource),
                 },
             }
         }
@@ -191,12 +177,37 @@ impl HttpUrl {
     }
 }
 
-// https://github.com/kornelski/rust_urlencoding/blob/a4df8027ab34a86a63f1be727965cf101556403f/src/enc.rs#L130-L136
-// Converts a UTF-8 byte to a single hexadecimal character
-#[cfg(feature = "urlencoding")]
-fn to_hex_digit(digit: u8) -> char {
-    match digit {
-        0..=9 => (b'0' + digit) as char,
-        10..=255 => (b'A' - 10 + digit) as char,
+/// Returns the `%HH` triplet representing `byte` for percent encoding.
+fn percent_encoded_triplet(byte: u8) -> [char; 3] {
+    const HEX: &[u8; 16] = b"0123456789ABCDEF";
+    ['%', HEX[(byte >> 4) as usize] as char, HEX[(byte & 0x0F) as usize] as char]
+}
+
+/// Percent-encodes a char and appends it to `result`.
+/// Unreserved characters (0-9, A-Z, a-z, -, ., _, ~) are not encoded.
+pub(crate) fn percent_encode_char(c: char, result: &mut String) {
+    match c {
+        // All URL-'safe' characters are not encoded
+        '0'..='9' | 'A'..='Z' | 'a'..='z' | '-' | '.' | '_' | '~' => {
+            result.push(c);
+        }
+        _ => {
+            // Any UTF-8 character can fit in 4 bytes
+            let mut utf8_buf = [0u8; 4];
+            c.encode_utf8(&mut utf8_buf).as_bytes().iter().for_each(|byte| {
+                for ch in percent_encoded_triplet(*byte) {
+                    result.push(ch);
+                }
+            });
+        }
     }
+}
+
+/// Percent-encodes the entire input string and returns the encoded version.
+pub(crate) fn percent_encode_string(input: &str) -> String {
+    let mut encoded = String::with_capacity(input.len());
+    for ch in input.chars() {
+        percent_encode_char(ch, &mut encoded);
+    }
+    encoded
 }

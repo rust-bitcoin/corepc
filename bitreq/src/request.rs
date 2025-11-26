@@ -7,6 +7,7 @@ use core::fmt::Write;
 use crate::connection::AsyncConnection;
 #[cfg(feature = "std")]
 use crate::connection::Connection;
+use crate::http_url::percent_encode_string;
 #[cfg(feature = "std")]
 use crate::http_url::{HttpUrl, Port};
 #[cfg(feature = "proxy")]
@@ -98,12 +99,8 @@ impl Request {
     /// This is only the request's data, it is not sent yet. For
     /// sending the request, see [`send`](struct.Request.html#method.send).
     ///
-    /// If `urlencoding` is not enabled, it is the responsibility of the
-    /// user to ensure there are no illegal characters in the URL.
-    ///
-    /// If `urlencoding` is enabled, the resource part of the URL will be
-    /// encoded. Any URL special characters (e.g. &, #, =) are not encoded
-    /// as they are assumed to be meaningful parameters etc.
+    /// The resource part of the URL will be encoded. Any URL special characters (e.g. &, #, =) are
+    /// not encoded as they are assumed to be meaningful parameters etc.
     pub fn new<T: Into<URL>>(method: Method, url: T) -> Request {
         Request {
             method,
@@ -151,18 +148,12 @@ impl Request {
     /// Adds given key and value as query parameter to request url
     /// (resource).
     ///
-    /// If `urlencoding` is not enabled, it is the responsibility
-    /// of the user to ensure there are no illegal characters in the
-    /// key or value.
-    ///
-    /// If `urlencoding` is enabled, the key and value are both encoded.
+    /// The key and value are both encoded.
     pub fn with_param<T: Into<String>, U: Into<String>>(mut self, key: T, value: U) -> Request {
         let key = key.into();
-        #[cfg(feature = "urlencoding")]
-        let key = urlencoding::encode(&key);
+        let key = percent_encode_string(&key);
         let value = value.into();
-        #[cfg(feature = "urlencoding")]
-        let value = urlencoding::encode(&value);
+        let value = percent_encode_string(&value);
 
         if !self.params.is_empty() {
             self.params.push('&');
@@ -610,7 +601,7 @@ mod parsing_tests {
     }
 }
 
-#[cfg(all(test, feature = "urlencoding"))]
+#[cfg(all(test, feature = "std"))]
 mod encoding_tests {
     use super::{get, ParsedRequest};
 
