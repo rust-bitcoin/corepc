@@ -161,7 +161,6 @@ dependencies = [
  "base64 0.22.1",
  "chrono",
  "log",
- "punycode",
  "rustls",
  "rustls-native-certs",
  "rustls-webpki",
@@ -541,12 +540,6 @@ checksum = "22244ce15aa966053a896d1accb3a6e68469b97c7f33f284b99f0d576879fc23"
 dependencies = [
  "unicode-ident",
 ]
-
-[[package]]
-name = "punycode"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9e1dcb320d6839f6edb64f7a4a59d39b30480d4d1765b56873f7c858538a5fe"
 
 [[package]]
 name = "quote"
