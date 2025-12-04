@@ -57,7 +57,7 @@
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
 //! | scanblocks                         | version + model |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //! | waitforblock                       | version + model |                                        |

@@ -46,7 +46,7 @@ pub const METHODS: &[Method] = &[
     Method::new_no_model("pruneblockchain", "PruneBlockchain", "prune_blockchain"),
     Method::new_no_model("savemempool", "SaveMempool", "save_mempool"),
     Method::new_modelled("scanblocks", "ScanBlocksStart", "scan_blocks"),
-    Method::new_modelled("scantxoutset", "ScanTxOutSet", "scan_tx_out_set"),
+    Method::new_modelled("scantxoutset", "ScanTxOutSetStart", "scan_tx_out_set"),
     Method::new_no_model("verifychain", "VerifyChain", "verify_chain"),
     Method::new_modelled("verifytxoutproof", "VerifyTxOutProof", "verify_tx_out_proof"),
     Method::new_modelled("waitforblock", "WaitForBlock", "wait_for_block"),
