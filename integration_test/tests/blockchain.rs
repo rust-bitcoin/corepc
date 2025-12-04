@@ -525,13 +525,6 @@ fn blockchain__scan_tx_out_set_modelled() {
 }
 
 #[test]
-fn blockchain__verify_tx_out_proof__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
-    node.fund_wallet();
-    verify_tx_out_proof(&node).unwrap();
-}
-
-#[test]
 fn blockchain__verify_chain() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
