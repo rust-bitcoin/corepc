@@ -48,7 +48,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -290,14 +290,15 @@ pub use crate::{
         ListLockUnspentItemError, ListReceivedByAddressError, ListUnspentItemError, ListWallets,
         LoadWallet, LockUnspent, Locked, NumericError, PartialSignatureError, PruneBlockchain,
         PsbtInput, PsbtInputError, PsbtOutput, PsbtOutputError, RawTransactionError,
-        RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType,
-        SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignFail, SignFailError,
-        SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
-        SignRawTransactionWithKey, SignRawTransactionWithWallet, SoftforkReject,
-        TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain,
-        VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError, WaitForBlockHeight,
-        WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt,
-        WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
+        RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScanTxOutSetAbort,
+        ScanTxOutSetError, ScanTxOutSetStatus, ScriptType, SendRawTransaction, SendToAddress,
+        SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
+        SignRawTransaction, SignRawTransactionError, SignRawTransactionWithKey,
+        SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
+        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
+        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
+        WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -316,7 +317,7 @@ pub use crate::{
     v20::{
         AddMultisigAddress, CreateMultisig, GenerateToDescriptor, GetTransaction,
         GetTransactionDetail, ListSinceBlock, ListSinceBlockError, ListTransactions,
-        TransactionItem, TransactionItemError,
+        ScanTxOutSetStart, ScanTxOutSetUnspent, TransactionItem, TransactionItemError,
     },
     v21::{
         AddPeerAddress, Bip9SoftforkInfo, GenerateBlock, GetBlockchainInfo, GetIndexInfo,

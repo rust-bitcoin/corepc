@@ -52,22 +52,19 @@ pub fn check_type_reexports(version: Version) -> Result<()> {
     };
 
     for type_name in version_defs.keys() {
-        let exported = export_map.values().any(|info| {
-            info.source_version == version_name && type_name == &info.source_ident
-        });
+        let exported = export_map
+            .values()
+            .any(|info| info.source_version == version_name && type_name == &info.source_ident);
         if !exported {
-            missing.push(format!(
-                "{} defines {} but does not re-export it",
-                version_name, type_name
-            ));
+            missing
+                .push(format!("{} defines {} but does not re-export it", version_name, type_name));
         }
     }
 
     // Checks all auxiliary types are re-exported.
     for (exported_name, export) in &export_map {
-        if let Some(deps) = definitions
-            .get(&export.source_version)
-            .and_then(|map| map.get(&export.source_ident))
+        if let Some(deps) =
+            definitions.get(&export.source_version).and_then(|map| map.get(&export.source_ident))
         {
             for dep in deps {
                 if !export_map.contains_key(dep) {
@@ -108,10 +105,7 @@ fn collect_version_dirs(src_dir: &Path) -> Result<Vec<String>> {
 }
 
 /// Parses all versioned source files and records every public struct/enum name.
-fn collect_type_files_and_names(
-    src_dir: &Path,
-    versions: &[String],
-) -> Result<ParsedTypeFiles> {
+fn collect_type_files_and_names(src_dir: &Path, versions: &[String]) -> Result<ParsedTypeFiles> {
     let mut files = Vec::new();
     let mut names = HashSet::new();
 
@@ -162,14 +156,18 @@ fn collect_type_definitions(
             match item {
                 Item::Struct(item_struct) if is_public(&item_struct.vis) => {
                     let deps = collect_deps_from_fields(&item_struct.fields, known_names);
-                    defs.entry(version.clone()).or_default().insert(item_struct.ident.to_string(), deps);
+                    defs.entry(version.clone())
+                        .or_default()
+                        .insert(item_struct.ident.to_string(), deps);
                 }
                 Item::Enum(item_enum) if is_public(&item_enum.vis) => {
                     let mut deps = BTreeSet::new();
                     for variant in item_enum.variants {
                         deps.extend(collect_deps_from_fields(&variant.fields, known_names));
                     }
-                    defs.entry(version.clone()).or_default().insert(item_enum.ident.to_string(), deps);
+                    defs.entry(version.clone())
+                        .or_default()
+                        .insert(item_enum.ident.to_string(), deps);
                 }
                 _ => {}
             }
@@ -180,15 +178,12 @@ fn collect_type_definitions(
 }
 
 /// Reads `mod.rs` for the chosen version and lists its public re-exports.
-fn collect_exports(
-    src_dir: &Path,
-    version: &str,
-) -> Result<HashMap<String, ExportInfo>> {
+fn collect_exports(src_dir: &Path, version: &str) -> Result<HashMap<String, ExportInfo>> {
     let mod_path = src_dir.join(version).join("mod.rs");
-    let content = fs::read_to_string(&mod_path)
-        .with_context(|| format!("reading {}", mod_path.display()))?;
-    let syntax = syn::parse_file(&content)
-        .with_context(|| format!("parsing {}", mod_path.display()))?;
+    let content =
+        fs::read_to_string(&mod_path).with_context(|| format!("reading {}", mod_path.display()))?;
+    let syntax =
+        syn::parse_file(&content).with_context(|| format!("parsing {}", mod_path.display()))?;
     let mut exports = HashMap::new();
 
     for item in syntax.items {
@@ -213,16 +208,14 @@ fn collect_exports(
 fn collect_deps_from_fields(fields: &Fields, known_names: &HashSet<String>) -> BTreeSet<String> {
     let mut deps = BTreeSet::new();
     match fields {
-        Fields::Named(named) => {
+        Fields::Named(named) =>
             for field in &named.named {
                 collect_type_dependencies(&field.ty, known_names, &mut deps);
-            }
-        }
-        Fields::Unnamed(unnamed) => {
+            },
+        Fields::Unnamed(unnamed) =>
             for field in &unnamed.unnamed {
                 collect_type_dependencies(&field.ty, known_names, &mut deps);
-            }
-        }
+            },
         Fields::Unit => {}
     }
     deps
@@ -255,11 +248,10 @@ fn collect_type_dependencies(
         Type::Reference(reference) => collect_type_dependencies(&reference.elem, known_names, deps),
         Type::Paren(paren) => collect_type_dependencies(&paren.elem, known_names, deps),
         Type::Group(group) => collect_type_dependencies(&group.elem, known_names, deps),
-        Type::Tuple(tuple) => {
+        Type::Tuple(tuple) =>
             for elem in &tuple.elems {
                 collect_type_dependencies(elem, known_names, deps);
-            }
-        }
+            },
         Type::Array(array) => collect_type_dependencies(&array.elem, known_names, deps),
         Type::Slice(slice) => collect_type_dependencies(&slice.elem, known_names, deps),
         Type::Ptr(ptr) => collect_type_dependencies(&ptr.elem, known_names, deps),
@@ -278,21 +270,17 @@ fn flatten_use_tree(prefix: Vec<String>, tree: &UseTree, acc: &mut Vec<UseEntry>
         UseTree::Rename(rename) => {
             let mut path = prefix;
             path.push(rename.ident.to_string());
-            acc.push(UseEntry {
-                path,
-                rename: Some(rename.rename.to_string()),
-            });
+            acc.push(UseEntry { path, rename: Some(rename.rename.to_string()) });
         }
         UseTree::Path(path) => {
             let mut new_prefix = prefix;
             new_prefix.push(path.ident.to_string());
             flatten_use_tree(new_prefix, &path.tree, acc);
         }
-        UseTree::Group(group) => {
+        UseTree::Group(group) =>
             for item in &group.items {
                 flatten_use_tree(prefix.clone(), item, acc);
-            }
-        }
+            },
         UseTree::Glob(_) => {}
     }
 }
@@ -303,10 +291,7 @@ fn interpret_flat_use(target_version: &str, entry: &UseEntry) -> Option<ExportIn
         return None;
     }
     let source_ident = entry.path.last()?.clone();
-    let exported_ident = entry
-        .rename
-        .clone()
-        .unwrap_or_else(|| source_ident.clone());
+    let exported_ident = entry.rename.clone().unwrap_or_else(|| source_ident.clone());
 
     match entry.path.first()?.as_str() {
         "self" => Some(ExportInfo {

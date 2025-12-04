@@ -34,8 +34,8 @@ pub use self::{
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutSetInfo, GetTxSpendingPrevout,
         GetTxSpendingPrevoutItem, LoadTxOutSet, MempoolEntry, MempoolEntryFees, ReceiveActivity,
-        ScanBlocksStart, Softfork, SoftforkType, SpendActivity, VerifyTxOutProof, WaitForBlock,
-        WaitForBlockHeight, WaitForNewBlock,
+        ScanBlocksStart, ScanTxOutSetStart, ScanTxOutSetUnspent, Softfork, SoftforkType,
+        SpendActivity, VerifyTxOutProof, WaitForBlock, WaitForBlockHeight, WaitForNewBlock,
     },
     generating::{Generate, GenerateBlock, GenerateToAddress, GenerateToDescriptor},
     mining::{
