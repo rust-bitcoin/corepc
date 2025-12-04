@@ -249,7 +249,8 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        GetBlockStats, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus, ScanTxOutSetStart, ScanTxOutSetUnspent
+        GetBlockStats, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus,
+        ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
     control::Logging,
     generating::{GenerateBlock, GenerateBlockError},
@@ -283,14 +284,15 @@ pub use crate::{
         ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError,
         ListUnspentItemError, ListWallets, LockUnspent, Locked, NumericError,
         PartialSignatureError, PruneBlockchain, RawTransactionError, RawTransactionInput,
-        RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
-        SignRawTransaction, SignRawTransactionError, SignRawTransactionWithKey,
-        SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
-        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
-        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
-        WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
+        RawTransactionOutput, RescanBlockchain, ScanTxOutSetAbort, ScanTxOutSetError,
+        ScanTxOutSetStatus, ScriptType, SendRawTransaction, SendToAddress, SetNetworkActive,
+        SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+        SignRawTransactionError, SignRawTransactionWithKey, SignRawTransactionWithWallet,
+        SoftforkReject, TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError,
+        VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError,
+        WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+        WitnessUtxoError,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,

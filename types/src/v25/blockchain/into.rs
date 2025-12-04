@@ -3,8 +3,10 @@
 use bitcoin::{Amount, BlockHash, FeeRate, ScriptBuf, Txid, Weight};
 
 use super::error::ScanBlocksStartError;
-use super::{GetBlockStats, GetBlockStatsError, ScanBlocksStart, ScanTxOutSetError, ScanTxOutSetStart,
-    ScanTxOutSetUnspent};
+use super::{
+    GetBlockStats, GetBlockStatsError, ScanBlocksStart, ScanTxOutSetError, ScanTxOutSetStart,
+    ScanTxOutSetUnspent,
+};
 use crate::model;
 
 impl GetBlockStats {

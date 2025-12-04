@@ -239,7 +239,8 @@ pub use self::{
         GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, GetRawMempool,
         GetRawMempoolVerbose, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
-        MempoolEntryFees, MempoolEntryFeesError, Softfork, SoftforkType, ScanTxOutSetStart, ScanTxOutSetUnspent,
+        MempoolEntryFees, MempoolEntryFeesError, ScanTxOutSetStart, ScanTxOutSetUnspent, Softfork,
+        SoftforkType,
     },
     control::GetRpcInfo,
     network::{GetNetworkInfo, GetPeerInfo, PeerInfo},
@@ -275,14 +276,15 @@ pub use crate::v17::{
     ListUnspentItemError, ListWallets, LoadWallet, LockUnspent, Locked, Logging, MempoolAcceptance,
     NumericError, PartialSignatureError, PruneBlockchain, PsbtInput, PsbtInputError, PsbtOutput,
     PsbtOutputError, RawTransactionError, RawTransactionInput, RawTransactionOutput,
-    RescanBlockchain, ScriptType, SendMany, SendRawTransaction, SendToAddress, SetNetworkActive,
-    SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+    RescanBlockchain, ScanTxOutSetAbort, ScanTxOutSetError, ScanTxOutSetStatus, ScriptType,
+    SendMany, SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignFail,
+    SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
     SignRawTransactionError, SignRawTransactionWithKey, SignRawTransactionWithWallet,
     SoftforkReject, TestMempoolAccept, TransactionCategory, TransactionItem, TransactionItemError,
     UploadTarget, ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage,
     VerifyTxOutProof, WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
     WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-    WalletProcessPsbt, WitnessUtxo, WitnessUtxoError, ScanTxOutSetError, ScanTxOutSetAbort, ScanTxOutSetStatus,
+    WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
 };
 #[doc(inline)]
 pub use crate::v18::{
