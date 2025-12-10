@@ -52,7 +52,7 @@
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
 //! | scanblocks                         | version + model |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -250,6 +250,7 @@ mod wallet;
 pub use self::{
     blockchain::{
         GetBlockStats, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus,
+        ScanTxOutSetStart, ScanTxOutSetUnspent,
     },
     control::Logging,
     generating::{GenerateBlock, GenerateBlockError},
@@ -283,14 +284,15 @@ pub use crate::{
         ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError,
         ListUnspentItemError, ListWallets, LockUnspent, Locked, NumericError,
         PartialSignatureError, PruneBlockchain, RawTransactionError, RawTransactionInput,
-        RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
-        SignRawTransaction, SignRawTransactionError, SignRawTransactionWithKey,
-        SignRawTransactionWithWallet, SoftforkReject, TransactionCategory, UploadTarget,
-        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
-        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
-        WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
-        WalletProcessPsbt, WitnessUtxo, WitnessUtxoError,
+        RawTransactionOutput, RescanBlockchain, ScanTxOutSetAbort, ScanTxOutSetError,
+        ScanTxOutSetStatus, ScriptType, SendRawTransaction, SendToAddress, SetNetworkActive,
+        SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey, SignRawTransaction,
+        SignRawTransactionError, SignRawTransactionWithKey, SignRawTransactionWithWallet,
+        SoftforkReject, TransactionCategory, UploadTarget, ValidateAddress, ValidateAddressError,
+        VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock, WaitForBlockError,
+        WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock, WaitForNewBlockError,
+        WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WalletProcessPsbt, WitnessUtxo,
+        WitnessUtxoError,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
