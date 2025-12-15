@@ -47,7 +47,7 @@
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | returns nothing |                                        |
-//! | scantxoutset                       | omitted         | API marked as experimental             |
+//! | scantxoutset                       | version + model | API marked as experimental             |
 //! | verifychain                        | version         |                                        |
 //! | verifytxoutproof                   | version + model |                                        |
 //!
@@ -244,8 +244,9 @@ pub use self::{
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo, GetMempoolInfoError,
         GetRawMempool, GetRawMempoolVerbose, GetTxOut, GetTxOutError, GetTxOutSetInfo,
         GetTxOutSetInfoError, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
-        MempoolEntryFees, MempoolEntryFeesError, PruneBlockchain, Softfork, SoftforkReject,
-        VerifyChain, VerifyTxOutProof,
+        MempoolEntryFees, MempoolEntryFeesError, PruneBlockchain, ScanTxOutSetAbort,
+        ScanTxOutSetError, ScanTxOutSetStart, ScanTxOutSetStatus, ScanTxOutSetUnspent, Softfork,
+        SoftforkReject, VerifyChain, VerifyTxOutProof,
     },
     control::{GetMemoryInfoStats, Locked, Logging},
     generating::{Generate, GenerateToAddress},

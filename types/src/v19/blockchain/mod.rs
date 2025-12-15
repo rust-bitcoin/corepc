@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 // TODO: Remove wildcard, use explicit types.
 pub use self::error::*;
-use super::{GetChainTxStatsError, GetMempoolInfoError};
+use super::{GetChainTxStatsError, GetMempoolInfoError, ScanTxOutSetError, ScanTxOutSetUnspent};
 
 /// Result of JSON-RPC method `getblockchaininfo`.
 ///
@@ -358,3 +358,28 @@ pub struct GetRawMempool(pub Vec<String>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Result of JSON-RPC method `scantxoutset`.
+///
+/// > scantxoutset "action" ( [scanobjects,...] )
+/// >
+/// > Arguments:
+/// > 1. action                        (string, required) The action to execute
+/// > 2. scanobjects                   (json array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanTxOutSetStart {
+    /// Whether the scan was completed.
+    pub success: bool,
+    /// The number of unspent transaction outputs scanned.
+    pub txouts: u64,
+    /// The block height at which the scan was done.
+    pub height: u64,
+    /// The hash of the block at the tip of the chain.
+    #[serde(rename = "bestblock")]
+    pub best_block: String,
+    /// The unspents.
+    pub unspents: Vec<ScanTxOutSetUnspent>,
+    /// The total amount of all found unspent outputs in BTC.
+    pub total_amount: f64,
+}
