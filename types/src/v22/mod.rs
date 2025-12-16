@@ -245,6 +245,7 @@
 // JSON-RPC types by API section.
 mod blockchain;
 mod control;
+mod hidden;
 mod network;
 mod raw_transactions;
 mod signer;
@@ -254,6 +255,7 @@ mod wallet;
 pub use self::{
     blockchain::GetMempoolInfo,
     control::Logging,
+    hidden::AddConnection,
     network::{Banned, GetNodeAddresses, GetPeerInfo, ListBanned, NodeAddress, PeerInfo},
     raw_transactions::{
         DecodeScript, DecodeScriptError, DecodeScriptSegwit, MempoolAcceptance,

@@ -321,10 +321,10 @@ pub use crate::{
         SendMany, SendManyVerbose, UnloadWallet, UpgradeWallet,
     },
     v22::{
-        Banned, DescriptorInfo, EnumerateSigners, GetAddressInfo, GetAddressInfoEmbedded,
-        GetNodeAddresses, ListBanned, ListDescriptors, MempoolAcceptance, MempoolAcceptanceError,
-        MempoolAcceptanceFees, NodeAddress, ScriptPubkey, Signers, TestMempoolAccept,
-        TestMempoolAcceptError, WalletDisplayAddress,
+        AddConnection, Banned, DescriptorInfo, EnumerateSigners, GetAddressInfo,
+        GetAddressInfoEmbedded, GetNodeAddresses, ListBanned, ListDescriptors, MempoolAcceptance,
+        MempoolAcceptanceError, MempoolAcceptanceFees, NodeAddress, ScriptPubkey, Signers,
+        TestMempoolAccept, TestMempoolAcceptError, WalletDisplayAddress,
     },
     v23::{
         AddMultisigAddress, Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript,

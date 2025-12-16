@@ -321,9 +321,9 @@ pub use crate::{
         SendMany, SendManyVerbose, UnloadWallet, UpgradeWallet,
     },
     v22::{
-        Banned, DescriptorInfo, EnumerateSigners, GetAddressInfo, GetAddressInfoEmbedded,
-        GetMempoolInfo, GetNodeAddresses, ListBanned, ListDescriptors, MempoolAcceptance,
-        MempoolAcceptanceError, MempoolAcceptanceFees, NodeAddress, ScriptPubkey, Signers,
-        TestMempoolAccept, TestMempoolAcceptError, WalletDisplayAddress,
+        AddConnection, Banned, DescriptorInfo, EnumerateSigners, GetAddressInfo,
+        GetAddressInfoEmbedded, GetMempoolInfo, GetNodeAddresses, ListBanned, ListDescriptors,
+        MempoolAcceptance, MempoolAcceptanceError, MempoolAcceptanceFees, NodeAddress,
+        ScriptPubkey, Signers, TestMempoolAccept, TestMempoolAcceptError, WalletDisplayAddress,
     },
 };

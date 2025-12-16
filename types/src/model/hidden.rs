@@ -8,6 +8,15 @@
 use bitcoin::FeeRate;
 use serde::{Deserialize, Serialize};
 
+/// Models the result of JSON-RPC method `addconnection`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct AddConnection {
+    /// The address of the newly added connection.
+    pub address: String,
+    /// Type of connection.
+    pub connection_type: String,
+}
+
 /// Models the result of JSON-RPC method `estimaterawfee`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct EstimateRawFee {

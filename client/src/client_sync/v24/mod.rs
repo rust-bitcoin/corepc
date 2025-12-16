@@ -73,6 +73,7 @@ crate::impl_client_v20__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
+crate::impl_client_v22__add_connection!();
 crate::impl_client_v21__add_peer_address!();
 crate::impl_client_v17__estimate_raw_fee!();
 crate::impl_client_v17__wait_for_block!();

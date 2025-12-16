@@ -7,6 +7,40 @@
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::mtype;
 use node::vtype::*; // All the version specific types.
+#[cfg(not(feature = "v21_and_below"))]
+use node::P2P;
+
+#[test]
+#[cfg(not(feature = "v21_and_below"))]
+fn hidden__add_connection__modelled() {
+    let (listener, dialer, _node3) = integration_test::three_node_network();
+
+    let p2p = listener.p2p_connect(false).expect("p2p address");
+    let address = match p2p {
+        P2P::Connect(socket, _) => socket.to_string(),
+        _ => unreachable!("p2p_connect should return P2P::Connect"),
+    };
+
+    let json: AddConnection = {
+        #[cfg(feature = "v26_and_below")]
+        {
+            dialer.client.add_connection(&address, "outbound-full-relay").expect("addconnection")
+        }
+        #[cfg(not(feature = "v26_and_below"))]
+        {
+            dialer
+                .client
+                .add_connection(&address, "outbound-full-relay", false)
+                .expect("addconnection")
+        }
+    };
+
+    let model: mtype::AddConnection = json.into_model();
+
+    assert_eq!(model.address, address);
+    assert_eq!(model.connection_type, "outbound-full-relay");
+    assert!(dialer.peers_connected() >= 1);
+}
 
 #[test]
 fn hidden__estimate_raw_fee__modelled() {
