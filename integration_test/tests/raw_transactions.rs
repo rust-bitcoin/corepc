@@ -127,18 +127,37 @@ fn raw_transactions__create_raw_transaction__modelled() {
     create_sign_send(&node);
 }
 
-// Notes on testing decoding of PBST.
+// Notes on testing decoding of PSBT.
 //
-// - `bip32_derivs` field in the input list of the decoded PSBT changes shape a bunch of times.
-// - In v23 a bunch of additional fields are added.
-// - In v24 taproot fields are added.
+// Version-specific behavior:
+// - v17: Base PSBT support via `createpsbt`/`decodepsbt`. No `utxoupdatepsbt`.
+// - v18-v19: `utxoupdatepsbt` added but default address type is p2sh-segwit; `utxoupdatepsbt`
+//   can't detect p2sh-segwit as segwit without descriptors, so UTXO data isn't populated.
+// - v20+: Default address type changed to bech32 (PR #16884). Native segwit is directly
+//   detected, so UTXO data is populated and fee calculation works.
+// - v23: Global xpubs field added (previously ended up in `unknown`).
+// - v24: Taproot fields added (`tap_internal_key`, etc).
+// - v30: MuSig2 fields added. TODO: Test MuSig2.
 //
-// All this should still be handled by `into_model` because `bitcoin::Psbt` has all optional fields.
+// The `bip32_derivs` field in inputs changes shape across versions.
+// All version differences should be handled by `into_model` because `bitcoin::Psbt` has optional fields.
 #[test]
 fn raw_transactions__decode_psbt__modelled() {
     let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
+    // utxoupdatepsbt (v18+)
+    // Looks up UTXOs from chain and populates `witness_utxo` field
+    // so that fee can be calculated (fee = sum(inputs) - sum(outputs)).
+    #[cfg(not(feature = "v17"))]
+    let mut psbt = {
+        let psbt = create_a_psbt(&node);
+        let updated: UtxoUpdatePsbt = node.client.utxo_update_psbt(&psbt).expect("utxoupdatepsbt");
+        updated.into_model().expect("UtxoUpdatePsbt into model").0
+    };
+
+    // v17: No utxoupdatepsbt available, so input values are unknown.
+    #[cfg(feature = "v17")]
     let mut psbt = create_a_psbt(&node);
 
     // A bunch of new fields got added in v23.
@@ -158,17 +177,35 @@ fn raw_transactions__decode_psbt__modelled() {
         let path =
             "m/84'/0'/0'/0/1".parse::<DerivationPath>().expect("failed to parse derivation path");
         map.insert(xpub, (fp, path));
-
         psbt.xpub = map;
     }
 
-    let encoded = psbt.to_string();
+    // Add an arbitrary tap_internal_key for v24+.
+    #[cfg(not(feature = "v23_and_below"))]
+    let tap_key = {
+        use bitcoin::secp256k1::XOnlyPublicKey;
 
+        let tap_key_bytes = <[u8; 32]>::from_hex(
+            "2afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e",
+        )
+        .unwrap();
+        let key = XOnlyPublicKey::from_slice(&tap_key_bytes).unwrap();
+        psbt.inputs[0].tap_internal_key = Some(key);
+        key
+    };
+
+    let encoded = psbt.to_string();
     let json: DecodePsbt = node.client.decode_psbt(&encoded).expect("decodepsbt");
     let model: Result<mtype::DecodePsbt, DecodePsbtError> = json.into_model();
-
-    #[allow(unused_variables)]
     let decoded = model.unwrap();
+
+    // Fee requires UTXO data. v18/v19 default to p2sh-segwit addresses which utxoupdatepsbt
+    // can't detect without descriptors. v20+ defaults to bech32 (PR #16884) which works.
+    #[cfg(feature = "v19_and_below")]
+    assert!(decoded.fee.is_none());
+
+    #[cfg(not(feature = "v19_and_below"))]
+    assert!(decoded.fee.expect("fee should be present").to_sat() > 0);
 
     // Before Core v23 global xpubs was not a known keypair.
     #[cfg(feature = "v22_and_below")]
@@ -177,7 +214,9 @@ fn raw_transactions__decode_psbt__modelled() {
     #[cfg(not(feature = "v22_and_below"))]
     assert_eq!(decoded.psbt.xpub.len(), 1);
 
-    // TODO: Add a taproot field and test it with v24
+    // v24+ Taproot fields (e.g. `tap_internal_key`).
+    #[cfg(not(feature = "v23_and_below"))]
+    assert_eq!(decoded.psbt.inputs[0].tap_internal_key, Some(tap_key));
 }
 
 #[test]
