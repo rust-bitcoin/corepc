@@ -2,10 +2,35 @@
 
 use core::fmt;
 
+use bitcoin::amount::ParseAmountError;
 use bitcoin::hex;
 
 use crate::error::write_err;
 use crate::NumericError;
+
+/// Error when converting an `EstimateRawFee` type into the model type.
+#[derive(Debug)]
+pub enum EstimateRawFeeError {
+    /// Conversion of the `feerate` field failed.
+    FeeRate(ParseAmountError),
+}
+
+impl fmt::Display for EstimateRawFeeError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Self::FeeRate(ref e) => write_err!(f, "conversion of the `feerate` field failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for EstimateRawFeeError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::FeeRate(ref e) => Some(e),
+        }
+    }
+}
 
 /// Error when converting a `WaitForBlock` type into the model type.
 #[derive(Debug)]
