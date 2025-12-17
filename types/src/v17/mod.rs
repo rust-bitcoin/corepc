@@ -250,8 +250,9 @@ pub use self::{
     control::{GetMemoryInfoStats, Locked, Logging},
     generating::{Generate, GenerateToAddress},
     hidden::{
-        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
-        WaitForNewBlock, WaitForNewBlockError,
+        EstimateRawFee, EstimateRawFeeError, RawFeeDetail, RawFeeRange, WaitForBlock,
+        WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock,
+        WaitForNewBlockError,
     },
     mining::{
         BlockTemplateTransaction, BlockTemplateTransactionError, GetBlockTemplate,

@@ -71,6 +71,7 @@ crate::impl_client_v17__generate!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
+crate::impl_client_v17__estimate_raw_fee!();
 crate::impl_client_v17__wait_for_block!();
 crate::impl_client_v17__wait_for_block_height!();
 crate::impl_client_v17__wait_for_new_block!();

@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: CC0-1.0
+
+//! Types for methods that are `== Hidden ==` and not in the API docs of Bitcoin Core.
+//!
+//! These structs model the types returned by the JSON-RPC API but have concrete types
+//! and are not specific to a specific version of Bitcoin Core.
+
+use bitcoin::FeeRate;
+use serde::{Deserialize, Serialize};
+
+/// Models the result of JSON-RPC method `estimaterawfee`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct EstimateRawFee {
+    /// Estimate for short time horizon.
+    pub short: Option<RawFeeDetail>,
+    /// Estimate for medium time horizon.
+    pub medium: Option<RawFeeDetail>,
+    /// Estimate for long time horizon.
+    pub long: RawFeeDetail,
+}
+
+/// Estimate for a time horizon. Part of `estimaterawfee`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct RawFeeDetail {
+    /// Estimate fee rate in BTC/kB.
+    pub fee_rate: Option<FeeRate>,
+    /// Exponential decay (per block) for historical moving average of confirmation data.
+    pub decay: f64,
+    /// The resolution of confirmation targets at this time horizon.
+    pub scale: u32,
+    /// Information about the lowest range of feerates to succeed in meeting the threshold.
+    pub pass: Option<RawFeeRange>,
+    /// Information about the highest range of feerates to fail to meet the threshold.
+    pub fail: Option<RawFeeRange>,
+    /// Errors encountered during processing.
+    pub errors: Option<Vec<String>>,
+}
+
+/// Information about a feerate range. Part of `estimaterawfee`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct RawFeeRange {
+    /// Start of feerate range.
+    pub start_range: Option<FeeRate>,
+    /// End of feerate range.
+    pub end_range: Option<FeeRate>,
+    /// Number of txs over history horizon in the feerate range that were confirmed within target.
+    pub within_target: f64,
+    /// Number of txs over history horizon in the feerate range that were confirmed at any point.
+    pub total_confirmed: f64,
+    /// Current number of txs in mempool in the feerate range unconfirmed for at least target blocks.
+    pub in_mempool: f64,
+    /// Number of txs over history horizon in the feerate range that left mempool unconfirmed after target.
+    pub left_mempool: f64,
+}
