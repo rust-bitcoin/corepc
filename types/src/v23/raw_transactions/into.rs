@@ -67,7 +67,7 @@ impl DecodePsbt {
             inputs,
             outputs,
         };
-        let fee = self.fee.map(Amount::from_sat);
+        let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::DecodePsbt { psbt, fee })
     }

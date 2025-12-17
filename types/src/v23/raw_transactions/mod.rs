@@ -47,7 +47,7 @@ pub struct DecodePsbt {
     /// Array of transaction outputs.
     pub outputs: Vec<PsbtOutput>,
     /// The transaction fee paid if all UTXOs slots in the PSBT have been filled.
-    pub fee: Option<u64>,
+    pub fee: Option<f64>,
 }
 
 /// An item from the global xpubs list. Part of `decodepsbt`.
