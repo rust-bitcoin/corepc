@@ -24,6 +24,8 @@ pub enum DecodePsbtError {
     Inputs(PsbtInputError),
     /// Conversion of one of the PSBT outputs failed.
     Outputs(PsbtOutputError),
+    /// Conversion of the `fee` field failed.
+    Fee(ParseAmountError),
 }
 
 impl fmt::Display for DecodePsbtError {
@@ -35,6 +37,7 @@ impl fmt::Display for DecodePsbtError {
             Self::Inputs(ref e) => write_err!(f, "conversion of one of the PSBT inputs failed"; e),
             Self::Outputs(ref e) =>
                 write_err!(f, "conversion of one of the PSBT outputs failed"; e),
+            Self::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
         }
     }
 }
@@ -47,6 +50,7 @@ impl std::error::Error for DecodePsbtError {
             Self::Unknown(ref e) => Some(e),
             Self::Inputs(ref e) => Some(e),
             Self::Outputs(ref e) => Some(e),
+            Self::Fee(ref e) => Some(e),
         }
     }
 }
