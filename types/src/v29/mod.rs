@@ -252,6 +252,7 @@
 //! </details>
 
 mod blockchain;
+mod hidden;
 mod mining;
 mod raw_transactions;
 mod util;
@@ -263,6 +264,11 @@ pub use self::{
         GetBlockHeaderVerboseError, GetBlockVerboseOne, GetBlockVerboseOneError, GetBlockchainInfo,
         GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
         GetDescriptorActivityError, ReceiveActivity, SpendActivity,
+    },
+    hidden::{
+        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+        GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
+        GetOrphanTxsVerboseTwoEntryError,
     },
     mining::{GetMiningInfo, GetMiningInfoError, NextBlockInfo, NextBlockInfoError},
     raw_transactions::{MempoolAcceptance, MempoolAcceptanceFees, TestMempoolAccept},

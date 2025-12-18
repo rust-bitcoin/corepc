@@ -78,6 +78,9 @@ crate::impl_client_v20__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
+crate::impl_client_v29__get_orphan_txs_verbosity_2!();
+crate::impl_client_v29__get_orphan_txs_verbosity_1!();
+crate::impl_client_v29__get_orphan_txs!();
 crate::impl_client_v27__add_connection!();
 crate::impl_client_v21__add_peer_address!();
 

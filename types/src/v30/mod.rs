@@ -243,6 +243,7 @@
 //! </details>
 
 mod blockchain;
+mod hidden;
 mod mining;
 mod raw_transactions;
 mod wallet;
@@ -250,6 +251,11 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::GetMempoolInfo,
+    hidden::{
+        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+        GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
+        GetOrphanTxsVerboseTwoEntryError,
+    },
     mining::{GetMiningInfo, GetMiningInfoError},
     raw_transactions::{
         ControlBlocksError, DecodePsbt, DecodePsbtError, GlobalXpub, GlobalXpubError,

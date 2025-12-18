@@ -5,7 +5,7 @@
 //! These structs model the types returned by the JSON-RPC API but have concrete types
 //! and are not specific to a specific version of Bitcoin Core.
 
-use bitcoin::FeeRate;
+use bitcoin::{FeeRate, Transaction, Txid, Wtxid};
 use serde::{Deserialize, Serialize};
 
 /// Models the result of JSON-RPC method `addconnection`.
@@ -60,4 +60,64 @@ pub struct RawFeeRange {
     pub in_mempool: f64,
     /// Number of txs over history horizon in the feerate range that left mempool unconfirmed after target.
     pub left_mempool: f64,
+}
+
+/// Models the result of JSON-RPC method `getorphantxs` with verbosity level 0.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetOrphanTxs(pub Vec<Txid>);
+
+/// Models the result of JSON-RPC method `getorphantxs` with verbosity level 1.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetOrphanTxsVerboseOne(pub Vec<GetOrphanTxsVerboseOneEntry>);
+
+/// Models an entry of the result list of JSON-RPC method `getorphantxs` with verbosity level 1.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetOrphanTxsVerboseOneEntry {
+    /// The transaction hash in hex
+    pub txid: Txid,
+    /// The transaction witness hash in hex
+    pub wtxid: Wtxid,
+    /// The serialized transaction size in bytes
+    pub bytes: u64,
+    /// The virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted.
+    pub vsize: u64,
+    /// The transaction weight as defined in BIP 141.
+    pub weight: u64,
+    /// The entry time into the orphanage expressed in UNIX epoch time
+    /// Only present in v29.
+    pub entry_time: Option<u32>,
+    /// The orphan expiration time expressed in UNIX epoch time
+    /// Only present in v29.
+    pub expiration_time: Option<u32>,
+    /// List of peer ids that we store this transaction for.
+    pub from: Vec<u64>,
+}
+
+/// Models the result of JSON-RPC method `getorphantxs` with verbosity level 2.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetOrphanTxsVerboseTwo(pub Vec<GetOrphanTxsVerboseTwoEntry>);
+
+/// Models an entry of the result list of JSON-RPC method `getorphantxs` with verbosity level 2.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetOrphanTxsVerboseTwoEntry {
+    /// The transaction hash in hex
+    pub txid: Txid,
+    /// The transaction witness hash in hex
+    pub wtxid: Wtxid,
+    /// The serialized transaction size in bytes
+    pub bytes: u64,
+    /// The virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted.
+    pub vsize: u64,
+    /// The transaction weight as defined in BIP 141.
+    pub weight: u64,
+    /// The entry time into the orphanage expressed in UNIX epoch time
+    /// Only present in v29.
+    pub entry_time: Option<u32>,
+    /// The orphan expiration time expressed in UNIX epoch time
+    /// Only present in v29.
+    pub expiration_time: Option<u32>,
+    /// List of peer ids that we store this transaction for.
+    pub from: Vec<u64>,
+    /// The orphan transaction.
+    pub transaction: Transaction,
 }

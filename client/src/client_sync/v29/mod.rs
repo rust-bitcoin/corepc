@@ -5,6 +5,7 @@
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
 pub mod blockchain;
+pub mod hidden;
 pub mod util;
 
 use std::collections::BTreeMap;
@@ -77,6 +78,9 @@ crate::impl_client_v20__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
+crate::impl_client_v29__get_orphan_txs_verbosity_2!();
+crate::impl_client_v29__get_orphan_txs_verbosity_1!();
+crate::impl_client_v29__get_orphan_txs!();
 crate::impl_client_v27__add_connection!();
 crate::impl_client_v21__add_peer_address!();
 crate::impl_client_v17__estimate_raw_fee!();
