@@ -417,7 +417,7 @@ pub struct GetChainTxStats {
     /// The elapsed time in the window in seconds. Only returned if "window_block_count" is > 0.
     pub window_interval: Option<u32>,
     /// The average rate of transactions per second in the window. Only returned if "window_interval" is > 0.
-    pub tx_rate: Option<u32>,
+    pub tx_rate: Option<f64>,
 }
 
 /// Models the result of JSON-RPC method `getdeploymentinfo`.

@@ -218,11 +218,15 @@ fn blockchain__get_chain_tips__modelled() {
 
 #[test]
 fn blockchain__get_chain_tx_stats__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _tx) = node.create_mined_transaction();
 
     let json: GetChainTxStats = node.client.get_chain_tx_stats().expect("getchaintxstats");
     let model: Result<mtype::GetChainTxStats, GetChainTxStatsError> = json.into_model();
-    model.unwrap();
+    let chain_tx_stats = model.unwrap();
+
+    assert!(chain_tx_stats.tx_rate.unwrap() > 0.0);
 }
 
 #[test]

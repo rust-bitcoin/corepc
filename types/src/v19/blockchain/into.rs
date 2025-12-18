@@ -81,7 +81,6 @@ impl GetChainTxStats {
             self.window_tx_count.map(|h| crate::to_u32(h, "window_tx_count")).transpose()?;
         let window_interval =
             self.window_interval.map(|h| crate::to_u32(h, "window_interval")).transpose()?;
-        let tx_rate = self.tx_rate.map(|h| crate::to_u32(h, "tx_rate")).transpose()?;
 
         Ok(model::GetChainTxStats {
             time: crate::to_u32(self.time, "time")?,
@@ -91,7 +90,7 @@ impl GetChainTxStats {
             window_block_count: crate::to_u32(self.window_block_count, "window_block_count")?,
             window_tx_count,
             window_interval,
-            tx_rate,
+            tx_rate: self.tx_rate,
         })
     }
 }

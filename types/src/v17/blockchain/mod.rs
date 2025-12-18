@@ -438,7 +438,7 @@ pub struct GetChainTxStats {
     pub window_interval: Option<i64>,
     /// The average rate of transactions per second in the window. Only returned if "window_interval" is > 0.
     #[serde(rename = "txrate")]
-    pub tx_rate: Option<i64>,
+    pub tx_rate: Option<f64>,
 }
 
 /// Result of JSON-RPC method `getdifficulty`.
