@@ -2,6 +2,9 @@
 
 use std::path::PathBuf;
 
+use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
+use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
+use bitcoin::Network;
 use node::{Conf, P2P};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
@@ -147,4 +150,26 @@ pub fn three_node_network() -> (Node, Node, Node) {
     assert!(node3.peers_connected() >= 1); // FIXME: Why not 2?
 
     (node1, node2, node3)
+}
+
+/// BIP32 key set for testing.
+pub struct TestKeys {
+    pub xprv: Xpriv,
+    pub xpub: Xpub,
+    pub fingerprint: Fingerprint,
+    pub x_only_public_key: XOnlyPublicKey,
+}
+
+/// Returns deterministic test keys derived from a zero seed.
+pub fn test_keys() -> TestKeys {
+    let secp = Secp256k1::new();
+    let seed = [0u8; 32];
+    let xprv = Xpriv::new_master(Network::Regtest, &seed).unwrap();
+    let xpub = Xpub::from_priv(&secp, &xprv);
+    TestKeys {
+        xprv,
+        xpub,
+        fingerprint: xpub.fingerprint(),
+        x_only_public_key: xprv.private_key.x_only_public_key(&secp).0,
+    }
 }
