@@ -5,13 +5,14 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 #![allow(unused_imports)] // Because of feature gated tests.
 
+use bitcoin::bip32::DerivationPath;
 use bitcoin::consensus::encode;
 use bitcoin::hex::FromHex as _;
 use bitcoin::opcodes::all::*;
 use bitcoin::{
     absolute, consensus, hex, psbt, script, transaction, Amount, ScriptBuf, Transaction, TxOut,
 };
-use integration_test::{Node, NodeExt as _, Wallet};
+use integration_test::{test_keys, Node, NodeExt as _, Wallet};
 use node::vtype::*;
 use node::{mtype, Input, Output}; // All the version specific types.
 
@@ -127,57 +128,57 @@ fn raw_transactions__create_raw_transaction__modelled() {
     create_sign_send(&node);
 }
 
-// Notes on testing decoding of PBST.
-//
-// - `bip32_derivs` field in the input list of the decoded PSBT changes shape a bunch of times.
-// - In v23 a bunch of additional fields are added.
-// - In v24 taproot fields are added.
-//
-// All this should still be handled by `into_model` because `bitcoin::Psbt` has all optional fields.
+// Tests PSBT decoding across Bitcoin Core versions.
+// Version-specific assertions are gated below.
 #[test]
 fn raw_transactions__decode_psbt__modelled() {
     let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
+    // v17: utxoupdatepsbt unavailable
+    #[cfg(feature = "v17")]
     let mut psbt = create_a_psbt(&node);
 
-    // A bunch of new fields got added in v23.
-    //
-    // Add an arbitrary global xpub to see if it decodes. Before v23 this will end up in `unknown`,
-    // from v23 onwards in should be in its own field.
+    // v18+: utxoupdatepsbt available
+    #[cfg(not(feature = "v17"))]
+    let mut psbt = {
+        let psbt = create_a_psbt(&node);
+        let updated: UtxoUpdatePsbt = node.client.utxo_update_psbt(&psbt).expect("utxoupdatepsbt");
+        updated.into_model().expect("UtxoUpdatePsbt into model").0
+    };
+
+    let keys = test_keys();
+    let path: DerivationPath = "m/84'/0'/0'/0/1".parse().expect("valid derivation path");
+    psbt.xpub.insert(keys.xpub, (keys.fingerprint, path));
+
+    // v24+: Taproot fields (e.g. `tap_internal_key`).
+    #[cfg(not(feature = "v23_and_below"))]
     {
-        use std::collections::BTreeMap;
-
-        use bitcoin::bip32::{DerivationPath, Fingerprint, Xpub};
-
-        let mut map = BTreeMap::default();
-        // Some arbitrary xpub I grabbed from rust-bitcoin.
-        let xpub = "xpub6ERApfZwUNrhLCkDtcHTcxd75RbzS1ed54G1LkBUHQVHQKqhMkhgbmJbZRkrgZw4koxb5JaHWkY4ALHY2grBGRjaDMzQLcgJvLJuZZvRcEL";
-        let xpub = xpub.parse::<Xpub>().expect("failed to parse xpub");
-        let fp = Fingerprint::from([1u8, 2, 3, 42]);
-        let path =
-            "m/84'/0'/0'/0/1".parse::<DerivationPath>().expect("failed to parse derivation path");
-        map.insert(xpub, (fp, path));
-
-        psbt.xpub = map;
+        psbt.inputs[0].tap_internal_key = Some(keys.x_only_public_key);
     }
 
     let encoded = psbt.to_string();
-
     let json: DecodePsbt = node.client.decode_psbt(&encoded).expect("decodepsbt");
     let model: Result<mtype::DecodePsbt, DecodePsbtError> = json.into_model();
-
-    #[allow(unused_variables)]
     let decoded = model.unwrap();
 
-    // Before Core v23 global xpubs was not a known keypair.
+    // v18/v19: utxoupdatepsbt can't populate UTXO data, so fee is None
+    #[cfg(feature = "v19_and_below")]
+    assert!(decoded.fee.is_none());
+
+    // v20+: utxoupdatepsbt allows fee to be calculated
+    #[cfg(not(feature = "v19_and_below"))]
+    assert!(decoded.fee.expect("fee should be present").to_sat() > 0);
+
+    // v23+: dedicated xpub field; earlier versions store in `unknown`.
     #[cfg(feature = "v22_and_below")]
     assert_eq!(decoded.psbt.unknown.len(), 1);
 
     #[cfg(not(feature = "v22_and_below"))]
     assert_eq!(decoded.psbt.xpub.len(), 1);
 
-    // TODO: Add a taproot field and test it with v24
+    #[cfg(not(feature = "v23_and_below"))]
+    assert_eq!(decoded.psbt.inputs[0].tap_internal_key, Some(keys.x_only_public_key));
 }
 
 #[test]

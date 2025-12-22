@@ -124,7 +124,7 @@ impl DecodePsbt {
 
         let psbt =
             bitcoin::Psbt { unsigned_tx, version, xpub, proprietary, unknown, inputs, outputs };
-        let fee = self.fee.map(Amount::from_sat);
+        let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::DecodePsbt { psbt, fee })
     }
