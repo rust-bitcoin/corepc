@@ -9,6 +9,18 @@
 //!
 //! See or use the `define_jsonrpc_bitreq_client!` macro to define a `Client`.
 
+/// Implements Bitcoin Core JSON-RPC API method `estimaterawfee`.
+#[macro_export]
+macro_rules! impl_client_v17__estimate_raw_fee {
+    () => {
+        impl Client {
+            pub fn estimate_raw_fee(&self, conf_target: u32) -> Result<EstimateRawFee> {
+                self.call("estimaterawfee", &[conf_target.into()])
+            }
+        }
+    };
+}
+
 /// Implements Bitcoin Core JSON-RPC API method `waitforblock`.
 #[macro_export]
 macro_rules! impl_client_v17__wait_for_block {

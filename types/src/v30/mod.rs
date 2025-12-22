@@ -243,6 +243,7 @@
 //! </details>
 
 mod blockchain;
+mod hidden;
 mod mining;
 mod raw_transactions;
 mod wallet;
@@ -250,6 +251,11 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::GetMempoolInfo,
+    hidden::{
+        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+        GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
+        GetOrphanTxsVerboseTwoEntryError,
+    },
     mining::{GetMiningInfo, GetMiningInfoError},
     raw_transactions::{
         ControlBlocksError, DecodePsbt, DecodePsbtError, GlobalXpub, GlobalXpubError,
@@ -270,28 +276,28 @@ pub use crate::{
         Bip125Replaceable, Bip32DerivError, BlockTemplateTransaction,
         BlockTemplateTransactionError, BumpFee, BumpFeeError, ChainTips, ChainTipsError,
         ChainTipsStatus, CombinePsbt, CombineRawTransaction, ConvertToPsbt, CreateMultisigError,
-        CreatePsbt, CreateRawTransaction, DecodeRawTransaction, EncryptWallet, EstimateSmartFee,
-        FinalizePsbt, FinalizePsbtError, FundRawTransaction, FundRawTransactionError, Generate,
-        GenerateToAddress, GetAddedNodeInfo, GetAddressInfoEmbeddedError, GetAddressesByLabel,
-        GetBalance, GetBestBlockHash, GetBlockCount, GetBlockHash, GetBlockStatsError,
-        GetBlockTemplate, GetBlockTemplateError, GetBlockVerboseZero, GetChainTips,
-        GetChainTxStatsError, GetConnectionCount, GetDifficulty, GetMemoryInfoStats,
-        GetMempoolInfoError, GetNetTotals, GetNetworkInfoAddress, GetNetworkInfoError,
-        GetNetworkInfoNetwork, GetNewAddress, GetRawChangeAddress, GetRawMempool,
-        GetRawTransaction, GetRawTransactionVerbose, GetRawTransactionVerboseError,
+        CreatePsbt, CreateRawTransaction, DecodeRawTransaction, EncryptWallet, EstimateRawFee,
+        EstimateRawFeeError, EstimateSmartFee, FinalizePsbt, FinalizePsbtError, FundRawTransaction,
+        FundRawTransactionError, Generate, GenerateToAddress, GetAddedNodeInfo,
+        GetAddressInfoEmbeddedError, GetAddressesByLabel, GetBalance, GetBestBlockHash,
+        GetBlockCount, GetBlockHash, GetBlockStatsError, GetBlockTemplate, GetBlockTemplateError,
+        GetBlockVerboseZero, GetChainTips, GetChainTxStatsError, GetConnectionCount, GetDifficulty,
+        GetMemoryInfoStats, GetMempoolInfoError, GetNetTotals, GetNetworkInfoAddress,
+        GetNetworkInfoError, GetNetworkInfoNetwork, GetNewAddress, GetRawChangeAddress,
+        GetRawMempool, GetRawTransaction, GetRawTransactionVerbose, GetRawTransactionVerboseError,
         GetReceivedByAddress, GetTransactionDetailError, GetTxOut, GetTxOutError,
         ListAddressGroupings, ListAddressGroupingsError, ListAddressGroupingsItem, ListLabels,
         ListLockUnspent, ListLockUnspentItem, ListLockUnspentItemError, ListReceivedByAddressError,
         ListUnspentItemError, ListWallets, LockUnspent, Locked, NumericError,
-        PartialSignatureError, PruneBlockchain, RawTransactionError, RawTransactionInput,
-        RawTransactionOutput, RescanBlockchain, ScriptType, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
-        SignRawTransaction, SignRawTransactionError, SignRawTransactionWithKey,
-        SignRawTransactionWithWallet, TransactionCategory, UploadTarget, ValidateAddress,
-        ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock,
-        WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError, WaitForNewBlock,
-        WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError, WitnessUtxo,
-        WitnessUtxoError,
+        PartialSignatureError, PruneBlockchain, RawFeeDetail, RawFeeRange, RawTransactionError,
+        RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScriptType,
+        SendRawTransaction, SendToAddress, SetNetworkActive, SetTxFee, SignFail, SignFailError,
+        SignMessage, SignMessageWithPrivKey, SignRawTransaction, SignRawTransactionError,
+        SignRawTransactionWithKey, SignRawTransactionWithWallet, TransactionCategory, UploadTarget,
+        ValidateAddress, ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof,
+        WaitForBlock, WaitForBlockError, WaitForBlockHeight, WaitForBlockHeightError,
+        WaitForNewBlock, WaitForNewBlockError, WalletCreateFundedPsbt, WalletCreateFundedPsbtError,
+        WitnessUtxo, WitnessUtxoError,
     },
     v18::{
         ActiveCommand, AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -312,8 +318,8 @@ pub use crate::{
         PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany, SendManyVerbose,
     },
     v22::{
-        Banned, EnumerateSigners, GetNodeAddresses, ListBanned, NodeAddress, ScriptPubkey, Signers,
-        WalletDisplayAddress,
+        AddConnection, Banned, EnumerateSigners, GetNodeAddresses, ListBanned, NodeAddress,
+        ScriptPubkey, Signers, WalletDisplayAddress,
     },
     v23::{
         Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError,

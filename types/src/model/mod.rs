@@ -11,6 +11,7 @@
 mod blockchain;
 mod control;
 mod generating;
+mod hidden;
 mod mining;
 mod network;
 mod raw_transactions;
@@ -38,6 +39,11 @@ pub use self::{
         WaitForBlockHeight, WaitForNewBlock,
     },
     generating::{Generate, GenerateBlock, GenerateToAddress, GenerateToDescriptor},
+    hidden::{
+        AddConnection, EstimateRawFee, GetOrphanTxs, GetOrphanTxsVerboseOne,
+        GetOrphanTxsVerboseOneEntry, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
+        RawFeeDetail, RawFeeRange,
+    },
     mining::{
         BlockTemplateTransaction, GetBlockTemplate, GetMiningInfo, GetPrioritisedTransactions,
         NextBlockInfo, PrioritisedTransaction,

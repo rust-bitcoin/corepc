@@ -58,6 +58,7 @@ crate::impl_client_v23__save_mempool!();
 crate::impl_client_v25__scan_blocks!();
 crate::impl_client_v17__verify_chain!();
 crate::impl_client_v17__verify_tx_out_proof!();
+crate::impl_client_v17__estimate_raw_fee!();
 crate::impl_client_v17__wait_for_block!();
 crate::impl_client_v17__wait_for_block_height!();
 crate::impl_client_v17__wait_for_new_block!();
@@ -77,6 +78,10 @@ crate::impl_client_v20__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
+crate::impl_client_v29__get_orphan_txs_verbosity_2!();
+crate::impl_client_v29__get_orphan_txs_verbosity_1!();
+crate::impl_client_v29__get_orphan_txs!();
+crate::impl_client_v27__add_connection!();
 crate::impl_client_v21__add_peer_address!();
 
 // == Mining ==

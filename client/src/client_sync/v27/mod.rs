@@ -4,6 +4,8 @@
 //!
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
+pub mod hidden;
+
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -74,7 +76,9 @@ crate::impl_client_v20__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
+crate::impl_client_v27__add_connection!();
 crate::impl_client_v21__add_peer_address!();
+crate::impl_client_v17__estimate_raw_fee!();
 crate::impl_client_v17__wait_for_block!();
 crate::impl_client_v17__wait_for_block_height!();
 crate::impl_client_v17__wait_for_new_block!();
