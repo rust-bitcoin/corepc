@@ -335,9 +335,9 @@ pub use crate::{
     v26::{
         AddrManInfoNetwork, CreateWallet, DescriptorProcessPsbt, DescriptorProcessPsbtError,
         DumpTxOutSet, DumpTxOutSetError, GetAddrManInfo, GetBalances, GetBalancesError,
-        GetPeerInfo, GetTransactionError, GetTxOutSetInfo, GetTxOutSetInfoError, LoadTxOutSet,
-        LoadTxOutSetError, LoadWallet, PeerInfo, UnloadWallet, WalletProcessPsbt,
-        WalletProcessPsbtError,
+        GetPeerInfo, GetRawAddrman, GetTransactionError, GetTxOutSetInfo, GetTxOutSetInfoError,
+        LoadTxOutSet, LoadTxOutSetError, LoadWallet, PeerInfo, RawAddrmanEntry, UnloadWallet,
+        WalletProcessPsbt, WalletProcessPsbtError,
     },
     v27::{GetPrioritisedTransactions, PrioritisedTransaction},
     v28::{

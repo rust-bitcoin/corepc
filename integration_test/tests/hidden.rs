@@ -28,3 +28,27 @@ fn hidden__estimate_raw_fee__modelled() {
 
     assert!(estimate.long.scale > 0);
 }
+
+#[test]
+#[cfg(not(feature = "v25_and_below"))]
+fn hidden__get_raw_addrman() {
+    let node = Node::with_wallet(Wallet::None, &[]);
+
+    // Add a peer address so the address manager has something.
+    let peer_address = "1.2.3.4";
+    let peer_port = 8333;
+    node.client.add_peer_address(peer_address, peer_port).expect("addpeeraddress");
+
+    let json: GetRawAddrman = node.client.get_raw_addrman().expect("getrawaddrman");
+
+    let entry = json
+        .new
+        .values()
+        .find(|e| e.address == peer_address && e.port == peer_port)
+        .expect("added peer should appear in the 'new' table");
+
+    assert_eq!(entry.network, "ipv4");
+
+    // mapped_as field added in v28, only present with -asmap config.
+    assert!(entry.mapped_as.is_none(), "mapped_as requires -asmap config");
+}
