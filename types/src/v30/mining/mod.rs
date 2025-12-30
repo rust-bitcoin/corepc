@@ -38,7 +38,7 @@ pub struct GetMiningInfo {
     pub target: String,
     /// The network hashes per second.
     #[serde(rename = "networkhashps")]
-    pub network_hash_ps: i64,
+    pub network_hash_ps: f64,
     /// The size of the mempool.
     #[serde(rename = "pooledtx")]
     pub pooled_tx: i64,

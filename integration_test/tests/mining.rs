@@ -39,19 +39,17 @@ fn mining__get_block_template__modelled() {
 #[test]
 fn mining__get_mining_info() {
     let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
 
     let json: GetMiningInfo = node.client.get_mining_info().expect("rpc");
 
-    // Up to v28 (i.e., not 29_0) there is no error converting into model.
     #[cfg(feature = "v28_and_below")]
-    let _: mtype::GetMiningInfo = json.into_model();
-
-    // v29 onwards
+    let model: mtype::GetMiningInfo = json.into_model();
+    // v29 added fields (bits, target) that can fail to parse.
     #[cfg(not(feature = "v28_and_below"))]
-    {
-        let model: Result<mtype::GetMiningInfo, GetMiningInfoError> = json.into_model();
-        model.unwrap();
-    }
+    let model: mtype::GetMiningInfo = json.into_model().unwrap();
+
+    assert!(model.network_hash_ps > 0.0);
 }
 
 #[test]
