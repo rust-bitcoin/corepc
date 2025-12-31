@@ -113,7 +113,7 @@ pub struct GetMiningInfo {
     /// The current target (v29 onwards).
     pub target: Option<Target>,
     /// The network hashes per second.
-    pub network_hash_ps: i64,
+    pub network_hash_ps: f64,
     /// The size of the mempool.
     pub pooled_tx: i64,
     /// Minimum feerate of packages selected for block inclusion.
