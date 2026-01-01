@@ -83,7 +83,7 @@ macro_rules! define_jsonrpc_bitreq_client {
             pub fn new(url: &str) -> Self {
                 let transport = jsonrpc::http::bitreq_http::Builder::new()
                     .url(url)
-                    .expect("jsonrpc v0.18, this function does not error")
+                    .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .build();
                 let inner = jsonrpc::client::Client::with_transport(transport);
@@ -100,7 +100,7 @@ macro_rules! define_jsonrpc_bitreq_client {
 
                 let transport = jsonrpc::http::bitreq_http::Builder::new()
                     .url(url)
-                    .expect("jsonrpc v0.18, this function does not error")
+                    .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .basic_auth(user.unwrap(), pass)
                     .build();
