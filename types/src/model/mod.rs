@@ -39,7 +39,10 @@ pub use self::{
         WaitForBlockHeight, WaitForNewBlock,
     },
     generating::{Generate, GenerateBlock, GenerateToAddress, GenerateToDescriptor},
-    hidden::{EstimateRawFee, RawFeeDetail, RawFeeRange},
+    hidden::{
+        EstimateRawFee, GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+        GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry, RawFeeDetail, RawFeeRange,
+    },
     mining::{
         BlockTemplateTransaction, GetBlockTemplate, GetMiningInfo, GetPrioritisedTransactions,
         NextBlockInfo, PrioritisedTransaction,
