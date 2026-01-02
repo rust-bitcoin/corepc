@@ -682,8 +682,7 @@ pub struct ListUnspentItem {
     /// The script key.
     pub script_pubkey: ScriptBuf,
     /// The transaction amount.
-    #[serde(default, with = "bitcoin::amount::serde::as_btc")]
-    pub amount: SignedAmount,
+    pub amount: Amount,
     /// The number of confirmations.
     pub confirmations: u32, // Docs do not indicate what negative value means?
     /// The redeemScript if scriptPubKey is P2SH.

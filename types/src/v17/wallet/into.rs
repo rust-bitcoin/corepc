@@ -660,7 +660,7 @@ impl ListUnspentItem {
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script

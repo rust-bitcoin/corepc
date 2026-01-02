@@ -2,7 +2,7 @@
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::consensus::encode;
-use bitcoin::{Address, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
+use bitcoin::{Address, Amount, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
 
 use super::{
     GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
@@ -218,7 +218,7 @@ impl ListUnspentItem {
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
         let label = self.label.unwrap_or_default();
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script

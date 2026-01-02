@@ -4,9 +4,7 @@ use bitcoin::amount::ParseAmountError;
 use bitcoin::hashes::hash160;
 use bitcoin::hex::FromHex;
 use bitcoin::key::PublicKey;
-use bitcoin::{
-    bip32, Address, Amount, ScriptBuf, SignedAmount, Txid, WitnessProgram, WitnessVersion,
-};
+use bitcoin::{bip32, Address, Amount, ScriptBuf, Txid, WitnessProgram, WitnessVersion};
 
 use super::{
     GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoEmbeddedError, GetAddressInfoError,
@@ -304,7 +302,7 @@ impl ListUnspentItem {
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script
