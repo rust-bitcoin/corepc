@@ -101,10 +101,7 @@ pub(super) async fn wrap_async_stream(
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
 
-    let tls = connector
-        .connect(dns_name, tcp)
-        .await
-        .map_err(|e| Error::IoError(io::Error::new(io::ErrorKind::Other, e)))?;
+    let tls = connector.connect(dns_name, tcp).await.map_err(Error::IoError)?;
 
     Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }
