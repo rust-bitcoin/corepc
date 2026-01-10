@@ -8,12 +8,12 @@ use std::net::TcpStream;
 use std::sync::OnceLock;
 
 use rustls::{self, ClientConfig, ClientConnection, RootCertStore, ServerName, StreamOwned};
-#[cfg(feature = "async-https")]
+#[cfg(feature = "tokio-rustls")]
 use tokio_rustls::{client::TlsStream, TlsConnector};
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
 
-#[cfg(feature = "async-https")]
+#[cfg(feature = "tokio-rustls")]
 use super::{AsyncHttpStream, AsyncTcpStream};
 use crate::Error;
 
@@ -68,10 +68,10 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, E
 
 // Async TLS implementation
 
-#[cfg(feature = "async-https")]
+#[cfg(feature = "tokio-rustls")]
 pub type AsyncSecuredStream = TlsStream<tokio::net::TcpStream>;
 
-#[cfg(feature = "async-https")]
+#[cfg(feature = "tokio-rustls")]
 pub(super) async fn wrap_async_stream(
     tcp: AsyncTcpStream,
     host: &str,
