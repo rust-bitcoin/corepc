@@ -2,6 +2,11 @@ use alloc::collections::BTreeMap;
 use core::fmt;
 #[cfg(feature = "std")]
 use core::fmt::Write;
+use core::time::Duration;
+#[cfg(feature = "std")]
+use std::env;
+#[cfg(feature = "std")]
+use std::time::Instant;
 
 #[cfg(feature = "async")]
 use crate::connection::AsyncConnection;
@@ -85,7 +90,8 @@ pub struct Request {
     params: String,
     headers: BTreeMap<String, String>,
     body: Option<Vec<u8>>,
-    pub(crate) timeout: Option<u64>,
+    timeout: Option<u64>,
+    pub(crate) pipelining: bool,
     pub(crate) max_headers_size: Option<usize>,
     pub(crate) max_status_line_len: Option<usize>,
     max_redirects: usize,
@@ -109,6 +115,7 @@ impl Request {
             headers: BTreeMap::new(),
             body: None,
             timeout: None,
+            pipelining: false,
             max_headers_size: None,
             max_status_line_len: None,
             max_redirects: 100,
@@ -247,6 +254,21 @@ impl Request {
         self
     }
 
+    /// Enables HTTP request pipelining for this request.
+    ///
+    /// Note that because pipelined requests may be replayed in case of failure, you should only
+    /// set this on idempotent requests.
+    ///
+    /// This is only used if the request is sent using a [`Client`] and an existing connection to
+    /// the same server with the same proxy exists.
+    ///
+    /// [`Client`]: crate::Client
+    #[cfg(feature = "async")]
+    pub fn with_pipelining(mut self) -> Request {
+        self.pipelining = true;
+        self
+    }
+
     /// Sends this request to the host.
     ///
     /// # Errors
@@ -259,22 +281,11 @@ impl Request {
     #[cfg(feature = "std")]
     pub fn send(self) -> Result<Response, Error> {
         let parsed_request = ParsedRequest::new(self)?;
-        if parsed_request.url.https {
-            #[cfg(feature = "rustls")]
-            {
-                let is_head = parsed_request.config.method == Method::Head;
-                let response = Connection::new(parsed_request).send_https()?;
-                Response::create(response, is_head)
-            }
-            #[cfg(not(feature = "rustls"))]
-            {
-                Err(Error::HttpsFeatureNotEnabled)
-            }
-        } else {
-            let is_head = parsed_request.config.method == Method::Head;
-            let response = Connection::new(parsed_request).send()?;
-            Response::create(response, is_head)
-        }
+        let is_head = parsed_request.config.method == Method::Head;
+        let connection =
+            Connection::new(parsed_request.connection_params(), parsed_request.timeout_at)?;
+        let response = connection.send(parsed_request)?;
+        Response::create(response, is_head)
     }
 
     /// Sends this request to the host, loaded lazily.
@@ -285,18 +296,8 @@ impl Request {
     #[cfg(feature = "std")]
     pub fn send_lazy(self) -> Result<ResponseLazy, Error> {
         let parsed_request = ParsedRequest::new(self)?;
-        if parsed_request.url.https {
-            #[cfg(feature = "rustls")]
-            {
-                Connection::new(parsed_request).send_https()
-            }
-            #[cfg(not(feature = "rustls"))]
-            {
-                Err(Error::HttpsFeatureNotEnabled)
-            }
-        } else {
-            Connection::new(parsed_request).send()
-        }
+        Connection::new(parsed_request.connection_params(), parsed_request.timeout_at)?
+            .send(parsed_request)
     }
 
     /// Sends this request to the host asynchronously.
@@ -311,18 +312,10 @@ impl Request {
     #[cfg(feature = "async")]
     pub async fn send_async(self) -> Result<Response, Error> {
         let parsed_request = ParsedRequest::new(self)?;
-        if parsed_request.url.https {
-            #[cfg(feature = "async-https")]
-            {
-                AsyncConnection::new(parsed_request).send_https().await
-            }
-            #[cfg(not(feature = "async-https"))]
-            {
-                Err(Error::HttpsFeatureNotEnabled)
-            }
-        } else {
-            AsyncConnection::new(parsed_request).send().await
-        }
+        AsyncConnection::new(parsed_request.connection_params(), parsed_request.timeout_at)
+            .await?
+            .send(parsed_request)
+            .await
     }
 
     /// Sends this request to the host asynchronously, "loaded lazily".
@@ -348,12 +341,13 @@ pub(crate) struct ParsedRequest {
     pub(crate) url: HttpUrl,
     pub(crate) redirects: Vec<HttpUrl>,
     pub(crate) config: Request,
+    pub(crate) timeout_at: Option<Instant>,
 }
 
 #[cfg(feature = "std")]
 impl ParsedRequest {
     #[allow(unused_mut)]
-    fn new(mut config: Request) -> Result<ParsedRequest, Error> {
+    pub(crate) fn new(mut config: Request) -> Result<ParsedRequest, Error> {
         let mut url = HttpUrl::parse(&config.url, None)?;
 
         if !config.params.is_empty() {
@@ -400,7 +394,13 @@ impl ParsedRequest {
             }
         }
 
-        Ok(ParsedRequest { url, redirects: Vec::new(), config })
+        let timeout = config.timeout.or_else(|| match env::var("BITREQ_TIMEOUT") {
+            Ok(t) => t.parse::<u64>().ok(),
+            Err(_) => None,
+        });
+        let timeout_at = timeout.map(|t| Instant::now() + Duration::from_secs(t));
+
+        Ok(ParsedRequest { url, redirects: Vec::new(), config, timeout_at })
     }
 
     fn get_http_head(&self) -> String {
@@ -506,6 +506,75 @@ impl ParsedRequest {
             Err(Error::InfiniteRedirectionLoop)
         } else {
             Ok(())
+        }
+    }
+
+    pub(crate) fn connection_params(&self) -> ConnectionParams<'_> {
+        ConnectionParams::from_request(self)
+    }
+}
+
+/// A key which determines whether an existing connection can be reused
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[cfg(feature = "std")]
+pub(crate) struct ConnectionParams<'a> {
+    pub(crate) https: bool,
+    pub(crate) host: &'a str,
+    pub(crate) port: Port,
+    #[cfg(feature = "proxy")]
+    pub(crate) proxy: Option<&'a Proxy>,
+}
+
+#[cfg(feature = "std")]
+impl<'a> ConnectionParams<'a> {
+    fn from_request(request: &'a ParsedRequest) -> Self {
+        Self {
+            https: request.url.https,
+            host: &request.url.host,
+            port: request.url.port,
+            #[cfg(feature = "proxy")]
+            proxy: request.config.proxy.as_ref(),
+        }
+    }
+}
+
+/// A [`ConnectionParams`] without references.
+#[cfg(feature = "std")]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
+pub(crate) struct OwnedConnectionParams {
+    pub(crate) https: bool,
+    pub(crate) host: String,
+    pub(crate) port: Port,
+    #[cfg(feature = "proxy")]
+    pub(crate) proxy: Option<Proxy>,
+}
+
+#[cfg(feature = "std")]
+impl PartialEq<ConnectionParams<'_>> for OwnedConnectionParams {
+    fn eq(&self, other: &ConnectionParams<'_>) -> bool {
+        if self.https != other.https || self.host != other.host || self.port != other.port {
+            return false;
+        }
+        #[cfg(feature = "proxy")]
+        {
+            self.proxy.as_ref() == other.proxy
+        }
+        #[cfg(not(feature = "proxy"))]
+        {
+            true
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl From<ConnectionParams<'_>> for OwnedConnectionParams {
+    fn from(other: ConnectionParams<'_>) -> Self {
+        Self {
+            https: other.https,
+            host: other.host.to_owned(),
+            port: other.port,
+            #[cfg(feature = "proxy")]
+            proxy: other.proxy.cloned(),
         }
     }
 }

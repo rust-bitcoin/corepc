@@ -2,10 +2,9 @@ use base64::engine::general_purpose::STANDARD;
 use base64::engine::Engine;
 
 use crate::error::Error;
-use crate::ParsedRequest;
 
 /// Kind of proxy connection (Basic, Digest, etc)
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub(crate) enum ProxyKind {
     Basic,
 }
@@ -15,10 +14,10 @@ pub(crate) enum ProxyKind {
 ///
 /// When credentials are provided, the Basic authentication type is used for
 /// Proxy-Authorization.
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct Proxy {
     pub(crate) server: String,
-    pub(crate) port: u32,
+    pub(crate) port: u16,
     pub(crate) user: Option<String>,
     pub(crate) password: Option<String>,
     pub(crate) kind: ProxyKind,
@@ -33,9 +32,9 @@ impl Proxy {
         }
     }
 
-    fn parse_address(host: &str) -> Result<(String, Option<u32>), Error> {
+    fn parse_address(host: &str) -> Result<(String, Option<u16>), Error> {
         if let Some((host, port)) = split_once(host, ":") {
-            let port = port.parse::<u32>().map_err(|_| Error::BadProxy)?;
+            let port = port.parse::<u16>().map_err(|_| Error::BadProxy)?;
             Ok((host.to_string(), Some(port)))
         } else {
             Ok((host.to_string(), None))
@@ -87,7 +86,7 @@ impl Proxy {
         })
     }
 
-    pub(crate) fn connect(&self, proxied_req: &ParsedRequest) -> String {
+    pub(crate) fn connect(&self, host: &str, port: u16) -> String {
         let authorization = if let Some(user) = &self.user {
             match self.kind {
                 ProxyKind::Basic => {
@@ -102,9 +101,7 @@ impl Proxy {
         } else {
             String::new()
         };
-        let host = &proxied_req.url.host;
-        let port = proxied_req.url.port.port();
-        format!("CONNECT {}:{} HTTP/1.1\r\n{}\r\n", host, port, authorization)
+        format!("CONNECT {host}:{port} HTTP/1.1\r\n{authorization}\r\n")
     }
 
     pub(crate) fn verify_response(response: &[u8]) -> Result<(), Error> {

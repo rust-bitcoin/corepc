@@ -5,12 +5,10 @@
 //! reading a few examples.
 //!
 //! Note: as a minimal library, bitreq has been written with the
-//! assumption that servers are well-behaved. This means that there is
-//! little error-correction for incoming data, which may cause some
-//! requests to fail unexpectedly. If you're writing an application or
-//! library that connects to servers you can't test beforehand,
-//! consider using a more robust library, such as
-//! [curl](https://crates.io/crates/curl).
+//! assumption that servers are well-behaved. This should be fine for
+//! nearly any HTTP(S) you find using standard HTTP(S) servers, but
+//! some truly ancient servers may cause spurious failures, especially
+//! while using pipelining.
 //!
 //! # Additional features
 //!
@@ -30,9 +28,12 @@
 //!
 //! This feature uses the (very good)
 //! [`rustls`](https://crates.io/crates/rustls) crate to secure the
-//! connection when needed. Note that if this feature is not enabled
-//! (and it is not by default), requests to urls that start with
-//! `https://` will fail and return a
+//! connection when needed. It uses `webpki-roots` to load certificate
+//! authorities to trust.
+//!
+//! Note that if no HTTPS feature is not enabled (and none are by
+//! default), requests to urls that start with `https://` will fail
+//! and return a
 //! [`HttpsFeatureNotEnabled`](enum.Error.html#variant.HttpsFeatureNotEnabled)
 //! error. `https` was the name of this feature until the other https
 //! feature variants were added, and is now an alias for
@@ -40,10 +41,16 @@
 //!
 //! ## `https-rustls-probe`
 //!
-//! Like `https-rustls`, but also includes the
+//! Like `https-rustls`, but uses the
 //! [`rustls-native-certs`](https://crates.io/crates/rustls-native-certs)
-//! crate to auto-detect root certificates installed in common
+//! crate to auto-detect certificate authorities installed in common
 //! locations.
+//!
+//! ## `https-native-tls`
+//!
+//! Uses the [`native-tls`](https://crates.io/crates/native-tls) crate
+//! to secure the connection when needed. This loads the system-native
+//! TLS library rather than a Rust-specific one.
 //!
 //! ## `async`
 //!
@@ -52,10 +59,28 @@
 //! [`send_lazy_async()`](struct.Request.html#method.send_lazy_async) methods
 //! that return futures for non-blocking operation.
 //!
-//! ## `async-https`
+//! It also enables [`Client`](struct.Client.html) to reuse TCP connections
+//! across requests.
 //!
-//! Like `async`, but also enables asynchronous HTTPS support using tokio-rustls.
-//! This feature depends on both `async` and `https-rustls` features.
+//! ## `async-https` or `async-https-rustls`
+//!
+//! Like `https` or `https-rustls` but also uses
+//! [`tokio-rustls`](https://crates.io/crates/tokio-rustls) (provided by the
+//! `rustls` team) to provide HTTPS support for async connections. Uses
+//! `webpki-roots` to load certificate authorities.
+//!
+//! ## `async-https-rustls-probe`
+//!
+//! The above except the equivalent of `https-rustls-probe` - this uses
+//! [`rustls-native-certs`](https://crates.io/crates/rustls-native-certs)
+//! to load certificate authorities.
+//!
+//! ## `async-https-native-tls`
+//!
+//! Like `https-native-tls` but also uses the
+//! [`tokio-native-tls`](https://crates.io/crates/tokio-native-tls) crate
+//! (provided by the `tokio` team) to provide HTTPS support for async
+//! connections.
 //!
 //! ## `proxy`
 //!
@@ -212,6 +237,8 @@
 extern crate alloc;
 
 #[cfg(feature = "std")]
+mod client;
+#[cfg(feature = "std")]
 mod connection;
 mod error;
 mod http_url;
@@ -220,6 +247,8 @@ mod proxy;
 mod request;
 mod response;
 
+#[cfg(feature = "async")]
+pub use client::{Client, RequestExt};
 pub use error::*;
 #[cfg(feature = "proxy")]
 pub use proxy::*;

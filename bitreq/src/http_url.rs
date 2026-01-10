@@ -5,16 +5,16 @@ use core::fmt::{self, Write};
 use crate::Error;
 
 #[cfg(feature = "std")]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 pub(crate) enum Port {
     ImplicitHttp,
     ImplicitHttps,
-    Explicit(u32),
+    Explicit(u16),
 }
 
 #[cfg(feature = "std")]
 impl Port {
-    pub(crate) fn port(self) -> u32 {
+    pub(crate) fn port(self) -> u16 {
         match self {
             Port::ImplicitHttp => 80,
             Port::ImplicitHttps => 443,
@@ -145,7 +145,7 @@ impl HttpUrl {
         }
 
         // Set appropriate port
-        let port = port.parse::<u32>().map(Port::Explicit).unwrap_or_else(|_| {
+        let port = port.parse::<u16>().map(Port::Explicit).unwrap_or_else(|_| {
             if https {
                 Port::ImplicitHttps
             } else {
