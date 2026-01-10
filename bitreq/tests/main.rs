@@ -12,6 +12,8 @@ use self::setup::*;
 async fn test_https() {
     // TODO: Implement this locally.
     assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
+    // Test reusing the existing connection in client:
+    assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
 }
 
 #[tokio::test]
@@ -34,16 +36,16 @@ async fn test_json_using_serde() {
 async fn test_timeout_too_low() {
     setup();
     let request = bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(1);
-    let result = maybe_make_request(request).await;
+    let result = maybe_make_request(request, true).await;
     assert!(result.is_err());
 }
 
 #[tokio::test]
 async fn test_timeout_high_enough() {
     setup();
-    let body =
-        get_body(bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(3)).await;
-    assert_eq!(body, "j: Q");
+    let request = bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(3);
+    let result = maybe_make_request(request, true).await.unwrap();
+    assert_eq!(result.as_str().unwrap(), "j: Q");
 }
 
 #[tokio::test]
@@ -109,7 +111,7 @@ async fn test_redirect_with_overridden_fragment() {
 #[tokio::test]
 async fn test_infinite_redirect() {
     setup();
-    let body = maybe_make_request(bitreq::get(url("/infiniteredirect"))).await;
+    let body = maybe_make_request(bitreq::get(url("/infiniteredirect")), false).await;
     assert!(body.is_err());
 }
 
@@ -178,7 +180,7 @@ async fn tcp_connect_timeout() {
     let _listener = std::net::TcpListener::bind("127.0.0.1:32162").unwrap();
     let request =
         bitreq::Request::new(bitreq::Method::Get, "http://127.0.0.1:32162").with_timeout(1);
-    let resp = maybe_make_request(request).await;
+    let resp = maybe_make_request(request, true).await;
     assert!(resp.is_err());
     if let Some(bitreq::Error::IoError(err)) = resp.err() {
         assert_eq!(err.kind(), io::ErrorKind::TimedOut);
@@ -190,7 +192,9 @@ async fn tcp_connect_timeout() {
 #[tokio::test]
 async fn test_header_cap() {
     setup();
-    let res = maybe_make_request(bitreq::get(url("/long_header")).with_max_headers_size(999)).await;
+    let res =
+        maybe_make_request(bitreq::get(url("/long_header")).with_max_headers_size(999), false)
+            .await;
     assert!(res.is_err());
     assert!(matches!(res.err(), Some(bitreq::Error::HeadersOverflow)));
 
@@ -204,7 +208,7 @@ async fn test_status_line_cap() {
 
     let request = bitreq::get(url("/long_status_line"))
         .with_max_status_line_length(expected_status_line.len() + 1);
-    let resp = maybe_make_request(request).await;
+    let resp = maybe_make_request(request, false).await;
     assert!(resp.is_err());
     assert!(matches!(resp.err(), Some(bitreq::Error::StatusLineOverflow)));
 

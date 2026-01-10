@@ -3,21 +3,18 @@
 
 use alloc::sync::Arc;
 use core::convert::TryFrom;
-use std::io::{self, Write};
+use std::io;
 use std::net::TcpStream;
 use std::sync::OnceLock;
 
 use rustls::{self, ClientConfig, ClientConnection, RootCertStore, ServerName, StreamOwned};
-#[cfg(feature = "async-https")]
-use tokio::io::AsyncWriteExt;
 #[cfg(feature = "async-https")]
 use tokio_rustls::{client::TlsStream, TlsConnector};
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
 
 #[cfg(feature = "async-https")]
-use super::{AsyncConnection, AsyncHttpStream};
-use super::{Connection, HttpStream};
+use super::{AsyncHttpStream, AsyncTcpStream};
 use crate::Error;
 
 pub type SecuredStream = StreamOwned<ClientConnection, TcpStream>;
@@ -54,32 +51,19 @@ fn build_client_config() -> Arc<ClientConfig> {
     Arc::new(config)
 }
 
-pub(super) fn create_secured_stream(conn: &Connection) -> Result<HttpStream, Error> {
-    // Rustls setup
+pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, Error> {
     #[cfg(feature = "log")]
-    log::trace!("Setting up TLS parameters for {}.", conn.request.url.host);
-    let dns_name = match ServerName::try_from(&*conn.request.url.host) {
+    log::trace!("Setting up TLS parameters for {host}.");
+    let dns_name = match ServerName::try_from(host) {
         Ok(result) => result,
         Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
     };
     let sess = ClientConnection::new(CONFIG.get_or_init(build_client_config).clone(), dns_name)
         .map_err(Error::RustlsCreateConnection)?;
 
-    // Connect
     #[cfg(feature = "log")]
-    log::trace!("Establishing TCP connection to {}.", conn.request.url.host);
-    let tcp = conn.connect()?;
-
-    // Send request
-    #[cfg(feature = "log")]
-    log::trace!("Establishing TLS session to {}.", conn.request.url.host);
-    let mut tls = StreamOwned::new(sess, tcp); // I don't think this actually does any communication.
-    #[cfg(feature = "log")]
-    log::trace!("Writing HTTPS request to {}.", conn.request.url.host);
-    let _ = tls.get_ref().set_write_timeout(conn.timeout()?);
-    tls.write_all(&conn.request.as_bytes())?;
-
-    Ok(HttpStream::create_secured(tls, conn.timeout_at))
+    log::trace!("Establishing TLS session to {host}.");
+    Ok(StreamOwned::new(sess, tcp))
 }
 
 // Async TLS implementation
@@ -88,36 +72,26 @@ pub(super) fn create_secured_stream(conn: &Connection) -> Result<HttpStream, Err
 pub type AsyncSecuredStream = TlsStream<tokio::net::TcpStream>;
 
 #[cfg(feature = "async-https")]
-pub(super) async fn create_async_secured_stream(
-    conn: &AsyncConnection,
+pub(super) async fn wrap_async_stream(
+    tcp: AsyncTcpStream,
+    host: &str,
 ) -> Result<AsyncHttpStream, Error> {
-    // Rustls setup
     #[cfg(feature = "log")]
-    log::trace!("Setting up TLS parameters for {}.", conn.request.url.host);
-    let dns_name = match ServerName::try_from(&*conn.request.url.host) {
+    log::trace!("Setting up TLS parameters for {host}.");
+    let dns_name = match ServerName::try_from(host) {
         Ok(result) => result,
         Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
     };
 
     let connector = TlsConnector::from(CONFIG.get_or_init(build_client_config).clone());
 
-    // Connect
     #[cfg(feature = "log")]
-    log::trace!("Establishing TCP connection to {}.", conn.request.url.host);
-    let tcp = conn.connect().await?;
+    log::trace!("Establishing TLS session to {host}.");
 
-    // Establish TLS connection
-    #[cfg(feature = "log")]
-    log::trace!("Establishing TLS session to {}.", conn.request.url.host);
-    let mut tls = connector
+    let tls = connector
         .connect(dns_name, tcp)
         .await
         .map_err(|e| Error::IoError(io::Error::new(io::ErrorKind::Other, e)))?;
 
-    // Send request
-    #[cfg(feature = "log")]
-    log::trace!("Writing HTTPS request to {}.", conn.request.url.host);
-    tls.write_all(&conn.request.as_bytes()).await?;
-
-    Ok(AsyncHttpStream::create_secured(tls))
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }

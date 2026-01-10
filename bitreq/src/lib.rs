@@ -212,6 +212,8 @@
 extern crate alloc;
 
 #[cfg(feature = "std")]
+mod client;
+#[cfg(feature = "std")]
 mod connection;
 mod error;
 mod http_url;
@@ -220,6 +222,8 @@ mod proxy;
 mod request;
 mod response;
 
+#[cfg(feature = "async")]
+pub use client::{Client, RequestExt};
 pub use error::*;
 #[cfg(feature = "proxy")]
 pub use proxy::*;
