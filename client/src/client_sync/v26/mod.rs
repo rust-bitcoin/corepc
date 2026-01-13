@@ -86,6 +86,7 @@ crate::impl_client_v17__estimate_raw_fee!();
 crate::impl_client_v17__wait_for_block!();
 crate::impl_client_v17__wait_for_block_height!();
 crate::impl_client_v17__wait_for_new_block!();
+crate::impl_client_v17__sync_with_validation_interface_queue!();
 
 // == Mining ==
 crate::impl_client_v17__get_block_template!();

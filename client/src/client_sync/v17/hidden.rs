@@ -56,3 +56,15 @@ macro_rules! impl_client_v17__wait_for_new_block {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `syncwithvalidationinterfacequeue`.
+#[macro_export]
+macro_rules! impl_client_v17__sync_with_validation_interface_queue {
+    () => {
+        impl Client {
+            pub fn sync_with_validation_interface_queue(&self) -> Result<()> {
+                self.call("syncwithvalidationinterfacequeue", &[])
+            }
+        }
+    };
+}
