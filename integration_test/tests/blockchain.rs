@@ -613,3 +613,17 @@ fn create_child_spending_parent(node: &Node, parent_txid: bitcoin::Txid) -> bitc
 
     child_txid
 }
+
+#[test]
+fn blockchain__sync_with_validation_interface_queue_after_mempool_activity() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
+    // Create activity that causes validation callbacks.
+    let (_address, _txid) = node.create_mempool_transaction();
+
+    let _: () = node
+        .client
+        .sync_with_validation_interface_queue()
+        .expect("syncwithvalidationinterfacequeue");
+}
