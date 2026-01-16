@@ -1,0 +1,10 @@
+# Default owners for everything in the repo
+*       @tcharding
+
+# Owners for specific directories
+/bitreq/        @jamillambert @oleonardolima
+/client/        @jamillambert
+/jsonrpc/       @apoelstra
+/node/          @RCasatta
+/types/         @jamillambert
+
