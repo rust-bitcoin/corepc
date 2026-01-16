@@ -349,11 +349,11 @@ pub use crate::{
     v27::{GetPrioritisedTransactions, PrioritisedTransaction},
     v28::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
-        GetNetworkInfo, GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock,
-        ListSinceBlockError, ListTransactions, Logging, ScanTxOutSetStart, ScanTxOutSetUnspent,
-        SubmitPackage, SubmitPackageError, SubmitPackageTxResult, SubmitPackageTxResultError,
-        SubmitPackageTxResultFees, SubmitPackageTxResultFeesError, TransactionItem,
-        TransactionItemError,
+        GetNetworkInfo, GetRawAddrMan, GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock,
+        ListSinceBlockError, ListTransactions, Logging, RawAddrManEntry, ScanTxOutSetStart,
+        ScanTxOutSetUnspent, SubmitPackage, SubmitPackageError, SubmitPackageTxResult,
+        SubmitPackageTxResultError, SubmitPackageTxResultFees, SubmitPackageTxResultFeesError,
+        TransactionItem, TransactionItemError,
     },
     v29::{
         ActivityEntry, ChainState, DeriveAddressesMultipath, GetBlockHeader, GetBlockHeaderError,

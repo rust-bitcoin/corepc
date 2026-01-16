@@ -250,6 +250,7 @@
 
 mod blockchain;
 mod control;
+mod hidden;
 mod mining;
 mod network;
 mod raw_transactions;
@@ -262,6 +263,7 @@ pub use self::{
         GetTxOutSetInfo, GetTxOutSetInfoError, LoadTxOutSet, LoadTxOutSetError,
     },
     control::Logging,
+    hidden::{GetRawAddrMan, RawAddrManEntry},
     mining::{GetPrioritisedTransactions, PrioritisedTransaction},
     network::{AddrManInfoNetwork, GetAddrManInfo, GetPeerInfo, PeerInfo},
     raw_transactions::{

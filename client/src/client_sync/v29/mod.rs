@@ -79,18 +79,19 @@ crate::impl_client_v20__generate_to_descriptor!();
 crate::impl_client_v17__invalidate_block!();
 
 // == Hidden ==
-crate::impl_client_v29__get_orphan_txs_verbosity_2!();
-crate::impl_client_v29__get_orphan_txs_verbosity_1!();
-crate::impl_client_v29__get_orphan_txs!();
 crate::impl_client_v27__add_connection!();
 crate::impl_client_v21__add_peer_address!();
 crate::impl_client_v17__estimate_raw_fee!();
+crate::impl_client_v29__get_orphan_txs!();
+crate::impl_client_v29__get_orphan_txs_verbosity_1!();
+crate::impl_client_v29__get_orphan_txs_verbosity_2!();
+crate::impl_client_v26__get_raw_addrman!();
+crate::impl_client_v20__mock_scheduler!();
+crate::impl_client_v17__reconsider_block!();
+crate::impl_client_v17__sync_with_validation_interface_queue!();
 crate::impl_client_v17__wait_for_block!();
 crate::impl_client_v17__wait_for_block_height!();
 crate::impl_client_v17__wait_for_new_block!();
-crate::impl_client_v17__sync_with_validation_interface_queue!();
-crate::impl_client_v17__reconsider_block!();
-crate::impl_client_v20__mock_scheduler!();
 
 // == Mining ==
 crate::impl_client_v17__get_block_template!();

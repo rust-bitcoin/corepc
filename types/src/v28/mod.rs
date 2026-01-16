@@ -252,6 +252,7 @@
 
 mod blockchain;
 mod control;
+mod hidden;
 mod mining;
 mod network;
 mod raw_transactions;
@@ -261,6 +262,7 @@ mod wallet;
 pub use self::{
     blockchain::{GetBlockchainInfo, ScanTxOutSetStart, ScanTxOutSetUnspent},
     control::Logging,
+    hidden::{GetRawAddrMan, RawAddrManEntry},
     mining::GetMiningInfo,
     network::GetNetworkInfo,
     raw_transactions::{
