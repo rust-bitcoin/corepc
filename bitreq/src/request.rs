@@ -159,6 +159,16 @@ impl Request {
         self.with_header("Content-Length", format!("{}", body_length))
     }
 
+    /// Add support for form url encode
+    pub fn with_form<T: serde::ser::Serialize>(mut self, body: &T) -> Result<Request, Error> {
+        self.headers
+            .insert("Content-Type".to_string(), "application/x-www-form-urlencoded".to_string());
+        match serde_urlencoded::to_string(&body) {
+            Ok(json) => Ok(self.with_body(json)),
+            Err(err) => Err(Error::SerdeUrlencodeError(err)),
+        }
+    }
+
     /// Adds given key and value as query parameter to request url
     /// (resource).
     ///
@@ -709,5 +719,78 @@ mod encoding_tests {
 
         let req = ParsedRequest::new(get("http://www.example.org/?ówò=what's this? 👀")).unwrap();
         assert_eq!(&req.url.path_and_query, "/?%C3%B3w%C3%B2=what%27s%20this?%20%F0%9F%91%80");
+    }
+}
+
+#[cfg(all(test, feature = "std"))]
+mod form_tests {
+    use alloc::collections::BTreeMap;
+
+    use super::post;
+
+    #[test]
+    fn test_with_form_sets_content_type() {
+        let mut form_data = BTreeMap::new();
+        form_data.insert("key", "value");
+
+        let req =
+            post("http://www.example.org").with_form(&form_data).expect("form encoding failed");
+        assert_eq!(
+            req.headers.get("Content-Type"),
+            Some(&"application/x-www-form-urlencoded".to_string())
+        );
+    }
+
+    #[test]
+    fn test_with_form_sets_content_length() {
+        let mut form_data = BTreeMap::new();
+        form_data.insert("key", "value");
+
+        let req =
+            post("http://www.example.org").with_form(&form_data).expect("form encoding failed");
+        // "key=value" is 9 bytes
+        assert_eq!(req.headers.get("Content-Length"), Some(&"9".to_string()));
+    }
+
+    #[test]
+    fn test_with_form_encodes_body() {
+        let mut form_data = BTreeMap::new();
+        form_data.insert("name", "test");
+        form_data.insert("value", "42");
+
+        let req =
+            post("http://www.example.org").with_form(&form_data).expect("form encoding failed");
+        let body = req.body.expect("body should be set");
+        let body_str = String::from_utf8(body).expect("body should be valid UTF-8");
+        // BTreeMap provides ordered iteration
+        assert_eq!(body_str, "name=test&value=42");
+    }
+
+    #[test]
+    fn test_with_form_encodes_special_characters() {
+        let mut form_data = BTreeMap::new();
+        form_data.insert("message", "hello world");
+        form_data.insert("special", "a&b=c");
+
+        let req =
+            post("http://www.example.org").with_form(&form_data).expect("form encoding failed");
+        let body = req.body.expect("body should be set");
+        let body_str = String::from_utf8(body).expect("body should be valid UTF-8");
+        // Spaces are encoded as + and special chars are percent-encoded
+        assert!(
+            body_str.contains("message=hello+world") || body_str.contains("message=hello%20world")
+        );
+        assert!(body_str.contains("special=a%26b%3Dc"));
+    }
+
+    #[test]
+    fn test_with_form_empty() {
+        let form_data: BTreeMap<&str, &str> = BTreeMap::new();
+
+        let req =
+            post("http://www.example.org").with_form(&form_data).expect("form encoding failed");
+        let body = req.body.expect("body should be set");
+        assert!(body.is_empty());
+        assert_eq!(req.headers.get("Content-Length"), Some(&"0".to_string()));
     }
 }

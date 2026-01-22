@@ -33,6 +33,44 @@ async fn test_json_using_serde() {
 }
 
 #[tokio::test]
+async fn test_with_form() {
+    use std::collections::HashMap;
+
+    setup();
+    let mut form_data = HashMap::new();
+    form_data.insert("name", "test");
+    form_data.insert("value", "42");
+
+    let response = make_request(
+        bitreq::post(url("/echo")).with_form(&form_data).expect("form encoding failed"),
+    )
+    .await;
+    let body = response.as_str().expect("response body should be valid UTF-8");
+    // Form data is URL encoded, order may vary due to HashMap
+    assert!(body.contains("name=test"));
+    assert!(body.contains("value=42"));
+}
+
+#[tokio::test]
+async fn test_with_form_special_chars() {
+    use std::collections::HashMap;
+
+    setup();
+    let mut form_data = HashMap::new();
+    form_data.insert("message", "hello world");
+    form_data.insert("special", "a&b=c");
+
+    let response = make_request(
+        bitreq::post(url("/echo")).with_form(&form_data).expect("form encoding failed"),
+    )
+    .await;
+    let body = response.as_str().expect("response body should be valid UTF-8");
+    // Special characters should be URL encoded
+    assert!(body.contains("message=hello+world") || body.contains("message=hello%20world"));
+    assert!(body.contains("special=a%26b%3Dc"));
+}
+
+#[tokio::test]
 async fn test_timeout_too_low() {
     setup();
     let request = bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(1);
