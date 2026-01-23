@@ -259,6 +259,8 @@ mod http_url;
 mod proxy;
 mod request;
 mod response;
+#[cfg(feature = "forms")]
+mod urlencode;
 
 #[cfg(feature = "async")]
 pub use client::{Client, RequestExt};
