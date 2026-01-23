@@ -249,6 +249,29 @@
 
 extern crate alloc;
 
+/// Acquires a mutex lock, recovering from poisoning.
+///
+/// A mutex becomes poisoned when a thread panics while holding the lock.
+/// This macro ignores poisoning and returns the guard anyway, which is
+/// usually the right behavior since:
+/// - The data may still be in a valid state
+/// - Propagating panics across threads is rarely useful
+///
+/// # Example
+///
+/// ```ignore
+/// use std::sync::Mutex;
+///
+/// let mutex = Mutex::new(42);
+/// let guard = lock!(mutex);
+/// ```
+#[cfg(feature = "async")]
+macro_rules! lock {
+    ($mutex:expr) => {
+        $mutex.lock().unwrap_or_else(|e| e.into_inner())
+    };
+}
+
 #[cfg(feature = "std")]
 mod client;
 #[cfg(feature = "std")]
