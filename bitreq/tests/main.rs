@@ -33,6 +33,7 @@ async fn test_json_using_serde() {
 }
 
 #[tokio::test]
+#[cfg(feature = "forms")]
 async fn test_with_form() {
     use std::collections::HashMap;
 
@@ -52,6 +53,7 @@ async fn test_with_form() {
 }
 
 #[tokio::test]
+#[cfg(feature = "forms")]
 async fn test_with_form_special_chars() {
     use std::collections::HashMap;
 

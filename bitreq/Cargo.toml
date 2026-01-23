@@ -17,8 +17,7 @@ maintenance = { status = "experimental" }
 
 [dependencies]
 # For the json-using-serde feature:
-serde = { version = "1.0.101" }
-serde_urlencoded = "0.7.1"
+serde = { version = "1.0.101", default-features = false, optional = true }
 serde_json = { version = "1.0.0", default-features = false, features = ["std"], optional = true }
 
 # For the proxy feature:
@@ -51,8 +50,9 @@ features = ["json-using-serde", "proxy", "https"]
 default = ["std"]
 std = []
 
+forms = ["serde/std", "std"]
 log = ["dep:log"]
-json-using-serde = ["serde_json"]
+json-using-serde = ["serde", "serde_json"]
 proxy = ["base64", "std"]
 
 https = ["https-rustls"]

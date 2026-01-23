@@ -13,8 +13,9 @@ pub enum Error {
     /// Ran into a Serde error.
     SerdeJsonError(serde_json::Error),
 
-    /// Ran into a Serde Urlencode error.
-    SerdeUrlencodeError(serde_urlencoded::ser::Error),
+    #[cfg(feature = "forms")]
+    /// Ran into a URL encoding error.
+    SerdeUrlencodeError(crate::urlencode::Error),
 
     /// The response body contains invalid UTF-8, so the `as_str()`
     /// conversion failed.
@@ -99,6 +100,7 @@ impl fmt::Display for Error {
         match self {
             #[cfg(feature = "json-using-serde")]
             SerdeJsonError(err) => write!(f, "{}", err),
+            #[cfg(feature = "forms")]
             SerdeUrlencodeError(err) => write!(f, "{}", err),
             #[cfg(feature = "std")]
             IoError(err) => write!(f, "{}", err),

@@ -160,10 +160,12 @@ impl Request {
     }
 
     /// Add support for form url encode
+    #[cfg(feature = "forms")]
     pub fn with_form<T: serde::ser::Serialize>(mut self, body: &T) -> Result<Request, Error> {
         self.headers
             .insert("Content-Type".to_string(), "application/x-www-form-urlencoded".to_string());
-        match serde_urlencoded::to_string(&body) {
+
+        match crate::urlencode::to_string(body) {
             Ok(json) => Ok(self.with_body(json)),
             Err(err) => Err(Error::SerdeUrlencodeError(err)),
         }
@@ -722,7 +724,7 @@ mod encoding_tests {
     }
 }
 
-#[cfg(all(test, feature = "std"))]
+#[cfg(all(test, feature = "forms"))]
 mod form_tests {
     use alloc::collections::BTreeMap;
 
