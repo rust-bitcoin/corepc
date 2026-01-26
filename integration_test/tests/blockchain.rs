@@ -499,12 +499,18 @@ fn blockchain__scan_blocks_modelled() {
 
     let json: ScanBlocksStart =
         node.client.scan_blocks_start(&[scan_desc]).expect("scanblocks start");
-    let model: Result<mtype::ScanBlocksStart, ScanBlocksStartError> = json.into_model();
+    let model: Result<mtype::ScanBlocksStart, ScanBlocksStartError> = json.clone().into_model();
     model.unwrap();
 
     let _: Option<ScanBlocksStatus> = node.client.scan_blocks_status().expect("scanblocks status");
 
     let _: ScanBlocksAbort = node.client.scan_blocks_abort().expect("scanblocks abort");
+
+    // ensures `completed` field is present in v26 onward.
+    #[cfg(not(feature = "v25_and_below"))]
+    {
+        assert!(json.completed);
+    }
 }
 
 #[test]

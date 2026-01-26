@@ -336,14 +336,14 @@ pub use crate::{
     },
     v25::{
         DescriptorInfo, GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors,
-        MempoolAcceptanceError, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError,
-        ScanBlocksStatus, TestMempoolAcceptError,
+        MempoolAcceptanceError, ScanBlocksAbort, ScanBlocksStartError, ScanBlocksStatus,
+        TestMempoolAcceptError,
     },
     v26::{
         AddrManInfoNetwork, CreateWallet, DescriptorProcessPsbt, DescriptorProcessPsbtError,
         DumpTxOutSet, DumpTxOutSetError, GetAddrManInfo, GetBalances, GetBalancesError,
         GetPeerInfo, GetTransactionError, GetTxOutSetInfo, GetTxOutSetInfoError, LoadTxOutSet,
-        LoadTxOutSetError, LoadWallet, PeerInfo, UnloadWallet, WalletProcessPsbt,
+        LoadTxOutSetError, LoadWallet, PeerInfo, ScanBlocksStart, UnloadWallet, WalletProcessPsbt,
         WalletProcessPsbtError,
     },
     v27::{GetPrioritisedTransactions, PrioritisedTransaction},
