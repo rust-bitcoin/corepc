@@ -315,8 +315,9 @@ pub use crate::{
     },
     v20::GenerateToDescriptor,
     v21::{
-        AddPeerAddress, GetIndexInfo, GetIndexInfoName, ImportDescriptors, ImportDescriptorsResult,
-        PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany, SendManyVerbose,
+        AddPeerAddress, GetIndexInfo, GetIndexInfoName, GetRawMempoolSequence, ImportDescriptors,
+        ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError, SendMany,
+        SendManyVerbose,
     },
     v22::{
         AddConnection, Banned, EnumerateSigners, GetNodeAddresses, ListBanned, NodeAddress,

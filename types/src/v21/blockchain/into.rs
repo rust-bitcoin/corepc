@@ -7,8 +7,8 @@ use bitcoin::{hex, BlockHash, Network, Txid, Work, Wtxid};
 use super::{
     GetBlockchainInfo, GetBlockchainInfoError, GetMempoolAncestors, GetMempoolAncestorsVerbose,
     GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
-    GetMempoolInfoError, GetRawMempool, GetRawMempoolVerbose, MapMempoolEntryError, MempoolEntry,
-    MempoolEntryError,
+    GetMempoolInfoError, GetRawMempool, GetRawMempoolSequence, GetRawMempoolVerbose,
+    MapMempoolEntryError, MempoolEntry, MempoolEntryError,
 };
 use crate::model;
 
@@ -203,5 +203,16 @@ impl GetRawMempoolVerbose {
             map.insert(txid, relative);
         }
         Ok(model::GetRawMempoolVerbose(map))
+    }
+}
+
+impl GetRawMempoolSequence {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetRawMempoolSequence, hex::HexToArrayError> {
+        // Parse txid strings into `bitcoin::Txid`.
+        let txids =
+            self.txids.iter().map(|t: &String| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
+
+        Ok(model::GetRawMempoolSequence { txids, mempool_sequence: self.mempool_sequence })
     }
 }

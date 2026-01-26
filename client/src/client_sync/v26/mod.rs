@@ -52,7 +52,7 @@ crate::impl_client_v17__get_mempool_ancestors!();
 crate::impl_client_v17__get_mempool_descendants!();
 crate::impl_client_v17__get_mempool_entry!();
 crate::impl_client_v17__get_mempool_info!();
-crate::impl_client_v17__get_raw_mempool!();
+crate::impl_client_v21__get_raw_mempool!();
 crate::impl_client_v17__get_tx_out!();
 crate::impl_client_v17__get_tx_out_proof!();
 crate::impl_client_v26__get_tx_out_set_info!();
