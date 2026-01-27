@@ -71,10 +71,11 @@ impl GetTxOutSetInfo {
 
         let height = crate::to_u32(self.height, "height")?;
         let best_block = self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?;
-        let transactions = crate::to_u32(self.transactions, "transactions")?;
+        let transactions =
+            self.transactions.map(|v| crate::to_u32(v, "transactions")).transpose()?;
         let tx_outs = crate::to_u32(self.tx_outs, "tx_outs")?;
         let bogo_size = crate::to_u32(self.bogo_size, "bogo_size")?;
-        let disk_size = crate::to_u32(self.disk_size, "disk_size")?;
+        let disk_size = self.disk_size.map(|v| crate::to_u32(v, "disk_size")).transpose()?;
         let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
 
         Ok(model::GetTxOutSetInfo {
@@ -87,6 +88,40 @@ impl GetTxOutSetInfo {
             hash_serialized_3: self.hash_serialized_3,
             disk_size,
             total_amount,
+            muhash: self.muhash,
+            total_unspendable_amount: self
+                .total_unspendable_amount
+                .map(|v| Amount::from_btc(v).map_err(E::TotalUnspendableAmount))
+                .transpose()?,
+            block_info: match self.block_info {
+                Some(b) => {
+                    let prevout_spent =
+                        Amount::from_btc(b.prevout_spent).map_err(E::PrevoutSpent)?;
+                    let coinbase = Amount::from_btc(b.coinbase).map_err(E::Coinbase)?;
+                    let new_outputs_ex_coinbase = Amount::from_btc(b.new_outputs_ex_coinbase)
+                        .map_err(E::NewOutputsExCoinbase)?;
+                    let unspendable = Amount::from_btc(b.unspendable).map_err(E::Unspendable)?;
+                    let unspendables = model::Unspendables {
+                        genesis_block: Amount::from_btc(b.unspendables.genesis_block)
+                            .map_err(E::UnspendablesGenesisBlock)?,
+                        bip30: Amount::from_btc(b.unspendables.bip30)
+                            .map_err(E::UnspendablesBip30)?,
+                        scripts: Amount::from_btc(b.unspendables.scripts)
+                            .map_err(E::UnspendablesScripts)?,
+                        unclaimed_rewards: Amount::from_btc(b.unspendables.unclaimed_rewards)
+                            .map_err(E::UnspendablesUnclaimedRewards)?,
+                    };
+
+                    Some(model::BlockInfo {
+                        prevout_spent,
+                        coinbase,
+                        new_outputs_ex_coinbase,
+                        unspendable,
+                        unspendables,
+                    })
+                }
+                None => None,
+            },
         })
     }
 }
