@@ -368,7 +368,7 @@ impl AsyncConnection {
         request: ParsedRequest,
     ) -> Pin<Box<dyn Future<Output = Result<Response, Error>> + Send + 'a>> {
         Box::pin(async move {
-            let conn = Arc::clone(&*self.0.lock().unwrap());
+            let conn = Arc::clone(&*lock!(self.0));
             #[cfg(debug_assertions)]
             {
                 let next_read = conn.readable_request_id.load(Ordering::Acquire);
@@ -427,7 +427,7 @@ impl AsyncConnection {
                     let new_connection =
                         AsyncConnection::new(request.connection_params(), request.timeout_at)
                             .await?;
-                    *self.0.lock().unwrap() = Arc::clone(&*new_connection.0.lock().unwrap());
+                    *lock!(self.0) = Arc::clone(&*lock!(new_connection.0));
                     core::mem::drop(read);
                     // Note that this cannot recurse infinitely as we'll always be able to send at
                     // least one request on the new socket (though some other request may race us
@@ -444,7 +444,7 @@ impl AsyncConnection {
                     Self::timeout(request.timeout_at, conn.write.lock()).await?
                 };
 
-                let socket_timeout = *conn.socket_new_requests_timeout.lock().unwrap();
+                let socket_timeout = *lock!(conn.socket_new_requests_timeout);
                 let socket_timed_out = Instant::now() > socket_timeout;
 
                 request_id = conn.next_request_id.fetch_add(1, Ordering::Relaxed);
@@ -545,7 +545,7 @@ impl AsyncConnection {
                                 match k.trim() {
                                     "timeout" => {
                                         let timeout_secs = (v as u64).saturating_sub(1);
-                                        *conn.socket_new_requests_timeout.lock().unwrap() =
+                                        *lock!(conn.socket_new_requests_timeout) =
                                             Instant::now()
                                                 .checked_add(Duration::from_secs(timeout_secs))
                                                 .unwrap_or(Instant::now());
