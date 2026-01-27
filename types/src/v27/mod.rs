@@ -333,14 +333,14 @@ pub use crate::{
         ScanTxOutSetUnspent, TestMempoolAccept, TestMempoolAcceptError,
     },
     v26::{
-        AddrManInfoNetwork, ChainState, CreateWallet, DescriptorProcessPsbt,
+        AddrManInfoNetwork, BlockInfo, ChainState, CreateWallet, DescriptorProcessPsbt,
         DescriptorProcessPsbtError, DumpTxOutSet, DumpTxOutSetError, GetAddrManInfo, GetBalances,
         GetBalancesError, GetChainStates, GetChainStatesError, GetPeerInfo, GetRawAddrMan,
         GetTransaction, GetTransactionError, GetTxOutSetInfo, GetTxOutSetInfoError, GetWalletInfo,
         GetWalletInfoError, GetWalletInfoScanning, LastProcessedBlock, LastProcessedBlockError,
         LoadTxOutSet, LoadTxOutSetError, LoadWallet, Logging, PeerInfo, RawAddrManEntry,
         SubmitPackage, SubmitPackageError, SubmitPackageTxResult, SubmitPackageTxResultError,
-        SubmitPackageTxResultFees, SubmitPackageTxResultFeesError, UnloadWallet, WalletProcessPsbt,
-        WalletProcessPsbtError,
+        SubmitPackageTxResultFees, SubmitPackageTxResultFeesError, UnloadWallet, Unspendables,
+        WalletProcessPsbt, WalletProcessPsbtError,
     },
 };

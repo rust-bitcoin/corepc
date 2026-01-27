@@ -530,11 +530,11 @@ impl GetTxOutSetInfo {
 
         let height = crate::to_u32(self.height, "height")?;
         let best_block = self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?;
-        let transactions = crate::to_u32(self.transactions, "transactions")?;
+        let transactions = Some(crate::to_u32(self.transactions, "transactions")?);
         let tx_outs = crate::to_u32(self.tx_outs, "tx_outs")?;
         let bogo_size = crate::to_u32(self.bogo_size, "bogo_size")?;
         let hash_serialized_2 = Some(self.hash_serialized_2); // TODO: Convert this to a hash type.
-        let disk_size = crate::to_u32(self.disk_size, "disk_size")?;
+        let disk_size = Some(crate::to_u32(self.disk_size, "disk_size")?);
         let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
 
         Ok(model::GetTxOutSetInfo {
@@ -547,6 +547,9 @@ impl GetTxOutSetInfo {
             hash_serialized_3: None, // v26 and later only.
             disk_size,
             total_amount,
+            muhash: None,
+            total_unspendable_amount: None,
+            block_info: None,
         })
     }
 }
