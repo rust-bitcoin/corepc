@@ -260,7 +260,7 @@ mod wallet;
 pub use self::{
     blockchain::{
         ChainState, DumpTxOutSet, DumpTxOutSetError, GetChainStates, GetChainStatesError,
-        GetTxOutSetInfo, GetTxOutSetInfoError, LoadTxOutSet, LoadTxOutSetError,
+        GetTxOutSetInfo, GetTxOutSetInfoError, LoadTxOutSet, LoadTxOutSetError, ScanBlocksStart,
     },
     control::Logging,
     hidden::{GetRawAddrMan, RawAddrManEntry},
@@ -355,7 +355,7 @@ pub use crate::{
     v25::{
         DescriptorInfo, GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors,
         MempoolAcceptance, MempoolAcceptanceError, MempoolAcceptanceFees, ScanBlocksAbort,
-        ScanBlocksStart, ScanBlocksStartError, ScanBlocksStatus, ScanTxOutSetStart,
-        ScanTxOutSetUnspent, TestMempoolAccept, TestMempoolAcceptError,
+        ScanBlocksStartError, ScanBlocksStatus, ScanTxOutSetStart, ScanTxOutSetUnspent,
+        TestMempoolAccept, TestMempoolAcceptError,
     },
 };
