@@ -318,8 +318,8 @@ pub use crate::{
     v20::{GenerateToDescriptor, GetTransactionDetail},
     v21::{
         AddPeerAddress, GenerateBlock, GetIndexInfo, GetIndexInfoName, GetNetworkInfo,
-        ImportDescriptors, ImportDescriptorsResult, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
-        SendMany, SendManyVerbose, UnloadWallet, UpgradeWallet,
+        GetRawMempoolSequence, ImportDescriptors, ImportDescriptorsResult, PsbtBumpFee,
+        PsbtBumpFeeError, Send, SendError, SendMany, SendManyVerbose, UnloadWallet, UpgradeWallet,
     },
     v22::{
         AddConnection, Banned, DescriptorInfo, EnumerateSigners, GetAddressInfo,

@@ -660,6 +660,15 @@ pub struct GetRawMempool(pub Vec<Txid>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetRawMempoolVerbose(pub BTreeMap<Txid, MempoolEntry>);
 
+/// Models the result of JSON-RPC method `getrawmempool` with verbose set to `false` and `mempool_sequence` set to `true`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetRawMempoolSequence {
+    /// List of transaction ids in the mempool.
+    pub txids: Vec<Txid>,
+    /// The mempool sequence value.
+    pub mempool_sequence: u64,
+}
+
 /// Models the result of JSON-RPC method `gettxout`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetTxOut {

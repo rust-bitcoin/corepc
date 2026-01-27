@@ -326,9 +326,10 @@ pub use crate::{
         AddPeerAddress, Bip9SoftforkInfo, GenerateBlock, GetBlockchainInfo, GetIndexInfo,
         GetIndexInfoName, GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
         GetMempoolDescendantsVerbose, GetMempoolEntry, GetNetworkInfo, GetRawMempool,
-        GetRawMempoolVerbose, GetWalletInfo, GetWalletInfoScanning, ImportDescriptors,
-        ImportDescriptorsResult, MempoolEntry, PsbtBumpFee, PsbtBumpFeeError, Send, SendError,
-        SendMany, SendManyVerbose, Softfork, SoftforkType, UnloadWallet, UpgradeWallet,
+        GetRawMempoolSequence, GetRawMempoolVerbose, GetWalletInfo, GetWalletInfoScanning,
+        ImportDescriptors, ImportDescriptorsResult, MempoolEntry, PsbtBumpFee, PsbtBumpFeeError,
+        Send, SendError, SendMany, SendManyVerbose, Softfork, SoftforkType, UnloadWallet,
+        UpgradeWallet,
     },
     ScriptPubkey,
 };

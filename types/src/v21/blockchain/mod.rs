@@ -267,3 +267,12 @@ pub struct GetRawMempool(pub Vec<String>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Result of JSON-RPC method `getrawmempool` with verbose set to `false` and `mempool_sequence` set to `true`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetRawMempoolSequence {
+    /// List of transaction ids in the mempool.
+    pub txids: Vec<String>,
+    /// The mempool sequence value.
+    pub mempool_sequence: u64,
+}

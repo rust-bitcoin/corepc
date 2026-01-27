@@ -354,20 +354,31 @@ fn blockchain__get_raw_mempool__modelled() {
     node.fund_wallet();
     let (_address, _txid) = node.create_mempool_transaction();
 
-    // verbose = false
+    // verbose = false + mempool_sequence = false
     let json: GetRawMempool = node.client.get_raw_mempool().expect("getrawmempool");
     let model: Result<mtype::GetRawMempool, hex::HexToArrayError> = json.clone().into_model();
     let mempool = model.unwrap();
     // Sanity check.
     assert_eq!(mempool.0.len(), 1);
 
-    // verbose = true
+    // verbose = true + mempool_sequence = false
     let json: GetRawMempoolVerbose =
         node.client.get_raw_mempool_verbose().expect("getrawmempool verbose");
     let model: Result<mtype::GetRawMempoolVerbose, MapMempoolEntryError> = json.into_model();
     let mempool = model.unwrap();
     // Sanity check.
     assert_eq!(mempool.0.len(), 1);
+
+    #[cfg(not(feature = "v20_and_below"))]
+    {
+        // verbose = false + mempool_sequence = true
+        let json: GetRawMempoolSequence =
+        node.client.get_raw_mempool_sequence().expect("getrawmempool sequence");
+        let model: Result<mtype::GetRawMempoolSequence, hex::HexToArrayError> = json.into_model();
+        let mempool = model.unwrap();
+        // Sanity check.
+        assert_eq!(mempool.txids.len(), 1);
+    }
 }
 
 #[test]

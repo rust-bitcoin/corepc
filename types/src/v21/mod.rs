@@ -245,7 +245,8 @@ pub use self::{
     blockchain::{
         Bip9SoftforkInfo, GetBlockchainInfo, GetMempoolAncestors, GetMempoolAncestorsVerbose,
         GetMempoolDescendants, GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolInfo,
-        GetRawMempool, GetRawMempoolVerbose, MempoolEntry, Softfork, SoftforkType,
+        GetRawMempool, GetRawMempoolSequence, GetRawMempoolVerbose, MempoolEntry, Softfork,
+        SoftforkType,
     },
     generating::GenerateBlock,
     hidden::AddPeerAddress,
