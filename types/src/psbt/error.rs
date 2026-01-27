@@ -42,6 +42,12 @@ impl std::error::Error for RawTransactionError {
 pub enum RawTransactionInputError {
     /// Conversion of the input `txid` field failed.
     Txid(hex::HexToArrayError),
+    /// Input lacked both `txid` and `coinbase` data.
+    MissingTxid,
+    /// Input lacked the `vout` field for a non-coinbase input.
+    MissingVout,
+    /// Input lacked both `scriptSig` and `coinbase` data.
+    MissingScriptSig,
     /// Conversion of the input `script_sig` field failed.
     ScriptSig(hex::HexToBytesError),
     /// Conversion of one of the `witness` hex strings failed.
@@ -52,6 +58,12 @@ impl fmt::Display for RawTransactionInputError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the input `txid` field failed"; e),
+            Self::MissingTxid =>
+                write!(f, "missing both `txid` and `coinbase` fields for the transaction input"),
+            Self::MissingVout =>
+                write!(f, "missing `vout` field for non-coinbase transaction input"),
+            Self::MissingScriptSig =>
+                write!(f, "missing both `scriptSig` and `coinbase` data for the transaction input"),
             Self::ScriptSig(ref e) =>
                 write_err!(f, "conversion of the input `script_sig` field failed"; e),
             Self::Witness(ref e) =>
@@ -65,6 +77,9 @@ impl std::error::Error for RawTransactionInputError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Self::Txid(ref e) => Some(e),
+            Self::MissingTxid => None,
+            Self::MissingVout => None,
+            Self::MissingScriptSig => None,
             Self::ScriptSig(ref e) => Some(e),
             Self::Witness(ref e) => Some(e),
         }

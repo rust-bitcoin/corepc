@@ -36,3 +36,37 @@ macro_rules! impl_client_v29__get_descriptor_activity {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `getblock`.
+#[macro_export]
+macro_rules! impl_client_v29__get_block {
+    () => {
+        impl Client {
+            /// Gets a block by blockhash. Kept for compatibility; uses verbose set to 0.
+            pub fn get_block(&self, hash: BlockHash) -> Result<Block> {
+                let json = self.get_block_verbose_zero(hash)?;
+                Ok(json.block()?)
+            }
+
+            /// Gets a block by blockhash with verbose set to 0.
+            pub fn get_block_verbose_zero(&self, hash: BlockHash) -> Result<GetBlockVerboseZero> {
+                self.call("getblock", &[into_json(hash)?, 0.into()])
+            }
+
+            /// Gets a block by blockhash with verbose set to 1.
+            pub fn get_block_verbose_one(&self, hash: BlockHash) -> Result<GetBlockVerboseOne> {
+                self.call("getblock", &[into_json(hash)?, 1.into()])
+            }
+
+            /// Gets a block by blockhash with verbose set to 2.
+            pub fn get_block_verbose_two(&self, hash: BlockHash) -> Result<GetBlockVerboseTwo> {
+                self.call("getblock", &[into_json(hash)?, 2.into()])
+            }
+
+            /// Gets a block by blockhash with verbose set to 3.
+            pub fn get_block_verbose_three(&self, hash: BlockHash) -> Result<GetBlockVerboseThree> {
+                self.call("getblock", &[into_json(hash)?, 3.into()])
+            }
+        }
+    };
+}

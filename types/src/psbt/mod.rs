@@ -76,13 +76,19 @@ impl RawTransaction {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RawTransactionInput {
-    /// The transaction id.
-    pub txid: String,
-    /// The output number.
-    pub vout: u32,
-    /// The script.
+    /// Coinbase data (present on coinbase transactions only).
+    #[serde(default)]
+    pub coinbase: Option<String>,
+    /// The transaction id (absent for coinbase inputs).
+    #[serde(default)]
+    pub txid: Option<String>,
+    /// The output number (absent for coinbase inputs).
+    #[serde(default)]
+    pub vout: Option<u32>,
+    /// The script (absent on coinbase inputs, the raw coinbase hex is available in `coinbase`).
     #[serde(rename = "scriptSig")]
-    pub script_sig: ScriptSig,
+    #[serde(default)]
+    pub script_sig: Option<ScriptSig>,
     /// Hex-encoded witness data (if any).
     #[serde(rename = "txinwitness")]
     pub txin_witness: Option<Vec<String>>,
@@ -95,8 +101,25 @@ impl RawTransactionInput {
     pub fn to_input(&self) -> Result<TxIn, RawTransactionInputError> {
         use RawTransactionInputError as E;
 
-        let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
-        let script_sig = self.script_sig.script_buf().map_err(E::ScriptSig)?;
+        // if txid is present, parse it
+        // if coinbase transaction, leave it empty
+        let previous_output = match (&self.txid, &self.coinbase) {
+            (Some(txid), _) => {
+                let parsed_txid = txid.parse::<Txid>().map_err(E::Txid)?;
+                let vout = self.vout.ok_or(RawTransactionInputError::MissingVout)?;
+                OutPoint { txid: parsed_txid, vout }
+            }
+            (None, Some(_)) => OutPoint::null(),
+            (None, None) => return Err(E::MissingTxid),
+        };
+
+        // if scriptSig is present, parse it
+        // if coinbase transaction, parse coinbase as scriptSig
+        let script_sig = match (&self.script_sig, &self.coinbase) {
+            (Some(script_sig), _) => script_sig.script_buf().map_err(E::ScriptSig)?,
+            (None, Some(coinbase)) => ScriptBuf::from_hex(coinbase).map_err(E::ScriptSig)?,
+            (None, None) => return Err(E::MissingScriptSig),
+        };
 
         let witness = match &self.txin_witness {
             Some(v) => crate::witness_from_hex_slice(v).map_err(E::Witness)?,
@@ -104,7 +127,7 @@ impl RawTransactionInput {
         };
 
         Ok(TxIn {
-            previous_output: OutPoint { txid, vout: self.vout },
+            previous_output,
             script_sig,
             sequence: Sequence::from_consensus(self.sequence),
             witness,

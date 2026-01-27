@@ -358,9 +358,12 @@ pub use crate::{
     v29::{
         ActivityEntry, ChainState, DeriveAddressesMultipath, GetBlockHeader, GetBlockHeaderError,
         GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockVerboseOne,
-        GetBlockVerboseOneError, GetBlockchainInfo, GetBlockchainInfoError, GetChainStates,
-        GetChainStatesError, GetDescriptorActivity, GetDescriptorActivityError, GetDescriptorInfo,
+        GetBlockVerboseOneError, GetBlockVerboseThree, GetBlockVerboseThreeError,
+        GetBlockVerboseThreePrevout, GetBlockVerboseThreeTransaction, GetBlockVerboseTwo,
+        GetBlockVerboseTwoError, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
+        GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
+        GetDescriptorActivityError, GetDescriptorInfo, GetRawTransactionVerboseWithPrevout,
         MempoolAcceptance, MempoolAcceptanceFees, NextBlockInfo, NextBlockInfoError,
-        ReceiveActivity, SpendActivity, TestMempoolAccept,
+        RawTransactionInputWithPrevout, ReceiveActivity, SpendActivity, TestMempoolAccept,
     },
 };

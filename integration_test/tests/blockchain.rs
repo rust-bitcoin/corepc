@@ -58,9 +58,54 @@ fn blockchain__get_block__modelled() {
     let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseOneError> = json.into_model();
     model.unwrap();
 
-    // TODO: Test getblock 2
-    // let json = node.client.get_block_with_verbosity(block_hash, 2).expect("getblock verbosity 2");
-    // assert!(json.into_model().is_ok());
+    #[cfg(not(feature = "v28_and_below"))]
+    {
+        let node = Node::with_wallet(Wallet::Default, &[]);
+        node.fund_wallet();
+        let (_address, mined_tx) = node.create_mined_transaction();
+        let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+
+        let json: GetBlockVerboseTwo =
+            node.client.get_block_verbose_two(block_hash).expect("getblock verbose=2");
+        let model: Result<mtype::GetBlockVerboseTwo, GetBlockVerboseTwoError> = json.into_model();
+        let block_v2 = model.unwrap();
+
+        assert_eq!(block_v2.tx.len(), block_v2.n_tx as usize);
+
+        let mined_txid = mined_tx.compute_txid();
+        let mined_entry = block_v2
+            .tx
+            .iter()
+            .find(|entry| entry.transaction.transaction.compute_txid() == mined_txid)
+            .expect("mined transaction should be present in verbosity=2 results");
+        assert!(mined_entry.fee.is_some());
+        assert!(!mined_entry.transaction.transaction.input.is_empty());
+        assert!(!mined_entry.transaction.transaction.output.is_empty());
+
+        let json: GetBlockVerboseThree =
+            node.client.get_block_verbose_three(block_hash).expect("getblock verbose=3");
+        let model: Result<mtype::GetBlockVerboseThree, GetBlockVerboseThreeError> =
+            json.into_model();
+        let block_v3 = model.unwrap();
+
+        assert_eq!(block_v3.tx.len(), block_v3.n_tx as usize);
+
+        let mined_entry = block_v3
+            .tx
+            .iter()
+            .find(|entry| entry.transaction.transaction.compute_txid() == mined_txid)
+            .expect("mined transaction should be present in verbosity=3 results");
+        assert!(
+            mined_entry.prevouts.iter().any(|prevout| prevout.is_some()),
+            "expected at least one prevout for the mined transaction"
+        );
+
+        for prevout in mined_entry.prevouts.iter().flatten() {
+            assert!(prevout.value.to_sat() > 0);
+            assert!(prevout.height <= block_v3.height);
+            assert!(!prevout.script_pubkey.script_pubkey.is_empty());
+        }
+    }
 }
 
 #[test]
