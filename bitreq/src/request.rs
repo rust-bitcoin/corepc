@@ -190,7 +190,7 @@ impl Request {
     pub fn with_json<T: serde::ser::Serialize>(mut self, body: &T) -> Result<Request, Error> {
         self.headers
             .insert("Content-Type".to_string(), "application/json; charset=UTF-8".to_string());
-        match serde_json::to_string(&body) {
+        match serde_json::to_vec(&body) {
             Ok(json) => Ok(self.with_body(json)),
             Err(err) => Err(Error::SerdeJsonError(err)),
         }
