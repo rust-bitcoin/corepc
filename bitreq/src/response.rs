@@ -248,7 +248,7 @@ impl Response {
     where
         T: serde::de::Deserialize<'a>,
     {
-        match serde_json::from_str(self.as_str()?) {
+        match serde_json::from_slice(self.as_bytes()) {
             Ok(json) => Ok(json),
             Err(err) => Err(Error::SerdeJsonError(err)),
         }
