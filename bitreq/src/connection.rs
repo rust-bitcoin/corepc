@@ -227,11 +227,32 @@ struct AsyncConnectionState {
     /// indeterminate state and no further reading is allowed. Any pending requests must either be
     /// retried or failed.
     readable_request_id: AtomicUsize,
+    /// If we have a pipelined request which has the requesting future dropped, we won't finish
+    /// reading the response and thus later responses will need to be retried over a fresh
+    /// connection.
+    /// Here we track the minimum request_id for which the future was dropped without finishing our
+    /// read - if we go to read a request_id higher than this we have to abort and retry.
+    min_dropped_reader_id: AtomicUsize,
     /// The time at which we should stop sending new requests over this socket and should instead
     /// connect again.
     /// Defaults to 60 seconds after open to align with nginx's default timeout of 75 seconds, but
     /// can be overridden by the `Keep-Alive` header.
     socket_new_requests_timeout: Mutex<Instant>,
+}
+
+#[cfg(feature = "async")]
+struct PendingReader<'a> {
+    min_dropped_reader_id: &'a AtomicUsize,
+    id: Option<usize>,
+}
+
+#[cfg(feature = "async")]
+impl<'a> Drop for PendingReader<'a> {
+    fn drop(&mut self) {
+        if let Some(reader_id) = self.id {
+            self.min_dropped_reader_id.fetch_min(reader_id, Ordering::AcqRel);
+        }
+    }
 }
 
 /// An async connection to the server for sending
@@ -272,6 +293,7 @@ impl AsyncConnection {
             write: AsyncMutex::new(write),
             next_request_id: AtomicUsize::new(0),
             readable_request_id: AtomicUsize::new(0),
+            min_dropped_reader_id: AtomicUsize::new(usize::MAX),
             socket_new_requests_timeout: Mutex::new(Instant::now() + Duration::from_secs(60)),
         }))))
     }
@@ -437,6 +459,10 @@ impl AsyncConnection {
             }
 
             let request_id;
+            let mut this_request = PendingReader {
+                min_dropped_reader_id: &conn.min_dropped_reader_id,
+                id: None,
+            };
             {
                 let mut write = if let Some(write) = write {
                     write
@@ -458,6 +484,7 @@ impl AsyncConnection {
                     "Writing HTTP request id {request_id} on connection to {:?}.",
                     request.connection_params(),
                 );
+                this_request.id = Some(request_id);
                 let write_res =
                     Self::timeout(request.timeout_at, write.write_all(&request.as_bytes())).await;
                 match write_res {
@@ -504,6 +531,12 @@ impl AsyncConnection {
                         "Non-pipelined requests should never need to wait as both locks were held and no other requests were in-filght"
                     );
                     read.take();
+                    if conn.min_dropped_reader_id.load(Ordering::Acquire) < request_id {
+                        // An earlier reader was dropped before we could finish reading the
+                        // response. Thus we need to retry on a fresh connection.
+                        should_retry = true;
+                        return Err(Error::Other("Retrying pipelining failure"));
+                    }
                     tokio::task::yield_now().await;
                     read = Some(conn.read.lock().await);
                 }
@@ -576,6 +609,10 @@ impl AsyncConnection {
                         }
                     }
                 }
+
+                // Now that we've processed the response, if the future is cancelled there's no
+                // need to kill the connection
+                this_request.id = None;
 
                 Ok(response)
             })
