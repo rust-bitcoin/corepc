@@ -229,3 +229,41 @@ async fn test_massive_content_length() {
     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
     // If it were to crash, it would have at this point. Pass!
 }
+
+#[tokio::test]
+#[cfg(feature = "async")]
+async fn test_future_drop_doesnt_hang() {
+    // Test that if a pipelined request on a connection isn't read (by dropping the `Future`) later
+    // requests on the same connection immediately get retried on a fresh connection.
+    use std::time::{Duration, Instant};
+
+    setup();
+    let client = bitreq::Client::new(2);
+
+    // First build a connection so that when we spawn both requests simultaneously below we don't
+    // try to connect twice.
+    // TODO: Use a local HTTP server that supports pipelining and make the responses take long
+    // enough that this test still durably detects cancellation safety issues.
+    let _init_connect = client.send_async(bitreq::get("http://example.com")).await;
+
+    // By sending two requests, one which we time out manually ~immediately (just long enough to
+    // send the request, but not long enough to have read a response) and one which we simply set a
+    // high timeout on, we should have a pending request which goes out but then the `Future` for
+    // it is dropped, leaving the second request on the same connection with no ability to read its
+    // response.
+    // Here our cancellation detection should kick in, allowing the second request to open a fresh
+    // connection and get a response immediately.
+    let timesout = client.send_async(bitreq::get("http://example.com").with_pipelining());
+    let request =
+        client.send_async(bitreq::get("http://example.com").with_timeout(10).with_pipelining());
+
+    let start = Instant::now();
+    let (timedout, response) =
+        tokio::join!(tokio::time::timeout(Duration::from_micros(10), timesout), request);
+    assert!(timedout.is_err(), "There's no way we get a response in 10 mics");
+    assert!(response.is_ok());
+    assert!(
+        start.elapsed() < Duration::from_secs(5),
+        "Request should complete quickly, and certainly not have to wait for its timeout to try again"
+    );
+}
