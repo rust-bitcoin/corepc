@@ -8,6 +8,8 @@ use bitcoin::hex::HexToBytesError;
 use bitcoin::{address, amount, hex, network};
 
 use crate::error::write_err;
+use crate::psbt::{RawTransactionInputError, RawTransactionOutputError};
+use crate::v17::GetRawTransactionVerboseError;
 use crate::{NumericError, ScriptPubkeyError};
 
 /// Error when converting a `GetBlockVerboseOne` type into the model type.
@@ -66,6 +68,159 @@ impl std::error::Error for GetBlockVerboseOneError {
 }
 
 impl From<NumericError> for GetBlockVerboseOneError {
+    fn from(e: NumericError) -> Self { Self::Numeric(e) }
+}
+
+/// Error when converting a `GetBlockVerboseTwo` type into the model type.
+#[derive(Debug)]
+pub enum GetBlockVerboseTwoError {
+    /// Conversion of numeric type to expected type failed.
+    Numeric(NumericError),
+    /// Conversion of the transaction `hash` field failed.
+    Hash(hex::HexToArrayError),
+    /// Conversion of the transaction `bits` field failed.
+    Bits(UnprefixedHexError),
+    /// Conversion of the `target` field failed.
+    Target(UnprefixedHexError),
+    /// Conversion of the transaction `chain_work` field failed.
+    ChainWork(UnprefixedHexError),
+    /// Conversion of the transaction `previous_block_hash` field failed.
+    PreviousBlockHash(hex::HexToArrayError),
+    /// Conversion of the transaction `next_block_hash` field failed.
+    NextBlockHash(hex::HexToArrayError),
+    /// Conversion of a transaction entry failed.
+    Transaction(GetRawTransactionVerboseError),
+    /// Conversion of the transaction `fee` field failed.
+    Fee(amount::ParseAmountError),
+}
+
+impl fmt::Display for GetBlockVerboseTwoError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Self::Numeric(ref e) => write_err!(f, "numeric"; e),
+            Self::Hash(ref e) => write_err!(f, "conversion of the `hash` field failed"; e),
+            Self::Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
+            Self::Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `chain_work` field failed"; e),
+            Self::PreviousBlockHash(ref e) =>
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
+            Self::NextBlockHash(ref e) =>
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            Self::Transaction(ref e) =>
+                write_err!(f, "conversion of a transaction entry failed"; e),
+            Self::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for GetBlockVerboseTwoError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::Numeric(ref e) => Some(e),
+            Self::Hash(ref e) => Some(e),
+            Self::Bits(ref e) => Some(e),
+            Self::Target(ref e) => Some(e),
+            Self::ChainWork(ref e) => Some(e),
+            Self::PreviousBlockHash(ref e) => Some(e),
+            Self::NextBlockHash(ref e) => Some(e),
+            Self::Transaction(ref e) => Some(e),
+            Self::Fee(ref e) => Some(e),
+        }
+    }
+}
+
+impl From<NumericError> for GetBlockVerboseTwoError {
+    fn from(e: NumericError) -> Self { Self::Numeric(e) }
+}
+
+/// Error when converting a `GetBlockVerboseThree` type into the model type.
+#[derive(Debug)]
+pub enum GetBlockVerboseThreeError {
+    /// Conversion of numeric type to expected type failed.
+    Numeric(NumericError),
+    /// Conversion of the transaction `hash` field failed.
+    Hash(hex::HexToArrayError),
+    /// Conversion of the transaction `bits` field failed.
+    Bits(UnprefixedHexError),
+    /// Conversion of the `target` field failed.
+    Target(UnprefixedHexError),
+    /// Conversion of the transaction `chain_work` field failed.
+    ChainWork(UnprefixedHexError),
+    /// Conversion of the transaction `previous_block_hash` field failed.
+    PreviousBlockHash(hex::HexToArrayError),
+    /// Conversion of the transaction `next_block_hash` field failed.
+    NextBlockHash(hex::HexToArrayError),
+    /// Conversion of one of the transaction inputs failed.
+    Inputs(RawTransactionInputError),
+    /// Conversion of one of the transaction outputs failed.
+    Outputs(RawTransactionOutputError),
+    /// Conversion of the transaction `block_hash` field failed.
+    TransactionBlockHash(hex::HexToArrayError),
+    /// Conversion of the transaction `fee` field failed.
+    Fee(amount::ParseAmountError),
+    /// Conversion of a prevout height failed.
+    PrevoutHeight(NumericError),
+    /// Conversion of a prevout value failed.
+    PrevoutValue(amount::ParseAmountError),
+    /// Conversion of a prevout script_pubkey failed.
+    PrevoutScriptPubkey(ScriptPubkeyError),
+}
+
+impl fmt::Display for GetBlockVerboseThreeError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Self::Numeric(ref e) => write_err!(f, "numeric"; e),
+            Self::Hash(ref e) => write_err!(f, "conversion of the `hash` field failed"; e),
+            Self::Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
+            Self::Target(ref e) => write_err!(f, "conversion of the `target` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `chain_work` field failed"; e),
+            Self::PreviousBlockHash(ref e) =>
+                write_err!(f, "conversion of the `previous_block_hash` field failed"; e),
+            Self::NextBlockHash(ref e) =>
+                write_err!(f, "conversion of the `next_block_hash` field failed"; e),
+            Self::Inputs(ref e) =>
+                write_err!(f, "conversion of one of the transaction inputs failed"; e),
+            Self::Outputs(ref e) =>
+                write_err!(f, "conversion of one of the transaction outputs failed"; e),
+            Self::TransactionBlockHash(ref e) =>
+                write_err!(f, "conversion of the `block_hash` field failed"; e),
+            Self::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
+            Self::PrevoutHeight(ref e) =>
+                write_err!(f, "conversion of a prevout `height` field failed"; e),
+            Self::PrevoutValue(ref e) =>
+                write_err!(f, "conversion of a prevout `value` field failed"; e),
+            Self::PrevoutScriptPubkey(ref e) =>
+                write_err!(f, "conversion of a prevout `script_pubkey` field failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for GetBlockVerboseThreeError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::Numeric(ref e) => Some(e),
+            Self::Hash(ref e) => Some(e),
+            Self::Bits(ref e) => Some(e),
+            Self::Target(ref e) => Some(e),
+            Self::ChainWork(ref e) => Some(e),
+            Self::PreviousBlockHash(ref e) => Some(e),
+            Self::NextBlockHash(ref e) => Some(e),
+            Self::Inputs(ref e) => Some(e),
+            Self::Outputs(ref e) => Some(e),
+            Self::TransactionBlockHash(ref e) => Some(e),
+            Self::Fee(ref e) => Some(e),
+            Self::PrevoutHeight(ref e) => Some(e),
+            Self::PrevoutValue(ref e) => Some(e),
+            Self::PrevoutScriptPubkey(ref e) => Some(e),
+        }
+    }
+}
+
+impl From<NumericError> for GetBlockVerboseThreeError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
 

@@ -12,8 +12,11 @@ use bitcoin::{Network, TxMerkleNode};
 
 pub use self::error::{
     GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseOneError,
-    GetBlockchainInfoError, GetChainStatesError, GetDescriptorActivityError,
+    GetBlockVerboseThreeError, GetBlockVerboseTwoError, GetBlockchainInfoError,
+    GetChainStatesError, GetDescriptorActivityError,
 };
+use crate::psbt::{RawTransactionInput, RawTransactionOutput};
+use crate::v17::GetRawTransactionVerbose;
 use crate::{model, ScriptPubkey};
 
 /// Result of JSON-RPC method `getblock` with verbosity set to 1.
@@ -68,6 +71,204 @@ pub struct GetBlockVerboseOne {
     /// The hash of the next block (if available).
     #[serde(rename = "nextblockhash")]
     pub next_block_hash: Option<String>,
+}
+
+/// Result of JSON-RPC method `getblock` with verbosity set to 2.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseTwo {
+    /// The block hash (same as provided).
+    pub hash: String,
+    /// The number of confirmations, or -1 if the block is not on the main chain.
+    pub confirmations: i64,
+    /// The block size.
+    pub size: i64,
+    /// The block size excluding witness data.
+    #[serde(rename = "strippedsize")]
+    pub stripped_size: Option<i64>,
+    /// The block weight as defined in BIP 141.
+    pub weight: u64,
+    /// The block height or index.
+    pub height: i64,
+    /// The block version.
+    pub version: i32,
+    /// The block version formatted in hexadecimal.
+    #[serde(rename = "versionHex")]
+    pub version_hex: String,
+    /// The merkle root.
+    #[serde(rename = "merkleroot")]
+    pub merkle_root: String,
+    /// The transactions.
+    pub tx: Vec<GetBlockVerboseTwoTransaction>,
+    /// The block time expressed in UNIX epoch time.
+    pub time: i64,
+    /// The median block time expressed in UNIX epoch time.
+    #[serde(rename = "mediantime")]
+    pub median_time: Option<i64>,
+    /// The nonce.
+    pub nonce: i64,
+    /// nBits: compact representation of the block difficulty target.
+    pub bits: String,
+    /// The difficulty target.
+    pub target: String,
+    /// The difficulty.
+    pub difficulty: f64,
+    /// Expected number of hashes required to produce the chain up to this block (in hex).
+    #[serde(rename = "chainwork")]
+    pub chain_work: String,
+    /// The number of transactions in the block.
+    #[serde(rename = "nTx")]
+    pub n_tx: i64,
+    /// The hash of the previous block (if available).
+    #[serde(rename = "previousblockhash")]
+    pub previous_block_hash: Option<String>,
+    /// The hash of the next block (if available).
+    #[serde(rename = "nextblockhash")]
+    pub next_block_hash: Option<String>,
+}
+
+/// A transaction entry for `getblock` verbosity 2.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseTwoTransaction {
+    /// The transaction data (same as `getrawtransaction` verbose output).
+    #[serde(flatten)]
+    pub transaction: GetRawTransactionVerbose,
+    /// The transaction fee in BTC (omitted if block undo data is not available).
+    pub fee: Option<f64>,
+}
+
+/// Result of JSON-RPC method `getblock` with verbosity set to 3.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseThree {
+    /// The block hash (same as provided) in RPC call.
+    pub hash: String,
+    /// The number of confirmations, or -1 if the block is not on the main chain.
+    pub confirmations: i64,
+    /// The block size.
+    pub size: i64,
+    /// The block size excluding witness data.
+    #[serde(rename = "strippedsize")]
+    pub stripped_size: Option<i64>,
+    /// The block weight as defined in BIP-141.
+    pub weight: u64,
+    /// The block height or index.
+    pub height: i64,
+    /// The block version.
+    pub version: i32,
+    /// The block version formatted in hexadecimal.
+    #[serde(rename = "versionHex")]
+    pub version_hex: String,
+    /// The merkle root.
+    #[serde(rename = "merkleroot")]
+    pub merkle_root: String,
+    /// The transactions.
+    pub tx: Vec<GetBlockVerboseThreeTransaction>,
+    /// The block time expressed in UNIX epoch time.
+    pub time: i64,
+    /// The median block time expressed in UNIX epoch time.
+    #[serde(rename = "mediantime")]
+    pub median_time: Option<i64>,
+    /// The nonce (this should be only 4 bytes).
+    pub nonce: i64,
+    /// nBits: compact representation of the block difficulty target.
+    pub bits: String,
+    /// The difficulty target.
+    pub target: String,
+    /// The difficulty.
+    pub difficulty: f64,
+    /// Expected number of hashes required to produce the chain up to this block (in hex).
+    #[serde(rename = "chainwork")]
+    pub chain_work: String,
+    /// The number of transactions in the block.
+    #[serde(rename = "nTx")]
+    pub n_tx: i64,
+    /// The hash of the previous block (if available).
+    #[serde(rename = "previousblockhash")]
+    pub previous_block_hash: Option<String>,
+    /// The hash of the next block (if available).
+    #[serde(rename = "nextblockhash")]
+    pub next_block_hash: Option<String>,
+}
+
+/// A transaction entry for `getblock` verbosity 3.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseThreeTransaction {
+    /// The transaction data (same as `getrawtransaction` verbose output, plus prevout info).
+    #[serde(flatten)]
+    pub transaction: GetRawTransactionVerboseWithPrevout,
+    /// The transaction fee in BTC (omitted if block undo data is not available).
+    pub fee: Option<f64>,
+}
+
+/// Result of JSON-RPC method `getrawtransaction` with extra prevout info in inputs.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetRawTransactionVerboseWithPrevout {
+    /// Whether specified block is in the active chain or not (only present with explicit "blockhash" argument).
+    pub in_active_chain: Option<bool>,
+    /// The serialized, hex-encoded data for 'txid'.
+    pub hex: String,
+    /// The transaction id (same as provided).
+    pub txid: String,
+    /// The transaction hash (differs from txid for witness transactions).
+    pub hash: String,
+    /// The serialized transaction size.
+    pub size: u64,
+    /// The virtual transaction size (differs from size for witness transactions).
+    pub vsize: u64,
+    /// The transaction's weight (between vsize*4-3 and vsize*4).
+    pub weight: u64,
+    /// The version.
+    pub version: i32,
+    /// The lock time.
+    #[serde(rename = "locktime")]
+    pub lock_time: u32,
+    /// Array of transaction inputs.
+    #[serde(rename = "vin")]
+    pub inputs: Vec<RawTransactionInputWithPrevout>,
+    /// Array of transaction outputs.
+    #[serde(rename = "vout")]
+    pub outputs: Vec<RawTransactionOutput>,
+    /// The block hash.
+    #[serde(rename = "blockhash")]
+    pub block_hash: Option<String>,
+    /// The confirmations.
+    pub confirmations: Option<u64>,
+    /// The transaction time in seconds since epoch (Jan 1 1970 GMT).
+    #[serde(rename = "time")]
+    pub transaction_time: Option<u64>,
+    /// The block time in seconds since epoch (Jan 1 1970 GMT).
+    #[serde(rename = "blocktime")]
+    pub block_time: Option<u64>,
+}
+
+/// A transaction input with optional prevout data (verbosity 3 only).
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct RawTransactionInputWithPrevout {
+    /// The input data.
+    #[serde(flatten)]
+    pub input: RawTransactionInput,
+    /// (only if undo data is available).
+    pub prevout: Option<GetBlockVerboseThreePrevout>,
+}
+
+/// The prevout information for a transaction input.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseThreePrevout {
+    /// Coinbase or not.
+    pub generated: bool,
+    /// The height of the prevout.
+    pub height: i64,
+    /// The value in BTC.
+    pub value: f64,
+    /// The script pubkey.
+    #[serde(rename = "scriptPubKey")]
+    pub script_pubkey: ScriptPubkey,
 }
 
 /// Result of JSON-RPC method `getblockchaininfo`.
