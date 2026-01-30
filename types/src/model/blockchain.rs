@@ -772,6 +772,8 @@ pub struct ScanBlocksStart {
     pub to_height: u32,
     /// Blocks that may have matched a scanobject
     pub relevant_blocks: Vec<BlockHash>,
+    /// Whether the scan is completed. For v26 onwards.
+    pub completed: Option<bool>,
 }
 
 /// Models the result of JSON-RPC method `verifytxoutproof`.

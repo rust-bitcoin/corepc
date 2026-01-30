@@ -175,3 +175,22 @@ pub struct LoadTxOutSet {
     /// The absolute path that the snapshot was loaded from.
     pub path: String,
 }
+
+/// Result of JSON-RPC method `scanblocks` with action "start".
+///
+/// > scanblocks "start" [scanobjects,...] ( start_height stop_height "filtertype" "options" )
+/// >
+/// > Arguments:
+/// > 1. scanobjects                            (json array, required) Array of scan objects
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct ScanBlocksStart {
+    /// The height we started the scan from
+    pub from_height: i64,
+    /// The height we ended the scan at
+    pub to_height: i64,
+    /// Blocks that may have matched a scanobject
+    pub relevant_blocks: Vec<String>,
+    /// True if the scan process was not aborted
+    pub completed: bool,
+}
