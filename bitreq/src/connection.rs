@@ -340,7 +340,7 @@ impl AsyncConnection {
                 // do proxy things
                 let mut tcp = Self::tcp_connect(&proxy.server, proxy.port).await?;
 
-                let proxy_request = proxy.connect(params.host, params.port.port());
+                let proxy_request = proxy.connect(params.host, params.port);
                 tcp.write_all(proxy_request.as_bytes()).await?;
                 tcp.flush().await?;
 
@@ -369,11 +369,11 @@ impl AsyncConnection {
 
                 Ok(tcp)
             }
-            None => Self::tcp_connect(params.host, params.port.port()).await,
+            None => Self::tcp_connect(params.host, params.port).await,
         }
 
         #[cfg(not(feature = "proxy"))]
-        Self::tcp_connect(&params.host, params.port.port()).await
+        Self::tcp_connect(&params.host, params.port).await
     }
 
     async fn timeout<O, F: Future<Output = O>>(timeout: Option<Instant>, f: F) -> Result<O, Error> {
@@ -713,7 +713,7 @@ impl Connection {
                 // do proxy things
                 let mut tcp = Self::tcp_connect(&proxy.server, proxy.port, timeout_at)?;
 
-                write!(tcp, "{}", proxy.connect(params.host, params.port.port()))?;
+                write!(tcp, "{}", proxy.connect(params.host, params.port))?;
                 tcp.flush()?;
 
                 // Max proxy response size to prevent unbounded memory allocation
@@ -741,11 +741,11 @@ impl Connection {
 
                 Ok(tcp)
             }
-            None => Self::tcp_connect(params.host, params.port.port(), timeout_at),
+            None => Self::tcp_connect(params.host, params.port, timeout_at),
         }
 
         #[cfg(not(feature = "proxy"))]
-        Self::tcp_connect(params.host, params.port.port(), timeout_at)
+        Self::tcp_connect(params.host, params.port, timeout_at)
     }
 
     /// Sends the [`Request`](struct.Request.html), consumes this

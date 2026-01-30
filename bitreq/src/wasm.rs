@@ -126,25 +126,7 @@ pub(crate) fn send_request(parsed_request: ParsedRequest) -> Result<Response, Er
 
 /// Builds the full URL including path and query parameters.
 fn build_full_url(parsed_request: &ParsedRequest) -> String {
-    let mut url = String::new();
-
-    if parsed_request.url.https {
-        url.push_str("https://");
-    } else {
-        url.push_str("http://");
-    }
-
-    url.push_str(&parsed_request.url.host);
-
-    // Add port if explicit
-    if let crate::http_url::Port::Explicit(port) = parsed_request.url.port {
-        url.push(':');
-        url.push_str(&port.to_string());
-    }
-
-    url.push_str(&parsed_request.url.path_and_query);
-
-    url
+    parsed_request.url.as_str().to_string()
 }
 
 /// Builds headers string in `key:value\nkey:value` format.
