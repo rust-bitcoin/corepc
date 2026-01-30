@@ -67,17 +67,20 @@ impl GetBlockStats {
 
 impl ScanBlocksStart {
     pub fn into_model(self) -> Result<model::ScanBlocksStart, ScanBlocksStartError> {
+        use ScanBlocksStartError as E;
+
         let relevant_blocks = self
             .relevant_blocks
             .iter()
             .map(|s| s.parse())
             .collect::<Result<Vec<_>, _>>()
-            .map_err(ScanBlocksStartError::RelevantBlocks)?;
+            .map_err(E::RelevantBlocks)?;
 
         Ok(model::ScanBlocksStart {
             from_height: crate::to_u32(self.from_height, "from_height")?,
             to_height: crate::to_u32(self.to_height, "to_height")?,
             relevant_blocks,
+            completed: None,
         })
     }
 }
