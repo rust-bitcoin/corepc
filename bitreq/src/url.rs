@@ -3,6 +3,23 @@
 use core::fmt;
 use std::ops::Range;
 
+/// Macro to conditionally set visibility to `pub` when fuzzing, `pub(crate)` otherwise.
+/// Used to expose internal methods for fuzz testing without making them part of the public API.
+macro_rules! pub_if_fuzzing {
+    (
+        $(#[$attr:meta])*
+        fn $name:ident($($args:tt)*) $body:tt
+    ) => {
+        $(#[$attr])*
+        #[cfg(fuzzing)]
+        pub fn $name($($args)*) $body
+
+        $(#[$attr])*
+        #[cfg(not(fuzzing))]
+        pub(crate) fn $name($($args)*) $body
+    };
+}
+
 /// Returns the default port for known schemes, or `None` for unknown schemes.
 fn default_port_for_scheme(scheme: &str) -> Option<u16> {
     match scheme {
@@ -408,50 +425,54 @@ impl Url {
         }
     }
 
-    /// Appends a single query parameter to the URL.
-    ///
-    /// The key and value are percent-encoded before being appended.
-    /// If the URL already has a query string, the parameter is appended with `&`.
-    /// Otherwise, it is appended with `?`.
-    pub(crate) fn append_query_param(&mut self, key: &str, value: &str) {
-        let encoded_key = percent_encode_string(key);
-        let encoded_value = percent_encode_string(value);
-        let separator = if self.query.is_some() { "&" } else { "?" };
+    pub_if_fuzzing! {
+        /// Appends a single query parameter to the URL.
+        ///
+        /// The key and value are percent-encoded before being appended.
+        /// If the URL already has a query string, the parameter is appended with `&`.
+        /// Otherwise, it is appended with `?`.
+        fn append_query_param(&mut self, key: &str, value: &str) {
+            let encoded_key = percent_encode_string(key);
+            let encoded_value = percent_encode_string(value);
+            let separator = if self.query.is_some() { "&" } else { "?" };
 
-        // Build the new serialization string
-        let new_serialization = if let Some(frag) = self.fragment() {
-            // Insert param before fragment
-            let frag_start = self.fragment.as_ref().unwrap().start - 1; // -1 for '#'
-            format!(
-                "{}{}{}={}#{}",
-                &self.serialization[..frag_start],
-                separator,
-                encoded_key,
-                encoded_value,
-                frag
-            )
-        } else {
-            format!("{}{}{}={}", &self.serialization, separator, encoded_key, encoded_value)
-        };
+            // Build the new serialization string
+            let new_serialization = if let Some(frag) = self.fragment() {
+                // Insert param before fragment
+                let frag_start = self.fragment.as_ref().unwrap().start - 1; // -1 for '#'
+                format!(
+                    "{}{}{}={}#{}",
+                    &self.serialization[..frag_start],
+                    separator,
+                    encoded_key,
+                    encoded_value,
+                    frag
+                )
+            } else {
+                format!("{}{}{}={}", &self.serialization, separator, encoded_key, encoded_value)
+            };
 
-        // Reparse to update all fields
-        *self =
-            Self::parse_inner(new_serialization).expect("append_query_param produced invalid URL");
+            // Reparse to update all fields
+            *self =
+                Self::parse_inner(new_serialization).expect("append_query_param produced invalid URL");
+        }
     }
 
-    /// If this URL has no fragment but `other` does, copies the fragment from `other`.
-    ///
-    /// This implements RFC 7231 section 7.1.2 behavior for preserving fragments
-    /// across redirects.
-    pub(crate) fn preserve_fragment_from(&mut self, other: &Url) {
-        if self.fragment.is_some() {
-            return;
-        }
+    pub_if_fuzzing! {
+        /// If this URL has no fragment but `other` does, copies the fragment from `other`.
+        ///
+        /// This implements RFC 7231 section 7.1.2 behavior for preserving fragments
+        /// across redirects.
+        fn preserve_fragment_from(&mut self, other: &Url) {
+            if self.fragment.is_some() {
+                return;
+            }
 
-        if let Some(other_frag) = other.fragment() {
-            let new_serialization = format!("{}#{}", &self.serialization, other_frag);
-            *self = Self::parse_inner(new_serialization)
-                .expect("preserve_fragment_from produced invalid URL");
+            if let Some(other_frag) = other.fragment() {
+                let new_serialization = format!("{}#{}", &self.serialization, other_frag);
+                *self = Self::parse_inner(new_serialization)
+                    .expect("preserve_fragment_from produced invalid URL");
+            }
         }
     }
 
