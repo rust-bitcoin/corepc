@@ -148,10 +148,14 @@ fn hidden__get_orphan_txs__modelled() {
     let json_v1: GetOrphanTxsVerboseOne = node2.client.get_orphan_txs_verbosity_1().expect("getorphantxs 1");
     let json_v2: GetOrphanTxsVerboseTwo = node2.client.get_orphan_txs_verbosity_2().expect("getorphantxs 2");
 
-    let model_v0: mtype::GetOrphanTxs = json_v0.into_model();
-    let model_v1: mtype::GetOrphanTxsVerboseOne = json_v1.into_model().unwrap();
-    let model_v2: mtype::GetOrphanTxsVerboseTwo = json_v2.into_model().unwrap();
+    // use explicit errors here to check that the re-exports are good
+    let model_v0: Result<mtype::GetOrphanTxs, GetOrphanTxsError> = json_v0.into_model();
+    let model_v1: Result<mtype::GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntryError> = json_v1.into_model();
+    let model_v2: Result<mtype::GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntryError> = json_v2.into_model();
 
+    let model_v0 = model_v0.unwrap();
+    let model_v1 = model_v1.unwrap();
+    let model_v2 = model_v2.unwrap();
 
     assert_eq!(model_v0.0.len(), NUM_ORPHANS as usize);
     assert_eq!(model_v1.0.len(), NUM_ORPHANS as usize);
