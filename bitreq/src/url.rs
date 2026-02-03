@@ -416,17 +416,22 @@ impl Url {
     pub(crate) fn append_query_param(&mut self, key: &str, value: &str) {
         let encoded_key = percent_encode_string(key);
         let encoded_value = percent_encode_string(value);
-        let param = format!("{}={}", encoded_key, encoded_value);
-
         let separator = if self.query.is_some() { "&" } else { "?" };
 
         // Build the new serialization string
         let new_serialization = if let Some(frag) = self.fragment() {
             // Insert param before fragment
             let frag_start = self.fragment.as_ref().unwrap().start - 1; // -1 for '#'
-            format!("{}{}{}#{}", &self.serialization[..frag_start], separator, param, frag)
+            format!(
+                "{}{}{}={}#{}",
+                &self.serialization[..frag_start],
+                separator,
+                encoded_key,
+                encoded_value,
+                frag
+            )
         } else {
-            format!("{}{}{}", &self.serialization, separator, param)
+            format!("{}{}{}={}", &self.serialization, separator, encoded_key, encoded_value)
         };
 
         // Reparse to update all fields
