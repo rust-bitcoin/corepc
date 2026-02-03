@@ -363,9 +363,7 @@ pub(crate) struct ParsedRequest {
 impl ParsedRequest {
     #[allow(unused_mut)]
     pub(crate) fn new(mut config: Request) -> Result<ParsedRequest, Error> {
-        let mut url = Url::parse(&config.url).map_err(|e| {
-            Error::IoError(std::io::Error::new(std::io::ErrorKind::InvalidInput, e.to_string()))
-        })?;
+        let mut url = Url::parse(&config.url)?;
 
         for (key, value) in &config.params {
             url.append_query_param(key, value);
@@ -511,9 +509,8 @@ impl ParsedRequest {
             let mut absolute_url = String::new();
             self.url.write_base_url_to(&mut absolute_url).unwrap();
             absolute_url.push_str(url);
-            let mut new_url = Url::parse(&absolute_url).map_err(|e| {
-                Error::IoError(std::io::Error::new(std::io::ErrorKind::InvalidInput, e.to_string()))
-            })?;
+            let mut new_url = Url::parse(&absolute_url)?;
+
             // Preserve fragment from original URL if new URL doesn't have one (RFC 7231 section 7.1.2)
             new_url.preserve_fragment_from(&self.url);
             std::mem::swap(&mut new_url, &mut self.url);

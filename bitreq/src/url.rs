@@ -1,5 +1,6 @@
 //! A minimal library for parsing and validating URLs.
 
+use core::fmt;
 use std::ops::Range;
 
 /// Returns the default port for known schemes, or `None` for unknown schemes.
@@ -31,8 +32,8 @@ pub enum ParseError {
     MissingPort,
 }
 
-impl std::fmt::Display for ParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ParseError::EmptyInput => write!(f, "empty input"),
             ParseError::InvalidCharacter(c) => write!(f, "invalid character: {:?}", c),
@@ -45,6 +46,7 @@ impl std::fmt::Display for ParseError {
     }
 }
 
+#[cfg(feature = "std")]
 impl std::error::Error for ParseError {}
 
 /// A parsed URL.
@@ -886,6 +888,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn parse_error_is_std_error() {
         fn assert_error<E: std::error::Error>(_: &E) {}
         assert_error(&ParseError::EmptyInput);
