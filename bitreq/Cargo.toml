@@ -50,6 +50,7 @@ all-features = true
 default = ["std"]
 std = []
 
+forms = ["serde/std", "std"]
 log = ["dep:log"]
 json-using-serde = ["serde", "serde_json"]
 proxy = ["base64", "std"]
