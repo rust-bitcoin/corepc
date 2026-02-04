@@ -83,4 +83,8 @@ required-features = ["async"]
 # Allow `format!("{}", x)`instead of enforcing `format!("{x}")`
 uninlined_format_args = "allow"
 
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ["cfg(fuzzing)"]
+
 # vim: ft=conf
