@@ -19,6 +19,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 # Enable this feature to get a blocking JSON-RPC client.
 client-sync = ["base64", "bitreq"]
+# Enable this feature to get an async JSON-RPC client.
+client-async = ["base64", "bitreq", "bitreq/async"]
 
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }

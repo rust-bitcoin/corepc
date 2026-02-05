@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! JSON-RPC clients for testing against specific versions of Bitcoin Core.
+//! Async JSON-RPC clients for specific versions of Bitcoin Core.
 
 mod error;
 mod jsonrpc_async;
@@ -23,7 +23,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-pub use crate::client_sync::error::Error;
+pub use crate::client_async::error::Error;
 
 /// Crate-specific Result type.
 ///
@@ -58,17 +58,16 @@ impl Auth {
 
 /// Defines a JSON-RPC client using `bitreq`.
 #[macro_export]
-macro_rules! define_jsonrpc_bitreq_client {
+macro_rules! define_jsonrpc_bitreq_async_client {
     ($version:literal) => {
         use std::fmt;
+        use $crate::client_async::{log_response, Auth, Result};
+        use $crate::client_async::error::Error;
+        use $crate::client_async::jsonrpc_async;
 
-        use $crate::client_sync::{log_response, Auth, Result};
-        use $crate::client_sync::error::Error;
-        use $crate::client_sync::jsonrpc_sync;
-
-        /// Client implements a JSON-RPC client for the Bitcoin Core daemon or compatible APIs.
+        /// Client implements an async JSON-RPC client for the Bitcoin Core daemon or compatible APIs.
         pub struct Client {
-            inner: jsonrpc_sync::Client,
+            inner: jsonrpc_async::AsyncClient,
         }
 
         impl fmt::Debug for Client {
@@ -83,12 +82,12 @@ macro_rules! define_jsonrpc_bitreq_client {
         impl Client {
             /// Creates a client to a bitcoind JSON-RPC server without authentication.
             pub fn new(url: &str) -> Self {
-                let transport = jsonrpc_sync::http::bitreq_http::Builder::new()
+                let transport = jsonrpc_async::http::bitreq_http_async::Builder::new()
                     .url(url)
                     .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .build();
-                let inner = jsonrpc_sync::Client::with_transport(transport);
+                let inner = jsonrpc_async::AsyncClient::with_transport(transport);
 
                 Self { inner }
             }
@@ -100,19 +99,19 @@ macro_rules! define_jsonrpc_bitreq_client {
                 }
                 let (user, pass) = auth.get_user_pass()?;
 
-                let transport = jsonrpc_sync::http::bitreq_http::Builder::new()
+                let transport = jsonrpc_async::http::bitreq_http_async::Builder::new()
                     .url(url)
                     .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .basic_auth(user.unwrap(), pass)
                     .build();
-                let inner = jsonrpc_sync::Client::with_transport(transport);
+                let inner = jsonrpc_async::AsyncClient::with_transport(transport);
 
                 Ok(Self { inner })
             }
 
             /// Call an RPC `method` with given `args` list.
-            pub fn call<T: for<'a> serde::de::Deserialize<'a>>(
+            pub async fn call<T: for<'a> serde::de::Deserialize<'a>>(
                 &self,
                 method: &str,
                 args: &[serde_json::Value],
@@ -123,7 +122,7 @@ macro_rules! define_jsonrpc_bitreq_client {
                     log::debug!(target: "corepc", "request: {} {}", method, serde_json::Value::from(args));
                 }
 
-                let resp = self.inner.send_request(req).map_err(Error::from);
+                let resp = self.inner.send_request(req).await.map_err(Error::from);
                 log_response(method, &resp);
                 Ok(resp?.result()?)
             }
@@ -140,14 +139,14 @@ macro_rules! define_jsonrpc_bitreq_client {
 ///
 /// - `$expected_versions`: An vector of expected server versions e.g., `[230100, 230200]`.
 #[macro_export]
-macro_rules! impl_client_check_expected_server_version {
+macro_rules! impl_async_client_check_expected_server_version {
     ($expected_versions:expr) => {
         impl Client {
             /// Checks that the JSON-RPC endpoint is for a `bitcoind` instance with the expected version.
-            pub fn check_expected_server_version(&self) -> Result<()> {
-                let server_version = self.server_version()?;
+            pub async fn check_expected_server_version(&self) -> Result<()> {
+                let server_version = self.server_version().await?;
                 if !$expected_versions.contains(&server_version) {
-                    return Err($crate::client_sync::error::UnexpectedServerVersionError {
+                    return Err($crate::client_async::error::UnexpectedServerVersionError {
                         got: server_version,
                         expected: $expected_versions.to_vec(),
                     })?;
@@ -167,7 +166,7 @@ where
 }
 
 /// Helper to log an RPC response.
-fn log_response(method: &str, resp: &Result<jsonrpc_sync::Response>) {
+fn log_response(method: &str, resp: &Result<jsonrpc_async::Response>) {
     use log::Level::{Debug, Trace, Warn};
 
     if log::log_enabled!(Warn) || log::log_enabled!(Debug) || log::log_enabled!(Trace) {
