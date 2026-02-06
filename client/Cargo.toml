@@ -22,7 +22,7 @@ allowed_duplicates = ["base64"]
 
 [features]
 # Enable this feature to get a blocking JSON-RPC client.
-client-sync = ["jsonrpc"]
+client-sync = ["jsonrpc", "jsonrpc/bitreq_http"]
 
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
@@ -31,6 +31,6 @@ serde = { version = "1.0.103", default-features = false, features = [ "derive", 
 serde_json = { version = "1.0.117" }
 types = { package = "corepc-types", version = "0.15.0", path = "../types", default-features = false, features = ["std"] }
 
-jsonrpc = { version = "0.20.0", path = "../jsonrpc", features = ["bitreq_http"], optional = true }
+jsonrpc = { version = "0.20.0", path = "../jsonrpc", default-features = false, optional = true }
 
 [dev-dependencies]
