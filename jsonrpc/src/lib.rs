@@ -20,10 +20,14 @@ pub extern crate base64;
 #[cfg(feature = "bitreq")]
 pub extern crate bitreq;
 
+#[cfg(feature = "client_async")]
+pub mod client_async;
 pub mod client_sync;
 pub mod error;
 pub mod http;
 
+#[cfg(feature = "bitreq_http_async")]
+pub use http::bitreq_http_async;
 #[cfg(feature = "bitreq_http_sync")]
 pub use http::bitreq_http_sync;
 #[cfg(feature = "simple_http")]

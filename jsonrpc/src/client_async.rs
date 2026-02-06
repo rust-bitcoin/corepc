@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! # Client support
+//! # Async client support
 //!
 //! Support for connecting to JSONRPC servers over HTTP, sending requests,
 //! and parsing responses.
@@ -8,7 +8,9 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt;
+use std::future::Future;
 use std::hash::{Hash, Hasher};
+use std::pin::Pin;
 use std::sync::atomic;
 
 use serde_json::value::RawValue;
@@ -17,20 +19,25 @@ use serde_json::Value;
 use crate::error::Error;
 use crate::{Request, Response};
 
-/// An interface for a transport over which to use the JSONRPC protocol.
+/// Boxed future type used by async transports.
+pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;
+
+/// An interface for an async transport over which to use the JSONRPC protocol.
 pub trait Transport: Send + Sync + 'static {
     /// Sends an RPC request over the transport.
-    fn send_request(&self, _: Request) -> Result<Response, Error>;
+    fn send_request<'a>(&'a self, req: Request<'a>) -> BoxFuture<'a, Result<Response, Error>>;
     /// Sends a batch of RPC requests over the transport.
-    fn send_batch(&self, _: &[Request]) -> Result<Vec<Response>, Error>;
+    fn send_batch<'a>(
+        &'a self,
+        reqs: &'a [Request<'a>],
+    ) -> BoxFuture<'a, Result<Vec<Response>, Error>>;
     /// Formats the target of this transport. I.e. the URL/socket/...
     fn fmt_target(&self, f: &mut fmt::Formatter) -> fmt::Result;
 }
 
-/// A JSON-RPC client.
+/// An async JSON-RPC client.
 ///
-/// Creates a new Client using one of the transport-specific constructors e.g.,
-/// [`Client::simple_http`] for a bare-minimum HTTP transport.
+/// Creates a new Client using one of the transport-specific constructors.
 pub struct Client {
     pub(crate) transport: Box<dyn Transport>,
     nonce: atomic::AtomicUsize,
@@ -52,8 +59,8 @@ impl Client {
     }
 
     /// Sends a request to a client.
-    pub fn send_request(&self, request: Request) -> Result<Response, Error> {
-        self.transport.send_request(request)
+    pub async fn send_request(&self, request: Request<'_>) -> Result<Response, Error> {
+        self.transport.send_request(request).await
     }
 
     /// Sends a batch of requests to the client.
@@ -65,14 +72,17 @@ impl Client {
     ///
     /// The return vector holds the response for the request at the corresponding index. If no
     /// response was provided, it's [`None`].
-    pub fn send_batch(&self, requests: &[Request]) -> Result<Vec<Option<Response>>, Error> {
+    pub async fn send_batch(
+        &self,
+        requests: &[Request<'_>],
+    ) -> Result<Vec<Option<Response>>, Error> {
         if requests.is_empty() {
             return Err(Error::EmptyBatch);
         }
 
         // If the request body is invalid JSON, the response is a single response object.
         // We ignore this case since we are confident we are producing valid JSON.
-        let responses = self.transport.send_batch(requests)?;
+        let responses = self.transport.send_batch(requests).await?;
         if responses.len() > requests.len() {
             return Err(Error::WrongBatchResponseSize);
         }
@@ -104,7 +114,7 @@ impl Client {
     ///
     /// To construct the arguments, one can use one of the shorthand methods
     /// [`crate::arg`] or [`crate::try_arg`].
-    pub fn call<R: for<'a> serde::de::Deserialize<'a>>(
+    pub async fn call<R: for<'a> serde::de::Deserialize<'a>>(
         &self,
         method: &str,
         args: Option<&RawValue>,
@@ -112,7 +122,7 @@ impl Client {
         let request = self.build_request(method, args);
         let id = request.id.clone();
 
-        let response = self.send_request(request)?;
+        let response = self.send_request(request).await?;
         if response.jsonrpc.is_some() && response.jsonrpc != Some(From::from("2.0")) {
             return Err(Error::VersionMismatch);
         }
@@ -199,8 +209,17 @@ mod tests {
 
     struct DummyTransport;
     impl Transport for DummyTransport {
-        fn send_request(&self, _: Request) -> Result<Response, Error> { Err(Error::NonceMismatch) }
-        fn send_batch(&self, _: &[Request]) -> Result<Vec<Response>, Error> { Ok(vec![]) }
+        fn send_request<'a>(&'a self, _: Request<'a>) -> BoxFuture<'a, Result<Response, Error>> {
+            Box::pin(async { Err(Error::NonceMismatch) })
+        }
+
+        fn send_batch<'a>(
+            &'a self,
+            _: &'a [Request<'a>],
+        ) -> BoxFuture<'a, Result<Vec<Response>, Error>> {
+            Box::pin(async { Ok(vec![]) })
+        }
+
         fn fmt_target(&self, _: &mut fmt::Formatter) -> fmt::Result { Ok(()) }
     }
 
