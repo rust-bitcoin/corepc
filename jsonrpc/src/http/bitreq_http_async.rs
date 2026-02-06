@@ -1,4 +1,4 @@
-//! This module implements the [`crate::client::Transport`] trait using [`bitreq`]
+//! This module implements the [`crate::client_async::Transport`] trait using [`bitreq`]
 //! as the underlying HTTP transport.
 //!
 //! [bitreq]: <https://github.com/rust-bitcoin/corepc/bitreq>
@@ -9,7 +9,7 @@ use std::{error, fmt};
 use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
 
-use crate::client::Transport;
+use crate::client_async::{BoxFuture, Transport};
 use crate::{Request, Response};
 
 const DEFAULT_URL: &str = "http://localhost";
@@ -44,24 +44,36 @@ impl BitreqHttpTransport {
     /// Returns a builder for [`BitreqHttpTransport`].
     pub fn builder() -> Builder { Builder::new() }
 
-    fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
+    /// Returns the timeout in whole seconds, rounding positive sub-second values up to one.
+    fn timeout_secs(&self) -> u64 {
+        let secs = self.timeout.as_secs();
+        if secs == 0 && self.timeout > Duration::from_secs(0) {
+            1
+        } else {
+            secs
+        }
+    }
+
+    async fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
     where
         R: for<'a> serde::de::Deserialize<'a>,
     {
+        let timeout_secs = self.timeout_secs();
+
         let req = match &self.basic_auth {
             Some(auth) => bitreq::Request::new(bitreq::Method::Post, &self.url)
-                .with_timeout(self.timeout.as_secs())
+                .with_timeout(timeout_secs)
                 .with_header("Authorization", auth)
                 .with_json(&req)?,
             None => bitreq::Request::new(bitreq::Method::Post, &self.url)
-                .with_timeout(self.timeout.as_secs())
+                .with_timeout(timeout_secs)
                 .with_json(&req)?,
         };
 
         // Send the request and parse the response. If the response is an error that does not
         // contain valid JSON in its body (for instance if the bitcoind HTTP server work queue
         // depth is exceeded), return the raw HTTP error so users can match against it.
-        let resp = req.send()?;
+        let resp = req.send_async().await?;
         match resp.json() {
             Ok(json) => Ok(json),
             Err(bitreq_err) =>
@@ -78,18 +90,24 @@ impl BitreqHttpTransport {
 }
 
 impl Transport for BitreqHttpTransport {
-    fn send_request(&self, req: Request) -> Result<Response, crate::Error> {
-        Ok(self.request(req)?)
+    fn send_request<'a>(
+        &'a self,
+        req: Request<'a>,
+    ) -> BoxFuture<'a, Result<Response, crate::Error>> {
+        Box::pin(async move { Ok(self.request(req).await?) })
     }
 
-    fn send_batch(&self, reqs: &[Request]) -> Result<Vec<Response>, crate::Error> {
-        Ok(self.request(reqs)?)
+    fn send_batch<'a>(
+        &'a self,
+        reqs: &'a [Request<'a>],
+    ) -> BoxFuture<'a, Result<Vec<Response>, crate::Error>> {
+        Box::pin(async move { Ok(self.request(reqs).await?) })
     }
 
     fn fmt_target(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.url) }
 }
 
-/// Builder for simple bitcoind [`BitreqHttpTransport`].
+/// Builder for async bitcoind [`BitreqHttpTransport`].
 #[derive(Clone, Debug)]
 pub struct Builder {
     tp: BitreqHttpTransport,
@@ -130,13 +148,14 @@ impl Builder {
     /// # Examples
     ///
     /// ```no_run
-    /// # use jsonrpc::bitreq_http::BitreqHttpTransport;
-    /// # use std::fs::{self, File};
+    /// # use jsonrpc::bitreq_http_async::BitreqHttpTransport;
+    /// # use std::fs::File;
+    /// # use std::io::Read;
     /// # use std::path::Path;
     /// # let cookie_file = Path::new("~/.bitcoind/.cookie");
     /// let mut file = File::open(cookie_file).expect("couldn't open cookie file");
     /// let mut cookie = String::new();
-    /// fs::read_to_string(&mut cookie).expect("couldn't read cookie file");
+    /// file.read_to_string(&mut cookie).expect("couldn't read cookie file");
     /// let client = BitreqHttpTransport::builder().cookie_auth(cookie);
     /// ```
     pub fn cookie_auth<S: AsRef<str>>(mut self, cookie: S) -> Self {
@@ -226,7 +245,7 @@ impl From<Error> for crate::Error {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Client;
+    use crate::client_async::Client;
 
     #[test]
     fn construct() {
