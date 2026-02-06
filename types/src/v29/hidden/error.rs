@@ -7,6 +7,30 @@ use bitcoin::hex;
 
 use crate::error::write_err;
 
+/// Error when converting a `GetOrphanTxs` type into the model type.
+#[derive(Debug)]
+pub enum GetOrphanTxsError {
+    /// Conversion of a `txid` from the orphanage failed.
+    Txid(hex::HexToArrayError),
+}
+
+impl fmt::Display for GetOrphanTxsError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Self::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for GetOrphanTxsError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::Txid(ref e) => Some(e),
+        }
+    }
+}
+
 /// Error when converting a `GetOrphanTxsVerboseOneEntry` type into the model type.
 #[derive(Debug)]
 pub enum GetOrphanTxsVerboseOneEntryError {
@@ -54,8 +78,9 @@ impl fmt::Display for GetOrphanTxsVerboseTwoEntryError {
             Self::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
             Self::Wtxid(ref e) => write_err!(f, "conversion of the `wtxid` field failed"; e),
             Self::Hex(ref e) => write_err!(f, "conversion of hex data to bytes failed"; e),
-            Self::Consensus(ref e) =>
-                write_err!(f, "consensus decoding of `hex` to transaction failed"; e),
+            Self::Consensus(ref e) => {
+                write_err!(f, "consensus decoding of `hex` to transaction failed"; e)
+            }
         }
     }
 }
