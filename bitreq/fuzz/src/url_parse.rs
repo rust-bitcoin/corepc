@@ -81,25 +81,27 @@ pub fn do_test(data: &[u8]) {
                 ref_url.query_pairs().map(|(k, v)| (k.into_owned(), v.into_owned())).collect();
             assert_eq!(bitreq_pairs, ref_pairs, "Query pairs mismatch for input: {:?}", input);
 
-            // Test append_query_param - use parts of the input as key/value
-            // This exercises the expect in append_query_param
+            // Test append_query_params - use parts of the input as key/value
+            // This exercises the expect in append_query_params
             {
                 let mut url_clone = bitreq_url.clone();
                 // Use the input itself as both key and value to exercise encoding
-                url_clone.append_query_param(&input, &input);
+                url_clone.append_query_params([(input.to_string(), input.to_string())]);
                 // Verify the URL is still valid by accessing its fields
                 let _ = url_clone.query();
                 let _ = url_clone.as_str();
 
                 // Test with empty strings
                 let mut url_clone2 = bitreq_url.clone();
-                url_clone2.append_query_param("", "");
+                url_clone2.append_query_params([("".into(), "".into())]);
                 let _ = url_clone2.as_str();
 
-                // Test appending multiple params
+                // Test appending multiple params in one call
                 let mut url_clone3 = bitreq_url.clone();
-                url_clone3.append_query_param("key1", "value1");
-                url_clone3.append_query_param("key2", &input);
+                url_clone3.append_query_params([
+                    ("key1".into(), "value1".into()),
+                    ("key2".into(), input.to_string()),
+                ]);
                 let _ = url_clone3.as_str();
             }
 

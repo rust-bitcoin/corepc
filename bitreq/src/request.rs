@@ -364,10 +364,7 @@ impl ParsedRequest {
     #[allow(unused_mut)]
     pub(crate) fn new(mut config: Request) -> Result<ParsedRequest, Error> {
         let mut url = Url::parse(&config.url)?;
-
-        for (key, value) in &config.params {
-            url.append_query_param(key, value);
-        }
+        url.append_query_params(config.params.drain(..));
 
         #[cfg(all(feature = "proxy", feature = "std"))]
         // Set default proxy from environment variables
