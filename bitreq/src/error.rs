@@ -2,6 +2,8 @@ use core::{fmt, str};
 #[cfg(feature = "std")]
 use std::{error, io};
 
+use crate::UrlParseError;
+
 /// Represents an error while sending, receiving, or parsing an HTTP response.
 #[derive(Debug)]
 #[non_exhaustive]
@@ -12,10 +14,11 @@ pub enum Error {
     #[cfg(feature = "json-using-serde")]
     /// Ran into a Serde error.
     SerdeJsonError(serde_json::Error),
+    /// The given URL is invalid and we failed parsing.
+    InvalidUrl(UrlParseError),
     /// The response body contains invalid UTF-8, so the `as_str()`
     /// conversion failed.
     InvalidUtf8InBody(str::Utf8Error),
-
     #[cfg(feature = "rustls")]
     /// Ran into a rustls error while creating the connection.
     RustlsCreateConnection(rustls::Error),
@@ -97,8 +100,8 @@ impl fmt::Display for Error {
             SerdeJsonError(err) => write!(f, "{}", err),
             #[cfg(feature = "std")]
             IoError(err) => write!(f, "{}", err),
+            InvalidUrl(err) => write!(f, "failed to parse given URL: {}", err),
             InvalidUtf8InBody(err) => write!(f, "{}", err),
-
             #[cfg(feature = "rustls")]
             RustlsCreateConnection(err) => write!(f, "error creating rustls connection: {}", err),
             #[cfg(feature = "native-tls")]
@@ -140,6 +143,7 @@ impl error::Error for Error {
             SerdeJsonError(err) => Some(err),
             #[cfg(feature = "std")]
             IoError(err) => Some(err),
+            InvalidUrl(err) => Some(err),
             InvalidUtf8InBody(err) => Some(err),
             #[cfg(feature = "rustls")]
             RustlsCreateConnection(err) => Some(err),
@@ -151,4 +155,8 @@ impl error::Error for Error {
 #[cfg(feature = "std")]
 impl From<io::Error> for Error {
     fn from(other: io::Error) -> Error { Error::IoError(other) }
+}
+
+impl From<UrlParseError> for Error {
+    fn from(other: UrlParseError) -> Error { Error::InvalidUrl(other) }
 }

@@ -325,12 +325,17 @@ proptest! {
     }
 
     /// Test that URLs with control characters are rejected.
+    ///
+    /// We skip cases with trailing whitespaces as they will be trimmed.
     #[test]
     fn control_characters_fail(
         prefix in "[a-z]{1,5}://[a-z]{2,10}",
         ctrl_char in 0u8..32u8,
         suffix in "[a-z]{0,10}"
     ) {
+        if ctrl_char.is_ascii_whitespace() && suffix.is_empty() {
+            return Ok(());
+        }
         let invalid_url = format!("{}{}{}", prefix, ctrl_char as char, suffix);
         let result = Url::parse(&invalid_url);
         prop_assert!(
