@@ -418,7 +418,7 @@ fn blockchain__get_raw_mempool__modelled() {
     {
         // verbose = false + mempool_sequence = true
         let json: GetRawMempoolSequence =
-        node.client.get_raw_mempool_sequence().expect("getrawmempool sequence");
+            node.client.get_raw_mempool_sequence().expect("getrawmempool sequence");
         let model: Result<mtype::GetRawMempoolSequence, hex::HexToArrayError> = json.into_model();
         let mempool = model.unwrap();
         // Sanity check.

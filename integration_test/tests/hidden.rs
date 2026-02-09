@@ -8,16 +8,14 @@
 use std::collections::HashMap;
 
 #[cfg(not(feature = "v28_and_below"))]
-use bitcoin::{
-    absolute, transaction, consensus, Amount, OutPoint, ScriptBuf, Sequence, Transaction,
-    TxIn, TxOut, Txid, Witness,
-};
-
+use bitcoin::hashes::Hash;
 #[cfg(not(feature = "v28_and_below"))]
 use bitcoin::hex::DisplayHex;
 #[cfg(not(feature = "v28_and_below"))]
-use bitcoin::hashes::Hash;
-
+use bitcoin::{
+    absolute, consensus, transaction, Amount, OutPoint, ScriptBuf, Sequence, Transaction, TxIn,
+    TxOut, Txid, Witness,
+};
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::mtype;
 use node::vtype::*; // All the version specific types.
@@ -108,8 +106,8 @@ fn hidden__get_orphan_txs__modelled() {
     // Generate a couple of orphan transactions by spending from non-existing UTXOs.
     const NUM_ORPHANS: u8 = 3;
     let address = node1.client.new_address().expect("failed to get new address");
-    let orphans: Vec<Transaction> = (0..NUM_ORPHANS).map(|i| {
-        Transaction {
+    let orphans: Vec<Transaction> = (0..NUM_ORPHANS)
+        .map(|i| Transaction {
             version: transaction::Version::ONE,
             lock_time: absolute::LockTime::ZERO,
             input: vec![TxIn {
@@ -125,8 +123,8 @@ fn hidden__get_orphan_txs__modelled() {
                 value: Amount::from_sat(100_000),
                 script_pubkey: address.script_pubkey(),
             }],
-        }
-    }).collect();
+        })
+        .collect();
 
     // The receiving node needs to be out of IBD to start accepting transactions.
     node2.mine_a_block();
@@ -137,21 +135,24 @@ fn hidden__get_orphan_txs__modelled() {
         let tx_bytes = consensus::encode::serialize(orphan);
         let tx_hex: String = tx_bytes.as_hex().to_string();
         // HACK: We should use sendmsgtopeer directly but it's not implemented yet.
-        node1.client
+        node1
+            .client
             .call::<HashMap<String, String>>(
                 "sendmsgtopeer",
                 &[PEER_ID.into(), "tx".into(), tx_hex.into()],
-            ).unwrap();
+            )
+            .unwrap();
     }
 
     let json_v0: GetOrphanTxs = node2.client.get_orphan_txs().expect("getorphantxs");
-    let json_v1: GetOrphanTxsVerboseOne = node2.client.get_orphan_txs_verbosity_1().expect("getorphantxs 1");
-    let json_v2: GetOrphanTxsVerboseTwo = node2.client.get_orphan_txs_verbosity_2().expect("getorphantxs 2");
+    let json_v1: GetOrphanTxsVerboseOne =
+        node2.client.get_orphan_txs_verbosity_1().expect("getorphantxs 1");
+    let json_v2: GetOrphanTxsVerboseTwo =
+        node2.client.get_orphan_txs_verbosity_2().expect("getorphantxs 2");
 
     let model_v0: mtype::GetOrphanTxs = json_v0.into_model();
     let model_v1: mtype::GetOrphanTxsVerboseOne = json_v1.into_model().unwrap();
     let model_v2: mtype::GetOrphanTxsVerboseTwo = json_v2.into_model().unwrap();
-
 
     assert_eq!(model_v0.0.len(), NUM_ORPHANS as usize);
     assert_eq!(model_v1.0.len(), NUM_ORPHANS as usize);
@@ -160,10 +161,7 @@ fn hidden__get_orphan_txs__modelled() {
     for orphan in orphans.iter() {
         assert!(model_v0.0.contains(&orphan.compute_txid()));
 
-        match model_v1.0
-            .iter()
-            .filter(|e| e.txid == orphan.compute_txid())
-            .next_back() {
+        match model_v1.0.iter().filter(|e| e.txid == orphan.compute_txid()).next_back() {
             Some(e) => {
                 assert_eq!(e.wtxid, orphan.compute_wtxid());
                 assert_eq!(e.bytes as usize, orphan.total_size());
@@ -171,16 +169,16 @@ fn hidden__get_orphan_txs__modelled() {
                 assert_eq!(e.weight, orphan.weight().to_wu());
                 // node2 received all orphans from node1, which is node2's peer=0
                 assert_eq!(e.from, vec![0]);
-            },
+            }
             None => {
-                panic!("Orphan with txid={} not found in `getorphantxs 1` response", orphan.compute_txid());
+                panic!(
+                    "Orphan with txid={} not found in `getorphantxs 1` response",
+                    orphan.compute_txid()
+                );
             }
         }
 
-        match model_v2.0
-            .iter()
-            .filter(|e| e.txid == orphan.compute_txid())
-            .next_back() {
+        match model_v2.0.iter().filter(|e| e.txid == orphan.compute_txid()).next_back() {
             Some(e) => {
                 assert_eq!(e.wtxid, orphan.compute_wtxid());
                 assert_eq!(e.bytes as usize, orphan.total_size());
@@ -189,9 +187,12 @@ fn hidden__get_orphan_txs__modelled() {
                 // node2 received all orphans from node1, which is node2's peer=0
                 assert_eq!(e.from, vec![0]);
                 assert_eq!(e.transaction, *orphan);
-            },
+            }
             None => {
-                panic!("Orphan with txid={} not found in `getorphantxs 2` response", orphan.compute_txid());
+                panic!(
+                    "Orphan with txid={} not found in `getorphantxs 2` response",
+                    orphan.compute_txid()
+                );
             }
         }
     }
