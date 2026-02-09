@@ -277,13 +277,31 @@ fn blockchain__get_chain_tx_stats__modelled() {
 #[test]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_deployment_info__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
-    let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    node.mine_a_block();
+    node.mine_a_block();
+
+    let first_block_hash = node
+        .client
+        .get_block_hash(0)
+        .expect("best_block_hash failed")
+        .block_hash()
+        .expect("block_hash parse failed");
+    let tip_block_hash = node.client.best_block_hash().expect("best_block_hash failed");
 
     let json: GetDeploymentInfo =
-        node.client.get_deployment_info(&block_hash).expect("getdeploymentinfo");
+        node.client.get_deployment_info(&first_block_hash).expect("getdeploymentinfo");
     let model: Result<mtype::GetDeploymentInfo, GetDeploymentInfoError> = json.into_model();
-    model.unwrap();
+    let deployment_info = model.unwrap();
+    assert_eq!(deployment_info.hash, first_block_hash);
+
+    let json_tip: GetDeploymentInfo =
+        node.client.get_deployment_info_tip().expect("getdeploymentinfo tip");
+    let model_tip: Result<mtype::GetDeploymentInfo, GetDeploymentInfoError> = json_tip.into_model();
+    let deployment_info_tip = model_tip.unwrap();
+
+    assert_eq!(deployment_info_tip.hash, tip_block_hash);
 }
 
 #[test]
