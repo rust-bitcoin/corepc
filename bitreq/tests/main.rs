@@ -18,6 +18,15 @@ async fn test_https() {
 }
 
 #[tokio::test]
+#[cfg(feature = "rustls")]
+async fn test_https_with_client() {
+    setup();
+    let client = bitreq::Client::new(1);
+    let response = client.send_async(bitreq::get(url("/a"))).await.unwrap();
+    assert_eq!(response.status_code, 200);
+}
+
+#[tokio::test]
 #[cfg(feature = "json-using-serde")]
 async fn test_json_using_serde() {
     const JSON_SRC: &str = r#"{
