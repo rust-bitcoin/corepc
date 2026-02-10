@@ -242,6 +242,7 @@
 //! If the timeout is set with `with_timeout`, the environment
 //! variable will be ignored.
 
+#![cfg_attr(all(not(feature = "std"), not(test)), no_std)]
 #![deny(missing_docs)]
 // std::io::Error::other was added in 1.74, so occurrences of this lint can't be
 // fixed before our MSRV gets that high.
@@ -256,7 +257,9 @@ mod connection;
 mod error;
 #[cfg(feature = "proxy")]
 mod proxy;
+#[cfg(feature = "std")]
 mod request;
+#[cfg(feature = "std")]
 mod response;
 mod url;
 
@@ -265,8 +268,8 @@ pub use client::{Client, RequestExt};
 pub use error::*;
 #[cfg(feature = "proxy")]
 pub use proxy::*;
-pub use request::*;
-pub use response::Response;
 #[cfg(feature = "std")]
-pub use response::ResponseLazy;
+pub use request::*;
+#[cfg(feature = "std")]
+pub use response::{Response, ResponseLazy};
 pub use url::{ParseError as UrlParseError, Url};
