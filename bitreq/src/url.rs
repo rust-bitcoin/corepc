@@ -1,7 +1,10 @@
 //! A minimal library for parsing and validating URLs.
 
+use alloc::format;
+use alloc::string::{String, ToString as _};
+use alloc::vec::Vec;
 use core::fmt;
-use std::ops::Range;
+use core::ops::Range;
 
 /// Macro to conditionally set visibility to `pub` when fuzzing, `pub(crate)` otherwise.
 /// Used to expose internal methods for fuzz testing without making them part of the public API.
@@ -522,8 +525,8 @@ impl Url {
     }
 }
 
-impl std::fmt::Display for Url {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Url {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_str(self.as_str())
     }
 }
