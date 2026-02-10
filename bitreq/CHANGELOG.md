@@ -1,3 +1,12 @@
+# 0.3.1 - 2026-02-10
+
+* Fix issues with non-`std` builds and add `#[no_std]` attribute [#498](https://github.com/rust-bitcoin/corepc/pull/498)
+* `Url` follow-ups [#491](https://github.com/rust-bitcoin/corepc/pull/491)
+* Handle async pipelined request cancellation correctly [#488](https://github.com/rust-bitcoin/corepc/pull/488)
+* Check utf-8 while deserializing JSON body [#486](https://github.com/rust-bitcoin/corepc/pull/486)
+* Add `Url` type for parsing and validating URLs [#467](https://github.com/rust-bitcoin/corepc/pull/467)
+* Expose all features in `docs.rs` builds [#466](https://github.com/rust-bitcoin/corepc/pull/466) 
+
 # 0.3.1 - 2026-01-19
 
 * Add default size limits for headers, status line, and body [#463](https://github.com/rust-bitcoin/corepc/pull/463)
