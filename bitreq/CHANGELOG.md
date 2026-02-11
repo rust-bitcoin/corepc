@@ -1,4 +1,4 @@
-# 0.3.1 - 2026-02-10
+# 0.3.2 - 2026-02-10
 
 * Fix issues with non-`std` builds and add `#[no_std]` attribute [#498](https://github.com/rust-bitcoin/corepc/pull/498)
 * `Url` follow-ups [#491](https://github.com/rust-bitcoin/corepc/pull/491)
