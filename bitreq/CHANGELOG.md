@@ -1,3 +1,7 @@
+# 0.3.3 - 2026-02-12
+
+* Make `Url::append_query_pairs` and `preserve_fragment_from` public methods [#500](https://github.com/rust-bitcoin/corepc/pull/500)
+
 # 0.3.2 - 2026-02-10
 
 * Fix issues with non-`std` builds and add `#[no_std]` attribute [#498](https://github.com/rust-bitcoin/corepc/pull/498)
