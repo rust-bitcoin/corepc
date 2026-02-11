@@ -41,6 +41,39 @@ struct ClientImpl<T> {
     capacity: usize,
 }
 
+pub struct ClientBuilder {
+    // root_certs: Vec<Vec<u8>>,
+    capacity: usize,
+}
+
+impl ClientBuilder {
+    pub fn new() -> Self {
+        Self {
+            capacity: 1,
+        }
+    }
+
+    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Self {
+        // self.root_certs.push(cert_der.into());
+        self
+    }
+
+    pub fn with_capacity(mut self, capacity: usize) -> Self {
+        self.capacity = capacity;
+        self
+    }
+
+    pub fn build(self) -> Client {
+        Client {
+            r#async: Arc::new(Mutex::new(ClientImpl {
+                connections: HashMap::new(),
+                lru_order: VecDeque::new(),
+                capacity: self.capacity,
+            })),
+        }
+    }
+}
+
 impl Client {
     /// Creates a new `Client` with the specified connection cache capacity.
     ///
@@ -56,6 +89,11 @@ impl Client {
                 capacity,
             })),
         }
+    }
+
+    /// Create a builder for a client
+    pub fn builder() -> ClientBuilder {
+        ClientBuilder::new()
     }
 
     /// Sends a request asynchronously using a cached connection if available.
