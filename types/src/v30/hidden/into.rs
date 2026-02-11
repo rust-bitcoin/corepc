@@ -5,7 +5,7 @@ use bitcoin::hashes::hex::FromHex;
 use bitcoin::{Transaction, Txid, Wtxid};
 
 use super::{
-    GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+    GetOrphanTxs, GetOrphanTxsError, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
     GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
     GetOrphanTxsVerboseTwoEntryError,
 };
@@ -13,7 +13,14 @@ use crate::model;
 
 impl GetOrphanTxs {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> model::GetOrphanTxs { model::GetOrphanTxs(self.0) }
+    pub fn into_model(self) -> Result<model::GetOrphanTxs, GetOrphanTxsError> {
+        use GetOrphanTxsError as E;
+
+        let txids: Result<Vec<Txid>, E> =
+            self.0.into_iter().map(|s| s.parse::<Txid>().map_err(E::Txid)).collect();
+
+        Ok(model::GetOrphanTxs(txids?))
+    }
 }
 
 impl GetOrphanTxsVerboseOneEntry {

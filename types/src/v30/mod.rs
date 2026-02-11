@@ -252,7 +252,7 @@ mod wallet;
 pub use self::{
     blockchain::GetMempoolInfo,
     hidden::{
-        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+        GetOrphanTxs, GetOrphanTxsError, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
         GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
         GetOrphanTxsVerboseTwoEntryError,
     },
