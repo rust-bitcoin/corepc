@@ -12,9 +12,6 @@ license = "ISC"
 edition = "2021"
 rust-version = "1.75.0"
 
-[badges]
-maintenance = { status = "experimental" }
-
 [dependencies]
 # For the json-using-serde feature:
 serde = { version = "1.0.101", default-features = false, optional = true }
