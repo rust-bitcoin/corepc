@@ -26,6 +26,7 @@ use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 #[cfg(feature = "async")]
 use crate::Response;
 use crate::{Error, Method, ResponseLazy};
+use crate::client::ClientConfig;
 
 type UnsecuredStream = TcpStream;
 
@@ -275,6 +276,42 @@ impl AsyncConnection {
                 return Err(Error::HttpsFeatureNotEnabled);
                 #[cfg(feature = "tokio-rustls")]
                 rustls_stream::wrap_async_stream(socket, params.host).await
+            } else {
+                Ok(AsyncHttpStream::Unsecured(socket))
+            }
+        };
+        let stream = if let Some(timeout_at) = timeout_at {
+            tokio::time::timeout_at(timeout_at.into(), future)
+                .await
+                .unwrap_or(Err(Error::IoError(timeout_err())))?
+        } else {
+            future.await?
+        };
+        let (read, write) = tokio::io::split(stream);
+
+        Ok(AsyncConnection(Mutex::new(Arc::new(AsyncConnectionState {
+            read: AsyncMutex::new(read),
+            write: AsyncMutex::new(write),
+            next_request_id: AtomicUsize::new(0),
+            readable_request_id: AtomicUsize::new(0),
+            min_dropped_reader_id: AtomicUsize::new(usize::MAX),
+            socket_new_requests_timeout: Mutex::new(Instant::now() + Duration::from_secs(60)),
+        }))))
+    }
+
+    pub(crate) async fn new_with_configs(
+        params: ConnectionParams<'_>,
+        timeout_at: Option<Instant>,
+        client_config: ClientConfig,
+    ) -> Result<AsyncConnection, Error> {
+        let future = async move {
+            let socket = Self::connect(params).await?;
+
+            if params.https {
+                #[cfg(not(feature = "tokio-rustls"))]
+                return Err(Error::HttpsFeatureNotEnabled);
+                #[cfg(feature = "tokio-rustls")]
+                rustls_stream::wrap_async_stream_with_configs(socket, params.host, client_config).await
             } else {
                 Ok(AsyncHttpStream::Unsecured(socket))
             }

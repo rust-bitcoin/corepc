@@ -39,22 +39,32 @@ struct ClientImpl<T> {
     connections: HashMap<ConnectionKey, Arc<T>>,
     lru_order: VecDeque<ConnectionKey>,
     capacity: usize,
+    client_config: Option<ClientConfig>,
 }
 
 pub struct ClientBuilder {
-    // root_certs: Vec<Vec<u8>>,
     capacity: usize,
+    client_config: Option<ClientConfig>,
+}
+
+#[derive(Clone)]
+pub struct ClientConfig {
+    pub tls: Option<TlsConfig>,
+}
+
+#[derive(Clone)]
+pub struct TlsConfig {
+    pub extra_root_cert: Vec<u8>, // DER-encoded certs
 }
 
 impl ClientBuilder {
     pub fn new() -> Self {
-        Self {
-            capacity: 1,
-        }
+        Self { capacity: 1, client_config: None }
     }
 
     pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Self {
-        // self.root_certs.push(cert_der.into());
+        let tls_config = TlsConfig { extra_root_cert: cert_der.into() };
+        self.client_config = Some(ClientConfig { tls: Some(tls_config) });
         self
     }
 
@@ -69,6 +79,7 @@ impl ClientBuilder {
                 connections: HashMap::new(),
                 lru_order: VecDeque::new(),
                 capacity: self.capacity,
+                client_config: self.client_config,
             })),
         }
     }
@@ -87,6 +98,7 @@ impl Client {
                 connections: HashMap::new(),
                 lru_order: VecDeque::new(),
                 capacity,
+                client_config: None,
             })),
         }
     }
@@ -115,7 +127,16 @@ impl Client {
         let conn = if let Some(conn) = conn_opt {
             conn
         } else {
-            let connection = AsyncConnection::new(key, parsed_request.timeout_at).await?;
+            let client_config = {
+                let state = self.r#async.lock().unwrap();
+                state.client_config.clone()
+            };
+
+            let connection = if let Some(client_config) = client_config {
+                AsyncConnection::new_with_configs(key, parsed_request.timeout_at, client_config).await?
+            } else {
+                AsyncConnection::new(key, parsed_request.timeout_at).await?
+            };
             let connection = Arc::new(connection);
 
             let mut state = self.r#async.lock().unwrap();

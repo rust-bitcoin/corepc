@@ -106,6 +106,30 @@ pub(super) async fn wrap_async_stream(
     Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }
 
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    client_config: ClientConfig,
+) -> Result<AsyncHttpStream, Error> {
+    #[cfg(feature = "log")]
+    log::trace!("Setting up TLS parameters for {host}.");
+    let dns_name = match ServerName::try_from(host) {
+        Ok(result) => result,
+        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
+    };
+
+    println!("{}", client_config);
+    let connector = TlsConnector::from(CONFIG.get_or_init(build_client_config).clone());
+
+    #[cfg(feature = "log")]
+    log::trace!("Establishing TLS session to {host}.");
+
+    let tls = connector.connect(dns_name, tcp).await.map_err(Error::IoError)?;
+
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
+}
+
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
 pub type SecuredStream = TlsStream<TcpStream>;
 
