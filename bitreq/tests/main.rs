@@ -11,10 +11,9 @@ use self::setup::*;
 #[cfg(feature = "rustls")]
 async fn test_https() {
     // TODO: Implement this locally.
-    // For now, skip external HTTPS testing or use local HTTP
-    assert_eq!(get_status_code(bitreq::get(url("/a"))).await, 200);
+    assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
     // Test reusing the existing connection in client:
-    assert_eq!(get_status_code(bitreq::get(url("/a"))).await, 200);
+    assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
 }
 
 #[tokio::test]
@@ -22,7 +21,7 @@ async fn test_https() {
 async fn test_https_with_client() {
     setup();
     let client = bitreq::Client::new(1);
-    let response = client.send_async(bitreq::get(url("/a"))).await.unwrap();
+    let response = client.send_async(bitreq::get("https://example.com")).await.unwrap();
     assert_eq!(response.status_code, 200);
 }
 
@@ -30,11 +29,21 @@ async fn test_https_with_client() {
 #[cfg(feature = "rustls")]
 async fn test_https_with_client_builder() {
     setup();
-    let cert_der = "foo";
     let client = bitreq::Client::builder()
-    // .with_root_certificate(cert_der)
     .build();
-    let response = client.send_async(bitreq::get(url("/a"))).await.unwrap();
+    let response = client.send_async(bitreq::get("https://example.com")).await.unwrap();
+    assert_eq!(response.status_code, 200);
+}
+
+#[tokio::test]
+#[cfg(feature = "rustls")]
+async fn test_https_with_client_builder_and_cert() {
+    setup();
+    let cert_der = include_bytes!("test_cert.der");
+    let client = bitreq::Client::builder()
+    .with_root_certificate(cert_der.as_slice())
+    .build();
+    let response = client.send_async(bitreq::get("https://example.com")).await.unwrap();
     assert_eq!(response.status_code, 200);
 }
 
