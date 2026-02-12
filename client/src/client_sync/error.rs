@@ -4,10 +4,12 @@ use std::{error, fmt, io};
 
 use bitcoin::hex;
 
+use crate::client_sync::jsonrpc_sync::error as jsonrpc_error;
+
 /// The error type for errors produced in this library.
 #[derive(Debug)]
 pub enum Error {
-    JsonRpc(jsonrpc::error::Error),
+    JsonRpc(jsonrpc_error::Error),
     HexToArray(hex::HexToArrayError),
     HexToBytes(hex::HexToBytesError),
     Json(serde_json::error::Error),
@@ -24,8 +26,8 @@ pub enum Error {
     MissingUserPassword,
 }
 
-impl From<jsonrpc::error::Error> for Error {
-    fn from(e: jsonrpc::error::Error) -> Error { Error::JsonRpc(e) }
+impl From<jsonrpc_error::Error> for Error {
+    fn from(e: jsonrpc_error::Error) -> Error { Error::JsonRpc(e) }
 }
 
 impl From<hex::HexToArrayError> for Error {

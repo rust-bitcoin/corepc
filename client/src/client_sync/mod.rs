@@ -3,6 +3,7 @@
 //! JSON-RPC clients for testing against specific versions of Bitcoin Core.
 
 mod error;
+mod jsonrpc_sync;
 pub mod v17;
 pub mod v18;
 pub mod v19;
@@ -38,7 +39,7 @@ pub enum Auth {
 }
 
 impl Auth {
-    /// Convert into the arguments that jsonrpc::Client needs.
+    /// Convert into the arguments that the JSON-RPC client needs.
     pub fn get_user_pass(self) -> Result<(Option<String>, Option<String>)> {
         match self {
             Auth::None => Ok((None, None)),
@@ -55,7 +56,7 @@ impl Auth {
     }
 }
 
-/// Defines a `jsonrpc::Client` using `bitreq`.
+/// Defines a JSON-RPC client using `bitreq`.
 #[macro_export]
 macro_rules! define_jsonrpc_bitreq_client {
     ($version:literal) => {
@@ -63,10 +64,11 @@ macro_rules! define_jsonrpc_bitreq_client {
 
         use $crate::client_sync::{log_response, Auth, Result};
         use $crate::client_sync::error::Error;
+        use $crate::client_sync::jsonrpc_sync;
 
         /// Client implements a JSON-RPC client for the Bitcoin Core daemon or compatible APIs.
         pub struct Client {
-            inner: jsonrpc::client::Client,
+            inner: jsonrpc_sync::Client,
         }
 
         impl fmt::Debug for Client {
@@ -81,12 +83,12 @@ macro_rules! define_jsonrpc_bitreq_client {
         impl Client {
             /// Creates a client to a bitcoind JSON-RPC server without authentication.
             pub fn new(url: &str) -> Self {
-                let transport = jsonrpc::http::bitreq_http::Builder::new()
+                let transport = jsonrpc_sync::http::bitreq_http::Builder::new()
                     .url(url)
                     .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .build();
-                let inner = jsonrpc::client::Client::with_transport(transport);
+                let inner = jsonrpc_sync::Client::with_transport(transport);
 
                 Self { inner }
             }
@@ -98,13 +100,13 @@ macro_rules! define_jsonrpc_bitreq_client {
                 }
                 let (user, pass) = auth.get_user_pass()?;
 
-                let transport = jsonrpc::http::bitreq_http::Builder::new()
+                let transport = jsonrpc_sync::http::bitreq_http::Builder::new()
                     .url(url)
                     .expect("jsonrpc v0.19, this function does not error")
                     .timeout(std::time::Duration::from_secs(60))
                     .basic_auth(user.unwrap(), pass)
                     .build();
-                let inner = jsonrpc::client::Client::with_transport(transport);
+                let inner = jsonrpc_sync::Client::with_transport(transport);
 
                 Ok(Self { inner })
             }
@@ -165,7 +167,7 @@ where
 }
 
 /// Helper to log an RPC response.
-fn log_response(method: &str, resp: &Result<jsonrpc::Response>) {
+fn log_response(method: &str, resp: &Result<jsonrpc_sync::Response>) {
     use log::Level::{Debug, Trace, Warn};
 
     if log::log_enabled!(Warn) || log::log_enabled!(Debug) || log::log_enabled!(Trace) {
