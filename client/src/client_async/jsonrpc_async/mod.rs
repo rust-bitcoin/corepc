@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! Minimal JSON-RPC support for the sync client.
+//! Minimal JSON-RPC support for the async client.
 
-pub(crate) mod client;
+pub(crate) mod client_async;
 pub(crate) mod error;
 pub(crate) mod http;
 
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 
-pub(crate) use self::client_async::Client;
+pub use self::client_async::{AsyncClient, AsyncTransport, BoxFuture};
 pub(crate) use self::error::Error;
 
 /// A JSON-RPC request object.
@@ -51,5 +51,4 @@ impl Response {
             serde_json::from_value(serde_json::Value::Null).map_err(Error::Json)
         }
     }
-
 }

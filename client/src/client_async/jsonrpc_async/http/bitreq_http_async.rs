@@ -8,16 +8,17 @@ use std::{error, fmt};
 use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
 
-use crate::client_sync::jsonrpc_sync::client::Transport;
-use crate::client_sync::jsonrpc_sync::{Error as JsonRpcError, Request, Response};
+use crate::client_async::jsonrpc_async::{
+    AsyncTransport, BoxFuture, Error as JsonRpcError, Request, Response,
+};
 
 const DEFAULT_URL: &str = "http://localhost";
 const DEFAULT_PORT: u16 = 8332; // the default RPC port for bitcoind.
 const DEFAULT_TIMEOUT_SECONDS: u64 = 15;
 
-/// An HTTP transport that uses `bitreq` and is useful for running a bitcoind RPC client.
+/// An async HTTP transport that uses [`bitreq`].
 #[derive(Clone, Debug)]
-pub struct BitreqHttpTransport {
+pub struct BitreqHttpAsyncTransport {
     /// URL of the RPC server.
     url: String,
     /// Timeout only supports second granularity.
@@ -26,9 +27,9 @@ pub struct BitreqHttpTransport {
     basic_auth: Option<String>,
 }
 
-impl Default for BitreqHttpTransport {
+impl Default for BitreqHttpAsyncTransport {
     fn default() -> Self {
-        BitreqHttpTransport {
+        BitreqHttpAsyncTransport {
             url: format!("{}:{}", DEFAULT_URL, DEFAULT_PORT),
             timeout: Duration::from_secs(DEFAULT_TIMEOUT_SECONDS),
             basic_auth: None,
@@ -36,11 +37,11 @@ impl Default for BitreqHttpTransport {
     }
 }
 
-impl BitreqHttpTransport {
-    /// Constructs a new `BitreqHttpTransport` with default parameters.
-    pub fn new() -> Self { BitreqHttpTransport::default() }
+impl BitreqHttpAsyncTransport {
+    /// Constructs a new [`BitreqHttpAsyncTransport`] with default parameters.
+    pub fn new() -> Self { BitreqHttpAsyncTransport::default() }
 
-    fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
+    async fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
     where
         R: for<'a> serde::de::Deserialize<'a>,
     {
@@ -57,7 +58,7 @@ impl BitreqHttpTransport {
         // Send the request and parse the response. If the response is an error that does not
         // contain valid JSON in its body (for instance if the bitcoind HTTP server work queue
         // depth is exceeded), return the raw HTTP error so users can match against it.
-        let resp = req.send()?;
+        let resp = req.send_async().await?;
         match resp.json() {
             Ok(json) => Ok(json),
             Err(bitreq_err) =>
@@ -73,23 +74,26 @@ impl BitreqHttpTransport {
     }
 }
 
-impl Transport for BitreqHttpTransport {
-    fn send_request(&self, req: Request) -> Result<Response, JsonRpcError> {
-        Ok(self.request(req)?)
+impl AsyncTransport for BitreqHttpAsyncTransport {
+    fn send_request<'a>(
+        &'a self,
+        req: Request<'a>,
+    ) -> BoxFuture<'a, Result<Response, JsonRpcError>> {
+        Box::pin(async move { Ok(self.request(req).await?) })
     }
 
     fn fmt_target(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.url) }
 }
 
-/// Builder for simple bitcoind `BitreqHttpTransport`.
+/// Builder for async bitcoind [`BitreqHttpAsyncTransport`].
 #[derive(Clone, Debug)]
 pub struct Builder {
-    tp: BitreqHttpTransport,
+    tp: BitreqHttpAsyncTransport,
 }
 
 impl Builder {
-    /// Constructs a new `Builder` with default configuration and the URL to use.
-    pub fn new() -> Builder { Builder { tp: BitreqHttpTransport::new() } }
+    /// Constructs a new [`Builder`] with default configuration and the URL to use.
+    pub fn new() -> Builder { Builder { tp: BitreqHttpAsyncTransport::new() } }
 
     /// Sets the timeout after which requests will abort if they aren't finished.
     pub fn timeout(mut self, timeout: Duration) -> Self {
@@ -115,8 +119,8 @@ impl Builder {
         self
     }
 
-    /// Builds the final `BitreqHttpTransport`.
-    pub fn build(self) -> BitreqHttpTransport { self.tp }
+    /// Builds the final [`BitreqHttpAsyncTransport`].
+    pub fn build(self) -> BitreqHttpAsyncTransport { self.tp }
 }
 
 impl Default for Builder {
