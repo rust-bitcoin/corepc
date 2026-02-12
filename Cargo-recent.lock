@@ -240,9 +240,10 @@ checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 name = "corepc-client"
 version = "0.11.0"
 dependencies = [
+ "base64 0.22.1",
  "bitcoin",
+ "bitreq",
  "corepc-types",
- "jsonrpc",
  "log",
  "serde",
  "serde_json",
