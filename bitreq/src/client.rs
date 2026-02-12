@@ -54,7 +54,7 @@ pub struct ClientConfig {
 
 #[derive(Clone)]
 pub struct TlsConfig {
-    pub extra_root_cert: Vec<u8>, // DER-encoded certs
+    pub custom_certificate: Vec<u8>, // DER-encoded cert
 }
 
 impl ClientBuilder {
@@ -62,8 +62,8 @@ impl ClientBuilder {
         Self { capacity: 1, client_config: None }
     }
 
-    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Self {
-        let tls_config = TlsConfig { extra_root_cert: cert_der.into() };
+    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, certificate: T) -> Self {
+        let tls_config = TlsConfig { custom_certificate: certificate.into() };
         self.client_config = Some(ClientConfig { tls: Some(tls_config) });
         self
     }
@@ -133,7 +133,8 @@ impl Client {
             };
 
             let connection = if let Some(client_config) = client_config {
-                AsyncConnection::new_with_configs(key, parsed_request.timeout_at, client_config).await?
+                AsyncConnection::new_with_configs(key, parsed_request.timeout_at, client_config)
+                    .await?
             } else {
                 AsyncConnection::new(key, parsed_request.timeout_at).await?
             };

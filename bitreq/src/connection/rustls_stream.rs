@@ -170,7 +170,7 @@ pub(super) async fn wrap_async_stream_with_configs(
     };
 
     let certificates = build_root_certificates();
-    let custom_certificate = custom_client_config.tls.unwrap().extra_root_cert;
+    let custom_certificate = custom_client_config.tls.unwrap().custom_certificate;
     let certificates = append_certificate(certificates, custom_certificate);
     let client_config = build_rustls_client_config(certificates);
     let connector = TlsConnector::from(CONFIG.get_or_init(|| client_config).clone());
