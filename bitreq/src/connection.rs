@@ -25,8 +25,9 @@ use tokio::sync::Mutex as AsyncMutex;
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 #[cfg(feature = "async")]
 use crate::Response;
-use crate::{Error, Method, ResponseLazy};
+#[cfg(feature = "async")]
 use crate::client::ClientConfig;
+use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
