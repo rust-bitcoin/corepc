@@ -195,7 +195,11 @@ jobs:
       - name: "Install rustfmt"
         run: rustup component add rustfmt
       - name: "Check formatting"
-        run: cargo fmt --all -- --check
+        run: |
+          cargo fmt --all -- --check
+          ./contrib/fmt-integration-tests.sh
+          ./contrib/fmt-verify.sh
+
 
   Verify:                       #  1 job, run `verify` directly.
     name: Verify - stable toolchain
