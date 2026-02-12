@@ -67,8 +67,6 @@ fn build_client_config() -> Arc<ClientConfig> {
 
 #[cfg(feature = "rustls")]
 fn build_root_certificates() -> RootCertStore {
-    println!("*** build_client_config CALLED ***");
-
     let mut root_certificates = RootCertStore::empty();
 
     // Try to load native certs
