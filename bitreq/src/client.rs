@@ -55,7 +55,6 @@ pub struct ClientConfig {
 
 #[derive(Clone)]
 pub struct TlsConfig {
-    pub custom_certificate: Vec<u8>, // DER-encoded cert
     pub certificates: Certificates,
 }
 
@@ -64,7 +63,7 @@ impl TlsConfig {
         let certificates =
             Certificates::new(Some(&certificate)).expect("failed to append certificate");
 
-        Self { custom_certificate: certificate, certificates: certificates }
+        Self { certificates: certificates }
     }
 }
 
