@@ -32,7 +32,9 @@ use crate::{Error, Method, ResponseLazy};
 type UnsecuredStream = TcpStream;
 
 #[cfg(feature = "rustls")]
-mod rustls_stream;
+// TEMPORARILY make it pub so Client mod can import.
+// all code accessed by Client should be encapsulated on new certificates (private crate) module
+pub mod rustls_stream;
 #[cfg(feature = "rustls")]
 type SecuredStream = rustls_stream::SecuredStream;
 
