@@ -132,12 +132,7 @@ impl Client {
                 state.client_config.clone()
             };
 
-            let connection = if let Some(client_config) = client_config {
-                AsyncConnection::new_with_configs(key, parsed_request.timeout_at, client_config)
-                    .await?
-            } else {
-                AsyncConnection::new(key, parsed_request.timeout_at).await?
-            };
+            let connection = AsyncConnection::new(key, parsed_request.timeout_at, client_config).await?;
             let connection = Arc::new(connection);
 
             let mut state = self.r#async.lock().unwrap();

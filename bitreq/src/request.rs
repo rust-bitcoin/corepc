@@ -338,7 +338,7 @@ impl Request {
     #[cfg(feature = "async")]
     pub async fn send_async(self) -> Result<Response, Error> {
         let parsed_request = ParsedRequest::new(self)?;
-        AsyncConnection::new(parsed_request.connection_params(), parsed_request.timeout_at)
+        AsyncConnection::new(parsed_request.connection_params(), parsed_request.timeout_at, None)
             .await?
             .send(parsed_request)
             .await
