@@ -124,43 +124,6 @@ fn build_client_config() -> Arc<ClientConfig> {
 }
 
 #[cfg(feature = "rustls")]
-fn build_root_certificates() -> RootCertStore {
-    let mut root_certificates = RootCertStore::empty();
-
-    // Try to load native certs
-    #[cfg(feature = "https-rustls-probe")]
-    if let Ok(os_roots) = rustls_native_certs::load_native_certs() {
-        for root_cert in os_roots {
-            // Ignore erroneous OS certificates, there's nothing
-            // to do differently in that situation anyways.
-            let _ = root_certificates.add(&rustls::Certificate(root_cert.0));
-        }
-    }
-
-    #[cfg(feature = "rustls-webpki")]
-    {
-        #[allow(deprecated)] // Need to use add_server_trust_anchors to compile with rustls 0.21.1
-        root_certificates.add_server_trust_anchors(TLS_SERVER_ROOTS.iter().map(|ta| {
-            rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-                ta.subject,
-                ta.spki,
-                ta.name_constraints,
-            )
-        }));
-    }
-    root_certificates
-}
-
-#[cfg(feature = "rustls")]
-fn append_certificate(mut certificates: RootCertStore, certificate: Vec<u8>) -> RootCertStore {
-    match certificates.add(&rustls::Certificate(certificate)) {
-        Ok(_) => println!("Certificate added successfully"),
-        Err(e) => println!("Failed to add certificate: {:?}", e),
-    }
-    certificates
-}
-
-#[cfg(feature = "rustls")]
 fn build_rustls_client_config(certificates: RootCertStore) -> Arc<ClientConfig> {
     let config = ClientConfig::builder()
         .with_safe_defaults()
