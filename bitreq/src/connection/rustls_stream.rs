@@ -50,7 +50,7 @@ impl Certificates {
         let mut certificates = self.inner;
         certificates
             .add(&rustls::Certificate(certificate.clone()))
-            .map_err(Error::RustlsCreateConnection)?;
+            .map_err(Error::RustlsAppendCert)?;
         self.inner = certificates;
         Ok(self)
     }

@@ -19,6 +19,9 @@ pub enum Error {
     #[cfg(feature = "rustls")]
     /// Ran into a rustls error while creating the connection.
     RustlsCreateConnection(rustls::Error),
+    #[cfg(feature = "rustls")]
+    /// Ran into a rustls error while appending a certificate.
+    RustlsAppendCert(rustls::Error),
     #[cfg(feature = "native-tls")]
     /// Ran into a native-tls error while creating the connection.
     NativeTlsCreateConnection(native_tls::Error),
@@ -101,6 +104,8 @@ impl fmt::Display for Error {
 
             #[cfg(feature = "rustls")]
             RustlsCreateConnection(err) => write!(f, "error creating rustls connection: {}", err),
+            #[cfg(feature = "rustls")]
+            RustlsAppendCert(err) => write!(f, "error appending certificate: {}", err),
             #[cfg(feature = "native-tls")]
             NativeTlsCreateConnection(err) => write!(f, "error creating native-tls connection: {err}"),
             MalformedChunkLength => write!(f, "non-usize chunk length with transfer-encoding: chunked"),
@@ -143,6 +148,8 @@ impl error::Error for Error {
             InvalidUtf8InBody(err) => Some(err),
             #[cfg(feature = "rustls")]
             RustlsCreateConnection(err) => Some(err),
+            #[cfg(feature = "rustls")]
+            RustlsAppendCert(err) => Some(err),
             _ => None,
         }
     }
