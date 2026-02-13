@@ -49,13 +49,13 @@ pub struct ClientBuilder {
 }
 
 #[derive(Clone)]
-pub struct ClientConfig {
-    pub tls: Option<TlsConfig>,
+pub(crate) struct ClientConfig {
+    pub(crate) tls: Option<TlsConfig>,
 }
 
 #[derive(Clone)]
-pub struct TlsConfig {
-    pub certificates: Certificates,
+pub(crate) struct TlsConfig {
+    pub(crate) certificates: Certificates,
 }
 
 impl TlsConfig {
