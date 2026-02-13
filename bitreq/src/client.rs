@@ -67,22 +67,90 @@ impl TlsConfig {
     }
 }
 
+/// Builder for configuring a `Client` with custom settings.
+///
+/// The builder allows you to set the connection pool capacity and add
+/// custom root certificates for TLS verification before constructing the client.
+///
+/// # Example
+///
+/// ```no_run
+/// # async fn example() -> Result<(), bitreq::Error> {
+/// use bitreq::Client;
+///
+/// let cert_der = include_bytes!("../tests/test_cert.der");
+/// let client = Client::builder()
+///     .with_root_certificate(cert_der.as_slice())
+///     .with_capacity(20)
+///     .build();
+///
+/// let response = bitreq::get("https://example.com")
+///     .send_async_with_client(&client)
+///     .await?;
+/// # Ok(())
+/// # }
+/// ```
 impl ClientBuilder {
+    /// Creates a new `ClientBuilder` with default settings.
+    ///
+    /// Default configuration:
+    /// * `capacity` - 1 (single connection)
+    /// * `root_certificates` - None (uses system certificates)
     pub fn new() -> Self {
         Self { capacity: 1, client_config: None }
     }
 
+    /// Adds a custom root certificate for TLS verification.
+    ///
+    /// The certificate must be provided in DER format as a byte slice.
+    /// This is useful when connecting to servers using self-signed certificates
+    /// or custom Certificate Authorities.
+    ///
+    /// # Arguments
+    ///
+    /// * `certificate` - A DER-encoded X.509 certificate as a byte slice
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use bitreq::Client;
+    /// let cert_der = include_bytes!("../tests/test_cert.der");
+    /// let client = Client::builder()
+    ///     .with_root_certificate(cert_der.as_slice())
+    ///     .build();
+    /// ```
     pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, certificate: T) -> Self {
         let tls_config = TlsConfig::new(certificate.into());
         self.client_config = Some(ClientConfig { tls: Some(tls_config) });
         self
     }
 
+    /// Sets the maximum number of connections to keep in the pool.
+    ///
+    /// When the pool reaches this capacity, the least recently used connection
+    /// is evicted to make room for new connections.
+    ///
+    /// # Arguments
+    ///
+    /// * `capacity` - Maximum number of cached connections
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use bitreq::Client;
+    /// let client = Client::builder()
+    ///     .with_capacity(10)
+    ///     .build();
+    /// ```
     pub fn with_capacity(mut self, capacity: usize) -> Self {
         self.capacity = capacity;
         self
     }
 
+    /// Builds the `Client` with the configured settings.
+    ///
+    /// Consumes the builder and returns a configured `Client` instance
+    /// ready to send requests with connection pooling.
     pub fn build(self) -> Client {
         Client {
             r#async: Arc::new(Mutex::new(ClientImpl {
@@ -96,7 +164,7 @@ impl ClientBuilder {
 }
 
 impl Client {
-    /// Creates a new `Client` with the specified connection cache capacity.
+    /// Creates a new `Client` with the specified connection pool capacity.
     ///
     /// # Arguments
     ///
