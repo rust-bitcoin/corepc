@@ -9,8 +9,8 @@
 use std::collections::{hash_map, HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
-use crate::connection::AsyncConnection;
 use crate::connection::rustls_stream::Certificates;
+use crate::connection::AsyncConnection;
 use crate::request::{OwnedConnectionParams as ConnectionKey, ParsedRequest};
 use crate::{Error, Request, Response};
 
@@ -61,12 +61,10 @@ pub struct TlsConfig {
 
 impl TlsConfig {
     fn new(certificate: Vec<u8>) -> Self {
-        let certificates = Certificates::new(Some(&certificate)).expect("failed to append certificate");
+        let certificates =
+            Certificates::new(Some(&certificate)).expect("failed to append certificate");
 
-        Self {
-            custom_certificate: certificate,
-            certificates: certificates,
-        }
+        Self { custom_certificate: certificate, certificates: certificates }
     }
 }
 
@@ -145,7 +143,8 @@ impl Client {
                 state.client_config.clone()
             };
 
-            let connection = AsyncConnection::new(key, parsed_request.timeout_at, client_config).await?;
+            let connection =
+                AsyncConnection::new(key, parsed_request.timeout_at, client_config).await?;
             let connection = Arc::new(connection);
 
             let mut state = self.r#async.lock().unwrap();
