@@ -9,7 +9,7 @@
 use std::collections::{hash_map, HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
-use crate::connection::rustls_stream::Certificates;
+use crate::connection::certificates::Certificates;
 use crate::connection::AsyncConnection;
 use crate::request::{OwnedConnectionParams as ConnectionKey, ParsedRequest};
 use crate::{Error, Request, Response};
