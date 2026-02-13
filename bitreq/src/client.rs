@@ -102,21 +102,30 @@ impl ClientBuilder {
 
     /// Adds a custom root certificate for TLS verification.
     ///
-    /// The certificate must be provided in DER format as a byte slice.
+    /// The certificate must be provided in DER format. This method accepts any type
+    /// that can be converted into a `Vec<u8>`, such as `Vec<u8>`, `&[u8]`, or arrays.
     /// This is useful when connecting to servers using self-signed certificates
     /// or custom Certificate Authorities.
     ///
     /// # Arguments
     ///
-    /// * `certificate` - A DER-encoded X.509 certificate as a byte slice
+    /// * `certificate` - A DER-encoded X.509 certificate. Accepts any type that implements
+    ///   `Into<Vec<u8>>` (e.g., `&[u8]`, `Vec<u8>`, or `[u8; N]`).
     ///
     /// # Example
     ///
     /// ```no_run
     /// # use bitreq::Client;
-    /// let cert_der = include_bytes!("../tests/test_cert.der");
+    /// // Using a byte slice
+    /// let cert_der: &[u8] = include_bytes!("../tests/test_cert.der");
     /// let client = Client::builder()
-    ///     .with_root_certificate(cert_der.as_slice())
+    ///     .with_root_certificate(cert_der)
+    ///     .build();
+    ///
+    /// // Using a Vec<u8>
+    /// let cert_vec: Vec<u8> = cert_der.to_vec();
+    /// let client = Client::builder()
+    ///     .with_root_certificate(cert_vec)
     ///     .build();
     /// ```
     pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, certificate: T) -> Self {
