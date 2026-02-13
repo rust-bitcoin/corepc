@@ -10,6 +10,7 @@ use std::collections::{hash_map, HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
 use crate::connection::AsyncConnection;
+use crate::connection::rustls_stream::Certificates;
 use crate::request::{OwnedConnectionParams as ConnectionKey, ParsedRequest};
 use crate::{Error, Request, Response};
 
@@ -55,6 +56,18 @@ pub struct ClientConfig {
 #[derive(Clone)]
 pub struct TlsConfig {
     pub custom_certificate: Vec<u8>, // DER-encoded cert
+    pub certificates: Certificates,
+}
+
+impl TlsConfig {
+    fn new(certificate: Vec<u8>) -> Self {
+        let certificates = Certificates::new(Some(&certificate)).expect("failed to append certificate");
+
+        Self {
+            custom_certificate: certificate,
+            certificates: certificates,
+        }
+    }
 }
 
 impl ClientBuilder {
@@ -63,7 +76,7 @@ impl ClientBuilder {
     }
 
     pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, certificate: T) -> Self {
-        let tls_config = TlsConfig { custom_certificate: certificate.into() };
+        let tls_config = TlsConfig::new(certificate.into());
         self.client_config = Some(ClientConfig { tls: Some(tls_config) });
         self
     }
