@@ -1,6 +1,5 @@
 #[cfg(feature = "rustls")]
 use rustls::RootCertStore;
-// use rustls::{self, RootCertStore};
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
 
