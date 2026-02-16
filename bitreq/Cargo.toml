@@ -1,6 +1,6 @@
 [package]
 name = "bitreq"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["Jens Pitkanen <jens@neon.moe>", "Tobin C. Harding <me@tobin.cc>"]
 description = "Simple, minimal-dependency HTTP client"
 documentation = "https://docs.rs/bitreq"
