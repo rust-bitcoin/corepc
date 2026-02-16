@@ -1,7 +1,7 @@
 [package]
 name = "bitreq"
 version = "0.3.3"
-authors = ["Jens Pitkanen <jens@neon.moe>", "Tobin C. Harding <me@tobin.cc>"]
+authors = ["Jens Pitkanen <jens@neon.moe>", "Tobin C. Harding <me@tobin.cc>", "Matt Corallo", "Elias Rohrer <dev@tnull.de>"]
 description = "Simple, minimal-dependency HTTP client"
 documentation = "https://docs.rs/bitreq"
 repository = "https://github.com/rust-bitcoin/corepc"
@@ -11,9 +11,6 @@ categories = ["web-programming::http-client"]
 license = "ISC"
 edition = "2021"
 rust-version = "1.75.0"
-
-[badges]
-maintenance = { status = "experimental" }
 
 [dependencies]
 # For the json-using-serde feature:
