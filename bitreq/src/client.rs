@@ -126,6 +126,18 @@ impl ClientBuilder {
     ///     .build();
     /// ```
     pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Self {
+        if let Some(ref mut client_config) = self.client_config {
+            if let Some(ref mut tls_config) = client_config.tls {
+                let certificates = tls_config.certificates.clone();
+                let certificates = certificates
+                    .append_certificate(cert_der.into())
+                    .expect("failed to append certificate");
+
+                tls_config.certificates = certificates;
+                return self;
+            }
+        }
+
         let tls_config = TlsConfig::new(cert_der.into());
         self.client_config = Some(ClientConfig { tls: Some(tls_config) });
         self
