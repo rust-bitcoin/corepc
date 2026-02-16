@@ -1,7 +1,12 @@
 //! This example demonstrates the client builder with custom DER certificate.
 //! to run: cargo run --example custom_cert --features async-https-rustls
 
-#[cfg(feature = "async")]
+#[cfg(not(feature = "async-https-rustls"))]
+fn main() {
+    println!("This example requires the 'async-https-rustls' feature.");
+}
+
+#[cfg(feature = "async-https-rustls")]
 fn main() -> Result<(), bitreq::Error> {
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_io()
@@ -11,6 +16,7 @@ fn main() -> Result<(), bitreq::Error> {
     runtime.block_on(request_with_client())
 }
 
+#[cfg(feature = "async-https-rustls")]
 async fn request_with_client() -> Result<(), bitreq::Error> {
     let url = "http://example.com";
     let cert_der = include_bytes!("../tests/test_cert.der");
