@@ -106,7 +106,7 @@ impl ClientBuilder {
     ///
     /// # Arguments
     ///
-    /// * `certificate` - A DER-encoded X.509 certificate. Accepts any type that implements
+    /// * `cert_der` - A DER-encoded X.509 certificate. Accepts any type that implements
     ///   `Into<Vec<u8>>` (e.g., `&[u8]`, `Vec<u8>`, or `[u8; N]`).
     ///
     /// # Example
