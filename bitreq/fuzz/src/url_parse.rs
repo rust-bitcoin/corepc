@@ -86,7 +86,7 @@ pub fn do_test(data: &[u8]) {
             {
                 let mut url_clone = bitreq_url.clone();
                 // Use the input itself as both key and value to exercise encoding
-                url_clone.append_query_params([(input.to_string(), input.to_string())]);
+                url_clone.append_query_params([(&*input, &*input)]);
                 // Verify the URL is still valid by accessing its fields
                 let _ = url_clone.query();
                 let _ = url_clone.as_str();
@@ -98,10 +98,7 @@ pub fn do_test(data: &[u8]) {
 
                 // Test appending multiple params in one call
                 let mut url_clone3 = bitreq_url.clone();
-                url_clone3.append_query_params([
-                    ("key1".into(), "value1".into()),
-                    ("key2".into(), input.to_string()),
-                ]);
+                url_clone3.append_query_params([("key1", "value1"), ("key2", &input)]);
                 let _ = url_clone3.as_str();
             }
 
