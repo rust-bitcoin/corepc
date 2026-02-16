@@ -96,9 +96,7 @@ impl ClientBuilder {
     /// Default configuration:
     /// * `capacity` - 1 (single connection)
     /// * `root_certificates` - None (uses system certificates)
-    pub fn new() -> Self {
-        Self { capacity: 1, client_config: None }
-    }
+    pub fn new() -> Self { Self { capacity: 1, client_config: None } }
 
     /// Adds a custom root certificate for TLS verification.
     ///
@@ -173,9 +171,7 @@ impl ClientBuilder {
 }
 
 impl Default for ClientBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 impl Client {
@@ -197,9 +193,7 @@ impl Client {
     }
 
     /// Create a builder for a client
-    pub fn builder() -> ClientBuilder {
-        ClientBuilder::new()
-    }
+    pub fn builder() -> ClientBuilder { ClientBuilder::new() }
 
     /// Sends a request asynchronously using a cached connection if available.
     pub async fn send_async(&self, request: Request) -> Result<Response, Error> {

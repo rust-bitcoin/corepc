@@ -22,19 +22,19 @@ use tokio::net::TcpStream as AsyncTcpStream;
 #[cfg(feature = "async")]
 use tokio::sync::Mutex as AsyncMutex;
 
+#[cfg(feature = "async")]
+use crate::client::ClientConfig;
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 #[cfg(feature = "async")]
 use crate::Response;
-#[cfg(feature = "async")]
-use crate::client::ClientConfig;
 use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
 #[cfg(feature = "rustls")]
-mod rustls_stream;
-#[cfg(feature = "rustls")]
 pub(crate) mod certificates;
+#[cfg(feature = "rustls")]
+mod rustls_stream;
 #[cfg(feature = "rustls")]
 type SecuredStream = rustls_stream::SecuredStream;
 
@@ -302,7 +302,10 @@ impl AsyncConnection {
 
     /// Call the correct wrapper function depending on whether client_configs are present
     #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
-    async fn wrap_async_stream(socket: AsyncTcpStream, host: &str, client_config: Option<ClientConfig>
+    async fn wrap_async_stream(
+        socket: AsyncTcpStream,
+        host: &str,
+        client_config: Option<ClientConfig>,
     ) -> Result<AsyncHttpStream, Error> {
         if let Some(client_config) = client_config {
             rustls_stream::wrap_async_stream_with_configs(socket, host, client_config).await
@@ -829,7 +832,8 @@ async fn async_handle_redirects(
             let new_connection;
             if needs_new_connection {
                 new_connection =
-                    AsyncConnection::new(request.connection_params(), request.timeout_at, None).await?;
+                    AsyncConnection::new(request.connection_params(), request.timeout_at, None)
+                        .await?;
                 connection = &new_connection;
             }
             connection.send(request).await
