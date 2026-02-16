@@ -59,9 +59,8 @@ pub(crate) struct TlsConfig {
 }
 
 impl TlsConfig {
-    fn new(certificate: Vec<u8>) -> Self {
-        let certificates =
-            Certificates::new(Some(&certificate)).expect("failed to append certificate");
+    fn new(cert_der: Vec<u8>) -> Self {
+        let certificates = Certificates::new(Some(cert_der)).expect("failed to append certificate");
 
         Self { certificates }
     }
@@ -126,8 +125,8 @@ impl ClientBuilder {
     ///     .with_root_certificate(cert_vec)
     ///     .build();
     /// ```
-    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, certificate: T) -> Self {
-        let tls_config = TlsConfig::new(certificate.into());
+    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Self {
+        let tls_config = TlsConfig::new(cert_der.into());
         self.client_config = Some(ClientConfig { tls: Some(tls_config) });
         self
     }

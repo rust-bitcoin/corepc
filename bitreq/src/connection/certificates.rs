@@ -11,21 +11,21 @@ pub(crate) struct Certificates {
 }
 
 impl Certificates {
-    pub(crate) fn new(certificate: Option<&Vec<u8>>) -> Result<Self, Error> {
+    pub(crate) fn new(cert_der: Option<Vec<u8>>) -> Result<Self, Error> {
         let certificates = Self { inner: RootCertStore::empty() };
 
-        if let Some(certificate) = certificate {
-            certificates.append_certificate(certificate)
+        if let Some(cert_der) = cert_der {
+            certificates.append_certificate(cert_der)
         } else {
             Ok(certificates)
         }
     }
 
     #[cfg(feature = "rustls")]
-    pub(crate) fn append_certificate(mut self, certificate: &[u8]) -> Result<Self, Error> {
+    pub(crate) fn append_certificate(mut self, cert_der: &[u8]) -> Result<Self, Error> {
         let mut certificates = self.inner;
         certificates
-            .add(&rustls::Certificate(certificate.to_owned()))
+            .add(&rustls::Certificate(cert_der.to_owned()))
             .map_err(Error::RustlsAppendCert)?;
         self.inner = certificates;
         Ok(self)
