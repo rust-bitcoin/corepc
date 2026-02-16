@@ -14,19 +14,18 @@ impl Certificates {
     pub(crate) fn new(certificate: Option<&Vec<u8>>) -> Result<Self, Error> {
         let certificates = Self { inner: RootCertStore::empty() };
 
-        let result = if let Some(certificate) = certificate {
+        if let Some(certificate) = certificate {
             certificates.append_certificate(certificate)
         } else {
             Ok(certificates)
-        };
-        result
+        }
     }
 
     #[cfg(feature = "rustls")]
-    pub(crate) fn append_certificate(mut self, certificate: &Vec<u8>) -> Result<Self, Error> {
+    pub(crate) fn append_certificate(mut self, certificate: &[u8]) -> Result<Self, Error> {
         let mut certificates = self.inner;
         certificates
-            .add(&rustls::Certificate(certificate.clone()))
+            .add(&rustls::Certificate(certificate.to_owned()))
             .map_err(Error::RustlsAppendCert)?;
         self.inner = certificates;
         Ok(self)

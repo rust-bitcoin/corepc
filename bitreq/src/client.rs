@@ -63,7 +63,7 @@ impl TlsConfig {
         let certificates =
             Certificates::new(Some(&certificate)).expect("failed to append certificate");
 
-        Self { certificates: certificates }
+        Self { certificates }
     }
 }
 
@@ -76,7 +76,7 @@ impl TlsConfig {
 ///
 /// ```no_run
 /// # async fn example() -> Result<(), bitreq::Error> {
-/// use bitreq::Client;
+/// use bitreq::{Client, RequestExt};
 ///
 /// let cert_der = include_bytes!("../tests/test_cert.der");
 /// let client = Client::builder()
@@ -169,6 +169,12 @@ impl ClientBuilder {
                 client_config: self.client_config,
             })),
         }
+    }
+}
+
+impl Default for ClientBuilder {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
