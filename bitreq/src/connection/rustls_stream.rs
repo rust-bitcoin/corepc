@@ -9,8 +9,6 @@ use std::io;
 use std::net::TcpStream;
 use std::sync::OnceLock;
 
-#[cfg(feature = "rustls")]
-use crate::client::ClientConfig as CustomClientConfig;
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
 use native_tls::{HandshakeError, TlsConnector, TlsStream};
 #[cfg(feature = "rustls")]
@@ -26,6 +24,8 @@ use webpki_roots::TLS_SERVER_ROOTS;
 use super::{AsyncHttpStream, AsyncTcpStream};
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
+#[cfg(feature = "async")]
+use crate::client::ClientConfig as CustomClientConfig;
 use crate::Error;
 
 #[cfg(feature = "rustls")]
