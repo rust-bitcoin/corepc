@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::{Address, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
+use bitcoin::{Address, BlockHash, RedeemScriptBuf, SignedAmount, Transaction, Txid};
 
 use super::{
     AddMultisigAddress, AddMultisigAddressError, GetTransaction, GetTransactionError,
@@ -16,7 +16,8 @@ impl AddMultisigAddress {
         use AddMultisigAddressError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let redeem_script = ScriptBuf::from_hex(&self.redeem_script).map_err(E::RedeemScript)?;
+        let redeem_script = RedeemScriptBuf::from_hex_no_length_prefix(&self.redeem_script)
+            .map_err(E::RedeemScript)?;
 
         Ok(model::AddMultisigAddress {
             address,
@@ -182,7 +183,7 @@ impl TransactionItem {
             .fee
             .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
             .transpose()? // optional historically
-            .unwrap_or_else(|| SignedAmount::from_sat(0));
+            .unwrap_or_else(|| SignedAmount::from_sat(0).expect("TODO: Handle this error"));
         let block_hash =
             self.block_hash.map(|h| h.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_height =

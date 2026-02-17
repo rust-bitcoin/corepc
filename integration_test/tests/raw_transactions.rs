@@ -7,10 +7,11 @@
 
 use bitcoin::bip32::DerivationPath;
 use bitcoin::consensus::encode;
-use bitcoin::hex::FromHex as _;
+use bitcoin::ext::*;
 use bitcoin::opcodes::all::*;
 use bitcoin::{
-    absolute, consensus, hex, psbt, script, transaction, Amount, ScriptBuf, Transaction, TxOut,
+    absolute, consensus, hex, psbt, script, transaction, Amount, ScriptPubKeyBuf, Transaction,
+    TxOut,
 };
 use integration_test::{test_keys, Node, NodeExt as _, Wallet};
 use node::vtype::*;
@@ -43,10 +44,10 @@ fn raw_transactions__combine_psbt__modelled() {
         .into_model()
         .expect("GetTxOut into model")
         .tx_out;
-    let spend_amount = Amount::from_sat(100_000);
-    let fee = Amount::from_sat(1000);
+    let spend_amount = Amount::from_sat_u32(100_000);
+    let fee = Amount::from_sat_u32(1000);
     // Calculate the change because we do not know the value of the UTXO.
-    let change_amount = tx_out.value - spend_amount - fee;
+    let change_amount = (tx_out.amount - spend_amount - fee).expect("invalid change amount");
 
     let inputs = vec![Input { txid, vout: 0, sequence: None }];
 
@@ -215,8 +216,9 @@ fn raw_transactions__decode_script__modelled() {
 }
 
 // Script builder code copied from rust-bitcoin script unit tests.
-fn arbitrary_p2pkh_script() -> ScriptBuf {
-    let pubkey_hash = <[u8; 20]>::from_hex("16e1ae70ff0fa102905d4af297f6912bda6cce19").unwrap();
+fn arbitrary_p2pkh_script() -> ScriptPubKeyBuf {
+    let pubkey_hash =
+        hex::decode_to_array::<20>("16e1ae70ff0fa102905d4af297f6912bda6cce19").unwrap();
 
     script::Builder::new()
         .push_opcode(OP_DUP)
@@ -227,13 +229,15 @@ fn arbitrary_p2pkh_script() -> ScriptBuf {
         .into_script()
 }
 
-fn arbitrary_multisig_script() -> ScriptBuf {
-    let pk1 =
-        <[u8; 33]>::from_hex("022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e")
-            .unwrap();
-    let pk2 =
-        <[u8; 33]>::from_hex("03a767c7221e9f15f870f1ad9311f5ab937d79fcaeee15bb2c722bca515581b4c0")
-            .unwrap();
+fn arbitrary_multisig_script() -> ScriptPubKeyBuf {
+    let pk1 = hex::decode_to_array::<33>(
+        "022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e",
+    )
+    .unwrap();
+    let pk2 = hex::decode_to_array::<33>(
+        "03a767c7221e9f15f870f1ad9311f5ab937d79fcaeee15bb2c722bca515581b4c0",
+    )
+    .unwrap();
 
     script::Builder::new()
         .push_opcode(OP_PUSHNUM_1)
@@ -412,7 +416,7 @@ fn raw_transactions__test_mempool_accept__modelled() {
         .test_mempool_accept(std::slice::from_ref(&signed_tx))
         .expect("testmempoolaccept");
     #[cfg(feature = "v20_and_below")]
-    type TestMempoolAcceptError = hex::HexToArrayError;
+    type TestMempoolAcceptError = hex::DecodeFixedLengthBytesError;
     let model: Result<mtype::TestMempoolAccept, TestMempoolAcceptError> = json.into_model();
     let test_mempool = model.unwrap();
 
@@ -446,9 +450,9 @@ fn create_sign_send(node: &Node) {
     let (_addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
-    let spend_amount = Amount::from_sat(100_000);
-    let fee = Amount::from_sat(1000);
-    let change_amount = tx_out.value - spend_amount - fee;
+    let spend_amount = Amount::from_sat_u32(100_000);
+    let fee = Amount::from_sat_u32(1000);
+    let change_amount = (tx_out.amount - spend_amount - fee).expect("invalid change amount");
 
     let inputs = vec![Input { txid, vout, sequence: None }];
 
@@ -487,7 +491,8 @@ fn create_sign_send(node: &Node) {
     // The proves we did everything correctly.
     let json: SendRawTransaction =
         node.client.send_raw_transaction(&sign_raw_transaction.tx).expect("sendrawtransaction");
-    let model: Result<mtype::SendRawTransaction, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::SendRawTransaction, hex::DecodeFixedLengthBytesError> =
+        json.into_model();
     model.unwrap();
 }
 
@@ -504,9 +509,9 @@ fn create_sign_with_key_send(node: &Node) {
     let (addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
-    let spend_amount = Amount::from_sat(100_000);
-    let fee = Amount::from_sat(1000);
-    let change_amount = tx_out.value - spend_amount - fee;
+    let spend_amount = Amount::from_sat_u32(100_000);
+    let fee = Amount::from_sat_u32(1000);
+    let change_amount = (tx_out.amount - spend_amount - fee).expect("valid change amount");
 
     let inputs = vec![Input { txid, vout, sequence: None }];
 
@@ -546,7 +551,8 @@ fn create_sign_with_key_send(node: &Node) {
     // The proves we did everything correctly.
     let json: SendRawTransaction =
         node.client.send_raw_transaction(&sign_raw_transaction.tx).expect("sendrawtransaction");
-    let model: Result<mtype::SendRawTransaction, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::SendRawTransaction, hex::DecodeFixedLengthBytesError> =
+        json.into_model();
     model.unwrap();
 }
 
@@ -565,7 +571,7 @@ fn create_fund_sign_send(node: &Node) {
     let inputs = vec![Input { txid, vout, sequence: None }];
     let mut outputs = vec![];
 
-    let spend_amount = Amount::from_sat(50_00_000_000);
+    let spend_amount = Amount::from_sat(50_00_000_000).expect("valid amount");
     // Just send back to ourself.
     let spend_address = node.client.new_address().expect("failed to create new address");
     outputs.push(Output::new(spend_address, spend_amount));
@@ -602,9 +608,9 @@ fn create_a_raw_transaction(node: &Node) -> Transaction {
     let (_addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
-    let spend_amount = Amount::from_sat(100_000);
-    let fee = Amount::from_sat(1000);
-    let change_amount = tx_out.value - spend_amount - fee;
+    let spend_amount = Amount::from_sat_u32(100_000);
+    let fee = Amount::from_sat_u32(1000);
+    let change_amount = (tx_out.amount - spend_amount - fee).expect("invalid change amount");
 
     let inputs = vec![Input { txid, vout, sequence: None }];
 
@@ -637,7 +643,7 @@ fn create_utxo(
     node: &Node,
 ) -> (bitcoin::Address, bitcoin::Transaction, bitcoin::Txid, bitcoin::TxOut, u64) {
     // TODO: We should probably pass this into `create_mined_transaction`.
-    const MILLION_SATS: bitcoin::Amount = bitcoin::Amount::from_sat(1000000);
+    const MILLION_SATS: bitcoin::Amount = bitcoin::Amount::from_sat_u32(1000000);
 
     let (addr, tx) = node.create_mined_transaction(); // A million sat transaction.
     let txid = tx.compute_txid();
@@ -652,7 +658,7 @@ fn create_utxo(
         .expect("GetTxOut into model")
         .tx_out;
 
-    let (tx_out, vout) = if tx_out.value == MILLION_SATS {
+    let (tx_out, vout) = if tx_out.amount == MILLION_SATS {
         (tx_out, 0)
     } else {
         let out = node
@@ -672,9 +678,9 @@ fn create_a_psbt(node: &Node) -> bitcoin::Psbt {
     let (_addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
-    let spend_amount = Amount::from_sat(100_000);
-    let fee = Amount::from_sat(1000);
-    let change_amount = tx_out.value - spend_amount - fee;
+    let spend_amount = Amount::from_sat_u32(100_000);
+    let fee = Amount::from_sat_u32(1000);
+    let change_amount = (tx_out.amount - spend_amount - fee).expect("invalid change amount");
 
     let inputs = vec![Input { txid, vout, sequence: None }];
 

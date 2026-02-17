@@ -23,6 +23,7 @@ pub struct EstimateRawFee {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct RawFeeDetail {
     /// Estimate fee rate in BTC/kB.
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub fee_rate: Option<FeeRate>,
     /// Exponential decay (per block) for historical moving average of confirmation data.
     pub decay: f64,
@@ -40,8 +41,10 @@ pub struct RawFeeDetail {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct RawFeeRange {
     /// Start of feerate range.
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub start_range: Option<FeeRate>,
     /// End of feerate range.
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub end_range: Option<FeeRate>,
     /// Number of txs over history horizon in the feerate range that were confirmed within target.
     pub within_target: f64,
@@ -110,5 +113,6 @@ pub struct GetOrphanTxsVerboseTwoEntry {
     /// List of peer ids that we store this transaction for.
     pub from: Vec<u64>,
     /// The orphan transaction.
+    #[serde(with = "bitcoin::as_consensus")]
     pub transaction: Transaction,
 }

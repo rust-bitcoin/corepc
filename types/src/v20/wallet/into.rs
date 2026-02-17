@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: CC0-1.0
 use bitcoin::consensus::encode;
 use bitcoin::hashes::hash160;
-use bitcoin::hex::FromHex;
 use bitcoin::key::PublicKey;
 use bitcoin::{
-    bip32, Address, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid, WitnessProgram,
-    WitnessVersion,
+    bip32, Address, BlockHash, RedeemScriptBuf, ScriptPubKeyBuf, SignedAmount, Transaction, Txid,
+    WitnessProgram, WitnessVersion,
 };
 
 use super::{
@@ -22,7 +21,8 @@ impl AddMultisigAddress {
         use AddMultisigAddressError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let redeem_script = ScriptBuf::from_hex(&self.redeem_script).map_err(E::RedeemScript)?;
+        let redeem_script = RedeemScriptBuf::from_hex_no_length_prefix(&self.redeem_script)
+            .map_err(E::RedeemScript)?;
 
         Ok(model::AddMultisigAddress {
             address,
@@ -39,7 +39,8 @@ impl GetAddressInfo {
         use GetAddressInfoError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {
@@ -49,7 +50,7 @@ impl GetAddressInfo {
                 let witness_version =
                     WitnessVersion::try_from(v as u8).map_err(E::WitnessVersion)?;
 
-                let bytes = Vec::from_hex(&hex).map_err(E::WitnessProgramBytes)?;
+                let bytes = bitcoin::hex::decode_to_vec(&hex).map_err(E::WitnessProgramBytes)?;
                 let witness_program =
                     WitnessProgram::new(witness_version, &bytes).map_err(E::WitnessProgram)?;
 
@@ -58,8 +59,10 @@ impl GetAddressInfo {
             _ => (None, None), // TODO: Think more if catchall is ok.
         };
         let script = self.script.map(|s| s.into_model());
-        let redeem_script =
-            self.hex.map(|hex| ScriptBuf::from_hex(&hex).map_err(E::Hex)).transpose()?;
+        let redeem_script = self
+            .hex
+            .map(|hex| RedeemScriptBuf::from_hex_no_length_prefix(&hex).map_err(E::Hex))
+            .transpose()?;
         let pubkeys = self
             .pubkeys
             .map(|pubkeys| {
@@ -124,7 +127,8 @@ impl GetAddressInfoEmbedded {
         use GetAddressInfoEmbeddedError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {
@@ -134,7 +138,7 @@ impl GetAddressInfoEmbedded {
                 let witness_version =
                     WitnessVersion::try_from(v as u8).map_err(E::WitnessVersion)?;
 
-                let bytes = Vec::from_hex(&hex).map_err(E::WitnessProgramBytes)?;
+                let bytes = bitcoin::hex::decode_to_vec(&hex).map_err(E::WitnessProgramBytes)?;
                 let witness_program =
                     WitnessProgram::new(witness_version, &bytes).map_err(E::WitnessProgram)?;
 
@@ -143,8 +147,10 @@ impl GetAddressInfoEmbedded {
             _ => (None, None), // TODO: Think more if catchall is ok.
         };
         let script = self.script.map(|s| s.into_model());
-        let redeem_script =
-            self.hex.map(|hex| ScriptBuf::from_hex(&hex).map_err(E::Hex)).transpose()?;
+        let redeem_script = self
+            .hex
+            .map(|hex| RedeemScriptBuf::from_hex_no_length_prefix(&hex).map_err(E::Hex))
+            .transpose()?;
         let pubkeys = None;
         let sigs_required =
             self.sigs_required.map(|s| crate::to_u32(s, "sigs_required")).transpose()?;
@@ -293,7 +299,7 @@ impl TransactionItem {
             .fee
             .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
             .transpose()? // optional historically
-            .unwrap_or_else(|| SignedAmount::from_sat(0));
+            .unwrap_or_else(|| SignedAmount::from_sat(0).expect("TODO: Handle this error"));
         let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
         let block_height = crate::to_u32(self.block_height, "block_height")?;
         let block_index = crate::to_u32(self.block_index, "block_index")?;

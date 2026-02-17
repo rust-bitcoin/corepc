@@ -16,7 +16,7 @@ pub enum AddMultisigAddressError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for AddMultisigAddressError {
@@ -43,7 +43,7 @@ impl std::error::Error for AddMultisigAddressError {
 #[derive(Debug)]
 pub enum BumpFeeError {
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `original_fee` field failed.
     OriginalFee(ParseAmountError),
     /// Conversion of the `fee` field failed.
@@ -80,17 +80,17 @@ pub enum GetAddressInfoError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
     /// The `witness_version` field's value was too big for a u8.
     WitnessVersionValue(i64),
     /// Conversion of the `witness_version` field failed.
     WitnessVersion(witness_version::TryFromError),
     /// Conversion of the `witness_program` field hex string to bytes failed.
-    WitnessProgramBytes(hex::HexToBytesError),
+    WitnessProgramBytes(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_program` field failed.
     WitnessProgram(witness_program::Error),
     /// Conversion of the `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `pubkeys` field failed.
     PubKeys(key::ParsePublicKeyError),
     /// Conversion of the `pubkey` field failed.
@@ -98,9 +98,9 @@ pub enum GetAddressInfoError {
     /// Conversion of the `embedded` field failed.
     Embedded(GetAddressInfoEmbeddedError),
     /// Conversion of the `hd_key_path` field failed.
-    HdKeyPath(bip32::Error),
+    HdKeyPath(bip32::ParseChildNumberError),
     /// Conversion of the `hd_seed_id` field failed.
-    HdSeedId(hex::HexToArrayError),
+    HdSeedId(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetAddressInfoError {
@@ -162,17 +162,17 @@ pub enum GetAddressInfoEmbeddedError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
     /// The `witness_version` field's value was too big for a u8.
     WitnessVersionValue(i64),
     /// Conversion of the `witness_version` field failed.
     WitnessVersion(witness_version::TryFromError),
     /// Conversion of the `witness_program` field hex string to bytes failed.
-    WitnessProgramBytes(hex::HexToBytesError),
+    WitnessProgramBytes(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_program` field failed.
     WitnessProgram(witness_program::Error),
     /// Conversion of the `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `pubkeys` field failed.
     PubKeys(key::ParsePublicKeyError),
     /// Conversion of the `pubkey` field failed.
@@ -232,11 +232,11 @@ pub enum GetTransactionError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wallet_conflicts` field failed.
-    WalletConflicts(hex::HexToArrayError),
+    WalletConflicts(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `hex` field failed.
     Tx(encode::FromHexError),
     /// Conversion of the `details` field failed.
@@ -326,7 +326,7 @@ pub enum GetWalletInfoError {
     /// Conversion of the `pay_tx_fee` field failed.
     PayTxFee(ParseAmountError),
     /// Conversion of the `hd_seed_id` field failed.
-    HdSeedId(hex::HexToArrayError),
+    HdSeedId(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetWalletInfoError {
@@ -398,7 +398,7 @@ pub enum ListLockUnspentItemError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ListLockUnspentItemError {
@@ -432,7 +432,7 @@ pub enum ListReceivedByAddressError {
     /// Conversion of the `amount` field failed.
     Amount(ParseAmountError),
     /// Conversion of txid in the `txids` list (with index) failed.
-    Txids(usize, hex::HexToArrayError),
+    Txids(usize, hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ListReceivedByAddressError {
@@ -465,7 +465,7 @@ pub enum ListSinceBlockError {
     /// Conversion of item in `removed` list failed.
     Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
-    LastBlock(hex::HexToArrayError),
+    LastBlock(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ListSinceBlockError {
@@ -503,9 +503,9 @@ pub enum TransactionItemError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for TransactionItemError {
@@ -546,15 +546,15 @@ pub enum ListUnspentItemError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `amount` field failed.
     Amount(ParseAmountError),
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
 }

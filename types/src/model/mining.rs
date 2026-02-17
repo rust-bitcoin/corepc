@@ -74,6 +74,7 @@ pub struct GetBlockTemplate {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct BlockTemplateTransaction {
     /// The transaction.
+    #[serde(with = "bitcoin::as_consensus")]
     pub data: Transaction,
     /// The transaction ID.
     pub txid: Txid,
@@ -116,7 +117,8 @@ pub struct GetMiningInfo {
     pub network_hash_ps: f64,
     /// The size of the mempool.
     pub pooled_tx: i64,
-    /// Minimum feerate of packages selected for block inclusion.
+    /// Minimum feerate of packages selected for block inclusion (v30 onwards).
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub block_min_tx_fee: Option<FeeRate>,
     /// Current network name as defined in BIP70 (main, test, regtest).
     pub chain: String,
@@ -151,9 +153,11 @@ pub struct GetPrioritisedTransactions(pub BTreeMap<Txid, PrioritisedTransaction>
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct PrioritisedTransaction {
     /// Transaction fee delta in satoshis.
+    #[serde(with = "bitcoin::amount::serde::as_sat")]
     pub fee_delta: Amount,
     /// Whether this transaction is currently in mempool.
     pub in_mempool: bool,
     /// Modified fee in satoshis. Only returned if in_mempool=true.
+    #[serde(with = "bitcoin::amount::serde::as_sat::opt")]
     pub modified_fee: Option<Amount>,
 }

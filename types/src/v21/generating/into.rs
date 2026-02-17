@@ -11,7 +11,7 @@ use crate::model;
 
 impl GenerateBlock {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GenerateBlock, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GenerateBlock, hex::DecodeFixedLengthBytesError> {
         let hash = self.hash.parse::<BlockHash>()?;
         Ok(model::GenerateBlock {
             hash,

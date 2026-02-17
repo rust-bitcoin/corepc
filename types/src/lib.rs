@@ -36,11 +36,11 @@ pub mod v30;
 pub mod model;
 
 use core::fmt;
+use core::num::NonZeroU64;
 
 use bitcoin::address::{self, Address, NetworkUnchecked};
 use bitcoin::amount::ParseAmountError;
-use bitcoin::hex::{self, FromHex as _};
-use bitcoin::{Amount, FeeRate, ScriptBuf, Witness};
+use bitcoin::{hex, Amount, FeeRate, ScriptPubKeyBuf, ScriptSigBuf, Witness};
 use serde::{Deserialize, Serialize};
 
 use crate::error::write_err;
@@ -89,17 +89,23 @@ impl fmt::Display for NumericError {
 impl std::error::Error for NumericError {}
 
 /// Converts `fee_rate` in BTC/kB to `FeeRate`.
-fn btc_per_kb(btc_per_kb: f64) -> Result<Option<FeeRate>, ParseAmountError> {
+fn btc_per_kb(btc_per_kb: f64) -> Result<FeeRate, ParseAmountError> {
     // TODO: After upgrade to bitcoin `v0.33` use `FeeRate::from_sat_per_kvb()`.
     let per_kb = Amount::from_btc(btc_per_kb)?;
-    Ok(FeeRate::from_sat_per_vb(per_kb.to_sat()).and_then(|fee_rate| fee_rate.checked_div(1000)))
+    // Just cast away high bits, there is no sane fee rate that does not fit in a u32.
+    let per_kb = per_kb.to_sat() as u32;
+    Ok(FeeRate::from_sat_per_vb(per_kb) / NonZeroU64::new(1000).expect("1000 is non-zero"))
 }
 
 // TODO: Remove this function if a new `Witness` constructor gets added.
 // https://github.com/rust-bitcoin/rust-bitcoin/issues/4350
-fn witness_from_hex_slice<T: AsRef<str>>(witness: &[T]) -> Result<Witness, hex::HexToBytesError> {
-    let bytes: Vec<Vec<u8>> =
-        witness.iter().map(|hex| Vec::from_hex(hex.as_ref())).collect::<Result<_, _>>()?;
+fn witness_from_hex_slice<T: AsRef<str>>(
+    witness: &[T],
+) -> Result<Witness, hex::DecodeVariableLengthBytesError> {
+    let bytes: Vec<Vec<u8>> = witness
+        .iter()
+        .map(|hex| bitcoin::hex::decode_to_vec(hex.as_ref()))
+        .collect::<Result<_, _>>()?;
     Ok(Witness::from_slice(&bytes))
 }
 
@@ -208,7 +214,7 @@ pub struct ScriptPubKey {
 #[derive(Debug)]
 pub enum ScriptPubKeyError {
     /// Conversion of the `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `addresses` field failed.
@@ -238,8 +244,8 @@ impl std::error::Error for ScriptPubKeyError {
 }
 
 impl ScriptPubKey {
-    fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
-        ScriptBuf::from_hex(&self.hex)
+    fn script_buf(&self) -> Result<ScriptPubKeyBuf, hex::DecodeVariableLengthBytesError> {
+        ScriptPubKeyBuf::from_hex_no_length_prefix(&self.hex)
     }
 
     fn address(&self) -> Option<Result<Address<NetworkUnchecked>, address::ParseError>> {
@@ -250,7 +256,8 @@ impl ScriptPubKey {
     pub fn into_model(self) -> Result<model::ScriptPubKey, ScriptPubKeyError> {
         use ScriptPubKeyError as E;
 
-        let script_pubkey = ScriptBuf::from_hex(&self.hex).map_err(E::Hex)?;
+        let script_pubkey =
+            ScriptPubKeyBuf::from_hex_no_length_prefix(&self.hex).map_err(E::Hex)?;
 
         let address =
             self.address.map(|s| s.parse::<Address<_>>().map_err(E::Address)).transpose()?;
@@ -284,8 +291,8 @@ pub struct ScriptSig {
 }
 
 impl ScriptSig {
-    pub fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
-        ScriptBuf::from_hex(&self.hex)
+    pub fn script_buf(&self) -> Result<ScriptSigBuf, hex::DecodeVariableLengthBytesError> {
+        ScriptSigBuf::from_hex_no_length_prefix(&self.hex)
     }
 }
 
@@ -298,6 +305,6 @@ mod tests {
         // per kB = per kvB because this is a conversion of legacy transaction weights.
         let f: f64 = 0.000001;
         let got = btc_per_kb(f).unwrap();
-        assert_eq!(got, Some(FeeRate::from_sat_per_kwu(25)))
+        assert_eq!(got, FeeRate::from_sat_per_kwu(25))
     }
 }

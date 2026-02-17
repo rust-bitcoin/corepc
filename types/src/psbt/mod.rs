@@ -4,10 +4,10 @@ mod error;
 
 use std::collections::{BTreeMap, HashMap};
 
-use bitcoin::hex::{self, FromHex as _};
+use bitcoin::script::{ScriptBuf, Tag};
 use bitcoin::{
-    absolute, bip32, ecdsa, psbt, secp256k1, transaction, Amount, OutPoint, PublicKey, ScriptBuf,
-    Sequence, Transaction, TxIn, TxOut, Txid, Witness,
+    absolute, bip32, ecdsa, hex, psbt, secp256k1, transaction, Amount, OutPoint, PublicKey,
+    ScriptSigBuf, Sequence, Transaction, TxIn, TxOut, Txid, Witness,
 };
 use serde::{Deserialize, Serialize};
 
@@ -35,7 +35,7 @@ pub struct RawTransaction {
     /// The transaction's weight (between vsize*4 - 3 and vsize*4).
     pub weight: u64,
     /// The version number.
-    pub version: i32,
+    pub version: u32,
     /// The lock time.
     #[serde(rename = "locktime")]
     pub lock_time: u32,
@@ -52,22 +52,22 @@ impl RawTransaction {
     pub fn to_transaction(&self) -> Result<Transaction, RawTransactionError> {
         use RawTransactionError as E;
 
-        let version = transaction::Version::non_standard(self.version);
+        let version = transaction::Version::maybe_non_standard(self.version);
         let lock_time = absolute::LockTime::from_consensus(self.lock_time);
-        let input = self
+        let inputs = self
             .inputs
             .iter()
             .map(|input| input.to_input())
             .collect::<Result<_, _>>()
             .map_err(E::Inputs)?;
-        let output = self
+        let outputs = self
             .outputs
             .iter()
             .map(|output| output.to_output())
             .collect::<Result<_, _>>()
             .map_err(E::Outputs)?;
 
-        Ok(Transaction { version, lock_time, input, output })
+        Ok(Transaction { version, lock_time, inputs, outputs })
     }
 }
 
@@ -109,7 +109,7 @@ impl RawTransactionInput {
                 let vout = self.vout.ok_or(RawTransactionInputError::MissingVout)?;
                 OutPoint { txid: parsed_txid, vout }
             }
-            (None, Some(_)) => OutPoint::null(),
+            (None, Some(_)) => OutPoint::COINBASE_PREVOUT,
             (None, None) => return Err(E::MissingTxid),
         };
 
@@ -117,7 +117,8 @@ impl RawTransactionInput {
         // if coinbase transaction, parse coinbase as scriptSig
         let script_sig = match (&self.script_sig, &self.coinbase) {
             (Some(script_sig), _) => script_sig.script_buf().map_err(E::ScriptSig)?,
-            (None, Some(coinbase)) => ScriptBuf::from_hex(coinbase).map_err(E::ScriptSig)?,
+            (None, Some(coinbase)) =>
+                ScriptSigBuf::from_hex_no_length_prefix(coinbase).map_err(E::ScriptSig)?,
             (None, None) => return Err(E::MissingScriptSig),
         };
 
@@ -155,10 +156,10 @@ impl RawTransactionOutput {
     pub fn to_output(&self) -> Result<TxOut, RawTransactionOutputError> {
         use RawTransactionOutputError as E;
 
-        let value = Amount::from_btc(self.value).map_err(E::Value)?;
+        let amount = Amount::from_btc(self.value).map_err(E::Value)?;
         let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubKey)?;
 
-        Ok(TxOut { value, script_pubkey })
+        Ok(TxOut { amount, script_pubkey })
     }
 }
 
@@ -179,10 +180,10 @@ impl WitnessUtxo {
     pub fn to_tx_out(&self) -> Result<TxOut, WitnessUtxoError> {
         use WitnessUtxoError as E;
 
-        let value = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
         let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubKey)?;
 
-        Ok(TxOut { value, script_pubkey })
+        Ok(TxOut { amount, script_pubkey })
     }
 }
 
@@ -201,8 +202,8 @@ pub struct PsbtScript {
 
 impl PsbtScript {
     /// Parses the hex into a `ScriptBuf`.
-    pub fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
-        ScriptBuf::from_hex(&self.hex)
+    pub fn script_buf<T: Tag>(&self) -> Result<ScriptBuf<T>, hex::DecodeVariableLengthBytesError> {
+        ScriptBuf::from_hex_no_length_prefix(&self.hex)
     }
 }
 
@@ -248,24 +249,20 @@ pub struct FinalScript {
 /// Converts a map of unknown key-value pairs.
 pub fn into_unknown(
     hash_map: HashMap<String, String>,
-) -> Result<BTreeMap<psbt::raw::Key, Vec<u8>>, hex::HexToBytesError> {
+) -> Result<BTreeMap<psbt::raw::Key, Vec<u8>>, hex::DecodeVariableLengthBytesError> {
     let mut map = BTreeMap::default();
     for (k, v) in hash_map.iter() {
         // FIXME: This is best guess, I (Tobin) don't actually know what
         // is in the hex string returned by Core.
-        let key = Vec::from_hex(k)?;
-        let value = Vec::from_hex(v)?;
+        let key_data = bitcoin::hex::decode_to_vec(k)?;
+        let value = bitcoin::hex::decode_to_vec(v)?;
 
         // rust-bitcoin separates out the key type.
-        let mut p = key.as_slice();
+        let mut p = key_data.as_slice();
         let _ = crate::compact_size_decode(&mut p); // Moves p past the keylen integer.
         let type_value = crate::compact_size_decode(&mut p);
 
-        // In the next release of rust-bitcoin this is changed to a u64.
-        // Yes this looses data - c'est la vie.
-        let type_value: u8 = type_value as u8;
-
-        let key = psbt::raw::Key { type_value, key };
+        let key = psbt::raw::Key { type_value, key_data };
         map.insert(key, value);
     }
     Ok(map)
@@ -300,7 +297,7 @@ pub fn map_into_bip32_derivation(
             Fingerprint::from_hex(&v.master_fingerprint).map_err(E::MasterFingerprint)?;
         let path = v.path.parse::<DerivationPath>().map_err(E::Path)?;
 
-        map.insert(pubkey.inner, (fingerprint, path));
+        map.insert(pubkey.to_inner(), (fingerprint, path));
     }
     Ok(map)
 }
@@ -319,7 +316,7 @@ pub fn vec_into_bip32_derivation(
             Fingerprint::from_hex(&deriv.master_fingerprint).map_err(E::MasterFingerprint)?;
         let path = deriv.path.parse::<DerivationPath>().map_err(E::Path)?;
 
-        map.insert(pubkey.inner, (fingerprint, path));
+        map.insert(pubkey.to_inner(), (fingerprint, path));
     }
     Ok(map)
 }

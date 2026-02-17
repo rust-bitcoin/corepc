@@ -25,8 +25,7 @@ impl RawFeeDetail {
     pub fn into_model(self) -> Result<model::RawFeeDetail, EstimateRawFeeError> {
         use EstimateRawFeeError as E;
 
-        let fee_rate =
-            self.fee_rate.map(crate::btc_per_kb).transpose().map_err(E::FeeRate)?.flatten();
+        let fee_rate = self.fee_rate.map(crate::btc_per_kb).transpose().map_err(E::FeeRate)?;
         let pass = self.pass.map(|p| p.into_model()).transpose()?;
         let fail = self.fail.map(|p| p.into_model()).transpose()?;
 
@@ -44,8 +43,8 @@ impl RawFeeDetail {
 impl RawFeeRange {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::RawFeeRange, EstimateRawFeeError> {
-        let start_range = crate::btc_per_kb(self.start_range).ok().flatten();
-        let end_range = crate::btc_per_kb(self.end_range).ok().flatten();
+        let start_range = crate::btc_per_kb(self.start_range).ok();
+        let end_range = crate::btc_per_kb(self.end_range).ok();
 
         Ok(model::RawFeeRange {
             start_range,

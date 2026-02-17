@@ -4,7 +4,7 @@ use core::fmt;
 
 use bitcoin::amount::{self, ParseAmountError};
 use bitcoin::consensus::encode;
-use bitcoin::error::UnprefixedHexError;
+use bitcoin::parse_int::UnprefixedHexError;
 use bitcoin::{address, hex, network};
 
 use crate::error::write_err;
@@ -16,9 +16,9 @@ pub enum GetBlockVerboseOneError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `merkle_root` field failed.
-    MerkleRoot(hex::HexToArrayError),
+    MerkleRoot(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `hex` field failed.
     Tx(encode::FromHexError),
     /// Conversion of the transaction `bits` field failed.
@@ -26,9 +26,9 @@ pub enum GetBlockVerboseOneError {
     /// Conversion of the transaction `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of the transaction `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `next_block_hash` field failed.
-    NextBlockHash(hex::HexToArrayError),
+    NextBlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetBlockVerboseOneError {
@@ -78,7 +78,7 @@ pub enum GetBlockchainInfoError {
     /// Conversion of the `chain` field failed.
     Chain(network::ParseNetworkError),
     /// Conversion of the `best_block_hash` field failed.
-    BestBlockHash(hex::HexToArrayError),
+    BestBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `chain_work` field failed.
     ChainWork(UnprefixedHexError),
 }
@@ -116,9 +116,10 @@ impl From<NumericError> for GetBlockchainInfoError {
 #[derive(Debug)]
 pub enum GetBlockHeaderError {
     /// Conversion of hex data to bytes failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Consensus decoding of bytes to header failed.
-    Header(encode::Error),
+    // TODO: Shorten path once after: https://github.com/rust-bitcoin/rust-bitcoin/pull/5709
+    Header(bitcoin::primitives::block::HeaderDecoderError),
 }
 
 impl fmt::Display for GetBlockHeaderError {
@@ -146,17 +147,17 @@ pub enum GetBlockHeaderVerboseError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of `merkle_root` field failed.
-    MerkleRoot(hex::HexToArrayError),
+    MerkleRoot(hex::DecodeFixedLengthBytesError),
     /// Conversion of `bits` field failed.
     Bits(UnprefixedHexError),
     /// Conversion of `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of `next_block_hash` field failed.
-    NextBlockHash(hex::HexToArrayError),
+    NextBlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetBlockHeaderVerboseError {
@@ -202,7 +203,7 @@ pub enum GetBlockStatsError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetBlockStatsError {
@@ -235,7 +236,7 @@ pub enum ChainTipsError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ChainTipsError {
@@ -267,7 +268,7 @@ pub enum GetChainTxStatsError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `window_final_block_hash` field failed.
-    WindowFinalBlockHash(hex::HexToArrayError),
+    WindowFinalBlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetChainTxStatsError {
@@ -298,7 +299,7 @@ impl From<NumericError> for GetChainTxStatsError {
 #[derive(Debug)]
 pub enum MapMempoolEntryError {
     /// Conversion of a `txid` failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of a `MempoolEntry` value inside a map failed.
     MempoolEntry(MempoolEntryError),
 }
@@ -328,13 +329,13 @@ pub enum MempoolEntryError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
+    Wtxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `MempoolEntryFees` type failed.
     Fees(MempoolEntryFeesError),
     /// Conversion of the `depends` field failed.
-    Depends(hex::HexToArrayError),
+    Depends(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `spent_by` field failed.
-    SpentBy(hex::HexToArrayError),
+    SpentBy(hex::DecodeFixedLengthBytesError),
 }
 
 impl From<NumericError> for MempoolEntryError {
@@ -448,11 +449,11 @@ pub enum GetTxOutError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `best_block` field failed.
-    BestBlock(hex::HexToArrayError),
+    BestBlock(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `value` field failed.
     Value(amount::ParseAmountError),
     /// Conversion of the `ScriptPubKey` hex to a `ScriptBuf` failed.
-    ScriptBuf(hex::HexToBytesError),
+    ScriptBuf(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `ScriptPubKey` `address` field failed.
     Address(address::ParseError),
 }
@@ -495,7 +496,7 @@ pub enum GetTxOutSetInfoError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `best_block` field failed.
-    BestBlock(hex::HexToArrayError),
+    BestBlock(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `total_amount` field failed.
     TotalAmount(amount::ParseAmountError),
 }
@@ -531,13 +532,13 @@ impl From<NumericError> for GetTxOutSetInfoError {
 #[derive(Debug)]
 pub enum ScanTxOutSetError {
     /// Conversion of the `best_block` field failed.
-    BestBlockHash(hex::HexToArrayError),
+    BestBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `total_amount` field failed.
     TotalAmount(amount::ParseAmountError),
     /// Conversion of the `amount` field failed.

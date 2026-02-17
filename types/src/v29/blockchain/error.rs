@@ -3,8 +3,8 @@
 use core::fmt;
 
 use bitcoin::consensus::encode;
-use bitcoin::error::UnprefixedHexError;
-use bitcoin::hex::HexToBytesError;
+use bitcoin::hex::DecodeVariableLengthBytesError;
+use bitcoin::parse_int::UnprefixedHexError;
 use bitcoin::{address, amount, hex, network};
 
 use crate::error::write_err;
@@ -18,9 +18,9 @@ pub enum GetBlockVerboseOneError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `merkle_root` field failed.
-    MerkleRoot(hex::HexToArrayError),
+    MerkleRoot(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `hex` field failed.
     Tx(encode::FromHexError),
     /// Conversion of the transaction `bits` field failed.
@@ -30,9 +30,9 @@ pub enum GetBlockVerboseOneError {
     /// Conversion of the transaction `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of the transaction `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `next_block_hash` field failed.
-    NextBlockHash(hex::HexToArrayError),
+    NextBlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetBlockVerboseOneError {
@@ -82,9 +82,9 @@ pub enum GetBlockVerboseTwoError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `merkle_root` field failed.
-    MerkleRoot(hex::HexToArrayError),
+    MerkleRoot(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `bits` field failed.
     Bits(UnprefixedHexError),
     /// Conversion of the `target` field failed.
@@ -92,9 +92,9 @@ pub enum GetBlockVerboseTwoError {
     /// Conversion of the transaction `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of the transaction `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `next_block_hash` field failed.
-    NextBlockHash(hex::HexToArrayError),
+    NextBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of a transaction entry failed.
     Transaction(GetRawTransactionVerboseError),
     /// Conversion of the transaction `fee` field failed.
@@ -151,9 +151,9 @@ pub enum GetBlockVerboseThreeError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `merkle_root` field failed.
-    MerkleRoot(hex::HexToArrayError),
+    MerkleRoot(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `bits` field failed.
     Bits(UnprefixedHexError),
     /// Conversion of the `target` field failed.
@@ -161,15 +161,15 @@ pub enum GetBlockVerboseThreeError {
     /// Conversion of the transaction `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of the transaction `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `next_block_hash` field failed.
-    NextBlockHash(hex::HexToArrayError),
+    NextBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of one of the transaction inputs failed.
     Inputs(RawTransactionInputError),
     /// Conversion of one of the transaction outputs failed.
     Outputs(RawTransactionOutputError),
     /// Conversion of the transaction `block_hash` field failed.
-    TransactionBlockHash(hex::HexToArrayError),
+    TransactionBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `fee` field failed.
     Fee(amount::ParseAmountError),
     /// Conversion of a prevout height failed.
@@ -251,11 +251,11 @@ pub enum GetBlockchainInfoError {
     /// Conversion of the `target` field failed.
     Target(UnprefixedHexError),
     /// Conversion of the `best_block_hash` field failed.
-    BestBlockHash(hex::HexToArrayError),
+    BestBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of the `script` field failed.
-    SignetChallenge(hex::HexToBytesError),
+    SignetChallenge(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for GetBlockchainInfoError {
@@ -294,17 +294,17 @@ impl From<NumericError> for GetBlockchainInfoError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
 
-impl From<HexToBytesError> for GetBlockchainInfoError {
-    fn from(e: HexToBytesError) -> Self { Self::SignetChallenge(e) }
+impl From<DecodeVariableLengthBytesError> for GetBlockchainInfoError {
+    fn from(e: DecodeVariableLengthBytesError) -> Self { Self::SignetChallenge(e) }
 }
 
 /// Error when converting a `GetBlockHeader` type into the model type.
 #[derive(Debug)]
 pub enum GetBlockHeaderError {
     /// Conversion of hex data to bytes failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Consensus decoding of bytes to header failed.
-    Header(encode::Error),
+    Header(bitcoin::primitives::block::HeaderDecoderError),
 }
 
 impl fmt::Display for GetBlockHeaderError {
@@ -332,9 +332,9 @@ pub enum GetBlockHeaderVerboseError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of `merkle_root` field failed.
-    MerkleRoot(hex::HexToArrayError),
+    MerkleRoot(hex::DecodeFixedLengthBytesError),
     /// Conversion of `bits` field failed.
     Bits(UnprefixedHexError),
     /// Conversion of `target` field failed.
@@ -342,9 +342,9 @@ pub enum GetBlockHeaderVerboseError {
     /// Conversion of `chain_work` field failed.
     ChainWork(UnprefixedHexError),
     /// Conversion of `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of `next_block_hash` field failed.
-    NextBlockHash(hex::HexToArrayError),
+    NextBlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetBlockHeaderVerboseError {
@@ -392,13 +392,13 @@ impl From<NumericError> for GetBlockHeaderVerboseError {
 #[derive(Debug)]
 pub enum GetChainStatesError {
     /// Conversion of the `best_block_hash` field failed.
-    BestBlockHash(hex::HexToArrayError),
+    BestBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `bits` field failed.
     Bits(UnprefixedHexError),
     /// Conversion of the `target` field failed.
     Target(UnprefixedHexError),
     /// Conversion of the `snapshot_block_hash` field failed.
-    SnapshotBlockHash(hex::HexToArrayError),
+    SnapshotBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
 }
@@ -442,17 +442,17 @@ pub enum GetDescriptorActivityError {
     /// Conversion of numeric type (e.g., height) to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `spend_txid` field failed.
-    SpendTxid(hex::HexToArrayError),
+    SpendTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `prevout_txid` field failed.
-    PrevoutTxid(hex::HexToArrayError),
+    PrevoutTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `amount` field (f64 BTC) failed.
     Amount(amount::ParseAmountError),
     /// Conversion of script hex to ScriptBuf failed.
-    Script(hex::HexToBytesError),
+    Script(hex::DecodeVariableLengthBytesError),
     /// Conversion of address string to Address failed.
     Address(address::ParseError),
     /// An error occurred during processing of an individual activity entry.
@@ -515,16 +515,16 @@ impl From<NumericError> for GetDescriptorActivityError {
     fn from(e: NumericError) -> Self { Self::Numeric(e) }
 }
 
-impl From<hex::HexToArrayError> for GetDescriptorActivityError {
-    fn from(e: hex::HexToArrayError) -> Self { Self::BlockHash(e) }
+impl From<hex::DecodeFixedLengthBytesError> for GetDescriptorActivityError {
+    fn from(e: hex::DecodeFixedLengthBytesError) -> Self { Self::BlockHash(e) }
 }
 
 impl From<amount::ParseAmountError> for GetDescriptorActivityError {
     fn from(e: amount::ParseAmountError) -> Self { Self::Amount(e) }
 }
 
-impl From<hex::HexToBytesError> for GetDescriptorActivityError {
-    fn from(e: hex::HexToBytesError) -> Self { Self::Script(e) }
+impl From<hex::DecodeVariableLengthBytesError> for GetDescriptorActivityError {
+    fn from(e: hex::DecodeVariableLengthBytesError) -> Self { Self::Script(e) }
 }
 
 impl From<address::ParseError> for GetDescriptorActivityError {
