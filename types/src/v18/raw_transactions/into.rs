@@ -25,8 +25,7 @@ impl AnalyzePsbt {
             .estimated_fee_rate
             .map(crate::btc_per_kb)
             .transpose()
-            .map_err(E::EstimatedFeeRate)?
-            .flatten();
+            .map_err(E::EstimatedFeeRate)?;
         let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::AnalyzePsbt {

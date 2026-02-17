@@ -44,13 +44,13 @@ impl std::error::Error for AnalyzePsbtError {
 #[derive(Debug)]
 pub enum AnalyzePsbtInputMissingError {
     /// Conversion of the `pubkeys` field failed.
-    PubKeys(hex::HexToArrayError),
+    PubKeys(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `signatures` field failed.
-    Signatures(hex::HexToArrayError),
+    Signatures(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `RedeemScript` field failed.
-    RedeemScript(hex::HexToArrayError),
+    RedeemScript(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `witness_script` field failed.
-    WitnessScript(hex::HexToArrayError),
+    WitnessScript(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for AnalyzePsbtInputMissingError {

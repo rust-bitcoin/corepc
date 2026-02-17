@@ -24,7 +24,7 @@ impl GetMempoolInfo {
             max_mempool,
             mempool_min_fee,
             min_relay_tx_fee,
-            incremental_relay_fee,
+            incremental_relay_fee: Some(incremental_relay_fee),
             unbroadcast_count,
             full_rbf: Some(self.full_rbf),
             permit_bare_multisig: Some(self.permit_bare_multisig),

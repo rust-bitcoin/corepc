@@ -3,11 +3,9 @@
 use alloc::collections::BTreeMap;
 use core::str::FromStr;
 
-use bitcoin::consensus::encode;
-use bitcoin::hashes::hex::FromHex;
 use bitcoin::{
-    absolute, block, hex, transaction, Amount, BlockHash, CompactTarget, Network, ScriptBuf,
-    Target, Transaction, TxMerkleNode, Txid, Weight, Work,
+    absolute, block, hex, transaction, Amount, BlockHash, CompactTarget, Network, Target,
+    Transaction, TxMerkleNode, Txid, Weight, WitnessScriptBuf, Work,
 };
 
 // TODO: Use explicit imports?
@@ -136,10 +134,10 @@ impl GetRawTransactionVerboseWithPrevout {
     > {
         use GetBlockVerboseThreeError as E;
 
-        let version = transaction::Version::non_standard(self.version);
+        let version = transaction::Version::maybe_non_standard(self.version);
         let lock_time = absolute::LockTime::from_consensus(self.lock_time);
 
-        let mut input = Vec::with_capacity(self.inputs.len());
+        let mut inputs = Vec::with_capacity(self.inputs.len());
         let mut prevouts = Vec::with_capacity(self.inputs.len());
         for item in self.inputs {
             let prevout = item
@@ -163,17 +161,17 @@ impl GetRawTransactionVerboseWithPrevout {
 
             prevouts.push(prevout);
             let txin = item.input.to_input().map_err(E::Inputs)?;
-            input.push(txin);
+            inputs.push(txin);
         }
 
-        let output = self
+        let outputs = self
             .outputs
             .into_iter()
             .map(|output| output.to_output())
             .collect::<Result<_, _>>()
             .map_err(E::Outputs)?;
 
-        let transaction = Transaction { version, lock_time, input, output };
+        let transaction = Transaction { version, lock_time, inputs, outputs };
         let block_hash = self
             .block_hash
             .map(|s| s.parse::<BlockHash>())
@@ -269,8 +267,11 @@ impl GetBlockchainInfo {
             self.prune_height.map(|h| crate::to_u32(h, "prune_height")).transpose()?;
         let prune_target_size =
             self.prune_target_size.map(|h| crate::to_u32(h, "prune_target_size")).transpose()?;
-        let signet_challenge =
-            self.signet_challenge.as_ref().map(|s| ScriptBuf::from_hex(s)).transpose()?;
+        let signet_challenge = self
+            .signet_challenge
+            .as_ref()
+            .map(|s| WitnessScriptBuf::from_hex_no_length_prefix(s))
+            .transpose()?;
 
         Ok(model::GetBlockchainInfo {
             chain,
@@ -302,8 +303,8 @@ impl GetBlockHeader {
     pub fn into_model(self) -> Result<model::GetBlockHeader, GetBlockHeaderError> {
         use GetBlockHeaderError as E;
 
-        let v = Vec::from_hex(&self.0).map_err(E::Hex)?;
-        let header = encode::deserialize::<block::Header>(&v).map_err(E::Header)?;
+        let v = bitcoin::hex::decode_to_vec(&self.0).map_err(E::Hex)?;
+        let header = encoding::decode_from_slice::<block::Header>(&v).map_err(E::Header)?;
 
         Ok(model::GetBlockHeader(header))
     }
@@ -354,7 +355,7 @@ impl GetBlockHeaderVerbose {
     }
 
     /// Converts json straight to a `bitcoin::BlockHeader`.
-    pub fn block_header(self) -> Result<block::Header, hex::HexToArrayError> { todo!() }
+    pub fn block_header(self) -> Result<block::Header, hex::DecodeFixedLengthBytesError> { todo!() }
 }
 
 impl GetChainStates {

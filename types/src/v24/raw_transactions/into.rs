@@ -4,12 +4,11 @@ use std::collections::BTreeMap;
 
 use bitcoin::bip32::{DerivationPath, Fingerprint, KeySource, Xpub};
 use bitcoin::hashes::{hash160, ripemd160, sha256, sha256d};
-use bitcoin::hex::{self, FromHex as _};
 use bitcoin::psbt::{self, raw, PsbtSighashType};
 use bitcoin::taproot::{
     ControlBlock, LeafVersion, TapLeafHash, TapNodeHash, TapTree, TaprootBuilder,
 };
-use bitcoin::{Amount, ScriptBuf, XOnlyPublicKey};
+use bitcoin::{hex, Amount, TapScriptBuf, XOnlyPublicKey};
 
 use super::{
     taproot, ControlBlocksError, DecodePsbt, DecodePsbtError, GlobalXpub, GlobalXpubError,
@@ -94,18 +93,12 @@ impl Proprietary {
     /// Converts this proprietary list element to a map entry suitable to use in `bitcoin::Psbt`.
     pub fn to_key_value_pair(
         &self,
-    ) -> Result<(raw::ProprietaryKey, Vec<u8>), hex::HexToBytesError> {
-        // FIXME: Remove cast once rust-bitcoin 0.33 is out.
-        //
-        // This is changed to a u64 in the upcoming rust-bitcoin
-        // release, until then just ignore any additional bits.
-        let subtype = self.subtype as u8;
+    ) -> Result<(raw::ProprietaryKey, Vec<u8>), hex::DecodeVariableLengthBytesError> {
+        let prefix = bitcoin::hex::decode_to_vec(&self.identifier)?;
+        let key = bitcoin::hex::decode_to_vec(&self.key)?;
+        let value = bitcoin::hex::decode_to_vec(&self.value)?;
 
-        let prefix = Vec::from_hex(&self.identifier)?;
-        let key = Vec::from_hex(&self.key)?;
-        let value = Vec::from_hex(&self.value)?;
-
-        Ok((raw::ProprietaryKey { prefix, subtype, key }, value))
+        Ok((raw::ProprietaryKey { prefix, subtype: self.subtype, key }, value))
     }
 }
 
@@ -161,7 +154,8 @@ impl PsbtInput {
                 let mut preimages = BTreeMap::default();
                 for (hash, preimage) in map.iter() {
                     let hash = hash.parse::<ripemd160::Hash>().map_err(E::Ripemd160)?;
-                    let preimage = Vec::from_hex(preimage).map_err(E::Ripemd160Preimage)?;
+                    let preimage =
+                        bitcoin::hex::decode_to_vec(preimage).map_err(E::Ripemd160Preimage)?;
                     preimages.insert(hash, preimage);
                 }
                 preimages
@@ -173,7 +167,8 @@ impl PsbtInput {
                 let mut preimages = BTreeMap::default();
                 for (hash, preimage) in map.iter() {
                     let hash = hash.parse::<sha256::Hash>().map_err(E::Sha256)?;
-                    let preimage = Vec::from_hex(preimage).map_err(E::Sha256Preimage)?;
+                    let preimage =
+                        bitcoin::hex::decode_to_vec(preimage).map_err(E::Sha256Preimage)?;
                     preimages.insert(hash, preimage);
                 }
                 preimages
@@ -185,7 +180,8 @@ impl PsbtInput {
                 let mut preimages = BTreeMap::default();
                 for (hash, preimage) in map.iter() {
                     let hash = hash.parse::<hash160::Hash>().map_err(E::Hash160)?;
-                    let preimage = Vec::from_hex(preimage).map_err(E::Hash160Preimage)?;
+                    let preimage =
+                        bitcoin::hex::decode_to_vec(preimage).map_err(E::Hash160Preimage)?;
                     preimages.insert(hash, preimage);
                 }
                 preimages
@@ -197,7 +193,8 @@ impl PsbtInput {
                 let mut preimages = BTreeMap::default();
                 for (hash, preimage) in map.iter() {
                     let hash = hash.parse::<sha256d::Hash>().map_err(E::Hash256)?;
-                    let preimage = Vec::from_hex(preimage).map_err(E::Hash256Preimage)?;
+                    let preimage =
+                        bitcoin::hex::decode_to_vec(preimage).map_err(E::Hash256Preimage)?;
                     preimages.insert(hash, preimage);
                 }
                 preimages
@@ -274,6 +271,9 @@ impl PsbtInput {
             None => BTreeMap::default(),
         };
 
+        // These field is not used in Core yet as of v30.
+        let musig2_participant_pubkeys = BTreeMap::default();
+
         Ok(psbt::Input {
             non_witness_utxo,
             witness_utxo,
@@ -294,6 +294,7 @@ impl PsbtInput {
             tap_key_origins,
             tap_internal_key,
             tap_merkle_root,
+            musig2_participant_pubkeys,
             proprietary,
             unknown,
         })
@@ -359,6 +360,9 @@ impl PsbtOutput {
             None => BTreeMap::default(),
         };
 
+        // These field is not used in Core yet as of v30.
+        let musig2_participant_pubkeys = BTreeMap::default();
+
         Ok(psbt::Output {
             redeem_script,
             witness_script,
@@ -366,6 +370,7 @@ impl PsbtOutput {
             tap_internal_key,
             tap_tree,
             tap_key_origins,
+            musig2_participant_pubkeys,
             proprietary,
             unknown,
         })
@@ -392,10 +397,10 @@ impl TaprootScript {
     /// Converts list element to a map entry suitable to use in `bitcoin::psbt::Input`.
     pub fn to_key_value_pair(
         &self,
-    ) -> Result<(ControlBlock, (ScriptBuf, LeafVersion)), TaprootScriptError> {
+    ) -> Result<(ControlBlock, (TapScriptBuf, LeafVersion)), TaprootScriptError> {
         use TaprootScriptError as E;
 
-        let script = ScriptBuf::from_hex(&self.script).map_err(E::Script)?;
+        let script = TapScriptBuf::from_hex_no_length_prefix(&self.script).map_err(E::Script)?;
 
         let leaf_version = self.leaf_version as u8; // FIXME: Is this cast ok?
         let version = LeafVersion::from_consensus(leaf_version).map_err(E::LeafVer)?;
@@ -415,7 +420,7 @@ fn control_block(control_blocks: &[String]) -> Result<ControlBlock, ControlBlock
         // FIXME: How can this be empty, there would be nothing to key the `tap_scripts` map by?
         0 => Err(E::Missing),
         1 => {
-            let bytes = Vec::from_hex(&control_blocks[0]).map_err(E::Parse)?;
+            let bytes = bitcoin::hex::decode_to_vec(&control_blocks[0]).map_err(E::Parse)?;
             Ok(ControlBlock::decode(&bytes).map_err(E::Decode)?)
         }
         n => Err(E::Multiple(n)),
@@ -455,7 +460,7 @@ fn build_taproot_tree(leaves: Vec<TaprootLeaf>) -> Result<TapTree, TaprootLeafEr
         let leaf_version = leaf.leaf_version as u8; // FIXME: Is this cast ok?
         let version = LeafVersion::from_consensus(leaf_version).map_err(E::LeafVer)?;
 
-        let script = ScriptBuf::from_hex(&leaf.script).map_err(E::Script)?;
+        let script = TapScriptBuf::from_hex_no_length_prefix(&leaf.script).map_err(E::Script)?;
 
         builder = builder.add_leaf_with_ver(depth, script, version).map_err(E::TaprootBuilder)?;
     }

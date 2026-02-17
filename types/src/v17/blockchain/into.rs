@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::hex::FromHex;
 use bitcoin::{
-    block, hex, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptBuf, TxMerkleNode,
-    TxOut, Txid, Weight, Work, Wtxid,
+    block, hex, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptPubKeyBuf,
+    TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
 };
 
 // TODO: Use explicit imports?
@@ -12,13 +11,15 @@ use super::*;
 
 impl GetBestBlockHash {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetBestBlockHash, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetBestBlockHash, hex::DecodeFixedLengthBytesError> {
         let hash = self.0.parse::<BlockHash>()?;
         Ok(model::GetBestBlockHash(hash))
     }
 
     /// Converts json straight to a `bitcoin::BlockHash`.
-    pub fn block_hash(self) -> Result<BlockHash, hex::HexToArrayError> { Ok(self.into_model()?.0) }
+    pub fn block_hash(self) -> Result<BlockHash, hex::DecodeFixedLengthBytesError> {
+        Ok(self.into_model()?.0)
+    }
 }
 
 impl GetBlockVerboseZero {
@@ -148,13 +149,15 @@ impl GetBlockCount {
 
 impl GetBlockHash {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetBlockHash, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetBlockHash, hex::DecodeFixedLengthBytesError> {
         let hash = self.0.parse::<BlockHash>()?;
         Ok(model::GetBlockHash(hash))
     }
 
     /// Converts json straight to a `bitcoin::BlockHash`.
-    pub fn block_hash(self) -> Result<BlockHash, hex::HexToArrayError> { Ok(self.into_model()?.0) }
+    pub fn block_hash(self) -> Result<BlockHash, hex::DecodeFixedLengthBytesError> {
+        Ok(self.into_model()?.0)
+    }
 }
 
 impl GetBlockHeader {
@@ -162,8 +165,8 @@ impl GetBlockHeader {
     pub fn into_model(self) -> Result<model::GetBlockHeader, GetBlockHeaderError> {
         use GetBlockHeaderError as E;
 
-        let v = Vec::from_hex(&self.0).map_err(E::Hex)?;
-        let header = encode::deserialize::<block::Header>(&v).map_err(E::Header)?;
+        let v = bitcoin::hex::decode_to_vec(&self.0).map_err(E::Hex)?;
+        let header = encoding::decode_from_slice::<block::Header>(&v).map_err(E::Header)?;
 
         Ok(model::GetBlockHeader(header))
     }
@@ -213,7 +216,7 @@ impl GetBlockHeaderVerbose {
     }
 
     /// Converts json straight to a `bitcoin::BlockHeader`.
-    pub fn block_header(self) -> Result<block::Header, hex::HexToArrayError> { todo!() }
+    pub fn block_header(self) -> Result<block::Header, hex::DecodeFixedLengthBytesError> { todo!() }
 }
 
 impl GetBlockStats {
@@ -228,7 +231,7 @@ impl GetBlockStats {
             .fee_rate_percentiles
             .iter()
             .map(|vb| FeeRate::from_sat_per_vb(*vb))
-            .collect::<Vec<Option<FeeRate>>>();
+            .collect::<Vec<FeeRate>>();
         let max_fee_rate = FeeRate::from_sat_per_vb(self.max_fee_rate);
         let minimum_fee_rate = FeeRate::from_sat_per_vb(self.minimum_fee_rate);
 
@@ -237,32 +240,32 @@ impl GetBlockStats {
         let total_weight = Weight::from_vb(self.total_weight);
 
         Ok(model::GetBlockStats {
-            average_fee: Amount::from_sat(self.average_fee),
-            average_fee_rate,
+            average_fee: Amount::from_sat(self.average_fee).expect("TODO: Handle this error"),
+            average_fee_rate: average_fee_rate,
             average_tx_size: crate::to_u32(self.average_tx_size, "average_tx_size")?,
             block_hash,
             fee_rate_percentiles,
             height: crate::to_u32(self.height, "height")?,
             inputs: crate::to_u32(self.inputs, "inputs")?,
-            max_fee: Amount::from_sat(self.max_fee),
+            max_fee: Amount::from_sat(self.max_fee).expect("TODO: Handle this error"),
             max_fee_rate,
             max_tx_size: crate::to_u32(self.max_tx_size, "max_tx_size")?,
-            median_fee: Amount::from_sat(self.median_fee),
+            median_fee: Amount::from_sat(self.median_fee).expect("TODO: Handle this error"),
             median_time: crate::to_u32(self.median_time, "median_time")?,
             median_tx_size: crate::to_u32(self.median_tx_size, "median_tx_size")?,
-            minimum_fee: Amount::from_sat(self.minimum_fee),
+            minimum_fee: Amount::from_sat(self.minimum_fee).expect("TODO: Handle this error"),
             minimum_fee_rate,
             minimum_tx_size: crate::to_u32(self.minimum_tx_size, "minimum_tx_size")?,
             outputs: crate::to_u32(self.outputs, "outputs")?,
-            subsidy: Amount::from_sat(self.subsidy),
+            subsidy: Amount::from_sat(self.subsidy).expect("TODO: Handle this error"),
             segwit_total_size: crate::to_u32(self.segwit_total_size, "segwit_total_size")?,
             segwit_total_weight,
             segwit_txs: crate::to_u32(self.segwit_txs, "segwit_txs")?,
             time: crate::to_u32(self.time, "time")?,
-            total_out: Amount::from_sat(self.total_out),
+            total_out: Amount::from_sat(self.total_out).expect("TODO: Handle this error"),
             total_size: crate::to_u32(self.total_size, "total_size")?,
             total_weight,
-            total_fee: Amount::from_sat(self.total_fee),
+            total_fee: Amount::from_sat(self.total_fee).expect("TODO: Handle this error"),
             txs: crate::to_u32(self.txs, "txs")?,
             utxo_increase: self.utxo_increase,
             utxo_size_increase: self.utxo_size_increase,
@@ -341,7 +344,9 @@ impl GetDifficulty {
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
@@ -364,7 +369,9 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
@@ -484,7 +491,7 @@ impl GetMempoolInfo {
 
 impl GetRawMempool {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempool, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetRawMempool, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempool(v))
     }
@@ -512,7 +519,7 @@ impl GetTxOut {
 
         let best_block = self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?;
         let tx_out = TxOut {
-            value: Amount::from_btc(self.value).map_err(E::Value)?,
+            amount: Amount::from_btc(self.value).map_err(E::Value)?,
             script_pubkey: self.script_pubkey.script_buf().map_err(E::ScriptBuf)?,
         };
 
@@ -587,7 +594,8 @@ impl ScanTxOutSetUnspent {
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
 
         Ok(model::ScanTxOutSetUnspent {
             txid,
@@ -605,7 +613,7 @@ impl ScanTxOutSetUnspent {
 
 impl VerifyTxOutProof {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::VerifyTxOutProof, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::VerifyTxOutProof, hex::DecodeFixedLengthBytesError> {
         let proofs = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::VerifyTxOutProof(proofs))
     }

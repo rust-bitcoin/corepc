@@ -18,7 +18,7 @@ pub enum ListSinceBlockError {
     /// Conversion of item in `removed` list failed.
     Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
-    LastBlock(hex::HexToArrayError),
+    LastBlock(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ListSinceBlockError {
@@ -60,11 +60,11 @@ pub enum TransactionItemError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of an item in the `wallet_conflicts` list failed.
-    WalletConflicts(hex::HexToArrayError),
+    WalletConflicts(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for TransactionItemError {

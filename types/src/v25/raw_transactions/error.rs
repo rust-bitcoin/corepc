@@ -43,9 +43,9 @@ pub enum MempoolAcceptanceError {
     /// Conversion of a numeric field failed.
     Numeric(NumericError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
+    Wtxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `base` fee field failed.
     Base(ParseAmountError),
     /// Conversion of the `effective-feerate` field failed.

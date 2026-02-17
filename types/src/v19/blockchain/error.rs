@@ -3,7 +3,7 @@
 use core::fmt;
 
 use bitcoin::amount::ParseAmountError;
-use bitcoin::error::UnprefixedHexError;
+use bitcoin::parse_int::UnprefixedHexError;
 use bitcoin::{hex, network};
 
 use crate::error::write_err;
@@ -17,7 +17,7 @@ pub enum GetBlockchainInfoError {
     /// Conversion of the `chain` field failed.
     Chain(network::ParseNetworkError),
     /// Conversion of the `best_block_hash` field failed.
-    BestBlockHash(hex::HexToArrayError),
+    BestBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `chain_work` field failed.
     ChainWork(UnprefixedHexError),
 }
@@ -56,9 +56,9 @@ impl From<NumericError> for GetBlockchainInfoError {
 #[derive(Debug)]
 pub enum GetBlockFilterError {
     /// Conversion of the `filter` field failed.
-    Filter(hex::HexToBytesError),
+    Filter(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `header` field failed.
-    Header(hex::HexToArrayError),
+    Header(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetBlockFilterError {
@@ -84,7 +84,7 @@ impl std::error::Error for GetBlockFilterError {
 #[derive(Debug)]
 pub enum MapMempoolEntryError {
     /// Conversion of a `txid` failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of a `MempoolEntry` failed.
     MempoolEntry(MempoolEntryError),
 }
@@ -114,13 +114,13 @@ pub enum MempoolEntryError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
+    Wtxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `MempoolEntryFees` type failed.
     Fees(MempoolEntryFeesError),
     /// Conversion of the `depends` field failed.
-    Depends(hex::HexToArrayError),
+    Depends(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `spent_by` field failed.
-    SpentBy(hex::HexToArrayError),
+    SpentBy(hex::DecodeFixedLengthBytesError),
 }
 
 impl From<NumericError> for MempoolEntryError {

@@ -112,7 +112,9 @@ impl Bip9Statistics {
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
@@ -135,7 +137,9 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
@@ -214,7 +218,7 @@ impl MempoolEntry {
 
 impl GetRawMempool {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempool, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetRawMempool, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempool(v))
     }

@@ -4,7 +4,8 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-use bitcoin::SignedAmount;
+use bitcoin::ext::*;
+use bitcoin::{BlockTime, SignedAmount};
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::vtype::*;
 use node::{mtype, TemplateRequest, TemplateRules}; // All the version specific types.
@@ -78,7 +79,7 @@ fn mining__prioritise_transaction() {
     node.fund_wallet();
 
     let (_addr, txid) = node.create_mempool_transaction();
-    let fee_delta = SignedAmount::from_sat(10_000);
+    let fee_delta = SignedAmount::from_sat(10_000).expect("valid amount");
     let json = node.client.prioritise_transaction(&txid, fee_delta).expect("prioritisetransaction");
     assert!(json) // According to docs always returns true.
 }
@@ -107,54 +108,52 @@ fn mining__submit_block() {
 // FIXME: Submitting this block sometimes works and sometimes returns 'inconclusive'.
 #[allow(dead_code)]
 fn submit_empty_block(node: &Node, bt: &mtype::GetBlockTemplate) {
-    use bitcoin::hashes::Hash as _;
+    use bitcoin::script::ScriptHash;
     use bitcoin::{
-        absolute, block, transaction, Amount, Block, OutPoint, ScriptBuf, ScriptHash, Sequence,
-        Transaction, TxIn, TxMerkleNode, TxOut, Witness,
+        absolute, block, transaction, Amount, Block, OutPoint, ScriptPubKeyBuf, ScriptSigBuf,
+        Sequence, Transaction, TxIn, TxMerkleNode, TxOut, Witness,
     };
 
-    let txdata = vec![Transaction {
+    let transactions = vec![Transaction {
         version: transaction::Version::ONE,
         lock_time: absolute::LockTime::ZERO,
-        input: vec![TxIn {
-            previous_output: OutPoint::default(),
+        inputs: vec![TxIn {
+            previous_output: OutPoint::COINBASE_PREVOUT, // Just a dummy value.
             // FIXME: (Tobin) I don't know if this script is meaningful in anyway other than enabling function reusability in the code copied from BDK?
-            script_sig: ScriptBuf::builder()
+            script_sig: ScriptSigBuf::builder()
                 .push_int(bt.height as _)
-                .push_int(rand::random()) // random number so that re-mining creates unique block
+                .expect("push height")
+                .push_int(rand::random())
+                .expect("push random number so that re-mining creates unique block")
                 .into_script(),
             sequence: Sequence::default(),
             witness: Witness::new(),
         }],
-        output: vec![TxOut {
-            value: Amount::ZERO,
-            script_pubkey: ScriptBuf::new_p2sh(&ScriptHash::all_zeros()),
+        outputs: vec![TxOut {
+            amount: Amount::ZERO,
+            script_pubkey: ScriptPubKeyBuf::new_p2sh(ScriptHash::from_byte_array([0; 20])),
         }],
     }];
 
-    let mut block = Block {
-        header: block::Header {
-            version: block::Version::default(),
-            prev_blockhash: bt.previous_block_hash,
-            merkle_root: TxMerkleNode::all_zeros(),
-            time: Ord::max(
-                bt.min_time,
-                std::time::UNIX_EPOCH.elapsed().expect("elapsed").as_secs() as u32,
-            ),
-            bits: bt.bits,
-            nonce: 0,
-        },
-        txdata,
+    let mut header = block::Header {
+        version: block::Version::default(),
+        prev_blockhash: bt.previous_block_hash,
+        merkle_root: TxMerkleNode::from_byte_array([0; 32]),
+        time: Ord::max(
+            BlockTime::from_u32(bt.min_time),
+            BlockTime::from_u32(std::time::UNIX_EPOCH.elapsed().expect("elapsed").as_secs() as u32),
+        ),
+        bits: bt.bits,
+        nonce: 0,
     };
 
-    block.header.merkle_root = block.compute_merkle_root().expect("must compute");
-
     for nonce in 0..=u32::MAX {
-        block.header.nonce = nonce;
-        if block.header.target().is_met_by(block.block_hash()) {
+        header.nonce = nonce;
+        if header.target().is_met_by(header.block_hash()) {
             break;
         }
     }
+    let block = Block::new_unchecked(header, transactions);
 
     let _: () = node.client.submit_block(&block).expect("submitblock");
 }
@@ -162,9 +161,8 @@ fn submit_empty_block(node: &Node, bt: &mtype::GetBlockTemplate) {
 // FIXME: Submitting this block returns 'inconclusive'.
 #[allow(dead_code)]
 fn mining__submit_block_with_dummy_coinbase(node: &Node, bt: &mtype::GetBlockTemplate) {
-    use bitcoin::hashes::Hash as _;
     use bitcoin::{
-        absolute, block, transaction, Amount, Block, OutPoint, ScriptBuf, Sequence, Transaction,
+        absolute, block, transaction, Amount, Block, OutPoint, ScriptSigBuf, Sequence, Transaction,
         TxIn, TxMerkleNode, TxOut, Witness,
     };
 
@@ -173,33 +171,33 @@ fn mining__submit_block_with_dummy_coinbase(node: &Node, bt: &mtype::GetBlockTem
     let coinbase = Transaction {
         version: transaction::Version::ONE,
         lock_time: absolute::LockTime::ZERO,
-        input: vec![TxIn {
-            previous_output: OutPoint::null(),
-            // FIXME: (Tobin) I don't know what this script means. Core return block invalid without it?
-            script_sig: ScriptBuf::builder()
-                .push_int(bt.height.into())
-                .push_int(rand::random()) // random number so that re-mining creates unique block
+        inputs: vec![TxIn {
+            previous_output: OutPoint::COINBASE_PREVOUT,
+            // FIXME: (Tobin) I don't know what this script means. Core returns block invalid without it?
+            script_sig: ScriptSigBuf::builder()
+                .push_int(bt.height.try_into().expect("int conversion"))
+                .expect("push height")
+                .push_int(rand::random())
+                .expect("push random number so that re-mining creates unique block")
                 .into_script(),
             sequence: Sequence::default(),
             witness: Witness::new(),
         }],
-        output: vec![TxOut {
-            value: Amount::from_sat(50 * 100_000_000),
+        outputs: vec![TxOut {
+            amount: Amount::from_sat(50 * 100_000_000).expect("valid amount"),
             script_pubkey: address.script_pubkey(),
         }],
     };
 
-    let mut block = Block {
-        header: block::Header {
-            version: bt.version,
-            prev_blockhash: bt.previous_block_hash,
-            merkle_root: TxMerkleNode::all_zeros(),
-            time: bt.min_time + 3600, // Some arbitrary amount of time.
-            bits: bt.bits,
-            nonce: 0,
-        },
-        txdata: vec![coinbase],
+    let mut header = block::Header {
+        version: bt.version,
+        prev_blockhash: bt.previous_block_hash,
+        merkle_root: TxMerkleNode::from_byte_array([0; 32]),
+        time: BlockTime::from_u32(bt.min_time + 3600), // Some arbitrary amount of time.
+        bits: bt.bits,
+        nonce: 0,
     };
+    let transactions = vec![coinbase];
 
     let mut nonces = bt.nonce_range.split(",");
     let nonce_start = match nonces.next() {
@@ -208,12 +206,13 @@ fn mining__submit_block_with_dummy_coinbase(node: &Node, bt: &mtype::GetBlockTem
     };
 
     for nonce in nonce_start..=u32::MAX {
-        block.header.nonce = nonce;
-        if block.header.target().is_met_by(block.block_hash()) {
+        header.nonce = nonce;
+        if header.target().is_met_by(header.block_hash()) {
             break;
         }
     }
 
+    let block = Block::new_unchecked(header, transactions);
     let _: () = node.client.submit_block(&block).expect("submitblock");
 }
 

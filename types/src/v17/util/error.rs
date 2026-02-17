@@ -11,7 +11,7 @@ pub enum CreateMultisigError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for CreateMultisigError {
@@ -40,13 +40,13 @@ pub enum ValidateAddressError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
     /// The `witness_version` field's value was too big for a u8.
     WitnessVersionValue(i64),
     /// Conversion of the `witness_version` field failed.
     WitnessVersion(witness_version::TryFromError),
     /// Conversion of the `witness_program` field hex string to bytes failed.
-    WitnessProgramBytes(hex::HexToBytesError),
+    WitnessProgramBytes(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_program` field failed.
     WitnessProgram(witness_program::Error),
 }

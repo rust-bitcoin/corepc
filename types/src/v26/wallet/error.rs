@@ -54,19 +54,19 @@ pub enum GetTransactionError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
+    Wtxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wallet_conflicts` field failed.
-    WalletConflicts(hex::HexToArrayError),
+    WalletConflicts(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaced_by_txid` field failed.
-    ReplacedByTxid(hex::HexToArrayError),
+    ReplacedByTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaces_txid` field failed.
-    ReplacesTxid(hex::HexToArrayError),
+    ReplacesTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `mempool_conflicts` field failed.
-    MempoolConflicts(hex::HexToArrayError),
+    MempoolConflicts(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `hex` field failed.
     Tx(encode::FromHexError),
     /// Conversion of the `details` field failed.
@@ -140,7 +140,7 @@ pub enum GetWalletInfoError {
     /// Conversion of the `pay_tx_fee` field failed.
     PayTxFee(ParseAmountError),
     /// Conversion of the `hd_seed_id` field failed.
-    HdSeedId(hex::HexToArrayError),
+    HdSeedId(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `last_processed_block` field failed.
     LastProcessedBlock(LastProcessedBlockError),
 }
@@ -187,7 +187,7 @@ impl From<NumericError> for GetWalletInfoError {
 #[derive(Debug)]
 pub enum LastProcessedBlockError {
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `height` field failed.
     Height(NumericError),
 }

@@ -5,6 +5,8 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
 use bitcoin::consensus::encode;
+#[allow(unused_imports)] // Because of feature gated tests.
+use bitcoin::ext::*;
 use bitcoin::hex;
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::vtype::*; // All the version specific types.
@@ -39,7 +41,8 @@ fn blockchain__get_best_block_hash__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
     let json: GetBestBlockHash = node.client.get_best_block_hash().expect("getbestblockhash");
-    let model: Result<mtype::GetBestBlockHash, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::GetBestBlockHash, hex::DecodeFixedLengthBytesError> =
+        json.into_model();
     model.unwrap();
 }
 
@@ -79,8 +82,8 @@ fn blockchain__get_block__modelled() {
             .find(|entry| entry.transaction.transaction.compute_txid() == mined_txid)
             .expect("mined transaction should be present in verbosity=2 results");
         assert!(mined_entry.fee.is_some());
-        assert!(!mined_entry.transaction.transaction.input.is_empty());
-        assert!(!mined_entry.transaction.transaction.output.is_empty());
+        assert!(!mined_entry.transaction.transaction.inputs.is_empty());
+        assert!(!mined_entry.transaction.transaction.outputs.is_empty());
 
         let json: GetBlockVerboseThree =
             node.client.get_block_verbose_three(block_hash).expect("getblock verbose=3");
@@ -140,7 +143,6 @@ fn blockchain__get_block_filter__modelled() {
 #[test]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_block_from_peer() {
-    use bitcoin::hashes::Hash;
     let (node1, _node2, _node3) = integration_test::three_node_network();
 
     let now = std::time::SystemTime::now()
@@ -152,8 +154,8 @@ fn blockchain__get_block_from_peer() {
     let mut header = bitcoin::block::Header {
         version: bitcoin::block::Version::from_consensus(0x20000000),
         prev_blockhash: node1.client.best_block_hash().expect("best_block_hash failed"),
-        merkle_root: bitcoin::TxMerkleNode::all_zeros(),
-        time: now,
+        merkle_root: bitcoin::TxMerkleNode::from_byte_array([0_u8; 32]),
+        time: bitcoin::BlockTime::from_u32(now),
         bits: bitcoin::CompactTarget::from_consensus(0x207fffff),
         nonce: 0,
     };
@@ -173,7 +175,7 @@ fn blockchain__get_block_hash__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
     let json: GetBlockHash = node.client.get_block_hash(0).expect("getblockhash");
-    let model: Result<mtype::GetBlockHash, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::GetBlockHash, hex::DecodeFixedLengthBytesError> = json.into_model();
     model.unwrap();
 }
 
@@ -349,7 +351,8 @@ fn blockchain__get_mempool_ancestors__modelled() {
 
     let json: GetMempoolAncestors =
         node.client.get_mempool_ancestors(child_txid).expect("getmempoolancestors");
-    let model: Result<mtype::GetMempoolAncestors, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> =
+        json.into_model();
     let ancestors = model.unwrap();
 
     assert!(ancestors.0.contains(&parent_txid));
@@ -379,7 +382,8 @@ fn blockchain__get_mempool_descendants__modelled() {
 
     let json: GetMempoolDescendants =
         node.client.get_mempool_descendants(parent_txid).expect("getmempooldescendants");
-    let model: Result<mtype::GetMempoolDescendants, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> =
+        json.into_model();
     let descendants = model.unwrap();
 
     assert!(descendants.0.contains(&child_txid));
@@ -436,7 +440,8 @@ fn blockchain__get_raw_mempool__modelled() {
 
     // verbose = false + mempool_sequence = false
     let json: GetRawMempool = node.client.get_raw_mempool().expect("getrawmempool");
-    let model: Result<mtype::GetRawMempool, hex::HexToArrayError> = json.clone().into_model();
+    let model: Result<mtype::GetRawMempool, hex::DecodeFixedLengthBytesError> =
+        json.clone().into_model();
     let mempool = model.unwrap();
     // Sanity check.
     assert_eq!(mempool.0.len(), 1);
@@ -454,7 +459,8 @@ fn blockchain__get_raw_mempool__modelled() {
         // verbose = false + mempool_sequence = true
         let json: GetRawMempoolSequence =
             node.client.get_raw_mempool_sequence().expect("getrawmempool sequence");
-        let model: Result<mtype::GetRawMempoolSequence, hex::HexToArrayError> = json.into_model();
+        let model: Result<mtype::GetRawMempoolSequence, hex::DecodeFixedLengthBytesError> =
+            json.into_model();
         let mempool = model.unwrap();
         // Sanity check.
         assert_eq!(mempool.txids.len(), 1);
@@ -646,7 +652,8 @@ fn blockchain__verify_tx_out_proof__modelled() {
     let proof = node.client.get_tx_out_proof(&[txid]).expect("gettxoutproof");
 
     let json: VerifyTxOutProof = node.client.verify_tx_out_proof(&proof).expect("verifytxoutproof");
-    let model: Result<mtype::VerifyTxOutProof, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::VerifyTxOutProof, hex::DecodeFixedLengthBytesError> =
+        json.into_model();
     let txids = model.unwrap();
 
     // sanity check
@@ -713,7 +720,7 @@ fn blockchain__wait_for_new_block__modelled() {
 fn create_child_spending_parent(node: &Node, parent_txid: bitcoin::Txid) -> bitcoin::Txid {
     let inputs = vec![Input { txid: parent_txid, vout: 0, sequence: None }];
     let spend_address = node.client.new_address().expect("newaddress");
-    let outputs = vec![Output::new(spend_address, bitcoin::Amount::from_sat(100_000))];
+    let outputs = vec![Output::new(spend_address, bitcoin::Amount::from_sat_u32(100_000))];
 
     let raw: CreateRawTransaction =
         node.client.create_raw_transaction(&inputs, &outputs).expect("createrawtransaction");

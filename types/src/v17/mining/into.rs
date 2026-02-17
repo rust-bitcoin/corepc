@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::hex::FromHex as _;
 use bitcoin::{
     block, consensus, BlockHash, CompactTarget, SignedAmount, Transaction, Txid, Weight, Wtxid,
 };
@@ -27,8 +26,9 @@ impl GetBlockTemplate {
             .map(|t| t.into_model())
             .collect::<Result<Vec<_>, _>>()
             .map_err(E::Transactions)?;
-        let coinbase_value = SignedAmount::from_sat(self.coinbase_value);
-        let target = Vec::from_hex(&self.target).map_err(E::Target)?;
+        let coinbase_value =
+            SignedAmount::from_sat(self.coinbase_value).expect("TODO: Handle this error");
+        let target = bitcoin::hex::decode_to_vec(&self.target).map_err(E::Target)?;
         let sigop_limit = crate::to_u32(self.sigop_limit, "sigop_limit")?;
         let weight_limit = crate::to_u32(self.weight_limit, "weight_limit")?;
         let size_limit = crate::to_u32(self.size_limit, "size_limit")?;
@@ -78,7 +78,7 @@ impl BlockTemplateTransaction {
             .iter()
             .map(|x| crate::to_u32(*x, "depend"))
             .collect::<Result<Vec<_>, _>>()?;
-        let fee = SignedAmount::from_sat(self.fee);
+        let fee = SignedAmount::from_sat(self.fee).expect("TODO: Handle this error");
         let sigops = crate::to_u32(self.sigops, "sigops")?;
         let weight = Weight::from_wu(self.weight); // FIXME: Is this the correct unit?
 

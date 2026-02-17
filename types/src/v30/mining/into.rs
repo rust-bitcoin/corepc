@@ -27,7 +27,7 @@ impl GetMiningInfo {
             target: Some(target),
             network_hash_ps: self.network_hash_ps,
             pooled_tx: self.pooled_tx,
-            block_min_tx_fee,
+            block_min_tx_fee: Some(block_min_tx_fee),
             chain: self.chain,
             signet_challenge: self.signet_challenge,
             next: Some(next),
