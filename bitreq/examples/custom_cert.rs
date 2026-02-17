@@ -20,7 +20,7 @@ fn main() -> Result<(), bitreq::Error> {
 async fn request_with_client() -> Result<(), bitreq::Error> {
     let url = "http://example.com";
     let cert_der = include_bytes!("../tests/test_cert.der");
-    let client = bitreq::Client::builder().with_root_certificate(cert_der.as_slice()).build();
+    let client = bitreq::Client::builder().with_root_certificate(cert_der.as_slice())?.build();
     // OR
     // let cert_der: &[u8] = include_bytes!("../tests/test_cert.der");
     // let client = bitreq::Client::builder().with_root_certificate(cert_der).build();

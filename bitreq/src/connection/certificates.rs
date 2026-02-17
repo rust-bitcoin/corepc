@@ -24,9 +24,7 @@ impl Certificates {
     #[cfg(feature = "rustls")]
     pub(crate) fn append_certificate(mut self, cert_der: Vec<u8>) -> Result<Self, Error> {
         let mut certificates = self.inner;
-        certificates
-            .add(&rustls::Certificate(cert_der))
-            .map_err(Error::RustlsAppendCert)?;
+        certificates.add(&rustls::Certificate(cert_der)).map_err(Error::RustlsAppendCert)?;
         self.inner = certificates;
         Ok(self)
     }

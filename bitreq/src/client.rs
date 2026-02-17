@@ -59,10 +59,10 @@ pub(crate) struct TlsConfig {
 }
 
 impl TlsConfig {
-    fn new(cert_der: Vec<u8>) -> Self {
-        let certificates = Certificates::new(Some(cert_der)).expect("failed to append certificate");
+    fn new(cert_der: Vec<u8>) -> Result<Self, Error> {
+        let certificates = Certificates::new(Some(cert_der))?;
 
-        Self { certificates }
+        Ok(Self { certificates })
     }
 }
 
@@ -80,6 +80,7 @@ impl TlsConfig {
 /// let cert_der = include_bytes!("../tests/test_cert.der");
 /// let client = Client::builder()
 ///     .with_root_certificate(cert_der.as_slice())
+///     .unwrap()
 ///     .with_capacity(20)
 ///     .build();
 ///
@@ -117,30 +118,32 @@ impl ClientBuilder {
     /// let cert_der: &[u8] = include_bytes!("../tests/test_cert.der");
     /// let client = Client::builder()
     ///     .with_root_certificate(cert_der)
+    ///     .unwrap()
     ///     .build();
     ///
     /// // Using a Vec<u8>
     /// let cert_vec: Vec<u8> = cert_der.to_vec();
     /// let client = Client::builder()
     ///     .with_root_certificate(cert_vec)
+    ///     .unwrap()
     ///     .build();
     /// ```
-    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Self {
+    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Result<Self, Error> {
+        let cert_der = cert_der.into();
+
         if let Some(ref mut client_config) = self.client_config {
             if let Some(ref mut tls_config) = client_config.tls {
                 let certificates = tls_config.certificates.clone();
-                let certificates = certificates
-                    .append_certificate(cert_der.into())
-                    .expect("failed to append certificate");
-
+                let certificates = certificates.append_certificate(cert_der)?;
                 tls_config.certificates = certificates;
-                return self;
+
+                return Ok(self);
             }
         }
 
-        let tls_config = TlsConfig::new(cert_der.into());
+        let tls_config = TlsConfig::new(cert_der)?;
         self.client_config = Some(ClientConfig { tls: Some(tls_config) });
-        self
+        Ok(self)
     }
 
     /// Sets the maximum number of connections to keep in the pool.
