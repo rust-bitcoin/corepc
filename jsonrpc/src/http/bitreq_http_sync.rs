@@ -259,7 +259,7 @@ mod impls {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Client;
+    use crate::client_sync::Client;
 
     #[test]
     fn construct() {

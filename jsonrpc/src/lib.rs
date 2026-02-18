@@ -38,7 +38,6 @@ pub mod simple_uds;
 use serde::{Deserialize, Serialize};
 use serde_json::value::RawValue;
 
-pub use crate::client_sync::{Client, Transport};
 pub use crate::error::Error;
 
 /// Shorthand method to convert an argument into a boxed [`serde_json::value::RawValue`].

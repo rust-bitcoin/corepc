@@ -110,7 +110,7 @@ mod tests {
     use std::thread;
 
     use super::*;
-    use crate::Client;
+    use crate::client_sync::Client;
 
     // Test a dummy request / response over a raw TCP transport
     #[test]
