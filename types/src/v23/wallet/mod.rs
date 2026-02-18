@@ -62,14 +62,14 @@ pub struct GetTransaction {
     pub fee: Option<f64>,
     /// The number of confirmations.
     pub confirmations: i64,
-    /// Only present if the transaction's only input is a coinbase one. v20 and later only.
+    /// Only present if the transaction's only input is a coinbase one.
     pub generated: Option<bool>,
     /// Whether we consider the outputs of this unconfirmed transaction safe to spend.
     pub trusted: Option<bool>,
     /// The block hash.
     #[serde(rename = "blockhash")]
     pub block_hash: Option<String>,
-    /// The block height containing the transaction. v20 and later only.
+    /// The block height containing the transaction.
     #[serde(rename = "blockheight")]
     pub block_height: Option<i64>,
     /// The index of the transaction in the block that includes it.
@@ -83,18 +83,18 @@ pub struct GetTransaction {
     /// Confirmed transactions that have been detected by the wallet to conflict with this transaction.
     #[serde(rename = "walletconflicts")]
     pub wallet_conflicts: Vec<String>,
-    /// Only if 'category' is 'send'. The txid if this tx was replaced. v23 and later only.
+    /// Only if 'category' is 'send'. The txid if this tx was replaced.
     pub replaced_by_txid: Option<String>,
-    /// Only if 'category' is 'send'. The txid if this tx replaces another. v23 and later only.
+    /// Only if 'category' is 'send'. The txid if this tx replaces another.
     pub replaces_txid: Option<String>,
-    /// If a comment to is associated with the transaction. v23 and later only.
+    /// If a comment to is associated with the transaction.
     pub to: Option<String>,
     /// The transaction time in seconds since epoch (1 Jan 1970 GMT).
     pub time: u32,
     /// The time received in seconds since epoch (1 Jan 1970 GMT).
     #[serde(rename = "timereceived")]
     pub time_received: u32,
-    /// If a comment is associated with the transaction, only present if not empty. v20 to v24 only.
+    /// If a comment is associated with the transaction, only present if not empty.
     pub comment: Option<String>,
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
     /// may be unknown for unconfirmed transactions not in the mempool
@@ -104,7 +104,7 @@ pub struct GetTransaction {
     pub details: Vec<GetTransactionDetail>,
     /// Raw data for transaction.
     pub hex: String,
-    /// The decoded transaction (only present when `verbose` is passed). v19 and later only.
+    /// The decoded transaction (only present when `verbose` is passed).
     pub decoded: Option<Transaction>,
 }
 

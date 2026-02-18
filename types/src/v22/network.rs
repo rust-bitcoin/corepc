@@ -75,9 +75,9 @@ pub struct PeerInfo {
     /// The time in seconds since epoch (Jan 1 1970 GMT) of the last receive.
     #[serde(rename = "lastrecv")]
     pub last_received: i64,
-    /// The UNIX epoch time of the last valid transaction received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last valid transaction received from this peer.
     pub last_transaction: i64,
-    /// The UNIX epoch time of the last block received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last block received from this peer.
     pub last_block: i64,
     /// The total bytes sent.
     #[serde(rename = "bytessent")]
@@ -123,14 +123,13 @@ pub struct PeerInfo {
     pub synced_blocks: i64,
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Vec<u64>,
-    /// The total number of addresses processed, excluding those dropped due to rate limiting. v21 and
-    /// later only.
+    /// The total number of addresses processed, excluding those dropped due to rate limiting.
     #[serde(rename = "addr_processed")]
     pub addresses_processed: usize,
-    /// The total number of addresses dropped due to rate limiting. v21 and later only.
+    /// The total number of addresses dropped due to rate limiting.
     #[serde(rename = "addr_rate_limited")]
     pub addresses_rate_limited: usize,
-    /// Any special permissions that have been granted to this peer. v0.19 and later only.
+    /// Any special permissions that have been granted to this peer.
     pub permissions: Vec<String>,
     /// Whether the peer is whitelisted.
     pub whitelisted: Option<bool>,

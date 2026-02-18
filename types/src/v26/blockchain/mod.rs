@@ -108,7 +108,6 @@ pub struct GetTxOutSetInfo {
     #[serde(rename = "bogosize")]
     pub bogo_size: i64,
     /// The serialized hash (only present if 'hash_serialized_3' hash_type is chosen).
-    /// v26 and later only.
     pub hash_serialized_3: Option<String>,
     /// The estimated size of the chainstate on disk (not available when coinstatsindex is used).
     pub disk_size: Option<i64>,

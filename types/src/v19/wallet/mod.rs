@@ -103,7 +103,7 @@ pub struct GetTransaction {
     pub details: Vec<GetTransactionDetail>,
     /// Raw data for transaction.
     pub hex: String,
-    /// The decoded transaction (only present when `verbose` is passed). v19 and later only.
+    /// The decoded transaction (only present when `verbose` is passed).
     pub decoded: Option<Transaction>,
 }
 

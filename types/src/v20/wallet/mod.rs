@@ -184,14 +184,14 @@ pub struct GetTransaction {
     pub fee: Option<f64>,
     /// The number of confirmations.
     pub confirmations: i64,
-    /// Only present if the transaction's only input is a coinbase one. v20 and later only.
+    /// Only present if the transaction's only input is a coinbase one.
     pub generated: Option<bool>,
     /// Whether we consider the outputs of this unconfirmed transaction safe to spend.
     pub trusted: Option<bool>,
     /// The block hash.
     #[serde(rename = "blockhash")]
     pub block_hash: Option<String>,
-    /// The block height containing the transaction. v20 and later only.
+    /// The block height containing the transaction.
     #[serde(rename = "blockheight")]
     pub block_height: Option<i64>,
     /// The index of the transaction in the block that includes it.
@@ -220,7 +220,7 @@ pub struct GetTransaction {
     pub details: Vec<GetTransactionDetail>,
     /// Raw data for transaction.
     pub hex: String,
-    /// The decoded transaction (only present when `verbose` is passed). v19 and later only.
+    /// The decoded transaction (only present when `verbose` is passed).
     pub decoded: Option<Transaction>,
 }
 
@@ -228,7 +228,7 @@ pub struct GetTransaction {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetTransactionDetail {
-    /// Only returns true if imported addresses were involved in transaction. v20 and later only.
+    /// Only returns true if imported addresses were involved in transaction.
     #[serde(rename = "involvesWatchonly")]
     pub involves_watch_only: Option<bool>,
     /// DEPRECATED. The account name involved in the transaction, can be "" for the default account.

@@ -28,7 +28,7 @@ pub struct DecodeScript {
     /// The output type.
     #[serde(rename = "type")]
     pub type_: String,
-    /// Bitcoin address (only if a well-defined address exists). v22 and later only.
+    /// Bitcoin address (only if a well-defined address exists).
     pub address: Option<String>,
     /// The required signatures.
     #[serde(rename = "reqSigs")]
@@ -55,7 +55,7 @@ pub struct DecodeScriptSegwit {
     /// The output type.
     #[serde(rename = "type")]
     pub type_: String,
-    /// Bitcoin address (only if a well-defined address exists). v22 and later only.
+    /// Bitcoin address (only if a well-defined address exists).
     pub address: Option<String>,
     /// The required signatures.
     #[serde(rename = "reqSigs")]
