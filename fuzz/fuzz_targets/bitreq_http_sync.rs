@@ -8,7 +8,7 @@ fn do_test(data: &[u8]) {
     {
         use std::io;
 
-        use jsonrpc::bitreq_http::{BitreqHttpTransport, FUZZ_TCP_SOCK};
+        use jsonrpc::bitreq_http_sync::{BitreqHttpTransport, FUZZ_TCP_SOCK};
         use jsonrpc::Client;
 
         *FUZZ_TCP_SOCK.lock().unwrap() = Some(io::Cursor::new(data.to_vec()));

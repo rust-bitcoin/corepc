@@ -19,7 +19,7 @@ use base64::Engine;
 #[cfg(feature = "proxy")]
 use socks::Socks5Stream;
 
-use crate::client::Transport;
+use crate::client_sync::Transport;
 use crate::http::DEFAULT_PORT;
 #[cfg(feature = "proxy")]
 use crate::http::DEFAULT_PROXY_PORT;

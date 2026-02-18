@@ -11,7 +11,7 @@ cargo-fuzz = true
 
 [dependencies]
 honggfuzz = { version = "0.5.55", default-features = false }
-jsonrpc = { path = "../jsonrpc", features = ["bitreq_http"] }
+jsonrpc = { path = "../jsonrpc", features = ["bitreq_http_sync"] }
 
 serde = { version = "1.0.103", features = [ "derive" ] }
 serde_json = "1.0"
@@ -20,8 +20,8 @@ serde_json = "1.0"
 unexpected_cfgs = { level = "deny", check-cfg = ['cfg(fuzzing)', 'cfg(jsonrpc_fuzz)'] }
 
 [[bin]]
-name = "bitreq_http"
-path = "fuzz_targets/bitreq_http.rs"
+name = "bitreq_http_sync"
+path = "fuzz_targets/bitreq_http_sync.rs"
 
 [[bin]]
 name = "simple_http"

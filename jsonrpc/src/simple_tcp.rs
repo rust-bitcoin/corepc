@@ -5,7 +5,7 @@
 
 use std::{error, fmt, io, net, time};
 
-use crate::client::Transport;
+use crate::client_sync::Transport;
 use crate::{Request, Response};
 
 #[derive(Debug, Clone)]

@@ -5,7 +5,7 @@
 use std::os::unix::net::UnixStream;
 use std::{error, fmt, io, path, time};
 
-use crate::client::Transport;
+use crate::client_sync::Transport;
 use crate::{Request, Response};
 
 /// Simple synchronous UDS transport.

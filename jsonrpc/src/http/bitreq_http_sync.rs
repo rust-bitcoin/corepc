@@ -1,4 +1,4 @@
-//! This module implements the [`crate::client::Transport`] trait using [`bitreq`]
+//! This module implements the [`crate::client_sync::Transport`] trait using [`bitreq`]
 //! as the underlying HTTP transport.
 //!
 //! [bitreq]: <https://github.com/rust-bitcoin/corepc/bitreq>
@@ -13,7 +13,7 @@ use std::{error, fmt};
 use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
 
-use crate::client::Transport;
+use crate::client_sync::Transport;
 use crate::{Request, Response};
 
 const DEFAULT_URL: &str = "http://localhost";
@@ -137,7 +137,7 @@ impl Builder {
     /// # Examples
     ///
     /// ```no_run
-    /// # use jsonrpc::bitreq_http::BitreqHttpTransport;
+    /// # use jsonrpc::bitreq_http_sync::BitreqHttpTransport;
     /// # use std::fs::{self, File};
     /// # use std::path::Path;
     /// # let cookie_file = Path::new("~/.bitcoind/.cookie");
