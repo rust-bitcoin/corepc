@@ -364,8 +364,9 @@ pub use crate::{
         GetBlockVerboseThreePrevout, GetBlockVerboseThreeTransaction, GetBlockVerboseTwo,
         GetBlockVerboseTwoError, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
         GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
-        GetDescriptorActivityError, GetDescriptorInfo, GetRawTransactionVerboseWithPrevout,
-        MempoolAcceptance, MempoolAcceptanceFees, NextBlockInfo, NextBlockInfoError,
-        RawTransactionInputWithPrevout, ReceiveActivity, SpendActivity, TestMempoolAccept,
+        GetDescriptorActivityError, GetDescriptorInfo, GetOrphanTxsError,
+        GetRawTransactionVerboseWithPrevout, MempoolAcceptance, MempoolAcceptanceFees,
+        NextBlockInfo, NextBlockInfoError, RawTransactionInputWithPrevout, ReceiveActivity,
+        SpendActivity, TestMempoolAccept,
     },
 };

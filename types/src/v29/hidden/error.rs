@@ -7,6 +7,30 @@ use bitcoin::hex;
 
 use crate::error::write_err;
 
+/// Error when converting a `GetOrphanTxs` type into the model type.
+#[derive(Debug)]
+pub enum GetOrphanTxsError {
+    /// Conversion of the `txid` field failed.
+    Txid(hex::HexToArrayError),
+}
+
+impl fmt::Display for GetOrphanTxsError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Self::Txid(ref e) => write_err!(f, "conversion of a txid list element failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for GetOrphanTxsError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::Txid(ref e) => Some(e),
+        }
+    }
+}
+
 /// Error when converting a `GetOrphanTxsVerboseOneEntry` type into the model type.
 #[derive(Debug)]
 pub enum GetOrphanTxsVerboseOneEntryError {
