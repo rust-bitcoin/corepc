@@ -8,8 +8,6 @@ use serde::{Deserialize, Serialize};
 mod error;
 mod into;
 
-use bitcoin::{Network, TxMerkleNode};
-
 pub use self::error::{
     GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseOneError,
     GetBlockVerboseThreeError, GetBlockVerboseTwoError, GetBlockchainInfoError,

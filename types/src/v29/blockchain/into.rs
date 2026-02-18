@@ -6,8 +6,8 @@ use core::str::FromStr;
 use bitcoin::consensus::encode;
 use bitcoin::hashes::hex::FromHex;
 use bitcoin::{
-    absolute, block, hex, transaction, Amount, BlockHash, CompactTarget, ScriptBuf, Target,
-    Transaction, Txid, Weight, Work,
+    absolute, block, hex, transaction, Amount, BlockHash, CompactTarget, Network, ScriptBuf,
+    Target, Transaction, TxMerkleNode, Txid, Weight, Work,
 };
 
 // TODO: Use explicit imports?

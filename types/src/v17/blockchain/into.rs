@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::{block, hex, Block, BlockHash, CompactTarget, ScriptBuf, Txid, Weight, Work};
+use bitcoin::hex::FromHex;
+use bitcoin::{
+    block, hex, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptBuf, TxMerkleNode,
+    TxOut, Txid, Weight, Work, Wtxid,
+};
 
 // TODO: Use explicit imports?
 use super::*;
