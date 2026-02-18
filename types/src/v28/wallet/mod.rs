@@ -7,7 +7,6 @@
 mod error;
 mod into;
 
-use bitcoin::Transaction;
 use serde::{Deserialize, Serialize};
 
 pub use self::error::{GetHdKeysError, ListSinceBlockError, TransactionItemError};
@@ -270,7 +269,7 @@ pub struct GetTransaction {
     /// Raw data for transaction.
     pub hex: String,
     /// The decoded transaction (only present when `verbose` is passed).
-    pub decoded: Option<Transaction>,
+    pub decoded: Option<String>,
     /// Hash and height of the block this information was generated on.
     #[serde(rename = "lastprocessedblock")]
     pub last_processed_block: Option<LastProcessedBlock>,
