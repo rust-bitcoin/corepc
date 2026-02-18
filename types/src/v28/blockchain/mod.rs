@@ -33,7 +33,7 @@ pub struct GetBlockchainInfo {
     pub best_block_hash: String,
     /// The current difficulty.
     pub difficulty: f64,
-    /// The block time expressed in UNIX epoch time. v23 and later only.
+    /// The block time expressed in UNIX epoch time.
     pub time: i64,
     /// Median time for the current best block.
     #[serde(rename = "mediantime")]

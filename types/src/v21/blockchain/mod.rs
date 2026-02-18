@@ -107,7 +107,7 @@ pub struct Bip9SoftforkInfo {
     pub timeout: i64,
     /// Height of the first block to which the status applies.
     pub since: i64,
-    /// Minimum height of blocks for which the rules may be enforced. v0.21 and later only.
+    /// Minimum height of blocks for which the rules may be enforced.
     pub min_activation_height: i64,
     /// Numeric statistics about BIP-9 signalling for a softfork (only for "started" status).
     pub statistics: Option<Bip9SoftforkStatistics>,
@@ -169,7 +169,7 @@ pub struct GetMempoolEntry(pub MempoolEntry);
 pub struct MempoolEntry {
     /// Virtual transaction size as defined in BIP 141.
     ///
-    /// This is different from actual serialized size for witness transactions as witness data is discounted.  v0.19 and later only.
+    /// This is different from actual serialized size for witness transactions as witness data is discounted.
     pub vsize: i64,
     /// Transaction weight as defined in BIP 141.
     pub weight: i64,
@@ -225,7 +225,7 @@ pub struct MempoolEntry {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolInfo {
-    /// True if the mempool is fully loaded. v0.19 and later only.
+    /// True if the mempool is fully loaded.
     pub loaded: bool,
     /// Current transaction count.
     pub size: i64,
@@ -246,7 +246,7 @@ pub struct GetMempoolInfo {
     /// Current minimum relay fee for transactions.
     #[serde(rename = "minrelaytxfee")]
     pub min_relay_tx_fee: f64,
-    /// Current number of transactions that haven't passed initial broadcast yet. v21 and later only.
+    /// Current number of transactions that haven't passed initial broadcast yet.
     #[serde(rename = "unbroadcastcount")]
     pub unbroadcast_count: i64,
 }

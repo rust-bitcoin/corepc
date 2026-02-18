@@ -294,7 +294,7 @@ pub struct GetBlockchainInfo {
     pub target: String,
     /// The current difficulty.
     pub difficulty: f64,
-    /// The block time expressed in UNIX epoch time. v23 and later only.
+    /// The block time expressed in UNIX epoch time.
     pub time: i64,
     /// The median block time expressed in UNIX epoch time.
     #[serde(rename = "mediantime")]

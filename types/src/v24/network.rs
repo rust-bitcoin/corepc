@@ -36,7 +36,7 @@ pub struct PeerInfo {
     pub network: Option<String>,
     /// The services offered.
     pub services: String,
-    /// The services offered, in human-readable form. v0.19 and later only.
+    /// The services offered, in human-readable form.
     #[serde(rename = "servicesnames")]
     pub services_names: Vec<String>,
     /// Whether peer has asked us to relay transactions to it.
@@ -48,9 +48,9 @@ pub struct PeerInfo {
     /// The time in seconds since epoch (Jan 1 1970 GMT) of the last receive.
     #[serde(rename = "lastrecv")]
     pub last_received: i64,
-    /// The UNIX epoch time of the last valid transaction received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last valid transaction received from this peer.
     pub last_transaction: i64,
-    /// The UNIX epoch time of the last block received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last block received from this peer.
     pub last_block: i64,
     /// The total bytes sent.
     #[serde(rename = "bytessent")]
@@ -80,9 +80,9 @@ pub struct PeerInfo {
     pub subversion: String,
     /// Inbound (true) or Outbound (false).
     pub inbound: bool,
-    /// Whether we selected peer as (compact blocks) high-bandwidth peer. v22 and later only.
+    /// Whether we selected peer as (compact blocks) high-bandwidth peer.
     pub bip152_hb_to: bool,
-    /// Whether peer selected us as (compact blocks) high-bandwidth peer. v22 and later only.
+    /// Whether peer selected us as (compact blocks) high-bandwidth peer.
     pub bip152_hb_from: bool,
     /// Whether connection was due to addnode/-connect or if it was an automatic/inbound connection.
     #[serde(rename = "addnode")]
