@@ -65,7 +65,7 @@ fn build_client_config() -> Arc<ClientConfig> {
     Arc::new(config)
 }
 
-#[cfg(feature = "rustls")]
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
 fn build_rustls_client_config(certificates: RootCertStore) -> Arc<ClientConfig> {
     let config = ClientConfig::builder()
         .with_safe_defaults()

@@ -31,7 +31,7 @@ use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
-#[cfg(feature = "rustls")]
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
 pub(crate) mod certificates;
 #[cfg(feature = "rustls")]
 mod rustls_stream;
