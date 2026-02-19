@@ -19,11 +19,13 @@ mod tls {
     #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
     pub(crate) use self::enabled::*;
 
+    #[cfg(not(all(feature = "rustls", feature = "tokio-rustls")))]
     mod disabled {
         #[derive(Clone)]
-        pub(crate) struct _ClientConfig;
+        pub(crate) struct ClientConfig;
     }
 
+    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
     mod enabled {
         use crate::client::ClientBuilder;
         use crate::connection::certificates::Certificates;
