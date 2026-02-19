@@ -17,7 +17,7 @@ async fn test_https() {
 }
 
 #[tokio::test]
-#[cfg(feature = "rustls")]
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
 async fn test_https_with_client() {
     setup();
     let client = bitreq::Client::new(1);
@@ -26,7 +26,7 @@ async fn test_https_with_client() {
 }
 
 #[tokio::test]
-#[cfg(feature = "rustls")]
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
 async fn test_https_with_client_builder() {
     setup();
     let client = bitreq::Client::builder().build();
@@ -35,7 +35,7 @@ async fn test_https_with_client_builder() {
 }
 
 #[tokio::test]
-#[cfg(feature = "rustls")]
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
 async fn test_https_with_client_builder_and_cert() {
     setup();
     let cert_der = include_bytes!("test_cert.der");
