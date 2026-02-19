@@ -153,8 +153,6 @@ pub struct ClientBuilder {
 ///
 /// let cert_der = include_bytes!("../tests/test_cert.der");
 /// let client = Client::builder()
-///     .with_root_certificate(cert_der.as_slice())
-///     .unwrap()
 ///     .with_capacity(20)
 ///     .build();
 ///
