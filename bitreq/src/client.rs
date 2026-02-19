@@ -9,10 +9,100 @@
 use std::collections::{hash_map, HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
-use crate::connection::certificates::Certificates;
 use crate::connection::AsyncConnection;
 use crate::request::{OwnedConnectionParams as ConnectionKey, ParsedRequest};
 use crate::{Error, Request, Response};
+
+mod tls {
+    #[cfg(not(all(feature = "rustls", feature = "tokio-rustls")))]
+    pub(crate) use self::disabled::*;
+    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    pub(crate) use self::enabled::*;
+
+    mod disabled {
+        #[derive(Clone)]
+        pub(crate) struct _ClientConfig;
+    }
+
+    mod enabled {
+        use crate::client::ClientBuilder;
+        use crate::connection::certificates::Certificates;
+        use crate::Error;
+
+        #[derive(Clone)]
+        pub(crate) struct ClientConfig {
+            pub(crate) tls: Option<TlsConfig>,
+        }
+
+        #[derive(Clone)]
+        pub(crate) struct TlsConfig {
+            pub(crate) certificates: Certificates,
+        }
+
+        impl TlsConfig {
+            fn new(cert_der: Vec<u8>) -> Result<Self, Error> {
+                let certificates = Certificates::new(Some(cert_der))?;
+
+                Ok(Self { certificates })
+            }
+        }
+
+        impl ClientBuilder {
+            /// Adds a custom root certificate for TLS verification.
+            ///
+            /// The certificate must be provided in DER format. This method accepts any type
+            /// that can be converted into a `Vec<u8>`, such as `Vec<u8>`, `&[u8]`, or arrays.
+            /// This is useful when connecting to servers using self-signed certificates
+            /// or custom Certificate Authorities.
+            ///
+            /// # Arguments
+            ///
+            /// * `cert_der` - A DER-encoded X.509 certificate. Accepts any type that implements
+            ///   `Into<Vec<u8>>` (e.g., `&[u8]`, `Vec<u8>`, or `[u8; N]`).
+            ///
+            /// # Example
+            ///
+            /// ```no_run
+            /// # use bitreq::Client;
+            /// // Using a byte slice
+            /// let cert_der: &[u8] = include_bytes!("../tests/test_cert.der");
+            /// let client = Client::builder()
+            ///     .with_root_certificate(cert_der)
+            ///     .unwrap()
+            ///     .build();
+            ///
+            /// // Using a Vec<u8>
+            /// let cert_vec: Vec<u8> = cert_der.to_vec();
+            /// let client = Client::builder()
+            ///     .with_root_certificate(cert_vec)
+            ///     .unwrap()
+            ///     .build();
+            /// ```
+            pub fn with_root_certificate<T: Into<Vec<u8>>>(
+                mut self,
+                cert_der: T,
+            ) -> Result<Self, Error> {
+                let cert_der = cert_der.into();
+
+                if let Some(ref mut client_config) = self.client_config {
+                    if let Some(ref mut tls_config) = client_config.tls {
+                        let certificates = tls_config.certificates.clone();
+                        let certificates = certificates.append_certificate(cert_der)?;
+                        tls_config.certificates = certificates;
+
+                        return Ok(self);
+                    }
+                }
+
+                let tls_config = TlsConfig::new(cert_der)?;
+                self.client_config = Some(ClientConfig { tls: Some(tls_config) });
+                Ok(self)
+            }
+        }
+    }
+}
+
+pub(crate) use tls::ClientConfig;
 
 /// A client that caches connections for reuse.
 ///
@@ -48,24 +138,6 @@ pub struct ClientBuilder {
     client_config: Option<ClientConfig>,
 }
 
-#[derive(Clone)]
-pub(crate) struct ClientConfig {
-    pub(crate) tls: Option<TlsConfig>,
-}
-
-#[derive(Clone)]
-pub(crate) struct TlsConfig {
-    pub(crate) certificates: Certificates,
-}
-
-impl TlsConfig {
-    fn new(cert_der: Vec<u8>) -> Result<Self, Error> {
-        let certificates = Certificates::new(Some(cert_der))?;
-
-        Ok(Self { certificates })
-    }
-}
-
 /// Builder for configuring a `Client` with custom settings.
 ///
 /// The builder allows you to set the connection pool capacity and add
@@ -97,54 +169,6 @@ impl ClientBuilder {
     /// * `capacity` - 1 (single connection)
     /// * `root_certificates` - None (uses system certificates)
     pub fn new() -> Self { Self { capacity: 1, client_config: None } }
-
-    /// Adds a custom root certificate for TLS verification.
-    ///
-    /// The certificate must be provided in DER format. This method accepts any type
-    /// that can be converted into a `Vec<u8>`, such as `Vec<u8>`, `&[u8]`, or arrays.
-    /// This is useful when connecting to servers using self-signed certificates
-    /// or custom Certificate Authorities.
-    ///
-    /// # Arguments
-    ///
-    /// * `cert_der` - A DER-encoded X.509 certificate. Accepts any type that implements
-    ///   `Into<Vec<u8>>` (e.g., `&[u8]`, `Vec<u8>`, or `[u8; N]`).
-    ///
-    /// # Example
-    ///
-    /// ```no_run
-    /// # use bitreq::Client;
-    /// // Using a byte slice
-    /// let cert_der: &[u8] = include_bytes!("../tests/test_cert.der");
-    /// let client = Client::builder()
-    ///     .with_root_certificate(cert_der)
-    ///     .unwrap()
-    ///     .build();
-    ///
-    /// // Using a Vec<u8>
-    /// let cert_vec: Vec<u8> = cert_der.to_vec();
-    /// let client = Client::builder()
-    ///     .with_root_certificate(cert_vec)
-    ///     .unwrap()
-    ///     .build();
-    /// ```
-    pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Result<Self, Error> {
-        let cert_der = cert_der.into();
-
-        if let Some(ref mut client_config) = self.client_config {
-            if let Some(ref mut tls_config) = client_config.tls {
-                let certificates = tls_config.certificates.clone();
-                let certificates = certificates.append_certificate(cert_der)?;
-                tls_config.certificates = certificates;
-
-                return Ok(self);
-            }
-        }
-
-        let tls_config = TlsConfig::new(cert_der)?;
-        self.client_config = Some(ClientConfig { tls: Some(tls_config) });
-        Ok(self)
-    }
 
     /// Sets the maximum number of connections to keep in the pool.
     ///
