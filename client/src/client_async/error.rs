@@ -4,7 +4,7 @@ use std::{error, fmt, io};
 
 use bitcoin::hex;
 
-use crate::client_sync::jsonrpc_sync::error as jsonrpc_error;
+use crate::client_async::jsonrpc_async::error as jsonrpc_error;
 
 /// The error type for errors produced in this library.
 #[derive(Debug)]

@@ -11,3 +11,6 @@ pub extern crate types;
 #[cfg(feature = "client-sync")]
 #[macro_use]
 pub mod client_sync;
+
+#[cfg(feature = "client-async")]
+pub mod client_async;
