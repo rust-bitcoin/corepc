@@ -150,7 +150,7 @@ fn hidden__get_orphan_txs__modelled() {
     let json_v2: GetOrphanTxsVerboseTwo =
         node2.client.get_orphan_txs_verbosity_2().expect("getorphantxs 2");
 
-    let model_v0: mtype::GetOrphanTxs = json_v0.into_model();
+    let model_v0: mtype::GetOrphanTxs = json_v0.into_model().unwrap();
     let model_v1: mtype::GetOrphanTxsVerboseOne = json_v1.into_model().unwrap();
     let model_v2: mtype::GetOrphanTxsVerboseTwo = json_v2.into_model().unwrap();
 

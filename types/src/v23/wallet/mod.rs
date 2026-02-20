@@ -7,7 +7,6 @@
 mod error;
 mod into;
 
-use bitcoin::Transaction;
 use serde::{Deserialize, Serialize};
 
 pub use self::error::{GetTransactionError, ListSinceBlockError, TransactionItemError};
@@ -105,7 +104,7 @@ pub struct GetTransaction {
     /// Raw data for transaction.
     pub hex: String,
     /// The decoded transaction (only present when `verbose` is passed).
-    pub decoded: Option<Transaction>,
+    pub decoded: Option<String>,
 }
 
 /// Result of the JSON-RPC method `getwalletinfo`.

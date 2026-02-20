@@ -270,7 +270,7 @@ pub use self::{
         SpendActivity,
     },
     hidden::{
-        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
+        GetOrphanTxs, GetOrphanTxsError, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
         GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
         GetOrphanTxsVerboseTwoEntryError,
     },
