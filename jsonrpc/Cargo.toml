@@ -21,7 +21,11 @@ default = [ "simple_http", "simple_tcp" ]
 # A bare-minimum HTTP transport.
 simple_http = [ "base64" ]
 # A transport that uses `bitreq` as the HTTP client.
-bitreq_http = [ "base64", "bitreq" ]
+bitreq_http_sync = [ "base64", "bitreq" ]
+# A transport that uses `bitreq` as the async HTTP client.
+bitreq_http_async = [ "base64", "bitreq", "bitreq/async", "client_async" ]
+# An async JSON-RPC client implementation.
+client_async = []
 # Basic transport over a raw TcpListener
 simple_tcp = []
 # Basic transport over a raw UnixStream

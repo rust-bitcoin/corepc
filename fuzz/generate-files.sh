@@ -23,7 +23,7 @@ cargo-fuzz = true
 
 [dependencies]
 honggfuzz = { version = "0.5.55", default-features = false }
-jsonrpc = { path = "..", features = ["bitreq_http"] }
+jsonrpc = { path = "..", features = ["bitreq_http_sync"] }
 
 serde = { version = "1.0.103", features = [ "derive" ] }
 serde_json = "1.0"

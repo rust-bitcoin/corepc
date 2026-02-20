@@ -19,7 +19,7 @@ use base64::Engine;
 #[cfg(feature = "proxy")]
 use socks::Socks5Stream;
 
-use crate::client::Transport;
+use crate::client_sync::{Client, Transport};
 use crate::http::DEFAULT_PORT;
 #[cfg(feature = "proxy")]
 use crate::http::DEFAULT_PROXY_PORT;
@@ -413,18 +413,18 @@ impl Default for Builder {
     fn default() -> Self { Builder::new() }
 }
 
-impl crate::Client {
+impl Client {
     /// Creates a new JSON-RPC client using a bare-minimum HTTP transport.
     pub fn simple_http(
         url: &str,
         user: Option<String>,
         pass: Option<String>,
-    ) -> Result<crate::Client, Error> {
+    ) -> Result<Client, Error> {
         let mut builder = Builder::new().url(url)?;
         if let Some(user) = user {
             builder = builder.auth(user, pass);
         }
-        Ok(crate::Client::with_transport(builder.build()))
+        Ok(Client::with_transport(builder.build()))
     }
 
     /// Creates a new JSON_RPC client using a HTTP-Socks5 proxy transport.
@@ -435,7 +435,7 @@ impl crate::Client {
         pass: Option<String>,
         proxy_addr: &str,
         proxy_auth: Option<(&str, &str)>,
-    ) -> Result<crate::Client, Error> {
+    ) -> Result<Client, Error> {
         let mut builder = Builder::new().url(url)?;
         if let Some(user) = user {
             builder = builder.auth(user, pass);
@@ -445,7 +445,7 @@ impl crate::Client {
             builder = builder.proxy_auth(user, pass);
         }
         let tp = builder.build();
-        Ok(crate::Client::with_transport(tp))
+        Ok(Client::with_transport(tp))
     }
 }
 
@@ -627,7 +627,6 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use crate::Client;
 
     #[test]
     fn test_urls() {
