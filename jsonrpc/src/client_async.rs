@@ -19,6 +19,8 @@ use serde_json::Value;
 use crate::error::Error;
 use crate::{Request, Response};
 
+const JSONRPC_VERSION: &str = "2.0";
+
 /// Boxed future type used by async transports.
 pub type BoxFuture<'a, T> = Pin<Box<dyn Future<Output = T> + Send + 'a>>;
 
@@ -55,7 +57,12 @@ impl Client {
     /// [`crate::arg`] or [`crate::try_arg`].
     pub fn build_request<'a>(&self, method: &'a str, params: Option<&'a RawValue>) -> Request<'a> {
         let nonce = self.nonce.fetch_add(1, atomic::Ordering::Relaxed);
-        Request { method, params, id: serde_json::Value::from(nonce), jsonrpc: Some("2.0") }
+        Request {
+            method,
+            params,
+            id: serde_json::Value::from(nonce),
+            jsonrpc: Some(JSONRPC_VERSION),
+        }
     }
 
     /// Sends a request to a client.
@@ -92,6 +99,9 @@ impl Client {
         // First index responses by ID and catch duplicate IDs.
         let mut by_id = HashMap::with_capacity(requests.len());
         for resp in responses.into_iter() {
+            if resp.jsonrpc.is_some() && resp.jsonrpc.as_deref() != Some(JSONRPC_VERSION) {
+                return Err(Error::VersionMismatch);
+            }
             let id = HashableValue(Cow::Owned(resp.id.clone()));
             if let Some(dup) = by_id.insert(id, resp) {
                 return Err(Error::BatchDuplicateResponseId(dup.id));
@@ -123,7 +133,7 @@ impl Client {
         let id = request.id.clone();
 
         let response = self.send_request(request).await?;
-        if response.jsonrpc.is_some() && response.jsonrpc != Some(From::from("2.0")) {
+        if response.jsonrpc.is_some() && response.jsonrpc.as_deref() != Some(JSONRPC_VERSION) {
             return Err(Error::VersionMismatch);
         }
         if response.id != id {
