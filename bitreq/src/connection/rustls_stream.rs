@@ -134,7 +134,7 @@ pub(super) async fn wrap_async_stream_with_configs(
     certificates = certificates.with_root_certificates();
 
     let client_config = build_rustls_client_config(certificates.inner);
-    let connector = TlsConnector::from(CONFIG.get_or_init(|| client_config).clone());
+    let connector = TlsConnector::from(client_config);
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
