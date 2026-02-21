@@ -13,6 +13,99 @@ use crate::connection::AsyncConnection;
 use crate::request::{OwnedConnectionParams as ConnectionKey, ParsedRequest};
 use crate::{Error, Request, Response};
 
+mod tls {
+    #[cfg(not(all(feature = "rustls", feature = "tokio-rustls")))]
+    pub(crate) use self::disabled::*;
+    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    pub(crate) use self::enabled::*;
+
+    #[cfg(not(all(feature = "rustls", feature = "tokio-rustls")))]
+    mod disabled {
+        #[derive(Clone)]
+        pub(crate) struct ClientConfig;
+    }
+
+    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    mod enabled {
+        use crate::client::ClientBuilder;
+        use crate::connection::certificates::Certificates;
+        use crate::Error;
+
+        #[derive(Clone)]
+        pub(crate) struct ClientConfig {
+            pub(crate) tls: Option<TlsConfig>,
+        }
+
+        #[derive(Clone)]
+        pub(crate) struct TlsConfig {
+            pub(crate) certificates: Certificates,
+        }
+
+        impl TlsConfig {
+            fn new(cert_der: Vec<u8>) -> Result<Self, Error> {
+                let certificates = Certificates::new(Some(cert_der))?;
+
+                Ok(Self { certificates })
+            }
+        }
+
+        impl ClientBuilder {
+            /// Adds a custom root certificate for TLS verification.
+            ///
+            /// The certificate must be provided in DER format. This method accepts any type
+            /// that can be converted into a `Vec<u8>`, such as `Vec<u8>`, `&[u8]`, or arrays.
+            /// This is useful when connecting to servers using self-signed certificates
+            /// or custom Certificate Authorities.
+            ///
+            /// # Arguments
+            ///
+            /// * `cert_der` - A DER-encoded X.509 certificate. Accepts any type that implements
+            ///   `Into<Vec<u8>>` (e.g., `&[u8]`, `Vec<u8>`, or `[u8; N]`).
+            ///
+            /// # Example
+            ///
+            /// ```no_run
+            /// # use bitreq::Client;
+            /// // Using a byte slice
+            /// let cert_der: &[u8] = include_bytes!("../tests/test_cert.der");
+            /// let client = Client::builder()
+            ///     .with_root_certificate(cert_der)
+            ///     .unwrap()
+            ///     .build();
+            ///
+            /// // Using a Vec<u8>
+            /// let cert_vec: Vec<u8> = cert_der.to_vec();
+            /// let client = Client::builder()
+            ///     .with_root_certificate(cert_vec)
+            ///     .unwrap()
+            ///     .build();
+            /// ```
+            pub fn with_root_certificate<T: Into<Vec<u8>>>(
+                mut self,
+                cert_der: T,
+            ) -> Result<Self, Error> {
+                let cert_der = cert_der.into();
+
+                if let Some(ref mut client_config) = self.client_config {
+                    if let Some(ref mut tls_config) = client_config.tls {
+                        let certificates = tls_config.certificates.clone();
+                        let certificates = certificates.append_certificate(cert_der)?;
+                        tls_config.certificates = certificates;
+
+                        return Ok(self);
+                    }
+                }
+
+                let tls_config = TlsConfig::new(cert_der)?;
+                self.client_config = Some(ClientConfig { tls: Some(tls_config) });
+                Ok(self)
+            }
+        }
+    }
+}
+
+pub(crate) use tls::ClientConfig;
+
 /// A client that caches connections for reuse.
 ///
 /// The client maintains a pool of up to `capacity` connections, evicting
@@ -39,10 +132,88 @@ struct ClientImpl<T> {
     connections: HashMap<ConnectionKey, Arc<T>>,
     lru_order: VecDeque<ConnectionKey>,
     capacity: usize,
+    client_config: Option<ClientConfig>,
+}
+
+pub struct ClientBuilder {
+    capacity: usize,
+    client_config: Option<ClientConfig>,
+}
+
+/// Builder for configuring a `Client` with custom settings.
+///
+/// The builder allows you to set the connection pool capacity and add
+/// custom root certificates for TLS verification before constructing the client.
+///
+/// # Example
+///
+/// ```no_run
+/// # async fn example() -> Result<(), bitreq::Error> {
+/// use bitreq::{Client, RequestExt};
+///
+/// let cert_der = include_bytes!("../tests/test_cert.der");
+/// let client = Client::builder()
+///     .with_capacity(20)
+///     .build();
+///
+/// let response = bitreq::get("https://example.com")
+///     .send_async_with_client(&client)
+///     .await?;
+/// # Ok(())
+/// # }
+/// ```
+impl ClientBuilder {
+    /// Creates a new `ClientBuilder` with default settings.
+    ///
+    /// Default configuration:
+    /// * `capacity` - 1 (single connection)
+    /// * `root_certificates` - None (uses system certificates)
+    pub fn new() -> Self { Self { capacity: 1, client_config: None } }
+
+    /// Sets the maximum number of connections to keep in the pool.
+    ///
+    /// When the pool reaches this capacity, the least recently used connection
+    /// is evicted to make room for new connections.
+    ///
+    /// # Arguments
+    ///
+    /// * `capacity` - Maximum number of cached connections
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use bitreq::Client;
+    /// let client = Client::builder()
+    ///     .with_capacity(10)
+    ///     .build();
+    /// ```
+    pub fn with_capacity(mut self, capacity: usize) -> Self {
+        self.capacity = capacity;
+        self
+    }
+
+    /// Builds the `Client` with the configured settings.
+    ///
+    /// Consumes the builder and returns a configured `Client` instance
+    /// ready to send requests with connection pooling.
+    pub fn build(self) -> Client {
+        Client {
+            r#async: Arc::new(Mutex::new(ClientImpl {
+                connections: HashMap::new(),
+                lru_order: VecDeque::new(),
+                capacity: self.capacity,
+                client_config: self.client_config,
+            })),
+        }
+    }
+}
+
+impl Default for ClientBuilder {
+    fn default() -> Self { Self::new() }
 }
 
 impl Client {
-    /// Creates a new `Client` with the specified connection cache capacity.
+    /// Creates a new `Client` with the specified connection pool capacity.
     ///
     /// # Arguments
     ///
@@ -54,9 +225,13 @@ impl Client {
                 connections: HashMap::new(),
                 lru_order: VecDeque::new(),
                 capacity,
+                client_config: None,
             })),
         }
     }
+
+    /// Create a builder for a client
+    pub fn builder() -> ClientBuilder { ClientBuilder::new() }
 
     /// Sends a request asynchronously using a cached connection if available.
     pub async fn send_async(&self, request: Request) -> Result<Response, Error> {
@@ -77,7 +252,13 @@ impl Client {
         let conn = if let Some(conn) = conn_opt {
             conn
         } else {
-            let connection = AsyncConnection::new(key, parsed_request.timeout_at).await?;
+            let client_config = {
+                let state = self.r#async.lock().unwrap();
+                state.client_config.clone()
+            };
+
+            let connection =
+                AsyncConnection::new(key, parsed_request.timeout_at, client_config).await?;
             let connection = Arc::new(connection);
 
             let mut state = self.r#async.lock().unwrap();

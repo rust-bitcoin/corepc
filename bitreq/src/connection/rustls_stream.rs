@@ -24,6 +24,8 @@ use webpki_roots::TLS_SERVER_ROOTS;
 use super::{AsyncHttpStream, AsyncTcpStream};
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
+#[cfg(feature = "async")]
+use crate::client::ClientConfig as CustomClientConfig;
 use crate::Error;
 
 #[cfg(feature = "rustls")]
@@ -63,6 +65,15 @@ fn build_client_config() -> Arc<ClientConfig> {
     Arc::new(config)
 }
 
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+fn build_rustls_client_config(certificates: RootCertStore) -> Arc<ClientConfig> {
+    let config = ClientConfig::builder()
+        .with_safe_defaults()
+        .with_root_certificates(certificates)
+        .with_no_client_auth();
+    Arc::new(config)
+}
+
 #[cfg(feature = "rustls")]
 pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, Error> {
     #[cfg(feature = "log")]
@@ -97,6 +108,33 @@ pub(super) async fn wrap_async_stream(
     };
 
     let connector = TlsConnector::from(CONFIG.get_or_init(build_client_config).clone());
+
+    #[cfg(feature = "log")]
+    log::trace!("Establishing TLS session to {host}.");
+
+    let tls = connector.connect(dns_name, tcp).await.map_err(Error::IoError)?;
+
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
+}
+
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    custom_client_config: CustomClientConfig,
+) -> Result<AsyncHttpStream, Error> {
+    #[cfg(feature = "log")]
+    log::trace!("Setting up TLS parameters for {host}.");
+    let dns_name = match ServerName::try_from(host) {
+        Ok(result) => result,
+        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
+    };
+
+    let mut certificates = custom_client_config.tls.unwrap().certificates;
+    certificates = certificates.with_root_certificates();
+
+    let client_config = build_rustls_client_config(certificates.inner);
+    let connector = TlsConnector::from(client_config);
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");

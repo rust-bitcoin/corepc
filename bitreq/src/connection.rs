@@ -22,6 +22,8 @@ use tokio::net::TcpStream as AsyncTcpStream;
 #[cfg(feature = "async")]
 use tokio::sync::Mutex as AsyncMutex;
 
+#[cfg(feature = "async")]
+use crate::client::ClientConfig;
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 #[cfg(feature = "async")]
 use crate::Response;
@@ -29,6 +31,8 @@ use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+pub(crate) mod certificates;
 #[cfg(feature = "rustls")]
 mod rustls_stream;
 #[cfg(feature = "rustls")]
@@ -266,15 +270,13 @@ impl AsyncConnection {
     pub(crate) async fn new(
         params: ConnectionParams<'_>,
         timeout_at: Option<Instant>,
+        client_config: Option<ClientConfig>,
     ) -> Result<AsyncConnection, Error> {
         let future = async move {
             let socket = Self::connect(params).await?;
 
             if params.https {
-                #[cfg(not(feature = "tokio-rustls"))]
-                return Err(Error::HttpsFeatureNotEnabled);
-                #[cfg(feature = "tokio-rustls")]
-                rustls_stream::wrap_async_stream(socket, params.host).await
+                Self::wrap_async_stream(socket, params.host, client_config).await
             } else {
                 Ok(AsyncHttpStream::Unsecured(socket))
             }
@@ -296,6 +298,30 @@ impl AsyncConnection {
             min_dropped_reader_id: AtomicUsize::new(usize::MAX),
             socket_new_requests_timeout: Mutex::new(Instant::now() + Duration::from_secs(60)),
         }))))
+    }
+
+    /// Call the correct wrapper function depending on whether client_configs are present
+    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    async fn wrap_async_stream(
+        socket: AsyncTcpStream,
+        host: &str,
+        client_config: Option<ClientConfig>,
+    ) -> Result<AsyncHttpStream, Error> {
+        if let Some(client_config) = client_config {
+            rustls_stream::wrap_async_stream_with_configs(socket, host, client_config).await
+        } else {
+            rustls_stream::wrap_async_stream(socket, host).await
+        }
+    }
+
+    /// Error treatment function, should not be called under normal circustances
+    #[cfg(not(all(feature = "rustls", feature = "tokio-rustls")))]
+    async fn wrap_async_stream(
+        _socket: AsyncTcpStream,
+        _host: &str,
+        _client_config: Option<ClientConfig>,
+    ) -> Result<AsyncHttpStream, Error> {
+        Err(Error::HttpsFeatureNotEnabled)
     }
 
     async fn tcp_connect(host: &str, port: u16) -> Result<AsyncTcpStream, Error> {
@@ -447,7 +473,7 @@ impl AsyncConnection {
                 };
                 (_internal) => {
                     let new_connection =
-                        AsyncConnection::new(request.connection_params(), request.timeout_at)
+                        AsyncConnection::new(request.connection_params(), request.timeout_at, None)
                             .await?;
                     *self.0.lock().unwrap() = Arc::clone(&*new_connection.0.lock().unwrap());
                     core::mem::drop(read);
@@ -806,7 +832,8 @@ async fn async_handle_redirects(
             let new_connection;
             if needs_new_connection {
                 new_connection =
-                    AsyncConnection::new(request.connection_params(), request.timeout_at).await?;
+                    AsyncConnection::new(request.connection_params(), request.timeout_at, None)
+                        .await?;
                 connection = &new_connection;
             }
             connection.send(request).await
