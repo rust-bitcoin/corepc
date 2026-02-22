@@ -254,7 +254,7 @@ impl Client {
         } else {
             let client_config = {
                 let state = self.r#async.lock().unwrap();
-                state.client_config.clone()
+                state.client_config.as_ref().map(Arc::clone)
             };
 
             let connection =
