@@ -106,35 +106,6 @@ mod tls {
 
 pub(crate) use tls::ClientConfig;
 
-/// A client that caches connections for reuse.
-///
-/// The client maintains a pool of up to `capacity` connections, evicting
-/// the least recently used connection when the cache is full.
-///
-/// # Example
-///
-/// ```no_run
-/// # async fn request() {
-/// use bitreq::{Client, RequestExt};
-///
-/// let client = Client::new(10); // Cache up to 10 connections
-/// let response = bitreq::get("https://example.com")
-///     .send_async_with_client(&client)
-///     .await;
-/// # }
-/// ```
-#[derive(Clone)]
-pub struct Client {
-    r#async: Arc<Mutex<ClientImpl<AsyncConnection>>>,
-}
-
-struct ClientImpl<T> {
-    connections: HashMap<ConnectionKey, Arc<T>>,
-    lru_order: VecDeque<ConnectionKey>,
-    capacity: usize,
-    client_config: Option<ClientConfig>,
-}
-
 pub struct ClientBuilder {
     capacity: usize,
     client_config: Option<ClientConfig>,
@@ -210,6 +181,35 @@ impl ClientBuilder {
 
 impl Default for ClientBuilder {
     fn default() -> Self { Self::new() }
+}
+
+/// A client that caches connections for reuse.
+///
+/// The client maintains a pool of up to `capacity` connections, evicting
+/// the least recently used connection when the cache is full.
+///
+/// # Example
+///
+/// ```no_run
+/// # async fn request() {
+/// use bitreq::{Client, RequestExt};
+///
+/// let client = Client::new(10); // Cache up to 10 connections
+/// let response = bitreq::get("https://example.com")
+///     .send_async_with_client(&client)
+///     .await;
+/// # }
+/// ```
+#[derive(Clone)]
+pub struct Client {
+    r#async: Arc<Mutex<ClientImpl<AsyncConnection>>>,
+}
+
+struct ClientImpl<T> {
+    connections: HashMap<ConnectionKey, Arc<T>>,
+    lru_order: VecDeque<ConnectionKey>,
+    capacity: usize,
+    client_config: Option<ClientConfig>,
 }
 
 impl Client {
