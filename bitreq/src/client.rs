@@ -173,7 +173,7 @@ impl ClientBuilder {
                 connections: HashMap::new(),
                 lru_order: VecDeque::new(),
                 capacity: self.capacity,
-                client_config: self.client_config,
+                client_config: self.client_config.map(Arc::new),
             })),
         }
     }
@@ -209,7 +209,7 @@ struct ClientImpl<T> {
     connections: HashMap<ConnectionKey, Arc<T>>,
     lru_order: VecDeque<ConnectionKey>,
     capacity: usize,
-    client_config: Option<ClientConfig>,
+    client_config: Option<Arc<ClientConfig>>,
 }
 
 impl Client {

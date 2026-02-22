@@ -121,7 +121,7 @@ pub(super) async fn wrap_async_stream(
 pub(super) async fn wrap_async_stream_with_configs(
     tcp: AsyncTcpStream,
     host: &str,
-    custom_client_config: CustomClientConfig,
+    custom_client_config: Arc<CustomClientConfig>,
 ) -> Result<AsyncHttpStream, Error> {
     #[cfg(feature = "log")]
     log::trace!("Setting up TLS parameters for {host}.");
@@ -130,7 +130,8 @@ pub(super) async fn wrap_async_stream_with_configs(
         Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
     };
 
-    let mut certificates = custom_client_config.tls.unwrap().certificates;
+    let tls_config = custom_client_config.tls.as_ref().unwrap();
+    let mut certificates = tls_config.certificates.clone();
     certificates = certificates.with_root_certificates();
 
     let client_config = build_rustls_client_config(certificates.inner);
