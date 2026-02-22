@@ -245,7 +245,7 @@ pub struct GetMempoolEntry(pub MempoolEntry);
 pub struct MempoolEntry {
     /// Virtual transaction size as defined in BIP 141.
     ///
-    /// This is different from actual serialized size for witness transactions as witness data is discounted.  v0.19 and later only.
+    /// This is different from actual serialized size for witness transactions as witness data is discounted.
     pub vsize: i64,
     /// DEPRECATED: same as vsize. Only returned if bitcoind is started with -deprecatedrpc=size
     /// size will be completely removed in v0.20.
@@ -319,7 +319,7 @@ pub struct MempoolEntryFees {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolInfo {
-    /// True if the mempool is fully loaded. v0.19 and later only.
+    /// True if the mempool is fully loaded.
     pub loaded: bool,
     /// Current transaction count.
     pub size: i64,

@@ -58,9 +58,54 @@ fn blockchain__get_block__modelled() {
     let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseOneError> = json.into_model();
     model.unwrap();
 
-    // TODO: Test getblock 2
-    // let json = node.client.get_block_with_verbosity(block_hash, 2).expect("getblock verbosity 2");
-    // assert!(json.into_model().is_ok());
+    #[cfg(not(feature = "v28_and_below"))]
+    {
+        let node = Node::with_wallet(Wallet::Default, &[]);
+        node.fund_wallet();
+        let (_address, mined_tx) = node.create_mined_transaction();
+        let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+
+        let json: GetBlockVerboseTwo =
+            node.client.get_block_verbose_two(block_hash).expect("getblock verbose=2");
+        let model: Result<mtype::GetBlockVerboseTwo, GetBlockVerboseTwoError> = json.into_model();
+        let block_v2 = model.unwrap();
+
+        assert_eq!(block_v2.tx.len(), block_v2.n_tx as usize);
+
+        let mined_txid = mined_tx.compute_txid();
+        let mined_entry = block_v2
+            .tx
+            .iter()
+            .find(|entry| entry.transaction.transaction.compute_txid() == mined_txid)
+            .expect("mined transaction should be present in verbosity=2 results");
+        assert!(mined_entry.fee.is_some());
+        assert!(!mined_entry.transaction.transaction.input.is_empty());
+        assert!(!mined_entry.transaction.transaction.output.is_empty());
+
+        let json: GetBlockVerboseThree =
+            node.client.get_block_verbose_three(block_hash).expect("getblock verbose=3");
+        let model: Result<mtype::GetBlockVerboseThree, GetBlockVerboseThreeError> =
+            json.into_model();
+        let block_v3 = model.unwrap();
+
+        assert_eq!(block_v3.tx.len(), block_v3.n_tx as usize);
+
+        let mined_entry = block_v3
+            .tx
+            .iter()
+            .find(|entry| entry.transaction.transaction.compute_txid() == mined_txid)
+            .expect("mined transaction should be present in verbosity=3 results");
+        assert!(
+            mined_entry.prevouts.iter().any(|prevout| prevout.is_some()),
+            "expected at least one prevout for the mined transaction"
+        );
+
+        for prevout in mined_entry.prevouts.iter().flatten() {
+            assert!(prevout.value.to_sat() > 0);
+            assert!(prevout.height <= block_v3.height);
+            assert!(!prevout.script_pubkey.script_pubkey.is_empty());
+        }
+    }
 }
 
 #[test]
@@ -232,13 +277,31 @@ fn blockchain__get_chain_tx_stats__modelled() {
 #[test]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_deployment_info__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
-    let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    node.mine_a_block();
+    node.mine_a_block();
+
+    let first_block_hash = node
+        .client
+        .get_block_hash(0)
+        .expect("best_block_hash failed")
+        .block_hash()
+        .expect("block_hash parse failed");
+    let tip_block_hash = node.client.best_block_hash().expect("best_block_hash failed");
 
     let json: GetDeploymentInfo =
-        node.client.get_deployment_info(&block_hash).expect("getdeploymentinfo");
+        node.client.get_deployment_info(&first_block_hash).expect("getdeploymentinfo");
     let model: Result<mtype::GetDeploymentInfo, GetDeploymentInfoError> = json.into_model();
-    model.unwrap();
+    let deployment_info = model.unwrap();
+    assert_eq!(deployment_info.hash, first_block_hash);
+
+    let json_tip: GetDeploymentInfo =
+        node.client.get_deployment_info_tip().expect("getdeploymentinfo tip");
+    let model_tip: Result<mtype::GetDeploymentInfo, GetDeploymentInfoError> = json_tip.into_model();
+    let deployment_info_tip = model_tip.unwrap();
+
+    assert_eq!(deployment_info_tip.hash, tip_block_hash);
 }
 
 #[test]
@@ -246,8 +309,25 @@ fn blockchain__get_deployment_info__modelled() {
 fn blockchain__get_descriptor_activity__modelled() {
     let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);
 
-    let json: GetDescriptorActivity =
-        node.client.get_descriptor_activity().expect("getdescriptoractivity");
+    // In Core v30, `getdescriptoractivity` requires `blockhashes` and `scanobjects` arguments.
+    // Older versions accepted omitting them.
+    let json: GetDescriptorActivity = {
+        #[cfg(feature = "v29_and_below")]
+        {
+            node.client.get_descriptor_activity().expect("getdescriptoractivity")
+        }
+
+        #[cfg(not(feature = "v29_and_below"))]
+        {
+            let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
+            node.client
+                .get_descriptor_activity(
+                    &[block_hash],
+                    &["pkh(022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e)"],
+                )
+                .expect("getdescriptoractivity")
+        }
+    };
     let model: Result<mtype::GetDescriptorActivity, GetDescriptorActivityError> = json.into_model();
     model.unwrap();
 }
@@ -373,7 +453,7 @@ fn blockchain__get_raw_mempool__modelled() {
     {
         // verbose = false + mempool_sequence = true
         let json: GetRawMempoolSequence =
-        node.client.get_raw_mempool_sequence().expect("getrawmempool sequence");
+            node.client.get_raw_mempool_sequence().expect("getrawmempool sequence");
         let model: Result<mtype::GetRawMempoolSequence, hex::HexToArrayError> = json.into_model();
         let mempool = model.unwrap();
         // Sanity check.
@@ -511,11 +591,18 @@ fn blockchain__scan_blocks_modelled() {
     let json: ScanBlocksStart =
         node.client.scan_blocks_start(&[scan_desc]).expect("scanblocks start");
     let model: Result<mtype::ScanBlocksStart, ScanBlocksStartError> = json.into_model();
-    model.unwrap();
+    let model = model.unwrap();
 
     let _: Option<ScanBlocksStatus> = node.client.scan_blocks_status().expect("scanblocks status");
 
     let _: ScanBlocksAbort = node.client.scan_blocks_abort().expect("scanblocks abort");
+
+    assert!(model.from_height <= model.to_height);
+
+    #[cfg(not(feature = "v25_and_below"))]
+    {
+        assert!(model.completed.is_some());
+    }
 }
 
 #[test]

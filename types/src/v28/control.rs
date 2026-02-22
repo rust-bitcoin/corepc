@@ -16,13 +16,13 @@ use serde::{Deserialize, Serialize};
 pub struct Logging {
     pub addrman: bool,
     pub bench: bool,
-    pub blockstorage: bool, // v23 and later only
+    pub blockstorage: bool,
     pub cmpctblock: bool,
     pub coindb: bool,
     pub estimatefee: bool,
     pub http: bool,
-    pub i2p: bool, // v23 and later only
-    pub ipc: bool, // v23 and later only
+    pub i2p: bool,
+    pub ipc: bool,
     pub leveldb: bool,
     pub libevent: bool,
     pub mempool: bool,
@@ -34,12 +34,12 @@ pub struct Logging {
     pub rand: bool,
     pub reindex: bool,
     pub rpc: bool,
-    pub scan: bool, // v25 and later only
+    pub scan: bool,
     pub selectcoins: bool,
     pub tor: bool,
-    pub txpackages: bool,       // v26 and later only
-    pub txreconciliation: bool, // v25 and later only
-    pub validation: bool,       // v23 and later only
-    pub walletdb: bool,         // v23 and later only
+    pub txpackages: bool,
+    pub txreconciliation: bool,
+    pub validation: bool,
+    pub walletdb: bool,
     pub zmq: bool,
 }

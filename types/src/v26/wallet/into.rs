@@ -73,6 +73,10 @@ impl GetTransaction {
             .into_iter()
             .map(|d| d.into_model().map_err(E::Details))
             .collect::<Result<Vec<_>, _>>()?;
+        let decoded = self
+            .decoded
+            .map(|tx| encode::deserialize_hex::<Transaction>(&tx).map_err(E::Tx))
+            .transpose()?;
         let last_processed_block = self
             .last_processed_block
             .map(|l| l.into_model())
@@ -102,7 +106,7 @@ impl GetTransaction {
             bip125_replaceable: self.bip125_replaceable.into_model(),
             parent_descriptors: self.parent_descriptors,
             details,
-            decoded: self.decoded,
+            decoded,
             last_processed_block,
             tx,
         })

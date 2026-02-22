@@ -110,10 +110,8 @@ pub struct GetBlockStats {
     #[serde(rename = "utxo_size_inc")]
     pub utxo_size_increase: i32,
     /// The increase/decrease in the number of unspent outputs, not counting unspendables.
-    /// v25 and later only.
     pub utxo_increase_actual: Option<i32>,
     /// The increase/decrease in size for the utxo index, not counting unspendables.
-    /// v25 and later only.
     #[serde(rename = "utxo_size_inc_actual")]
     pub utxo_size_increase_actual: Option<i32>,
 }

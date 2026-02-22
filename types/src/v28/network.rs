@@ -26,7 +26,7 @@ pub struct GetNetworkInfo {
     /// The services we offer to the network (hex string).
     #[serde(rename = "localservices")]
     pub local_services: String,
-    /// The services we offer to the network. v0.19 and later only.
+    /// The services we offer to the network.
     #[serde(rename = "localservicesnames")]
     pub local_services_names: Vec<String>,
     /// `true` if transaction relay is requested from peers.
@@ -37,9 +37,9 @@ pub struct GetNetworkInfo {
     pub time_offset: isize,
     /// The total number of connections.
     pub connections: usize,
-    /// The number of inbound connections. v21 and later only.
+    /// The number of inbound connections.
     pub connections_in: usize,
-    /// The number of outbound connections. v21 and later only.
+    /// The number of outbound connections.
     pub connections_out: usize,
     /// Whether p2p networking is enabled.
     #[serde(rename = "networkactive")]

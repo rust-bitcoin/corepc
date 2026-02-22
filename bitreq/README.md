@@ -42,36 +42,3 @@ require a higher MSRV.
 
 ## License
 This crate is distributed under the terms of the [ISC license](COPYING.md).
-
-## Planned for a future major release
-
-This is a list of features I'll implement once it gets long enough, or
-a severe enough issue is found that there's good reason to make a
-major version bump.
-
-- Change the response/request structs to allow multiple headers with
-  the same name.
-- Set sane defaults for maximum header size and status line
-  length. The ability to add maximums was added in response to
-  [#55](https://github.com/neonmoe/minreq/issues/55), but defaults for
-  the limits is a breaking change.
-- Clearer error when making a request to an url that does not start
-  with `http://` or `https://`.
-- Change default proxy port to 1080 (from 8080). Curl uses 1080, so it's a sane
-  default.
-
-### Potential ideas
-
-Just thinking out loud, might not end up doing some or all of these.
-
-- Non-exhaustive error type, to be able to add new errors in minor
-  versions.
-- Refactor applicable parts to `#![no_std]`, maybe even exposing a
-  less convenient API for `#![no_std]` usage. Keep the current API as
-  in any case (at the very least, as a default feature).
-  - Maybe something along the lines of ["The case for
-    sans-io"](https://fasterthanli.me/articles/the-case-for-sans-io)?
-    Adding the much-requested async support as a feature could be
-    pretty clean if built around this idea.
-- Would be good if the crate got smaller with 3.0, not bigger. Maybe
-  there's something to cut, something to optimize?

@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::{block, hex, Block, BlockHash, CompactTarget, ScriptBuf, Txid, Weight, Work};
+use bitcoin::hex::FromHex;
+use bitcoin::{
+    block, hex, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptBuf, TxMerkleNode,
+    TxOut, Txid, Weight, Work, Wtxid,
+};
 
 // TODO: Use explicit imports?
 use super::*;
@@ -36,7 +40,7 @@ impl GetBlockVerboseOne {
         let hash = self.hash.parse::<BlockHash>().map_err(E::Hash)?;
         let stripped_size =
             self.stripped_size.map(|size| crate::to_u32(size, "stripped_size")).transpose()?;
-        let weight = Weight::from_wu(self.weight); // FIXME: Confirm this uses weight units.
+        let weight = Weight::from_wu(self.weight);
         let version = block::Version::from_consensus(self.version);
         let tx = self
             .tx

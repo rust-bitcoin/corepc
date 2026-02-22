@@ -5,9 +5,10 @@ use bitcoin::{Amount, BlockHash};
 
 use super::{
     DumpTxOutSet, DumpTxOutSetError, GetChainStates, GetChainStatesError, GetTxOutSetInfo,
-    GetTxOutSetInfoError, LoadTxOutSet, LoadTxOutSetError,
+    GetTxOutSetInfoError, LoadTxOutSet, LoadTxOutSetError, ScanBlocksStart,
 };
 use crate::model;
+use crate::v25::ScanBlocksStartError;
 
 impl GetChainStates {
     /// Converts v26 GetChainStates (and its ChainState subtypes) to model::GetChainStates
@@ -136,5 +137,25 @@ impl LoadTxOutSet {
         let coins_loaded = Amount::from_btc(self.coins_loaded).map_err(E::CoinsLoaded)?;
 
         Ok(model::LoadTxOutSet { coins_loaded, tip_hash, base_height, path: self.path })
+    }
+}
+
+impl ScanBlocksStart {
+    pub fn into_model(self) -> Result<model::ScanBlocksStart, ScanBlocksStartError> {
+        use ScanBlocksStartError as E;
+
+        let relevant_blocks = self
+            .relevant_blocks
+            .iter()
+            .map(|s| s.parse())
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(E::RelevantBlocks)?;
+
+        Ok(model::ScanBlocksStart {
+            from_height: crate::to_u32(self.from_height, "from_height")?,
+            to_height: crate::to_u32(self.to_height, "to_height")?,
+            relevant_blocks,
+            completed: Some(self.completed),
+        })
     }
 }

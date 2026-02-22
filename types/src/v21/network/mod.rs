@@ -30,7 +30,7 @@ pub struct GetNetworkInfo {
     /// The services we offer to the network (hex string).
     #[serde(rename = "localservices")]
     pub local_services: String,
-    /// The services we offer to the network. v0.19 and later only.
+    /// The services we offer to the network.
     #[serde(rename = "localservicesnames")]
     pub local_services_names: Vec<String>,
     /// `true` if transaction relay is requested from peers.
@@ -41,9 +41,9 @@ pub struct GetNetworkInfo {
     pub time_offset: isize,
     /// The total number of connections.
     pub connections: usize,
-    /// The number of inbound connections. v21 and later only.
+    /// The number of inbound connections.
     pub connections_in: usize,
-    /// The number of outbound connections. v21 and later only.
+    /// The number of outbound connections.
     pub connections_out: usize,
     /// Whether p2p networking is enabled.
     #[serde(rename = "networkactive")]
@@ -103,9 +103,9 @@ pub struct PeerInfo {
     /// The time in seconds since epoch (Jan 1 1970 GMT) of the last receive.
     #[serde(rename = "lastrecv")]
     pub last_received: i64,
-    /// The UNIX epoch time of the last valid transaction received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last valid transaction received from this peer.
     pub last_transaction: i64,
-    /// The UNIX epoch time of the last block received from this peer. v21 and later only.
+    /// The UNIX epoch time of the last block received from this peer.
     pub last_block: i64,
     /// The total bytes sent.
     #[serde(rename = "bytessent")]
@@ -147,14 +147,13 @@ pub struct PeerInfo {
     pub synced_blocks: i64,
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Vec<u64>,
-    /// The total number of addresses processed, excluding those dropped due to rate limiting. v21 and
-    /// later only.
+    /// The total number of addresses processed, excluding those dropped due to rate limiting.
     #[serde(rename = "addr_processed")]
     pub addresses_processed: usize,
-    /// The total number of addresses dropped due to rate limiting. v21 and later only.
+    /// The total number of addresses dropped due to rate limiting.
     #[serde(rename = "addr_rate_limited")]
     pub addresses_rate_limited: usize,
-    /// Any special permissions that have been granted to this peer. v0.19 and later only.
+    /// Any special permissions that have been granted to this peer.
     pub permissions: Vec<String>,
     /// Whether the peer is whitelisted.
     pub whitelisted: Option<bool>,

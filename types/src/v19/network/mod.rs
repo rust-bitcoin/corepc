@@ -140,7 +140,7 @@ pub struct PeerInfo {
     pub synced_blocks: i64,
     /// The heights of blocks we're currently asking from this peer.
     pub inflight: Vec<u64>,
-    /// Any special permissions that have been granted to this peer. v0.19 and later only.
+    /// Any special permissions that have been granted to this peer.
     pub permissions: Vec<String>,
     /// Whether the peer is whitelisted.
     pub whitelisted: Option<bool>,

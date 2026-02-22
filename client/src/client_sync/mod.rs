@@ -164,42 +164,6 @@ where
     Ok(serde_json::to_value(val)?)
 }
 
-/// Shorthand for converting an `Option` into an `Option<serde_json::Value>`.
-#[allow(dead_code)] // TODO: Remove this if unused still when we are done.
-fn opt_into_json<T>(opt: Option<T>) -> Result<serde_json::Value>
-where
-    T: serde::ser::Serialize,
-{
-    match opt {
-        Some(val) => Ok(into_json(val)?),
-        None => Ok(serde_json::Value::Null),
-    }
-}
-
-/// Shorthand for `serde_json::Value::Null`.
-#[allow(dead_code)] // TODO: Remove this if unused still when we are done.
-fn null() -> serde_json::Value { serde_json::Value::Null }
-
-/// Shorthand for an empty `serde_json::Value` array.
-#[allow(dead_code)] // TODO: Remove this if unused still when we are done.
-fn empty_arr() -> serde_json::Value { serde_json::Value::Array(vec![]) }
-
-/// Shorthand for an empty `serde_json` object.
-#[allow(dead_code)] // TODO: Remove this if unused still when we are done.
-fn empty_obj() -> serde_json::Value { serde_json::Value::Object(Default::default()) }
-
-/// Convert a possible-null result into an `Option`.
-#[allow(dead_code)] // TODO: Remove this if unused still when we are done.
-fn opt_result<T: for<'a> serde::de::Deserialize<'a>>(
-    result: serde_json::Value,
-) -> Result<Option<T>> {
-    if result == serde_json::Value::Null {
-        Ok(None)
-    } else {
-        Ok(serde_json::from_value(result)?)
-    }
-}
-
 /// Helper to log an RPC response.
 fn log_response(method: &str, resp: &Result<jsonrpc::Response>) {
     use log::Level::{Debug, Trace, Warn};

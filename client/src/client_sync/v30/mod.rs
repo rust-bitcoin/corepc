@@ -4,6 +4,8 @@
 //!
 //! We ignore option arguments unless they effect the shape of the returned JSON data.
 
+pub mod blockchain;
+
 use std::collections::BTreeMap;
 use std::path::Path;
 
@@ -28,7 +30,7 @@ crate::impl_client_check_expected_server_version!({ [300000, 300100, 300200] });
 // == Blockchain ==
 crate::impl_client_v29__dump_tx_out_set!();
 crate::impl_client_v17__get_best_block_hash!();
-crate::impl_client_v17__get_block!();
+crate::impl_client_v29__get_block!();
 crate::impl_client_v17__get_blockchain_info!();
 crate::impl_client_v17__get_block_count!();
 crate::impl_client_v19__get_block_filter!();
@@ -40,7 +42,7 @@ crate::impl_client_v26__get_chain_states!();
 crate::impl_client_v17__get_chain_tips!();
 crate::impl_client_v17__get_chain_tx_stats!();
 crate::impl_client_v23__get_deployment_info!();
-crate::impl_client_v29__get_descriptor_activity!();
+crate::impl_client_v30__get_descriptor_activity!();
 crate::impl_client_v17__get_difficulty!();
 crate::impl_client_v17__get_mempool_ancestors!();
 crate::impl_client_v17__get_mempool_descendants!();

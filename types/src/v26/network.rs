@@ -155,6 +155,5 @@ pub struct PeerInfo {
     /// v2 (BIP324 encrypted transport protocol).
     pub transport_protocol_type: String,
     /// The session ID for this connection, or "" if there is none ("v2" transport protocol only).
-    /// v26 and later only.
     pub session_id: String,
 }

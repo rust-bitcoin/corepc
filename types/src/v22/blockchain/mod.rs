@@ -18,7 +18,7 @@ pub use super::GetMempoolInfoError;
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetMempoolInfo {
-    /// True if the mempool is fully loaded. v0.19 and later only.
+    /// True if the mempool is fully loaded.
     pub loaded: bool,
     /// Current transaction count.
     pub size: i64,
@@ -28,8 +28,7 @@ pub struct GetMempoolInfo {
     pub bytes: i64,
     /// Total memory usage for the mempool.
     pub usage: i64,
-    /// Total fees for the mempool in BTC, ignoring modified fees through prioritisetransaction. v23
-    /// and later only.
+    /// Total fees for the mempool in BTC, ignoring modified fees through prioritisetransaction.
     pub total_fee: f64,
     /// Maximum memory usage for the mempool.
     #[serde(rename = "maxmempool")]
@@ -42,7 +41,7 @@ pub struct GetMempoolInfo {
     /// Current minimum relay fee for transactions.
     #[serde(rename = "minrelaytxfee")]
     pub min_relay_tx_fee: f64,
-    /// Current number of transactions that haven't passed initial broadcast yet. v21 and later only.
+    /// Current number of transactions that haven't passed initial broadcast yet.
     #[serde(rename = "unbroadcastcount")]
     pub unbroadcast_count: i64,
 }

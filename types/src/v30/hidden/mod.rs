@@ -7,10 +7,10 @@
 mod error;
 mod into;
 
-use bitcoin::Txid;
 use serde::{Deserialize, Serialize};
 
 pub use self::error::{GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwoEntryError};
+pub use super::GetOrphanTxsError;
 
 /// Result of JSON-RPC method `getorphantxs` verbosity 0.
 ///
@@ -19,7 +19,7 @@ pub use self::error::{GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwoEn
 /// > Shows transactions in the tx orphanage.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
-pub struct GetOrphanTxs(pub Vec<Txid>);
+pub struct GetOrphanTxs(pub Vec<String>);
 
 /// Result of JSON-RPC method `getorphantxs` verbosity 1.
 ///
@@ -43,12 +43,10 @@ pub struct GetOrphanTxsVerboseOneEntry {
     pub vsize: u64,
     /// The transaction weight as defined in BIP 141.
     pub weight: u64,
-    /// The entry time into the orphanage expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The entry time into the orphanage expressed in UNIX epoch time.
     #[serde(rename = "entry")]
     pub entry_time: Option<u32>,
-    /// The orphan expiration time expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The orphan expiration time expressed in UNIX epoch time.
     #[serde(rename = "expiration")]
     pub expiration_time: Option<u32>,
     /// List of peer ids that we store this transaction for.
@@ -79,11 +77,9 @@ pub struct GetOrphanTxsVerboseTwoEntry {
     pub weight: u64,
     /// List of peer ids that we store this transaction for.
     pub from: Vec<u64>,
-    /// The entry time into the orphanage expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The entry time into the orphanage expressed in UNIX epoch time.
     pub entry_time: Option<u32>,
-    /// The orphan expiration time expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The orphan expiration time expressed in UNIX epoch time.
     pub expiration_time: Option<u32>,
     /// The serialized, hex-encoded transaction data.
     pub hex: String,

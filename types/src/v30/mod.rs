@@ -337,15 +337,16 @@ pub use crate::{
     },
     v25::{
         DescriptorInfo, GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors,
-        MempoolAcceptanceError, ScanBlocksAbort, ScanBlocksStart, ScanBlocksStartError,
-        ScanBlocksStatus, TestMempoolAcceptError,
+        MempoolAcceptanceError, ScanBlocksAbort, ScanBlocksStartError, ScanBlocksStatus,
+        TestMempoolAcceptError,
     },
     v26::{
         AddrManInfoNetwork, CreateWallet, DescriptorProcessPsbt, DescriptorProcessPsbtError,
         DumpTxOutSet, DumpTxOutSetError, GetAddrManInfo, GetBalances, GetBalancesError,
         GetPeerInfo, GetTransactionError, GetTxOutSetInfo, GetTxOutSetInfoBlockInfo,
         GetTxOutSetInfoError, GetTxOutSetInfoUnspendables, LoadTxOutSet, LoadTxOutSetError,
-        LoadWallet, PeerInfo, UnloadWallet, WalletProcessPsbt, WalletProcessPsbtError,
+        LoadWallet, PeerInfo, ScanBlocksStart, UnloadWallet, WalletProcessPsbt,
+        WalletProcessPsbtError,
     },
     v27::{GetPrioritisedTransactions, PrioritisedTransaction},
     v28::{
@@ -359,9 +360,13 @@ pub use crate::{
     v29::{
         ActivityEntry, ChainState, DeriveAddressesMultipath, GetBlockHeader, GetBlockHeaderError,
         GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockVerboseOne,
-        GetBlockVerboseOneError, GetBlockchainInfo, GetBlockchainInfoError, GetChainStates,
-        GetChainStatesError, GetDescriptorActivity, GetDescriptorActivityError, GetDescriptorInfo,
-        MempoolAcceptance, MempoolAcceptanceFees, NextBlockInfo, NextBlockInfoError,
-        ReceiveActivity, SpendActivity, TestMempoolAccept,
+        GetBlockVerboseOneError, GetBlockVerboseThree, GetBlockVerboseThreeError,
+        GetBlockVerboseThreePrevout, GetBlockVerboseThreeTransaction, GetBlockVerboseTwo,
+        GetBlockVerboseTwoError, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
+        GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
+        GetDescriptorActivityError, GetDescriptorInfo, GetOrphanTxsError,
+        GetRawTransactionVerboseWithPrevout, MempoolAcceptance, MempoolAcceptanceFees,
+        NextBlockInfo, NextBlockInfoError, RawTransactionInputWithPrevout, ReceiveActivity,
+        SpendActivity, TestMempoolAccept,
     },
 };
