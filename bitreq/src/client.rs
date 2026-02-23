@@ -153,9 +153,9 @@ impl ClientBuilder {
     /// Creates a new `ClientBuilder` with default settings.
     ///
     /// Default configuration:
-    /// * `capacity` - 1 (single connection)
+    /// * `capacity` - 10 (single connection)
     /// * `root_certificates` - None (uses system certificates)
-    pub fn new() -> Self { Self { capacity: 1, client_config: None } }
+    pub fn new() -> Self { Self { capacity: 10, client_config: None } }
 
     /// Sets the maximum number of connections to keep in the pool.
     ///
