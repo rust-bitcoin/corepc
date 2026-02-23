@@ -23,6 +23,10 @@ mod tls {
     mod disabled {
         #[derive(Clone)]
         pub(crate) struct ClientConfig;
+
+        impl ClientConfig {
+            pub fn build(self) -> Self { self }
+        }
     }
 
     #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
@@ -36,6 +40,13 @@ mod tls {
             pub(crate) tls: Option<TlsConfig>,
         }
 
+        impl ClientConfig {
+            pub fn build(self) -> Self {
+                let tls = self.tls.map(|tls| tls.build());
+                Self { tls }
+            }
+        }
+
         #[derive(Clone)]
         pub(crate) struct TlsConfig {
             pub(crate) certificates: Certificates,
@@ -46,6 +57,11 @@ mod tls {
                 let certificates = Certificates::new(Some(cert_der))?;
 
                 Ok(Self { certificates })
+            }
+
+            fn build(mut self) -> Self {
+                self.certificates = self.certificates.with_root_certificates();
+                self
             }
         }
 
@@ -88,8 +104,8 @@ mod tls {
 
                 if let Some(ref mut client_config) = self.client_config {
                     if let Some(ref mut tls_config) = client_config.tls {
-                        let certificates = tls_config.certificates.clone();
-                        let certificates = certificates.append_certificate(cert_der)?;
+                        let certificates =
+                            tls_config.certificates.clone().append_certificate(cert_der)?;
                         tls_config.certificates = certificates;
 
                         return Ok(self);
@@ -168,12 +184,13 @@ impl ClientBuilder {
     /// Consumes the builder and returns a configured `Client` instance
     /// ready to send requests with connection pooling.
     pub fn build(self) -> Client {
+        let client_config = self.client_config.map(|c| c.build());
         Client {
             r#async: Arc::new(Mutex::new(ClientImpl {
                 connections: HashMap::new(),
                 lru_order: VecDeque::new(),
                 capacity: self.capacity,
-                client_config: self.client_config.map(Arc::new),
+                client_config: client_config.map(Arc::new),
             })),
         }
     }

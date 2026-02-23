@@ -1,4 +1,7 @@
 #[cfg(feature = "rustls")]
+use std::sync::Arc;
+
+#[cfg(feature = "rustls")]
 use rustls::RootCertStore;
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
@@ -7,12 +10,12 @@ use crate::Error;
 
 #[derive(Clone)]
 pub(crate) struct Certificates {
-    pub(crate) inner: RootCertStore,
+    pub(crate) inner: Arc<RootCertStore>,
 }
 
 impl Certificates {
     pub(crate) fn new(cert_der: Option<Vec<u8>>) -> Result<Self, Error> {
-        let certificates = Self { inner: RootCertStore::empty() };
+        let certificates = Self { inner: Arc::new(RootCertStore::empty()) };
 
         if let Some(cert_der) = cert_der {
             certificates.append_certificate(cert_der)
@@ -23,15 +26,15 @@ impl Certificates {
 
     #[cfg(feature = "rustls")]
     pub(crate) fn append_certificate(mut self, cert_der: Vec<u8>) -> Result<Self, Error> {
-        let mut certificates = self.inner;
+        let certificates = Arc::make_mut(&mut self.inner);
         certificates.add(&rustls::Certificate(cert_der)).map_err(Error::RustlsAppendCert)?;
-        self.inner = certificates;
+
         Ok(self)
     }
 
     #[cfg(feature = "rustls")]
     pub(crate) fn with_root_certificates(mut self) -> Self {
-        let mut root_certificates = self.inner;
+        let root_certificates = Arc::make_mut(&mut self.inner);
 
         // Try to load native certs
         #[cfg(feature = "https-rustls-probe")]
@@ -55,7 +58,6 @@ impl Certificates {
                 )
             }));
         }
-        self.inner = root_certificates;
         self
     }
 }

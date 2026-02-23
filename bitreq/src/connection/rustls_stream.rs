@@ -66,7 +66,7 @@ fn build_client_config() -> Arc<ClientConfig> {
 }
 
 #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
-fn build_rustls_client_config(certificates: RootCertStore) -> Arc<ClientConfig> {
+fn build_rustls_client_config(certificates: Arc<RootCertStore>) -> Arc<ClientConfig> {
     let config = ClientConfig::builder()
         .with_safe_defaults()
         .with_root_certificates(certificates)
@@ -131,10 +131,9 @@ pub(super) async fn wrap_async_stream_with_configs(
     };
 
     let tls_config = custom_client_config.tls.as_ref().unwrap();
-    let mut certificates = tls_config.certificates.clone();
-    certificates = certificates.with_root_certificates();
+    let certificates = Arc::clone(&tls_config.certificates.inner);
 
-    let client_config = build_rustls_client_config(certificates.inner);
+    let client_config = build_rustls_client_config(certificates);
     let connector = TlsConnector::from(client_config);
 
     #[cfg(feature = "log")]
