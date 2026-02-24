@@ -139,8 +139,6 @@ pub struct PeerInfo {
     /// The minimum fee rate for transactions this peer accepts.
     #[serde(rename = "minfeefilter")]
     pub minimum_fee_filter: f64,
-    /// Whether the peer is whitelisted (deprecated in v0.21).
-    pub whitelisted: Option<bool>,
     /// The total bytes sent aggregated by message type.
     #[serde(rename = "bytessent_per_msg")]
     pub bytes_sent_per_message: BTreeMap<String, u64>,
