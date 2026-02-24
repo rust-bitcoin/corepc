@@ -251,8 +251,6 @@ pub struct GetAddressInfo {
     #[serde(rename = "hdseedid")]
     pub hd_seed_id: Option<String>,
     /// Alias for hdseedid maintained for backwards compatibility.
-    ///
-    /// Will be removed in V0.18.
     #[serde(rename = "hdmasterkeyid")]
     pub hd_master_key_id: Option<String>,
     /// Array of labels associated with the address.

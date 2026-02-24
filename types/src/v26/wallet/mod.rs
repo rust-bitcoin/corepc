@@ -114,7 +114,7 @@ pub struct GetTransaction {
     /// The time received in seconds since epoch (1 Jan 1970 GMT).
     #[serde(rename = "timereceived")]
     pub time_received: u32,
-    /// If a comment is associated with the transaction, only present if not empty. v20 to v24 only.
+    /// If a comment is associated with the transaction, only present if not empty.
     pub comment: Option<String>,
     /// Whether this transaction could be replaced due to BIP125 (replace-by-fee);
     /// may be unknown for unconfirmed transactions not in the mempool

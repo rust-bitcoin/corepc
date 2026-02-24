@@ -55,7 +55,7 @@ pub struct GetNetworkInfo {
     /// List of local addresses.
     #[serde(rename = "localaddresses")]
     pub local_addresses: Vec<GetNetworkInfoAddress>,
-    /// Any network and blockchain warnings. Before v28 this was a single String.
+    /// Any network and blockchain warnings.
     pub warnings: Vec<String>,
 }
 
