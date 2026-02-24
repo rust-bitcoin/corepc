@@ -34,22 +34,20 @@ pub struct GetOrphanTxsVerboseOne(pub Vec<GetOrphanTxsVerboseOneEntry>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetOrphanTxsVerboseOneEntry {
-    /// The transaction hash in hex
+    /// The transaction hash in hex.
     pub txid: String,
-    /// The transaction witness hash in hex
+    /// The transaction witness hash in hex.
     pub wtxid: String,
-    /// The serialized transaction size in bytes
+    /// The serialized transaction size in bytes.
     pub bytes: u64,
     /// The virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted.
     pub vsize: u64,
     /// The transaction weight as defined in BIP 141.
     pub weight: u64,
-    /// The entry time into the orphanage expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The entry time into the orphanage expressed in UNIX epoch time.
     #[serde(rename = "entry")]
     pub entry_time: u32,
-    /// The orphan expiration time expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The orphan expiration time expressed in UNIX epoch time.
     #[serde(rename = "expiration")]
     pub expiration_time: u32,
     /// List of peer ids that we store this transaction for.
@@ -68,24 +66,23 @@ pub struct GetOrphanTxsVerboseTwo(pub Vec<GetOrphanTxsVerboseTwoEntry>);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetOrphanTxsVerboseTwoEntry {
-    /// The transaction hash in hex
+    /// The transaction hash in hex.
     pub txid: String,
-    /// The transaction witness hash in hex
+    /// The transaction witness hash in hex.
     pub wtxid: String,
-    /// The serialized transaction size in bytes
+    /// The serialized transaction size in bytes.
     pub bytes: u64,
-    /// The virtual transaction size as defined in BIP 141. This is different from actual serialized size for witness transactions as witness data is discounted.
+    /// The virtual transaction size as defined in BIP 141. This is different from actual serialized
+    /// size for witness transactions as witness data is discounted.
     pub vsize: u64,
     /// The transaction weight as defined in BIP 141.
     pub weight: u64,
     /// List of peer ids that we store this transaction for.
     pub from: Vec<u64>,
-    /// The entry time into the orphanage expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The entry time into the orphanage expressed in UNIX epoch time.
     #[serde(rename = "entry")]
     pub entry_time: u32,
-    /// The orphan expiration time expressed in UNIX epoch time
-    /// Only present in v29.
+    /// The orphan expiration time expressed in UNIX epoch time.
     #[serde(rename = "expiration")]
     pub expiration_time: u32,
     /// The serialized, hex-encoded transaction data.

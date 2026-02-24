@@ -355,7 +355,7 @@ impl GetBlockHeaderVerbose {
 }
 
 impl GetChainStates {
-    /// Converts v26 GetChainStates (and its ChainState subtypes) to model::GetChainStates
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::GetChainStates, GetChainStatesError> {
         use GetChainStatesError as E;
 

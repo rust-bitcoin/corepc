@@ -364,7 +364,7 @@ pub struct GetBlockHeaderVerbose {
     pub nonce: i64,
     /// The bits.
     pub bits: String,
-    /// The difficulty target (hex-encoded). From v29+.
+    /// The difficulty target (hex-encoded).
     pub target: String,
     /// The difficulty.
     pub difficulty: f64,

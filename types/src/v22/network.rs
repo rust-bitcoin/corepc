@@ -131,8 +131,6 @@ pub struct PeerInfo {
     pub addresses_rate_limited: usize,
     /// Any special permissions that have been granted to this peer.
     pub permissions: Vec<String>,
-    /// Whether the peer is whitelisted.
-    pub whitelisted: Option<bool>,
     /// The minimum fee rate for transactions this peer accepts.
     #[serde(rename = "minfeefilter")]
     pub min_fee_filter: Option<f64>, // Docs rekon this exists.
