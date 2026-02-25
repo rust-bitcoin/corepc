@@ -7,7 +7,7 @@
 
 use bitcoin::address::KnownHrp;
 use bitcoin::{Address, CompressedPublicKey, PrivateKey};
-use corepc_client::client_async::{Auth, Client, Error as AsyncClientError};
+use corepc_client::bdk_client::{Auth, Client, Error as AsyncClientError};
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::mtype;
 
