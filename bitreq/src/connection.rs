@@ -23,9 +23,7 @@ use tokio::net::TcpStream as AsyncTcpStream;
 use tokio::sync::Mutex as AsyncMutex;
 
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
-#[cfg(feature = "async")]
-use crate::Response;
-use crate::{Error, Method, ResponseLazy};
+use crate::{Error, Method, Response, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
@@ -50,6 +48,18 @@ impl HttpStream {
     #[cfg(feature = "async")]
     pub(crate) fn create_buffer(buffer: Vec<u8>) -> HttpStream {
         HttpStream::Buffer(std::io::Cursor::new(buffer))
+    }
+
+    /// Updates the timeout deadline used for read/write operations on this stream.
+    #[cfg(not(feature = "async"))]
+    pub(crate) fn set_timeout_at(&mut self, timeout_at: Option<Instant>) {
+        match self {
+            HttpStream::Unsecured(_, t) => *t = timeout_at,
+            #[cfg(feature = "rustls")]
+            HttpStream::Secured(_, t) => *t = timeout_at,
+            #[cfg(feature = "async")]
+            HttpStream::Buffer(_) => {}
+        }
     }
 }
 
@@ -767,6 +777,57 @@ impl Connection {
                 request.config.max_body_size,
             )?;
             handle_redirects(request, response)
+        })
+    }
+
+    /// Creates a `Connection` from an existing [`HttpStream`].
+    ///
+    /// Used by [`Client`](crate::Client) to wrap a pooled stream for reuse.
+    #[cfg(not(feature = "async"))]
+    pub(crate) fn from_stream(stream: HttpStream) -> Connection { Connection { stream } }
+
+    /// Sends the request and reads the full response, returning:
+    /// - The [`Response`].
+    /// - An [`Option<HttpStream>`] for connection reuse (if `Connection: keep-alive` was present).
+    /// - The [`ParsedRequest`] for potential redirect handling by the caller.
+    ///
+    /// Unlike [`send`](Self::send), this method does **not** follow redirects, leaving
+    /// that responsibility to the caller (the [`Client`](crate::Client)).
+    #[cfg(not(feature = "async"))]
+    pub(crate) fn send_for_pool(
+        mut self,
+        request: ParsedRequest,
+    ) -> Result<(Response, Option<HttpStream>, ParsedRequest), Error> {
+        enforce_timeout(request.timeout_at, move || {
+            let is_head = request.config.method == Method::Head;
+            let max_body_size = request.config.max_body_size;
+
+            // Update stream timeout for this request
+            self.stream.set_timeout_at(request.timeout_at);
+
+            // Send request
+            #[cfg(feature = "log")]
+            log::trace!("Writing HTTP request (pooled).");
+            self.stream.write_all(&request.as_bytes())?;
+
+            // Receive response
+            #[cfg(feature = "log")]
+            log::trace!("Reading HTTP response (pooled).");
+            let mut response_lazy = ResponseLazy::from_stream(
+                self.stream,
+                request.config.max_headers_size,
+                request.config.max_status_line_len,
+                request.config.max_body_size,
+            )?;
+
+            // Set URL on the response from the request
+            request.url.write_base_url_to(&mut response_lazy.url).unwrap();
+            request.url.write_resource_to(&mut response_lazy.url).unwrap();
+
+            // Read full body and recover stream if keep-alive
+            let (response, stream) =
+                Response::create_pooled(response_lazy, is_head, max_body_size)?;
+            Ok((response, stream, request))
         })
     }
 }
