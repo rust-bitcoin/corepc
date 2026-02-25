@@ -17,6 +17,8 @@ pub enum GetBlockVerboseOneError {
     Numeric(NumericError),
     /// Conversion of the transaction `hash` field failed.
     Hash(hex::HexToArrayError),
+    /// Conversion of the transaction `merkle_root` field failed.
+    MerkleRoot(hex::HexToArrayError),
     /// Conversion of the transaction `hex` field failed.
     Tx(encode::FromHexError),
     /// Conversion of the transaction `bits` field failed.
@@ -34,6 +36,8 @@ impl fmt::Display for GetBlockVerboseOneError {
         match *self {
             Self::Numeric(ref e) => write_err!(f, "numeric"; e),
             Self::Hash(ref e) => write_err!(f, "conversion of the `hash` field failed"; e),
+            Self::MerkleRoot(ref e) =>
+                write_err!(f, "conversion of the `merkle_root` field failed"; e),
             Self::Tx(ref e) => write_err!(f, "conversion of the `tx` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `bits` field failed"; e),
             Self::ChainWork(ref e) =>
@@ -52,6 +56,7 @@ impl std::error::Error for GetBlockVerboseOneError {
         match *self {
             Self::Numeric(ref e) => Some(e),
             Self::Hash(ref e) => Some(e),
+            Self::MerkleRoot(ref e) => Some(e),
             Self::Tx(ref e) => Some(e),
             Self::Bits(ref e) => Some(e),
             Self::ChainWork(ref e) => Some(e),
