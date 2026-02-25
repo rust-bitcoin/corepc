@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! Async JSON-RPC clients for specific versions of Bitcoin Core.
+//! Async JSON-RPC clients for Bitcoin Core v25 to v30.
 
-pub mod bdk_client;
 mod error;
+pub mod rpcs;
 
 use std::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-pub use crate::client_async::error::Error;
+pub use crate::bdk_client::error::Error;
 
 /// Crate-specific Result type.
 ///

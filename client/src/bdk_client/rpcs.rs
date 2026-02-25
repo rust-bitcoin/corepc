@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! Async JSON-RPC client with the RPC set used by BDK for Core versions 25 to 30.
+//! RPC set used by BDK.
+//! All functions return the version nonspecific, strongly typed types.
 
 use bitcoin::{block, Block, BlockHash, Transaction, Txid};
 
-use crate::client_async::{into_json, Client, Result};
+use crate::bdk_client::{into_json, Client, Result};
 use crate::types::model::{GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne};
 
 impl Client {
@@ -15,13 +16,13 @@ impl Client {
         Ok(json.into_model()?.0)
     }
 
-    /// Gets block count.
+    /// Gets the block count.
     pub async fn get_block_count(&self) -> Result<u64> {
         let json: crate::types::v25::GetBlockCount = self.call("getblockcount", &[]).await?;
         Ok(json.into_model().0)
     }
 
-    /// Gets block hash for a height.
+    /// Gets the block hash for a height.
     pub async fn get_block_hash(&self, height: u32) -> Result<BlockHash> {
         let json: crate::types::v25::GetBlockHash =
             self.call("getblockhash", &[into_json(height)?]).await?;
@@ -34,14 +35,14 @@ impl Client {
         Ok(json.into_model()?.0)
     }
 
-    /// Gets block header by blockhash.
+    /// Gets the block header by blockhash.
     pub async fn get_block_header(&self, hash: &BlockHash) -> Result<block::Header> {
         let json: crate::types::v25::GetBlockHeader =
             self.call("getblockheader", &[into_json(hash)?, into_json(false)?]).await?;
         Ok(json.into_model()?.0)
     }
 
-    /// Gets block header with verbose output.
+    /// Gets the block header with verbose output.
     pub async fn get_block_header_verbose(
         &self,
         hash: &BlockHash,
@@ -74,20 +75,20 @@ impl Client {
         }
     }
 
-    /// Gets block filter for a blockhash.
+    /// Gets the block filter for a blockhash.
     pub async fn get_block_filter(&self, hash: &BlockHash) -> Result<GetBlockFilter> {
         let json: crate::types::v25::GetBlockFilter =
             self.call("getblockfilter", &[into_json(hash)?]).await?;
         Ok(json.into_model()?)
     }
 
-    /// Gets transaction IDs currently in the mempool.
+    /// Gets the transaction IDs currently in the mempool.
     pub async fn get_raw_mempool(&self) -> Result<Vec<Txid>> {
         let json: crate::types::v25::GetRawMempool = self.call("getrawmempool", &[]).await?;
         Ok(json.into_model()?.0)
     }
 
-    /// Gets raw transaction by txid.
+    /// Gets the raw transaction by txid.
     pub async fn get_raw_transaction(&self, txid: &Txid) -> Result<Transaction> {
         let json: crate::types::v25::GetRawTransaction =
             self.call("getrawtransaction", &[into_json(txid)?]).await?;

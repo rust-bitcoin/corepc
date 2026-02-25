@@ -13,4 +13,4 @@ pub extern crate types;
 pub mod client_sync;
 
 #[cfg(feature = "client-async")]
-pub mod client_async;
+pub mod bdk_client;
