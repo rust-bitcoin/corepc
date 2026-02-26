@@ -66,10 +66,10 @@ pub enum GetOrphanTxsVerboseTwoEntryError {
     Txid(hex::HexToArrayError),
     /// Conversion of the transaction `wtxid` field failed.
     Wtxid(hex::HexToArrayError),
-    /// Conversion of hex data to bytes failed.
+    /// Conversion of the `hex` field to bytes failed.
     Hex(hex::HexToBytesError),
-    /// Consensus decoding of `hex` to transaction failed.
-    Consensus(encode::Error),
+    /// Consensus decoding of the `hex` bytes to `transaction` failed.
+    Transaction(encode::Error),
 }
 
 impl fmt::Display for GetOrphanTxsVerboseTwoEntryError {
@@ -77,9 +77,9 @@ impl fmt::Display for GetOrphanTxsVerboseTwoEntryError {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
             Self::Wtxid(ref e) => write_err!(f, "conversion of the `wtxid` field failed"; e),
-            Self::Hex(ref e) => write_err!(f, "conversion of hex data to bytes failed"; e),
-            Self::Consensus(ref e) =>
-                write_err!(f, "consensus decoding of `hex` to transaction failed"; e),
+            Self::Hex(ref e) => write_err!(f, "conversion of the `hex` field to bytes failed"; e),
+            Self::Transaction(ref e) =>
+                write_err!(f, "consensus decoding of the `hex` bytes to `transaction` failed"; e),
         }
     }
 }
@@ -91,7 +91,7 @@ impl std::error::Error for GetOrphanTxsVerboseTwoEntryError {
             Self::Txid(ref e) => Some(e),
             Self::Wtxid(ref e) => Some(e),
             Self::Hex(ref e) => Some(e),
-            Self::Consensus(ref e) => Some(e),
+            Self::Transaction(ref e) => Some(e),
         }
     }
 }

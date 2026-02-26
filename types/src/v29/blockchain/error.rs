@@ -289,15 +289,14 @@ pub enum GetBlockHeaderError {
     /// Conversion of hex data to bytes failed.
     Hex(hex::HexToBytesError),
     /// Consensus decoding of bytes to header failed.
-    Consensus(encode::Error),
+    Header(encode::Error),
 }
 
 impl fmt::Display for GetBlockHeaderError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hex(ref e) => write_err!(f, "conversion of hex data to bytes failed"; e),
-            Self::Consensus(ref e) =>
-                write_err!(f, "consensus decoding of bytes to header failed"; e),
+            Self::Header(ref e) => write_err!(f, "consensus decoding of bytes to header failed"; e),
         }
     }
 }
@@ -307,7 +306,7 @@ impl std::error::Error for GetBlockHeaderError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Self::Hex(ref e) => Some(e),
-            Self::Consensus(ref e) => Some(e),
+            Self::Header(ref e) => Some(e),
         }
     }
 }
@@ -427,8 +426,14 @@ impl From<NumericError> for GetChainStatesError {
 pub enum GetDescriptorActivityError {
     /// Conversion of numeric type (e.g., height) to expected type failed.
     Numeric(NumericError),
-    /// Conversion of a hash string (BlockHash, Txid) failed.
-    Hash(hex::HexToArrayError),
+    /// Conversion of the `spend_txid` field failed.
+    SpendTxid(hex::HexToArrayError),
+    /// Conversion of the `prevout_txid` field failed.
+    PrevoutTxid(hex::HexToArrayError),
+    /// Conversion of the `txid` field failed.
+    Txid(hex::HexToArrayError),
+    /// Conversion of the `block_hash` field failed.
+    BlockHash(hex::HexToArrayError),
     /// Conversion of the `amount` field (f64 BTC) failed.
     Amount(amount::ParseAmountError),
     /// Conversion of script hex to ScriptBuf failed.
@@ -449,7 +454,13 @@ impl fmt::Display for GetDescriptorActivityError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
-            Self::Hash(ref e) => write_err!(f, "conversion of a hash string failed"; e),
+            Self::SpendTxid(ref e) =>
+                write_err!(f, "conversion of the `spend_txid` field failed"; e),
+            Self::PrevoutTxid(ref e) =>
+                write_err!(f, "conversion of the `prevout_txid` field failed"; e),
+            Self::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `block_hash` field failed"; e),
             Self::Amount(ref e) => write_err!(f, "conversion of the `amount` field failed"; e),
             Self::Script(ref e) => write_err!(f, "conversion of the script `hex` field failed"; e),
             Self::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
@@ -470,7 +481,10 @@ impl std::error::Error for GetDescriptorActivityError {
 
         match *self {
             Numeric(ref e) => Some(e),
-            Hash(ref e) => Some(e),
+            SpendTxid(ref e) => Some(e),
+            PrevoutTxid(ref e) => Some(e),
+            Txid(ref e) => Some(e),
+            BlockHash(ref e) => Some(e),
             Amount(ref e) => Some(e),
             Script(ref e) => Some(e),
             Address(ref e) => Some(e),
@@ -487,7 +501,7 @@ impl From<NumericError> for GetDescriptorActivityError {
 }
 
 impl From<hex::HexToArrayError> for GetDescriptorActivityError {
-    fn from(e: hex::HexToArrayError) -> Self { Self::Hash(e) }
+    fn from(e: hex::HexToArrayError) -> Self { Self::BlockHash(e) }
 }
 
 impl From<amount::ParseAmountError> for GetDescriptorActivityError {

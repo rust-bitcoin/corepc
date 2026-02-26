@@ -11,7 +11,7 @@ use crate::error::write_err;
 /// Error when converting a `DecodePsbt` type into the model type.
 #[derive(Debug)]
 pub enum DecodePsbtError {
-    /// Conversion of the `tx` field failed.
+    /// Conversion of the `tx` field to `unsigned_tx` failed.
     Tx(RawTransactionError),
     /// Conversion of the `global_xpubs` field failed.
     GlobalXpubs(GlobalXpubError),
@@ -30,7 +30,8 @@ pub enum DecodePsbtError {
 impl fmt::Display for DecodePsbtError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Tx(ref e) => write_err!(f, "conversion of raw transaction data field failed"; e),
+            Self::Tx(ref e) =>
+                write_err!(f, "conversion of the `tx` field to `unsigned_tx` failed"; e),
             Self::GlobalXpubs(ref e) =>
                 write_err!(f, "conversion of one the map items in the `global_xbubs` field failed"; e),
             Self::Proprietary(ref e) =>

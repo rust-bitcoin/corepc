@@ -162,7 +162,7 @@ impl GetBlockHeader {
         use GetBlockHeaderError as E;
 
         let v = Vec::from_hex(&self.0).map_err(E::Hex)?;
-        let header = encode::deserialize::<block::Header>(&v).map_err(E::Consensus)?;
+        let header = encode::deserialize::<block::Header>(&v).map_err(E::Header)?;
 
         Ok(model::GetBlockHeader(header))
     }
