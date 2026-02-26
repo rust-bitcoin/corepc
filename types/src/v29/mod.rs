@@ -332,7 +332,7 @@ pub use crate::{
     },
     v22::{
         AddConnection, Banned, EnumerateSigners, GetNodeAddresses, ListBanned, NodeAddress,
-        ScriptPubkey, Signers, WalletDisplayAddress,
+        ScriptPubKey, Signers, WalletDisplayAddress,
     },
     v23::{
         AddMultisigAddress, Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript,

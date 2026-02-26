@@ -91,7 +91,7 @@ pub struct DecodeRawTransaction(pub Transaction);
 /// Models the result of JSON-RPC method `decodescript`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct DecodeScript {
-    /// The `scriptPubkey`.
+    /// The `scriptPubKey`.
     pub script_pubkey: Option<ScriptBuf>,
     /// Inferred descriptor for the script. v23 and later only.
     pub descriptor: Option<String>,

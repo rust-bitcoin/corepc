@@ -174,11 +174,11 @@ pub fn compact_size_decode(slice: &mut &[u8]) -> u64 {
 ///
 /// This is used by methods in the blockchain section and in the raw transaction section (i.e raw
 /// transaction and psbt methods). The shape changed in Core v22 but the new shape is fully
-/// backwards compatible so we only provide it not a v0.17 specific type. The `mtype::ScriptPubkey`
+/// backwards compatible so we only provide it not a v0.17 specific type. The `mtype::ScriptPubKey`
 /// mirrors this design (but with concrete `rust-bitcoin` types).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
-pub struct ScriptPubkey {
+pub struct ScriptPubKey {
     /// Script assembly.
     pub asm: String,
     /// Inferred descriptor for the output. v23 and later only.
@@ -204,9 +204,9 @@ pub struct ScriptPubkey {
     pub addresses: Option<Vec<String>>,
 }
 
-/// Error when converting a `ScriptPubkey` type into the model type.
+/// Error when converting a `ScriptPubKey` type into the model type.
 #[derive(Debug)]
-pub enum ScriptPubkeyError {
+pub enum ScriptPubKeyError {
     /// Conversion of the `hex` field failed.
     Hex(hex::HexToBytesError),
     /// Conversion of the `address` field failed.
@@ -215,7 +215,7 @@ pub enum ScriptPubkeyError {
     Addresses(address::ParseError),
 }
 
-impl fmt::Display for ScriptPubkeyError {
+impl fmt::Display for ScriptPubKeyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hex(ref e) => write_err!(f, "conversion of the `hex` field failed"; e),
@@ -227,7 +227,7 @@ impl fmt::Display for ScriptPubkeyError {
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for ScriptPubkeyError {
+impl std::error::Error for ScriptPubKeyError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Self::Hex(ref e) => Some(e),
@@ -237,7 +237,7 @@ impl std::error::Error for ScriptPubkeyError {
     }
 }
 
-impl ScriptPubkey {
+impl ScriptPubKey {
     fn script_buf(&self) -> Result<ScriptBuf, hex::HexToBytesError> {
         ScriptBuf::from_hex(&self.hex)
     }
@@ -247,8 +247,8 @@ impl ScriptPubkey {
     }
 
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::ScriptPubkey, ScriptPubkeyError> {
-        use ScriptPubkeyError as E;
+    pub fn into_model(self) -> Result<model::ScriptPubKey, ScriptPubKeyError> {
+        use ScriptPubKeyError as E;
 
         let script_pubkey = ScriptBuf::from_hex(&self.hex).map_err(E::Hex)?;
 
@@ -264,7 +264,7 @@ impl ScriptPubkey {
             })
             .transpose()?;
 
-        Ok(model::ScriptPubkey {
+        Ok(model::ScriptPubKey {
             script_pubkey,
             required_signatures: self.required_signatures,
             address,

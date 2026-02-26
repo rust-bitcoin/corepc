@@ -380,7 +380,7 @@ impl TaprootScriptPathSig {
     {
         use TaprootScriptPathSigError as E;
 
-        let pubkey = self.pubkey.parse::<XOnlyPublicKey>().map_err(E::Pubkey)?;
+        let pubkey = self.pubkey.parse::<XOnlyPublicKey>().map_err(E::PubKey)?;
         let hash = self.leaf_hash.parse::<TapLeafHash>().map_err(E::LeafHash)?;
         let sig = super::taproot::signature_from_str(&self.sig).map_err(E::Sig)?;
 
@@ -429,7 +429,7 @@ impl TaprootBip32Deriv {
     ) -> Result<(XOnlyPublicKey, (Vec<TapLeafHash>, KeySource)), TaprootBip32DerivsError> {
         use TaprootBip32DerivsError as E;
 
-        let pubkey = self.pubkey.parse::<XOnlyPublicKey>().map_err(E::Pubkey)?;
+        let pubkey = self.pubkey.parse::<XOnlyPublicKey>().map_err(E::PubKey)?;
         let fp = Fingerprint::from_hex(&self.master_fingerprint).map_err(E::MasterFingerprint)?;
         let path = self.path.parse::<DerivationPath>().map_err(E::Path)?;
         let hashes = self

@@ -124,7 +124,7 @@ pub struct PsbtInput {
     /// The hex-encoded Taproot merkle root.
     pub taproot_merkle_root: Option<String>,
     /// MuSig2 participant public keys.
-    pub musig2_participant_pubkeys: Option<Vec<Musig2ParticipantPubkeys>>,
+    pub musig2_participant_pubkeys: Option<Vec<Musig2ParticipantPubKeys>>,
     /// MuSig2 public nonces.
     pub musig2_pubnonces: Option<Vec<Musig2Pubnonce>>,
     /// MuSig2 partial signatures.
@@ -152,7 +152,7 @@ pub struct PsbtOutput {
     /// BIP32 derivation paths for keys.
     pub taproot_bip32_derivs: Option<Vec<TaprootBip32Deriv>>,
     /// MuSig2 participant public keys.
-    pub musig2_participant_pubkeys: Option<Vec<Musig2ParticipantPubkeys>>,
+    pub musig2_participant_pubkeys: Option<Vec<Musig2ParticipantPubKeys>>,
     /// The output proprietary map.
     pub proprietary: Option<Vec<Proprietary>>,
     /// The unknown global fields.
@@ -214,7 +214,7 @@ pub struct TaprootLeaf {
 /// MuSig2 participant public keys. Part of `decodepsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
-pub struct Musig2ParticipantPubkeys {
+pub struct Musig2ParticipantPubKeys {
     /// The compressed aggregate public key for which the participants create.
     pub aggregate_pubkey: String,
     /// The compressed public keys that are aggregated for aggregate_pubkey.

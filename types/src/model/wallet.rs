@@ -171,10 +171,10 @@ pub struct GetAddressInfo {
 pub enum ScriptType {
     /// Non-standard output script type.
     NonStandard,
-    /// Pubkey output script.
-    Pubkey,
-    /// Pubkey hash output script.
-    PubkeyHash,
+    /// PubKey output script.
+    PubKey,
+    /// PubKey hash output script.
+    PubKeyHash,
     /// Script hash output script.
     ScriptHash,
     /// Multisig output script.

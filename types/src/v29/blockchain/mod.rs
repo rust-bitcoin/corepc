@@ -15,7 +15,7 @@ pub use self::error::{
 };
 use crate::psbt::{RawTransactionInput, RawTransactionOutput};
 use crate::v17::GetRawTransactionVerbose;
-use crate::{model, ScriptPubkey};
+use crate::{model, ScriptPubKey};
 
 /// Result of JSON-RPC method `getblock` with verbosity set to 1.
 #[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
@@ -266,7 +266,7 @@ pub struct GetBlockVerboseThreePrevout {
     pub value: f64,
     /// The script pubkey.
     #[serde(rename = "scriptPubKey")]
-    pub script_pubkey: ScriptPubkey,
+    pub script_pubkey: ScriptPubKey,
 }
 
 /// Result of JSON-RPC method `getblockchaininfo`.
@@ -473,7 +473,7 @@ pub struct SpendActivity {
     /// The vout of the spend.
     pub prevout_vout: u32,
     /// The prev scriptPubKey.
-    pub prevout_spk: ScriptPubkey,
+    pub prevout_spk: ScriptPubKey,
 }
 
 /// Represents a 'receive' activity event. Part of `getdescriptoractivity`.
@@ -495,5 +495,5 @@ pub struct ReceiveActivity {
     /// The vout of the receiving output.
     pub vout: u32,
     /// The ScriptPubKey.
-    pub output_spk: ScriptPubkey,
+    pub output_spk: ScriptPubKey,
 }

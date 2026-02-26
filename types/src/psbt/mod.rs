@@ -15,7 +15,7 @@ pub use self::error::{
     Bip32DerivError, PartialSignatureError, RawTransactionError, RawTransactionInputError,
     RawTransactionOutputError, WitnessUtxoError,
 };
-use crate::{ScriptPubkey, ScriptSig};
+use crate::{ScriptPubKey, ScriptSig};
 
 /// Represents a bitcoin transaction.
 ///
@@ -147,7 +147,7 @@ pub struct RawTransactionOutput {
     pub index: u64,
     /// The script pubkey.
     #[serde(rename = "scriptPubKey")]
-    pub script_pubkey: ScriptPubkey,
+    pub script_pubkey: ScriptPubKey,
 }
 
 impl RawTransactionOutput {
@@ -156,7 +156,7 @@ impl RawTransactionOutput {
         use RawTransactionOutputError as E;
 
         let value = Amount::from_btc(self.value).map_err(E::Value)?;
-        let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubkey)?;
+        let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubKey)?;
 
         Ok(TxOut { value, script_pubkey })
     }
@@ -171,7 +171,7 @@ pub struct WitnessUtxo {
     pub amount: f64,
     /// The scriptPubKey.
     #[serde(rename = "scriptPubKey")]
-    pub script_pubkey: ScriptPubkey,
+    pub script_pubkey: ScriptPubKey,
 }
 
 impl WitnessUtxo {
@@ -180,7 +180,7 @@ impl WitnessUtxo {
         use WitnessUtxoError as E;
 
         let value = Amount::from_btc(self.amount).map_err(E::Amount)?;
-        let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubkey)?;
+        let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubKey)?;
 
         Ok(TxOut { value, script_pubkey })
     }
@@ -295,7 +295,7 @@ pub fn map_into_bip32_derivation(
 
     let mut map = BTreeMap::default();
     for (k, v) in hash_map.iter() {
-        let pubkey = k.parse::<PublicKey>().map_err(E::Pubkey)?;
+        let pubkey = k.parse::<PublicKey>().map_err(E::PubKey)?;
         let fingerprint =
             Fingerprint::from_hex(&v.master_fingerprint).map_err(E::MasterFingerprint)?;
         let path = v.path.parse::<DerivationPath>().map_err(E::Path)?;
@@ -314,7 +314,7 @@ pub fn vec_into_bip32_derivation(
 
     let mut map = BTreeMap::default();
     for deriv in v.iter() {
-        let pubkey = deriv.pubkey.parse::<PublicKey>().map_err(E::Pubkey)?;
+        let pubkey = deriv.pubkey.parse::<PublicKey>().map_err(E::PubKey)?;
         let fingerprint =
             Fingerprint::from_hex(&deriv.master_fingerprint).map_err(E::MasterFingerprint)?;
         let path = deriv.path.parse::<DerivationPath>().map_err(E::Path)?;

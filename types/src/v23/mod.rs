@@ -325,6 +325,6 @@ pub use crate::{
         AddConnection, Banned, DescriptorInfo, EnumerateSigners, GetAddressInfo,
         GetAddressInfoEmbedded, GetMempoolInfo, GetNodeAddresses, ListBanned, ListDescriptors,
         MempoolAcceptance, MempoolAcceptanceError, MempoolAcceptanceFees, NodeAddress,
-        ScriptPubkey, Signers, TestMempoolAccept, TestMempoolAcceptError, WalletDisplayAddress,
+        ScriptPubKey, Signers, TestMempoolAccept, TestMempoolAcceptError, WalletDisplayAddress,
     },
 };

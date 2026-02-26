@@ -331,5 +331,5 @@ pub use crate::{
         Send, SendError, SendMany, SendManyVerbose, Softfork, SoftforkType, UnloadWallet,
         UpgradeWallet,
     },
-    ScriptPubkey,
+    ScriptPubKey,
 };

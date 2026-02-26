@@ -263,12 +263,12 @@ pub enum ScriptType {
     /// Non-standard output script type.
     #[serde(rename = "nonstandard")]
     NonStandard,
-    /// Pubkey output script.
+    /// PubKey output script.
     #[serde(rename = "pubkey")]
-    Pubkey,
-    /// Pubkey hash output script.
+    PubKey,
+    /// PubKey hash output script.
     #[serde(rename = "pubkeyhash")]
-    PubkeyHash,
+    PubKeyHash,
     /// Script hash output script.
     #[serde(rename = "scripthash")]
     ScriptHash,

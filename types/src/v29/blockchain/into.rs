@@ -147,7 +147,7 @@ impl GetRawTransactionVerboseWithPrevout {
                         .map_err(E::PrevoutHeight)?;
                     let value = Amount::from_btc(prevout.value).map_err(E::PrevoutValue)?;
                     let script_pubkey =
-                        prevout.script_pubkey.into_model().map_err(E::PrevoutScriptPubkey)?;
+                        prevout.script_pubkey.into_model().map_err(E::PrevoutScriptPubKey)?;
                     Ok::<model::GetBlockVerboseThreePrevout, GetBlockVerboseThreeError>(
                         model::GetBlockVerboseThreePrevout {
                             generated: prevout.generated,

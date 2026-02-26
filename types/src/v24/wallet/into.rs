@@ -219,7 +219,7 @@ impl ListUnspentItem {
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let vout = crate::to_u32(self.vout, "vout")?;
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
+        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
         let label = self.label.unwrap_or_default();
 
         let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;

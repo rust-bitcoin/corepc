@@ -10,7 +10,7 @@ use bitcoin::{address, amount, hex, network};
 use crate::error::write_err;
 use crate::psbt::{RawTransactionInputError, RawTransactionOutputError};
 use crate::v17::GetRawTransactionVerboseError;
-use crate::{NumericError, ScriptPubkeyError};
+use crate::{NumericError, ScriptPubKeyError};
 
 /// Error when converting a `GetBlockVerboseOne` type into the model type.
 #[derive(Debug)]
@@ -165,7 +165,7 @@ pub enum GetBlockVerboseThreeError {
     /// Conversion of a prevout value failed.
     PrevoutValue(amount::ParseAmountError),
     /// Conversion of a prevout script_pubkey failed.
-    PrevoutScriptPubkey(ScriptPubkeyError),
+    PrevoutScriptPubKey(ScriptPubKeyError),
 }
 
 impl fmt::Display for GetBlockVerboseThreeError {
@@ -192,7 +192,7 @@ impl fmt::Display for GetBlockVerboseThreeError {
                 write_err!(f, "conversion of a prevout `height` field failed"; e),
             Self::PrevoutValue(ref e) =>
                 write_err!(f, "conversion of a prevout `value` field failed"; e),
-            Self::PrevoutScriptPubkey(ref e) =>
+            Self::PrevoutScriptPubKey(ref e) =>
                 write_err!(f, "conversion of a prevout `script_pubkey` field failed"; e),
         }
     }
@@ -215,7 +215,7 @@ impl std::error::Error for GetBlockVerboseThreeError {
             Self::Fee(ref e) => Some(e),
             Self::PrevoutHeight(ref e) => Some(e),
             Self::PrevoutValue(ref e) => Some(e),
-            Self::PrevoutScriptPubkey(ref e) => Some(e),
+            Self::PrevoutScriptPubKey(ref e) => Some(e),
         }
     }
 }
@@ -440,9 +440,9 @@ pub enum GetDescriptorActivityError {
     /// if the inner errors are distinct enough, but can be helpful.
     ActivityEntry(Box<GetDescriptorActivityError>), // Use Box to avoid recursive type size issues
     /// Conversion of the `prevout_spk` field failed.
-    PrevoutSpk(ScriptPubkeyError),
+    PrevoutSpk(ScriptPubKeyError),
     /// Conversion of the `output_spk` field failed.
-    OutputSpk(ScriptPubkeyError),
+    OutputSpk(ScriptPubKeyError),
 }
 
 impl fmt::Display for GetDescriptorActivityError {

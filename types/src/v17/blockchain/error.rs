@@ -438,7 +438,7 @@ impl From<ParseAmountError> for GetMempoolInfoError {
 /// Error when converting a `GetTxOut` type into the model type.
 ///
 /// Note that variants in this type are not named in the usual fashion. The `ScriptBuf` and
-/// `Address` variants are named after the functions on [`crate::ScriptPubkey`].
+/// `Address` variants are named after the functions on [`crate::ScriptPubKey`].
 #[derive(Debug)]
 pub enum GetTxOutError {
     /// Conversion of numeric type to expected type failed.
@@ -447,9 +447,9 @@ pub enum GetTxOutError {
     BestBlock(hex::HexToArrayError),
     /// Conversion of the transaction `value` field failed.
     Value(amount::ParseAmountError),
-    /// Conversion of the `ScriptPubkey` hex to a `ScriptBuf` failed.
+    /// Conversion of the `ScriptPubKey` hex to a `ScriptBuf` failed.
     ScriptBuf(hex::HexToBytesError),
-    /// Conversion of the `ScriptPubkey` `address` field failed.
+    /// Conversion of the `ScriptPubKey` `address` field failed.
     Address(address::ParseError),
 }
 
@@ -461,9 +461,9 @@ impl fmt::Display for GetTxOutError {
                 write_err!(f, "conversion of the `beast_block` field failed"; e),
             Self::Value(ref e) => write_err!(f, "conversion of the `value` field failed"; e),
             Self::ScriptBuf(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` hex to a `ScriptBuf` failed"; e),
+                write_err!(f, "conversion of the `ScriptPubKey` hex to a `ScriptBuf` failed"; e),
             Self::Address(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` `address` field failed"; e),
+                write_err!(f, "conversion of the `ScriptPubKey` `address` field failed"; e),
         }
     }
 }

@@ -259,7 +259,7 @@ pub use self::{
     mining::{GetMiningInfo, GetMiningInfoError},
     raw_transactions::{
         ControlBlocksError, DecodePsbt, DecodePsbtError, GlobalXpub, GlobalXpubError,
-        Musig2PartialSig, Musig2ParticipantPubkeys, Musig2Pubnonce, Proprietary, PsbtInput,
+        Musig2PartialSig, Musig2ParticipantPubKeys, Musig2Pubnonce, Proprietary, PsbtInput,
         PsbtInputError, PsbtOutput, PsbtOutputError, TaprootBip32Deriv, TaprootBip32DerivsError,
         TaprootLeaf, TaprootLeafError, TaprootScript, TaprootScriptError, TaprootScriptPathSig,
         TaprootScriptPathSigError,
@@ -321,7 +321,7 @@ pub use crate::{
     },
     v22::{
         AddConnection, Banned, EnumerateSigners, GetNodeAddresses, ListBanned, NodeAddress,
-        ScriptPubkey, Signers, WalletDisplayAddress,
+        ScriptPubKey, Signers, WalletDisplayAddress,
     },
     v23::{
         Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError,
