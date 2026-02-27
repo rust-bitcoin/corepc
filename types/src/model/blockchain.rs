@@ -60,7 +60,7 @@ pub struct GetBlockVerboseOne {
     /// The block version.
     pub version: block::Version,
     /// The merkle root.
-    pub merkle_root: String,
+    pub merkle_root: TxMerkleNode,
     /// The transaction ids.
     pub tx: Vec<Txid>,
     /// The block time expressed in UNIX epoch time.
@@ -103,7 +103,7 @@ pub struct GetBlockVerboseTwo {
     /// The block version.
     pub version: block::Version,
     /// The merkle root.
-    pub merkle_root: String,
+    pub merkle_root: TxMerkleNode,
     /// The transactions.
     pub tx: Vec<GetBlockVerboseTwoTransaction>,
     /// The block time expressed in UNIX epoch time.
@@ -155,7 +155,7 @@ pub struct GetBlockVerboseThree {
     /// The block version.
     pub version: block::Version,
     /// The merkle root.
-    pub merkle_root: String,
+    pub merkle_root: TxMerkleNode,
     /// The transactions.
     pub tx: Vec<GetBlockVerboseThreeTransaction>,
     /// The block time expressed in UNIX epoch time.

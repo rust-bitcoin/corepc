@@ -23,6 +23,7 @@ impl GetBlockVerboseOne {
             self.stripped_size.map(|size| crate::to_u32(size, "stripped_size")).transpose()?;
         let weight = Weight::from_wu(self.weight);
         let version = block::Version::from_consensus(self.version);
+        let merkle_root = self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?;
         let tx = self
             .tx
             .iter()
@@ -51,7 +52,7 @@ impl GetBlockVerboseOne {
             weight,
             height: crate::to_u32(self.height, "height")?,
             version,
-            merkle_root: self.merkle_root, // TODO: Use hash, which one depends on segwit or not.
+            merkle_root,
             tx,
             time: crate::to_u32(self.time, "time")?,
             median_time,
@@ -77,6 +78,7 @@ impl GetBlockVerboseTwo {
             self.stripped_size.map(|size| crate::to_u32(size, "stripped_size")).transpose()?;
         let weight = Weight::from_wu(self.weight);
         let version = block::Version::from_consensus(self.version);
+        let merkle_root = self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?;
         let tx = self
             .tx
             .into_iter()
@@ -109,7 +111,7 @@ impl GetBlockVerboseTwo {
             weight,
             height: crate::to_u32(self.height, "height")?,
             version,
-            merkle_root: self.merkle_root, // TODO: Use hash, which one depends on segwit or not.
+            merkle_root,
             tx,
             time: crate::to_u32(self.time, "time")?,
             median_time,
@@ -202,6 +204,7 @@ impl GetBlockVerboseThree {
             self.stripped_size.map(|size| crate::to_u32(size, "stripped_size")).transpose()?;
         let weight = Weight::from_wu(self.weight);
         let version = block::Version::from_consensus(self.version);
+        let merkle_root = self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?;
         let tx = self
             .tx
             .into_iter()
@@ -234,7 +237,7 @@ impl GetBlockVerboseThree {
             weight,
             height: crate::to_u32(self.height, "height")?,
             version,
-            merkle_root: self.merkle_root, // TODO: Use hash, which one depends on segwit or not.
+            merkle_root,
             tx,
             time: crate::to_u32(self.time, "time")?,
             median_time,
