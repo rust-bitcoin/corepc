@@ -252,9 +252,8 @@ mod wallet;
 pub use self::{
     blockchain::GetMempoolInfo,
     hidden::{
-        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
-        GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry,
-        GetOrphanTxsVerboseTwoEntryError,
+        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry, GetOrphanTxsVerboseTwo,
+        GetOrphanTxsVerboseTwoEntry,
     },
     mining::{GetMiningInfo, GetMiningInfoError},
     raw_transactions::{
@@ -365,6 +364,7 @@ pub use crate::{
         GetBlockVerboseTwoError, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
         GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
         GetDescriptorActivityError, GetDescriptorInfo, GetOrphanTxsError,
+        GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwoEntryError,
         GetRawTransactionVerboseWithPrevout, MempoolAcceptance, MempoolAcceptanceFees,
         NextBlockInfo, NextBlockInfoError, RawTransactionInputWithPrevout, ReceiveActivity,
         SpendActivity, TestMempoolAccept,
