@@ -15,7 +15,7 @@ use bitcoin::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{GetRawTransactionVerbose, ScriptPubkey};
+use super::{GetRawTransactionVerbose, ScriptPubKey};
 
 /// Models the result of JSON-RPC method `dumptxoutset`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -202,7 +202,7 @@ pub struct GetBlockVerboseThreePrevout {
     /// The value in BTC.
     pub value: Amount,
     /// The script pubkey.
-    pub script_pubkey: ScriptPubkey,
+    pub script_pubkey: ScriptPubKey,
 }
 
 /// Models the result of JSON-RPC method `getblockchaininfo`.
@@ -636,7 +636,7 @@ pub struct SpendActivity {
     /// The vout of the prevout.
     pub prevout_vout: u32,
     /// The prev scriptPubKey.
-    pub prevout_spk: ScriptPubkey,
+    pub prevout_spk: ScriptPubKey,
 }
 
 /// Models a 'receive' activity event. Part of `getdescriptoractivity`
@@ -653,7 +653,7 @@ pub struct ReceiveActivity {
     /// The vout of the receiving output.
     pub vout: u32,
     /// The ScriptPubKey.
-    pub output_spk: ScriptPubkey,
+    pub output_spk: ScriptPubKey,
 }
 
 /// Models the result of JSON-RPC method `getdifficulty`.

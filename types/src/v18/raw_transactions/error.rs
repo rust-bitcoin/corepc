@@ -44,7 +44,7 @@ impl std::error::Error for AnalyzePsbtError {
 #[derive(Debug)]
 pub enum AnalyzePsbtInputMissingError {
     /// Conversion of the `pubkeys` field failed.
-    Pubkeys(hex::HexToArrayError),
+    PubKeys(hex::HexToArrayError),
     /// Conversion of the `signatures` field failed.
     Signatures(hex::HexToArrayError),
     /// Conversion of the `RedeemScript` field failed.
@@ -56,7 +56,7 @@ pub enum AnalyzePsbtInputMissingError {
 impl fmt::Display for AnalyzePsbtInputMissingError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Pubkeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
+            Self::PubKeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
             Self::Signatures(ref e) =>
                 write_err!(f, "conversion of the `signatures` field failed"; e),
             Self::RedeemScript(ref e) =>
@@ -71,7 +71,7 @@ impl fmt::Display for AnalyzePsbtInputMissingError {
 impl std::error::Error for AnalyzePsbtInputMissingError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
-            Self::Pubkeys(ref e) => Some(e),
+            Self::PubKeys(ref e) => Some(e),
             Self::Signatures(ref e) => Some(e),
             Self::RedeemScript(ref e) => Some(e),
             Self::WitnessScript(ref e) => Some(e),

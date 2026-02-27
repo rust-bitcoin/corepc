@@ -40,7 +40,7 @@ pub enum ValidateAddressError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubkey(hex::HexToBytesError),
+    ScriptPubKey(hex::HexToBytesError),
     /// The `witness_version` field's value was too big for a u8.
     WitnessVersionValue(i64),
     /// Conversion of the `witness_version` field failed.
@@ -55,7 +55,7 @@ impl fmt::Display for ValidateAddressError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Address(ref e) => write!(f, "conversion of the `address` field failed: {}", e),
-            Self::ScriptPubkey(ref e) =>
+            Self::ScriptPubKey(ref e) =>
                 write!(f, "conversion of the `script_pubkey` field failed: {}", e),
             Self::WitnessVersionValue(v) => write!(f, "invalid witness version number: {}", v),
             Self::WitnessVersion(ref e) =>
@@ -76,7 +76,7 @@ impl std::error::Error for ValidateAddressError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Self::Address(ref e) => Some(e),
-            Self::ScriptPubkey(ref e) => Some(e),
+            Self::ScriptPubKey(ref e) => Some(e),
             Self::WitnessVersionValue(_) => None,
             Self::WitnessVersion(ref e) => Some(e),
             Self::WitnessProgramBytes(ref e) => Some(e),

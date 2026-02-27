@@ -65,7 +65,7 @@ impl AnalyzePsbtInputMissing {
                 .iter()
                 .map(|s| s.parse::<hash160::Hash>())
                 .collect::<Result<_, _>>()
-                .map_err(E::Pubkeys)?,
+                .map_err(E::PubKeys)?,
             None => vec![],
         };
         let signatures = match self.signatures {

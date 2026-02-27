@@ -85,7 +85,7 @@ pub use self::{
 /// transaction and psbt methods).
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
-pub struct ScriptPubkey {
+pub struct ScriptPubKey {
     /// The script_pubkey parsed from hex.
     pub script_pubkey: ScriptBuf,
     /// Number of required signatures - deprecated in Core v22.

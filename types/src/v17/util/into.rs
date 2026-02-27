@@ -48,7 +48,7 @@ impl ValidateAddress {
         use ValidateAddressError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
+        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {

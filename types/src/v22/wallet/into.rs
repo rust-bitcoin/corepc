@@ -17,7 +17,7 @@ impl GetAddressInfo {
         use GetAddressInfoError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
+        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {
@@ -45,12 +45,12 @@ impl GetAddressInfo {
                     .iter()
                     .map(|s| s.parse::<PublicKey>())
                     .collect::<Result<Vec<_>, _>>()
-                    .map_err(E::Pubkeys)
+                    .map_err(E::PubKeys)
             })
             .transpose()?;
         let sigs_required =
             self.sigs_required.map(|s| crate::to_u32(s, "sigs_required")).transpose()?;
-        let pubkey = self.pubkey.map(|s| s.parse::<PublicKey>()).transpose().map_err(E::Pubkey)?;
+        let pubkey = self.pubkey.map(|s| s.parse::<PublicKey>()).transpose().map_err(E::PubKey)?;
         let embedded =
             self.embedded.map(|embedded| embedded.into_model()).transpose().map_err(E::Embedded)?;
         let hd_key_path = self
@@ -102,7 +102,7 @@ impl GetAddressInfoEmbedded {
         use GetAddressInfoEmbeddedError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubkey)?;
+        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {
@@ -126,7 +126,7 @@ impl GetAddressInfoEmbedded {
         let pubkeys = None;
         let sigs_required =
             self.sigs_required.map(|s| crate::to_u32(s, "sigs_required")).transpose()?;
-        let pubkey = self.pubkey.map(|s| s.parse::<PublicKey>()).transpose().map_err(E::Pubkey)?;
+        let pubkey = self.pubkey.map(|s| s.parse::<PublicKey>()).transpose().map_err(E::PubKey)?;
 
         Ok(model::GetAddressInfoEmbedded {
             address,

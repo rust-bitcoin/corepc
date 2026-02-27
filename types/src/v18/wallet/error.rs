@@ -17,7 +17,7 @@ pub enum GetAddressInfoError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubkey(hex::HexToBytesError),
+    ScriptPubKey(hex::HexToBytesError),
     /// The `witness_version` field's value was too big for a u8.
     WitnessVersionValue(i64),
     /// Conversion of the `witness_version` field failed.
@@ -29,9 +29,9 @@ pub enum GetAddressInfoError {
     /// Conversion of the `hex` field failed.
     Hex(hex::HexToBytesError),
     /// Conversion of the `pubkeys` field failed.
-    Pubkeys(key::ParsePublicKeyError),
+    PubKeys(key::ParsePublicKeyError),
     /// Conversion of the `pubkey` field failed.
-    Pubkey(key::ParsePublicKeyError),
+    PubKey(key::ParsePublicKeyError),
     /// Conversion of the `embedded` field failed.
     Embedded(GetAddressInfoEmbeddedError),
     /// Conversion of the `hd_key_path` field failed.
@@ -47,7 +47,7 @@ impl fmt::Display for GetAddressInfoError {
         match *self {
             Self::Numeric(ref e) => write_err!(f, "numeric"; e),
             Self::Address(ref e) => write_err!(f, "conversion of the `address` field failed"; e),
-            Self::ScriptPubkey(ref e) =>
+            Self::ScriptPubKey(ref e) =>
                 write_err!(f, "conversion of the `script_pubkey` field failed"; e),
             Self::WitnessVersionValue(v) => write!(f, "invalid witness version number: {}", v),
             Self::WitnessVersion(ref e) =>
@@ -57,8 +57,8 @@ impl fmt::Display for GetAddressInfoError {
             Self::WitnessProgram(ref e) =>
                 write_err!(f, "conversion of the `witness_program` field failed"; e),
             Self::Hex(ref e) => write_err!(f, "conversion of the `hex` field failed"; e),
-            Self::Pubkeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
-            Self::Pubkey(ref e) => write_err!(f, "conversion of the `pubkey` failed"; e),
+            Self::PubKeys(ref e) => write_err!(f, "conversion of the `pubkeys` field failed"; e),
+            Self::PubKey(ref e) => write_err!(f, "conversion of the `pubkey` failed"; e),
             Self::Embedded(ref e) => write_err!(f, "conversion of the `embedded` field failed"; e),
             Self::HdKeyPath(ref e) =>
                 write_err!(f, "conversion of the `hd_key_path` field failed"; e),
@@ -76,14 +76,14 @@ impl std::error::Error for GetAddressInfoError {
         match *self {
             Self::Numeric(ref e) => Some(e),
             Self::Address(ref e) => Some(e),
-            Self::ScriptPubkey(ref e) => Some(e),
+            Self::ScriptPubKey(ref e) => Some(e),
             Self::WitnessVersionValue(_) => None,
             Self::WitnessVersion(ref e) => Some(e),
             Self::WitnessProgramBytes(ref e) => Some(e),
             Self::WitnessProgram(ref e) => Some(e),
             Self::Hex(ref e) => Some(e),
-            Self::Pubkeys(ref e) => Some(e),
-            Self::Pubkey(ref e) => Some(e),
+            Self::PubKeys(ref e) => Some(e),
+            Self::PubKey(ref e) => Some(e),
             Self::Embedded(ref e) => Some(e),
             Self::HdKeyPath(ref e) => Some(e),
             Self::HdSeedId(ref e) => Some(e),

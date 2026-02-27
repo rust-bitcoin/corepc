@@ -296,7 +296,7 @@ impl std::error::Error for PsbtOutputError {
 #[derive(Debug)]
 pub enum TaprootScriptPathSigError {
     /// Conversion of the `pubkey` field failed.
-    Pubkey(secp256k1::Error),
+    PubKey(secp256k1::Error),
     /// Conversion of the `leaf_hash` field failed.
     LeafHash(hex::HexToArrayError),
     /// Conversion of the `sig` field failed.
@@ -306,7 +306,7 @@ pub enum TaprootScriptPathSigError {
 impl fmt::Display for TaprootScriptPathSigError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Pubkey(ref e) => write_err!(f, "conversion of the `pubkey` field failed"; e),
+            Self::PubKey(ref e) => write_err!(f, "conversion of the `pubkey` field failed"; e),
             Self::LeafHash(ref e) => write_err!(f, "conversion of the `leaf_hash` field failed"; e),
             Self::Sig(ref e) => write_err!(f, "conversion of the `sig` field failed"; e),
         }
@@ -317,7 +317,7 @@ impl fmt::Display for TaprootScriptPathSigError {
 impl std::error::Error for TaprootScriptPathSigError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
-            Self::Pubkey(ref e) => Some(e),
+            Self::PubKey(ref e) => Some(e),
             Self::LeafHash(ref e) => Some(e),
             Self::Sig(ref e) => Some(e),
         }
@@ -398,7 +398,7 @@ impl std::error::Error for ControlBlocksError {
 #[derive(Debug)]
 pub enum TaprootBip32DerivsError {
     /// Conversion of the `pubkey` field failed.
-    Pubkey(secp256k1::Error),
+    PubKey(secp256k1::Error),
     /// Conversion of the `master_fingerprint` field failed.
     MasterFingerprint(hex::HexToArrayError),
     /// Conversion of the `path` field failed.
@@ -410,7 +410,7 @@ pub enum TaprootBip32DerivsError {
 impl fmt::Display for TaprootBip32DerivsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Pubkey(ref e) => write_err!(f, "conversion of the `pubkey` field failed"; e),
+            Self::PubKey(ref e) => write_err!(f, "conversion of the `pubkey` field failed"; e),
             Self::MasterFingerprint(ref e) =>
                 write_err!(f, "conversion of the `master_fingerprint` field failed"; e),
             Self::Path(ref e) => write_err!(f, "conversion of the `path` field failed"; e),
@@ -424,7 +424,7 @@ impl fmt::Display for TaprootBip32DerivsError {
 impl std::error::Error for TaprootBip32DerivsError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
-            Self::Pubkey(ref e) => Some(e),
+            Self::PubKey(ref e) => Some(e),
             Self::MasterFingerprint(ref e) => Some(e),
             Self::Path(ref e) => Some(e),
             Self::LeafHashes(ref e) => Some(e),
