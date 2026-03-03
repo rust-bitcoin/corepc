@@ -303,7 +303,7 @@ impl GetBlockHeader {
         use GetBlockHeaderError as E;
 
         let v = Vec::from_hex(&self.0).map_err(E::Hex)?;
-        let header = encode::deserialize::<block::Header>(&v).map_err(E::Consensus)?;
+        let header = encode::deserialize::<block::Header>(&v).map_err(E::Header)?;
 
         Ok(model::GetBlockHeader(header))
     }
@@ -407,11 +407,12 @@ impl GetDescriptorActivity {
                             .block_hash
                             .map(|s| BlockHash::from_str(&s))
                             .transpose()
-                            .map_err(E::Hash)?;
+                            .map_err(E::BlockHash)?;
                         let height =
                             spend.height.map(|h| crate::to_u32(h, "height")).transpose()?;
-                        let spend_txid = Txid::from_str(&spend.spend_txid).map_err(E::Hash)?;
-                        let prevout_txid = Txid::from_str(&spend.prevout_txid).map_err(E::Hash)?;
+                        let spend_txid = Txid::from_str(&spend.spend_txid).map_err(E::SpendTxid)?;
+                        let prevout_txid =
+                            Txid::from_str(&spend.prevout_txid).map_err(E::PrevoutTxid)?;
                         let prevout_spk = spend.prevout_spk.into_model().map_err(E::PrevoutSpk)?;
 
                         Ok(model::ActivityEntry::Spend(model::SpendActivity {
@@ -431,10 +432,10 @@ impl GetDescriptorActivity {
                             .block_hash
                             .map(|s| BlockHash::from_str(&s))
                             .transpose()
-                            .map_err(E::Hash)?;
+                            .map_err(E::BlockHash)?;
                         let height =
                             receive.height.map(|h| crate::to_u32(h, "height")).transpose()?; // Uses From<NumericError>
-                        let txid = Txid::from_str(&receive.txid).map_err(E::Hash)?;
+                        let txid = Txid::from_str(&receive.txid).map_err(E::Txid)?;
                         let output_spk = receive.output_spk.into_model().map_err(E::OutputSpk)?;
 
                         Ok(model::ActivityEntry::Receive(model::ReceiveActivity {

@@ -65,7 +65,7 @@ pub enum BlockTemplateTransactionError {
     Data(consensus::encode::FromHexError),
     /// Conversion of the `txid` field failed.
     Txid(hex::HexToArrayError),
-    /// Conversion of the `hash` field failed.
+    /// Conversion of the `hash` field to `wtxid` failed.
     Hash(hex::HexToArrayError),
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
@@ -77,7 +77,8 @@ impl fmt::Display for BlockTemplateTransactionError {
             Self::Numeric(ref e) => write_err!(f, "numeric"; e),
             Self::Data(ref e) => write_err!(f, "conversion of the `data` field failed"; e),
             Self::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
-            Self::Hash(ref e) => write_err!(f, "conversion of the `hash` field failed"; e),
+            Self::Hash(ref e) =>
+                write_err!(f, "conversion of the `hash` field to `wtxid` failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `fee` field failed"; e),
         }
     }

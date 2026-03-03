@@ -118,15 +118,14 @@ pub enum GetBlockHeaderError {
     /// Conversion of hex data to bytes failed.
     Hex(hex::HexToBytesError),
     /// Consensus decoding of bytes to header failed.
-    Consensus(encode::Error),
+    Header(encode::Error),
 }
 
 impl fmt::Display for GetBlockHeaderError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hex(ref e) => write_err!(f, "conversion of hex data to bytes failed"; e),
-            Self::Consensus(ref e) =>
-                write_err!(f, "consensus decoding of bytes to header failed"; e),
+            Self::Header(ref e) => write_err!(f, "consensus decoding of bytes to header failed"; e),
         }
     }
 }
@@ -136,7 +135,7 @@ impl std::error::Error for GetBlockHeaderError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Self::Hex(ref e) => Some(e),
-            Self::Consensus(ref e) => Some(e),
+            Self::Header(ref e) => Some(e),
         }
     }
 }

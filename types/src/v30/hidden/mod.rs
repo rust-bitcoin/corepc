@@ -4,13 +4,13 @@
 //!
 //! Types for methods that are excluded from the API docs by default.
 
-mod error;
 mod into;
 
 use serde::{Deserialize, Serialize};
 
-pub use self::error::{GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwoEntryError};
-pub use super::GetOrphanTxsError;
+pub use super::{
+    GetOrphanTxsError, GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwoEntryError,
+};
 
 /// Result of JSON-RPC method `getorphantxs` verbosity 0.
 ///

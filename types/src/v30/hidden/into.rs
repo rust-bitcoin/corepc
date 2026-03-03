@@ -59,7 +59,7 @@ impl GetOrphanTxsVerboseTwoEntry {
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let wtxid = self.wtxid.parse::<Wtxid>().map_err(E::Wtxid)?;
         let v = Vec::from_hex(&self.hex).map_err(E::Hex)?;
-        let transaction = encode::deserialize::<Transaction>(&v).map_err(E::Consensus)?;
+        let transaction = encode::deserialize::<Transaction>(&v).map_err(E::Transaction)?;
 
         Ok(model::GetOrphanTxsVerboseTwoEntry {
             txid,
