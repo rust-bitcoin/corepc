@@ -1,27 +1,20 @@
-//! This module implements the [`crate::client::Transport`] trait using [`bitreq`]
+//! This module implements the [`crate::client_async::Transport`] trait using [`bitreq`]
 //! as the underlying HTTP transport.
 //!
 //! [bitreq]: <https://github.com/rust-bitcoin/corepc/bitreq>
 
-#[cfg(jsonrpc_fuzz)]
-use std::io::{self, Read, Write};
-#[cfg(jsonrpc_fuzz)]
-use std::sync::Mutex;
 use std::time::Duration;
 use std::{error, fmt};
 
 use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
 
-use crate::client::Transport;
+use crate::client_async::{BoxFuture, Transport};
 use crate::{Request, Response};
 
 const DEFAULT_URL: &str = "http://localhost";
 const DEFAULT_PORT: u16 = 8332; // the default RPC port for bitcoind.
-#[cfg(not(jsonrpc_fuzz))]
 const DEFAULT_TIMEOUT_SECONDS: u64 = 15;
-#[cfg(jsonrpc_fuzz)]
-const DEFAULT_TIMEOUT_SECONDS: u64 = 1;
 
 /// An HTTP transport that uses [`bitreq`] and is useful for running a bitcoind RPC client.
 #[derive(Clone, Debug)]
@@ -51,7 +44,7 @@ impl BitreqHttpTransport {
     /// Returns a builder for [`BitreqHttpTransport`].
     pub fn builder() -> Builder { Builder::new() }
 
-    fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
+    async fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
     where
         R: for<'a> serde::de::Deserialize<'a>,
     {
@@ -68,7 +61,7 @@ impl BitreqHttpTransport {
         // Send the request and parse the response. If the response is an error that does not
         // contain valid JSON in its body (for instance if the bitcoind HTTP server work queue
         // depth is exceeded), return the raw HTTP error so users can match against it.
-        let resp = req.send()?;
+        let resp = req.send_async().await?;
         match resp.json() {
             Ok(json) => Ok(json),
             Err(bitreq_err) =>
@@ -85,18 +78,24 @@ impl BitreqHttpTransport {
 }
 
 impl Transport for BitreqHttpTransport {
-    fn send_request(&self, req: Request) -> Result<Response, crate::Error> {
-        Ok(self.request(req)?)
+    fn send_request<'a>(
+        &'a self,
+        req: Request<'a>,
+    ) -> BoxFuture<'a, Result<Response, crate::Error>> {
+        Box::pin(async move { Ok(self.request(req).await?) })
     }
 
-    fn send_batch(&self, reqs: &[Request]) -> Result<Vec<Response>, crate::Error> {
-        Ok(self.request(reqs)?)
+    fn send_batch<'a>(
+        &'a self,
+        reqs: &'a [Request<'a>],
+    ) -> BoxFuture<'a, Result<Vec<Response>, crate::Error>> {
+        Box::pin(async move { Ok(self.request(reqs).await?) })
     }
 
     fn fmt_target(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.url) }
 }
 
-/// Builder for simple bitcoind [`BitreqHttpTransport`].
+/// Builder for async bitcoind [`BitreqHttpTransport`].
 #[derive(Clone, Debug)]
 pub struct Builder {
     tp: BitreqHttpTransport,
@@ -137,7 +136,7 @@ impl Builder {
     /// # Examples
     ///
     /// ```no_run
-    /// # use jsonrpc::bitreq_http::BitreqHttpTransport;
+    /// # use jsonrpc::bitreq_http_async::BitreqHttpTransport;
     /// # use std::fs::{self, File};
     /// # use std::path::Path;
     /// # let cookie_file = Path::new("~/.bitcoind/.cookie");
@@ -230,36 +229,10 @@ impl From<Error> for crate::Error {
     }
 }
 
-/// Global mutex used by the fuzzing harness to inject data into the read end of the TCP stream.
-#[cfg(jsonrpc_fuzz)]
-pub static FUZZ_TCP_SOCK: Mutex<Option<io::Cursor<Vec<u8>>>> = Mutex::new(None);
-
-#[cfg(jsonrpc_fuzz)]
-#[derive(Clone, Debug)]
-struct TcpStream;
-
-#[cfg(jsonrpc_fuzz)]
-mod impls {
-    use super::*;
-
-    impl Read for TcpStream {
-        fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-            match *FUZZ_TCP_SOCK.lock().unwrap() {
-                Some(ref mut cursor) => io::Read::read(cursor, buf),
-                None => Ok(0),
-            }
-        }
-    }
-    impl Write for TcpStream {
-        fn write(&mut self, buf: &[u8]) -> io::Result<usize> { io::sink().write(buf) }
-        fn flush(&mut self) -> io::Result<()> { Ok(()) }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Client;
+    use crate::client_async::Client;
 
     #[test]
     fn construct() {

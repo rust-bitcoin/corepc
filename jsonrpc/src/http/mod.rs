@@ -3,8 +3,11 @@
 #[cfg(feature = "simple_http")]
 pub mod simple_http;
 
-#[cfg(feature = "bitreq_http")]
-pub mod bitreq_http;
+#[cfg(feature = "bitreq_http_sync")]
+pub mod bitreq_http_sync;
+
+#[cfg(feature = "bitreq_http_async")]
+pub mod bitreq_http_async;
 
 /// The default TCP port to use for connections.
 /// Set to 8332, the default RPC port for bitcoind.
