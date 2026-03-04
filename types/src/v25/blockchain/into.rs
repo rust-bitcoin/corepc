@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::{Amount, BlockHash, FeeRate, ScriptBuf, Txid, Weight};
+use bitcoin::{Amount, BlockHash, FeeRate, ScriptPubKeyBuf, Txid, Weight};
 
 use super::error::ScanBlocksStartError;
 use super::{
@@ -21,7 +21,7 @@ impl GetBlockStats {
             .fee_rate_percentiles
             .iter()
             .map(|vb| FeeRate::from_sat_per_vb(*vb))
-            .collect::<Vec<Option<FeeRate>>>();
+            .collect::<Vec<FeeRate>>();
         let max_fee_rate = FeeRate::from_sat_per_vb(self.max_fee_rate);
         let minimum_fee_rate = FeeRate::from_sat_per_vb(self.minimum_fee_rate);
 
@@ -30,32 +30,32 @@ impl GetBlockStats {
         let total_weight = Weight::from_vb(self.total_weight);
 
         Ok(model::GetBlockStats {
-            average_fee: Amount::from_sat(self.average_fee),
+            average_fee: Amount::from_sat(self.average_fee).expect("TODO: Handle this error"),
             average_fee_rate,
             average_tx_size: crate::to_u32(self.average_tx_size, "average_tx_size")?,
             block_hash,
             fee_rate_percentiles,
             height: crate::to_u32(self.height, "height")?,
             inputs: crate::to_u32(self.inputs, "inputs")?,
-            max_fee: Amount::from_sat(self.max_fee),
+            max_fee: Amount::from_sat(self.max_fee).expect("TODO: Handle this error"),
             max_fee_rate,
             max_tx_size: crate::to_u32(self.max_tx_size, "max_tx_size")?,
-            median_fee: Amount::from_sat(self.median_fee),
+            median_fee: Amount::from_sat(self.median_fee).expect("TODO: Handle this error"),
             median_time: crate::to_u32(self.median_time, "median_time")?,
             median_tx_size: crate::to_u32(self.median_tx_size, "median_tx_size")?,
-            minimum_fee: Amount::from_sat(self.minimum_fee),
+            minimum_fee: Amount::from_sat(self.minimum_fee).expect("TODO: Handle this error"),
             minimum_fee_rate,
             minimum_tx_size: crate::to_u32(self.minimum_tx_size, "minimum_tx_size")?,
             outputs: crate::to_u32(self.outputs, "outputs")?,
-            subsidy: Amount::from_sat(self.subsidy),
+            subsidy: Amount::from_sat(self.subsidy).expect("TODO: Handle this error"),
             segwit_total_size: crate::to_u32(self.segwit_total_size, "segwit_total_size")?,
             segwit_total_weight,
             segwit_txs: crate::to_u32(self.segwit_txs, "segwit_txs")?,
             time: crate::to_u32(self.time, "time")?,
-            total_out: Amount::from_sat(self.total_out),
+            total_out: Amount::from_sat(self.total_out).expect("TODO: Handle this error"),
             total_size: crate::to_u32(self.total_size, "total_size")?,
             total_weight,
-            total_fee: Amount::from_sat(self.total_fee),
+            total_fee: Amount::from_sat(self.total_fee).expect("TODO: Handle this error"),
             txs: crate::to_u32(self.txs, "txs")?,
             utxo_increase: self.utxo_increase,
             utxo_size_increase: self.utxo_size_increase,
@@ -115,7 +115,8 @@ impl ScanTxOutSetUnspent {
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
 
         Ok(model::ScanTxOutSetUnspent {
             txid,

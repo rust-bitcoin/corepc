@@ -11,9 +11,9 @@ use crate::NumericError;
 #[derive(Debug)]
 pub enum GetChainStatesError {
     /// Conversion of the `best_block_hash` field failed.
-    BestBlockHash(hex::HexToArrayError),
+    BestBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `snapshot_block_hash` field failed.
-    SnapshotBlockHash(hex::HexToArrayError),
+    SnapshotBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
 }
@@ -51,9 +51,9 @@ pub enum DumpTxOutSetError {
     /// Conversion of the `coins_written` field to Amount failed.
     CoinsWritten(amount::ParseAmountError),
     /// Conversion of the `base_hash` field failed.
-    BaseHash(hex::HexToArrayError),
+    BaseHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txoutset_hash` field failed.
-    TxOutSetHash(hex::HexToArrayError),
+    TxOutSetHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
 }
@@ -93,7 +93,7 @@ pub enum GetTxOutSetInfoError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the transaction `best_block` field failed.
-    BestBlock(hex::HexToArrayError),
+    BestBlock(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `total_amount` field failed.
     TotalAmount(amount::ParseAmountError),
     /// Conversion of the `prevout_spent` field failed.
@@ -175,7 +175,7 @@ pub enum LoadTxOutSetError {
     /// Conversion of the `coins_loaded` field to Amount failed.
     CoinsLoaded(amount::ParseAmountError),
     /// Conversion of the `tip_hash` field failed.
-    TipHash(hex::HexToArrayError),
+    TipHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
 }

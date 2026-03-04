@@ -932,7 +932,9 @@ pub struct SendToAddress(pub String);
 
 impl SendToAddress {
     /// Converts json straight to a `bitcoin::Txid`.
-    pub fn txid(self) -> Result<Txid, hex::HexToArrayError> { Ok(self.into_model()?.txid) }
+    pub fn txid(self) -> Result<Txid, hex::DecodeFixedLengthBytesError> {
+        Ok(self.into_model()?.txid)
+    }
 }
 
 /// Result of JSON-RPC method `settxfee`.

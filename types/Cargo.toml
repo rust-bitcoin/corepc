@@ -14,11 +14,15 @@ exclude = ["tests", "contrib"]
 
 [features]
 default = ["std"]
-std = ["bitcoin/std"]
+std = ["bitcoin/std", "encoding/std", "hex-unstable/std", "p2p/std"]
 serde-deny-unknown-fields = []
 
 [dependencies]
-bitcoin = { version = "0.32.0", default-features = false, features = ["serde", "base64", "secp-recovery"] }
+# Branch `corepc`. hex stuff plus RC stuff (#5704, #5657, and #5710)
+bitcoin = { version = "0.33.0-beta", path = "../../rust-bitcoin/bitcoin", default-features = false, features = ["serde", "base64", "secp-recovery"] }
+encoding = { package = "bitcoin-consensus-encoding", path = "../../rust-bitcoin/consensus_encoding", default-features = false }        
+hex-unstable = { package = "hex-conservative", version = "0.3.0", default-features = false }
+p2p = { package = "bitcoin-p2p-messages", path = "../../rust-bitcoin/p2p", default-features = false }
 serde = { version = "1.0.103", default-features = false, features = [ "derive", "alloc" ] }
 serde_json = { version = "1.0.117" }
 

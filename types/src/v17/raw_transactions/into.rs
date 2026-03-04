@@ -4,8 +4,8 @@ use std::collections::BTreeMap;
 
 use bitcoin::psbt::{self, Psbt, PsbtParseError, PsbtSighashType};
 use bitcoin::{
-    absolute, consensus, hex, transaction, Address, Amount, BlockHash, ScriptBuf, Sequence,
-    Transaction, Txid,
+    absolute, consensus, hex, transaction, Address, Amount, BlockHash, ScriptPubKeyBuf,
+    ScriptSigBuf, Sequence, Transaction, Txid,
 };
 
 use super::{
@@ -196,6 +196,9 @@ impl PsbtInput {
         let tap_internal_key = None;
         let tap_merkle_root = None;
 
+        // These field is not used in Core yet as of v30.
+        let musig2_participant_pubkeys = BTreeMap::default();
+
         Ok(psbt::Input {
             non_witness_utxo,
             witness_utxo,
@@ -216,6 +219,7 @@ impl PsbtInput {
             tap_key_origins,
             tap_internal_key,
             tap_merkle_root,
+            musig2_participant_pubkeys,
             proprietary,
             unknown,
         })
@@ -255,6 +259,9 @@ impl PsbtOutput {
         let tap_tree = None;
         let tap_key_origins = BTreeMap::default();
 
+        // These field is not used in Core yet as of v30.
+        let musig2_participant_pubkeys = BTreeMap::default();
+
         Ok(psbt::Output {
             redeem_script,
             witness_script,
@@ -262,6 +269,7 @@ impl PsbtOutput {
             tap_internal_key,
             tap_tree,
             tap_key_origins,
+            musig2_participant_pubkeys,
             proprietary,
             unknown,
         })
@@ -288,7 +296,7 @@ impl DecodeScript {
         use DecodeScriptError as E;
 
         let script_pubkey = match self.hex {
-            Some(hex) => Some(ScriptBuf::from_hex(&hex).map_err(E::Hex)?),
+            Some(hex) => Some(ScriptPubKeyBuf::from_hex_no_length_prefix(&hex).map_err(E::Hex)?),
             None => None,
         };
         let addresses = match self.addresses {
@@ -368,23 +376,23 @@ impl GetRawTransactionVerbose {
     ) -> Result<model::GetRawTransactionVerbose, GetRawTransactionVerboseError> {
         use GetRawTransactionVerboseError as E;
 
-        let version = transaction::Version::non_standard(self.version);
+        let version = transaction::Version::maybe_non_standard(self.version);
         let lock_time = absolute::LockTime::from_consensus(self.lock_time);
 
-        let input = self
+        let inputs = self
             .inputs
             .into_iter()
             .map(|input| input.to_input())
             .collect::<Result<_, _>>()
             .map_err(E::Inputs)?;
-        let output = self
+        let outputs = self
             .outputs
             .into_iter()
             .map(|output| output.to_output())
             .collect::<Result<_, _>>()
             .map_err(E::Outputs)?;
 
-        let transaction = Transaction { version, lock_time, input, output };
+        let transaction = Transaction { version, lock_time, inputs, outputs };
         let block_hash =
             self.block_hash.map(|s| s.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?;
 
@@ -401,13 +409,13 @@ impl GetRawTransactionVerbose {
 
 impl SendRawTransaction {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::SendRawTransaction, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::SendRawTransaction, hex::DecodeFixedLengthBytesError> {
         let txid = self.0.parse::<Txid>()?;
         Ok(model::SendRawTransaction(txid))
     }
 
     /// Converts json straight to a `bitcoin::Txid`.
-    pub fn txid(self) -> Result<Txid, hex::HexToArrayError> {
+    pub fn txid(self) -> Result<Txid, hex::DecodeFixedLengthBytesError> {
         let model = self.into_model()?;
         Ok(model.0)
     }
@@ -439,7 +447,8 @@ impl SignFail {
         use SignFailError as E;
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
-        let script_sig = ScriptBuf::from_hex(&self.script_sig).map_err(E::ScriptSig)?;
+        let script_sig =
+            ScriptSigBuf::from_hex_no_length_prefix(&self.script_sig).map_err(E::ScriptSig)?;
         let sequence = Sequence::from_consensus(self.sequence);
 
         Ok(model::SignFail { txid, vout: self.vout, script_sig, sequence, error: self.error })
@@ -448,7 +457,7 @@ impl SignFail {
 
 impl TestMempoolAccept {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::TestMempoolAccept, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::TestMempoolAccept, hex::DecodeFixedLengthBytesError> {
         let results = self.0.into_iter().map(|r| r.into_model()).collect::<Result<_, _>>()?;
 
         Ok(model::TestMempoolAccept { results })
@@ -457,7 +466,7 @@ impl TestMempoolAccept {
 
 impl MempoolAcceptance {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::MempoolAcceptance, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::MempoolAcceptance, hex::DecodeFixedLengthBytesError> {
         let txid = self.txid.parse::<Txid>()?;
 
         Ok(model::MempoolAcceptance {

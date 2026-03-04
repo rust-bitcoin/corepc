@@ -2,3 +2,6 @@
 
 Cargo.lock
 **/target
+
+# The Claude config directory
+.claude

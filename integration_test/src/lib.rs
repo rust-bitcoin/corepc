@@ -3,8 +3,7 @@
 use std::path::PathBuf;
 
 use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
-use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
-use bitcoin::Network;
+use bitcoin::{Network, XOnlyPublicKey};
 use node::{Conf, P2P};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
@@ -86,7 +85,7 @@ impl NodeExt for Node {
     }
 
     fn create_mempool_transaction(&self) -> (bitcoin::Address, bitcoin::Txid) {
-        const MILLION_SATS: bitcoin::Amount = bitcoin::Amount::from_sat(1000000);
+        const MILLION_SATS: bitcoin::Amount = bitcoin::Amount::from_sat_u32(1000000);
 
         let address = self.client.new_address().expect("failed to get new address");
 
@@ -105,7 +104,8 @@ impl NodeExt for Node {
 
         let best_block_hash = self.client.best_block_hash().expect("best_block_hash");
         let best_block = self.client.get_block(best_block_hash).expect("best_block");
-        let tx = best_block.txdata[1].clone();
+
+        let tx = best_block.assume_checked(None).transactions()[1].clone();
 
         (address, tx)
     }
@@ -162,14 +162,13 @@ pub struct TestKeys {
 
 /// Returns deterministic test keys derived from a zero seed.
 pub fn test_keys() -> TestKeys {
-    let secp = Secp256k1::new();
     let seed = [0u8; 32];
-    let xprv = Xpriv::new_master(Network::Regtest, &seed).unwrap();
-    let xpub = Xpub::from_priv(&secp, &xprv);
+    let xprv = Xpriv::new_master(Network::Regtest, &seed);
+    let xpub = Xpub::from_xpriv(&xprv);
     TestKeys {
         xprv,
         xpub,
         fingerprint: xpub.fingerprint(),
-        x_only_public_key: xprv.private_key.x_only_public_key(&secp).0,
+        x_only_public_key: xprv.private_key.x_only_public_key().0.into(),
     }
 }

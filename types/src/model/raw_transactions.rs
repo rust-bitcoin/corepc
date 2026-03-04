@@ -9,7 +9,10 @@ use alloc::collections::BTreeMap;
 
 use bitcoin::address::{Address, NetworkUnchecked};
 use bitcoin::hashes::{hash160, sha256};
-use bitcoin::{Amount, BlockHash, FeeRate, Psbt, ScriptBuf, Sequence, Transaction, Txid, Wtxid};
+use bitcoin::{
+    Amount, BlockHash, FeeRate, Psbt, ScriptPubKeyBuf, ScriptSigBuf, Sequence, Transaction, Txid,
+    Wtxid,
+};
 use serde::{Deserialize, Serialize};
 
 /// Models the result of JSON-RPC method `analyzepsbt`.
@@ -22,8 +25,10 @@ pub struct AnalyzePsbt {
     /// Estimated feerate of the final signed transaction in BTC/kB.
     ///
     /// Shown only if all UTXO slots in the PSBT have been filled.
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub estimated_fee_rate: Option<FeeRate>,
     /// The transaction fee paid. Shown only if all UTXO slots in the PSBT have been filled.
+    #[serde(with = "bitcoin::amount::serde::as_sat::opt")]
     pub fee: Option<Amount>,
     /// Role of the next person that this psbt needs to go to.
     pub next: String,
@@ -61,7 +66,7 @@ pub struct CombinePsbt(pub Psbt);
 
 /// Models the result of JSON-RPC method `combinerawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct CombineRawTransaction(pub Transaction);
+pub struct CombineRawTransaction(#[serde(with = "bitcoin::as_consensus")] pub Transaction);
 
 /// Models the result of JSON-RPC method `converttopsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -73,7 +78,7 @@ pub struct CreatePsbt(pub Psbt);
 
 /// Models the result of JSON-RPC method `createrawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct CreateRawTransaction(pub Transaction);
+pub struct CreateRawTransaction(#[serde(with = "bitcoin::as_consensus")] pub Transaction);
 
 /// Models the result of JSON-RPC method `decodepsbt`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -81,18 +86,19 @@ pub struct DecodePsbt {
     /// The decoded PSBT.
     pub psbt: Psbt,
     /// The transaction fee paid if all UTXOs slots in the PSBT have been filled.
+    #[serde(with = "bitcoin::amount::serde::as_sat::opt")]
     pub fee: Option<Amount>,
 }
 
 /// Models the result of JSON-RPC method `decoderawtransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct DecodeRawTransaction(pub Transaction);
+pub struct DecodeRawTransaction(#[serde(with = "bitcoin::as_consensus")] pub Transaction);
 
 /// Models the result of JSON-RPC method `decodescript`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct DecodeScript {
     /// The `scriptPubKey`.
-    pub script_pubkey: Option<ScriptBuf>,
+    pub script_pubkey: Option<ScriptPubKeyBuf>,
     /// Inferred descriptor for the script. v23 and later only.
     pub descriptor: Option<String>,
     /// The output type.
@@ -117,6 +123,7 @@ pub struct DescriptorProcessPsbt {
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
     /// The transaction if complete.
+    #[serde(with = "bitcoin::as_consensus::opt")]
     pub tx: Option<Transaction>,
 }
 
@@ -126,6 +133,7 @@ pub struct FinalizePsbt {
     /// The partially signed transaction if not extracted.
     pub psbt: Option<Psbt>,
     /// The transaction if extracted.
+    #[serde(with = "bitcoin::as_consensus::opt")]
     pub tx: Option<Transaction>,
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
@@ -135,8 +143,10 @@ pub struct FinalizePsbt {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct FundRawTransaction {
     /// The resulting raw transaction.
+    #[serde(with = "bitcoin::as_consensus")]
     pub tx: Transaction,
     /// Fee the resulting transaction pays.
+    #[serde(with = "bitcoin::amount::serde::as_sat")]
     pub fee: Amount,
     /// The position of the added change output, or -1.
     pub change_position: i64,
@@ -144,7 +154,7 @@ pub struct FundRawTransaction {
 
 /// Models the result of JSON-RPC method `getrawtransaction` with verbose set to `false`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetRawTransaction(pub Transaction);
+pub struct GetRawTransaction(#[serde(with = "bitcoin::as_consensus")] pub Transaction);
 
 /// Models the result of JSON-RPC method `getrawtransaction` with verbose set to `true`.
 /// Result of JSON-RPC method `getrawtransaction`
@@ -153,6 +163,7 @@ pub struct GetRawTransactionVerbose {
     /// Whether specified block is in the active chain or not (only present with explicit "blockhash" argument).
     pub in_active_chain: Option<bool>,
     /// The transaction (encapsulates the other data returned by original RPC call).
+    #[serde(with = "bitcoin::as_consensus")]
     pub transaction: Transaction,
     /// The block hash (`None` for mempool transactions).
     pub block_hash: Option<BlockHash>,
@@ -176,6 +187,7 @@ pub struct SendRawTransaction(pub Txid);
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct SignRawTransaction {
     /// The raw transaction with signature(s).
+    #[serde(with = "bitcoin::as_consensus")]
     pub tx: Transaction,
     /// If the transaction has a complete set of signatures.
     pub complete: bool,
@@ -197,7 +209,7 @@ pub struct SignFail {
     /// The index of the output to spent and used as input.
     pub vout: u64,
     /// The signature script.
-    pub script_sig: ScriptBuf,
+    pub script_sig: ScriptSigBuf,
     /// Script sequence number.
     pub sequence: Sequence,
     /// Verification or signing error related to the input.
@@ -236,11 +248,13 @@ pub struct SubmitPackageTxResult {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct SubmitPackageTxResultFees {
     /// Transaction fee.
+    #[serde(with = "bitcoin::amount::serde::as_sat")]
     pub base_fee: Amount,
     /// The effective feerate.
     ///
     /// Will be `None` if the transaction was already in the mempool. For example, the package
     /// feerate and/or feerate with modified fees from the `prioritisetransaction` JSON-RPC method.
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub effective_fee_rate: Option<FeeRate>,
     /// If [`Self::effective_fee_rate`] is provided, this holds the [`Wtxid`]s of the transactions
     /// whose fees and vsizes are included in effective-feerate.
@@ -277,9 +291,11 @@ pub struct MempoolAcceptance {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct MempoolAcceptanceFees {
     /// Transaction fee in BTC.
+    #[serde(with = "bitcoin::amount::serde::as_sat")]
     pub base: Amount,
     /// The effective feerate in BTC per KvB. May differ from the base feerate if, for example, there
     /// are modified fees from `prioritisetransaction` or a package feerate was used.
+    #[serde(with = "bitcoin::fee_rate::serde::as_sat_per_vb_floor::opt")]
     pub effective_feerate: Option<FeeRate>,
     /// Transactions whose fees and vsizes are included in `effective_feerate`.
     pub effective_includes: Option<Vec<Wtxid>>,

@@ -2,7 +2,9 @@
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::consensus::encode;
-use bitcoin::{Address, Amount, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
+use bitcoin::{
+    Address, Amount, BlockHash, RedeemScriptBuf, ScriptPubKeyBuf, SignedAmount, Transaction, Txid,
+};
 
 use super::{
     GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
@@ -138,7 +140,7 @@ impl TransactionItem {
             .fee
             .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
             .transpose()? // optional historically
-            .unwrap_or_else(|| SignedAmount::from_sat(0));
+            .unwrap_or_else(|| SignedAmount::from_sat(0).expect("TODO: Handle this error"));
         let block_hash =
             self.block_hash.map(|h| h.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_height =
@@ -219,14 +221,15 @@ impl ListUnspentItem {
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let vout = crate::to_u32(self.vout, "vout")?;
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
         let label = self.label.unwrap_or_default();
 
         let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script
-            .map(|hex| ScriptBuf::from_hex(&hex).map_err(E::RedeemScript))
+            .map(|hex| RedeemScriptBuf::from_hex_no_length_prefix(&hex).map_err(E::RedeemScript))
             .transpose()?;
 
         Ok(model::ListUnspentItem {

@@ -5,6 +5,7 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 #![allow(unused_imports)] // Because of feature gated tests.
 
+use bitcoin::ext::*;
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::vtype::*;
 use node::{mtype, Input, Output}; // All the version specific types.

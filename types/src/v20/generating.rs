@@ -28,7 +28,9 @@ pub struct GenerateToDescriptor(
 
 impl GenerateToDescriptor {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GenerateToDescriptor, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GenerateToDescriptor, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|s| s.parse()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GenerateToDescriptor(v))
     }

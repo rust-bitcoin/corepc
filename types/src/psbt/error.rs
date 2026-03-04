@@ -41,7 +41,7 @@ impl std::error::Error for RawTransactionError {
 #[derive(Debug)]
 pub enum RawTransactionInputError {
     /// Conversion of the input `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Input lacked both `txid` and `coinbase` data.
     MissingTxid,
     /// Input lacked the `vout` field for a non-coinbase input.
@@ -49,9 +49,9 @@ pub enum RawTransactionInputError {
     /// Input lacked both `scriptSig` and `coinbase` data.
     MissingScriptSig,
     /// Conversion of the input `script_sig` field failed.
-    ScriptSig(hex::HexToBytesError),
+    ScriptSig(hex::DecodeVariableLengthBytesError),
     /// Conversion of one of the `witness` hex strings failed.
-    Witness(hex::HexToBytesError),
+    Witness(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for RawTransactionInputError {
@@ -92,7 +92,7 @@ pub enum RawTransactionOutputError {
     /// Conversion of the output `value` field failed.
     Value(amount::ParseAmountError),
     /// Conversion of the output `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for RawTransactionOutputError {
@@ -121,7 +121,7 @@ pub enum WitnessUtxoError {
     /// Conversion of the `amount` field failed.
     Amount(ParseAmountError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for WitnessUtxoError {
@@ -150,7 +150,7 @@ pub enum PartialSignatureError {
     /// Error parsing public key.
     PublicKey(key::ParsePublicKeyError),
     /// Error parsing signature.
-    Signature(ecdsa::Error),
+    Signature(ecdsa::ParseSignatureError),
 }
 
 impl fmt::Display for PartialSignatureError {
@@ -180,9 +180,9 @@ pub enum Bip32DerivError {
     /// Conversion of the pubkey failed.
     PubKey(key::ParsePublicKeyError),
     /// Conversion of the `master_fingerprint` field failed.
-    MasterFingerprint(hex::HexToArrayError),
+    MasterFingerprint(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `path` field failed.
-    Path(bip32::Error),
+    Path(bip32::ParseChildNumberError),
 }
 
 impl fmt::Display for Bip32DerivError {

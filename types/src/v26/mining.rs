@@ -35,7 +35,9 @@ pub struct PrioritisedTransaction {
 
 impl GetPrioritisedTransactions {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetPrioritisedTransactions, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetPrioritisedTransactions, hex::DecodeFixedLengthBytesError> {
         let mut map = BTreeMap::new();
         for (k, v) in self.0.into_iter() {
             let txid = k.parse::<Txid>()?;
@@ -49,7 +51,7 @@ impl PrioritisedTransaction {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> model::PrioritisedTransaction {
         model::PrioritisedTransaction {
-            fee_delta: Amount::from_sat(self.fee_delta as u64),
+            fee_delta: Amount::from_sat(self.fee_delta as u64).expect("TODO: Handle this error"),
             in_mempool: self.in_mempool,
             modified_fee: None,
         }

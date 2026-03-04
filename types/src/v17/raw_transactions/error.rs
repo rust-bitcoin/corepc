@@ -19,7 +19,7 @@ pub enum DecodePsbtError {
     /// Conversion of the `tx` field to `unsigned_tx` failed.
     Tx(RawTransactionError),
     /// Conversion of one the map items in the `unknown` field failed.
-    Unknown(hex::HexToBytesError),
+    Unknown(hex::DecodeVariableLengthBytesError),
     /// Conversion of one of the PSBT inputs failed.
     Inputs(PsbtInputError),
     /// Conversion of one of the PSBT outputs failed.
@@ -68,17 +68,17 @@ pub enum PsbtInputError {
     /// Conversion of the `sighash` field failed.
     Sighash(sighash::SighashTypeParseError),
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_script` field failed.
-    WitnessScript(hex::HexToBytesError),
+    WitnessScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `bip32_derivs` field failed.
     Bip32Derivs(Bip32DerivError),
     /// Conversion of the `final_script_sig` field failed.
-    FinalScriptSig(hex::HexToBytesError),
+    FinalScriptSig(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `final_script_witness` field failed.
-    FinalScriptWitness(hex::HexToBytesError),
+    FinalScriptWitness(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `unknown` field failed.
-    Unknown(hex::HexToBytesError),
+    Unknown(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for PsbtInputError {
@@ -128,13 +128,13 @@ impl std::error::Error for PsbtInputError {
 #[derive(Debug)]
 pub enum PsbtOutputError {
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_script` field failed.
-    WitnessScript(hex::HexToBytesError),
+    WitnessScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `bip32_derivs` field failed.
     Bip32Derivs(Bip32DerivError),
     /// Conversion of the `unknown` field failed.
-    Unknown(hex::HexToBytesError),
+    Unknown(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for PsbtOutputError {
@@ -167,7 +167,7 @@ impl std::error::Error for PsbtOutputError {
 #[derive(Debug)]
 pub enum DecodeScriptError {
     /// Conversion of the transaction `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the transaction `addresses` field failed.
     Addresses(address::ParseError),
     /// Conversion of the transaction `p2sh` field failed.
@@ -260,7 +260,7 @@ pub enum GetRawTransactionVerboseError {
     /// Conversion of one of the transaction outputs failed.
     Outputs(RawTransactionOutputError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetRawTransactionVerboseError {
@@ -319,9 +319,9 @@ impl std::error::Error for SignRawTransactionError {
 #[derive(Debug)]
 pub enum SignFailError {
     /// Conversion of the transaction `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `script_sig` field failed.
-    ScriptSig(hex::HexToBytesError),
+    ScriptSig(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for SignFailError {

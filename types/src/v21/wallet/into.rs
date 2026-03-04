@@ -50,7 +50,7 @@ impl Send {
 
 impl SendMany {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::SendMany, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::SendMany, hex::DecodeFixedLengthBytesError> {
         let txid = self.0.parse::<Txid>()?;
         Ok(model::SendMany(txid))
     }
@@ -58,7 +58,7 @@ impl SendMany {
 
 impl SendManyVerbose {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::SendManyVerbose, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::SendManyVerbose, hex::DecodeFixedLengthBytesError> {
         let txid = self.txid.parse::<Txid>()?;
         Ok(model::SendManyVerbose { txid, fee_reason: self.fee_reason })
     }

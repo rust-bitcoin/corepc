@@ -61,7 +61,9 @@ v17 = ["v18_and_below"]
 TODO = []                       # This is a dirty hack while writing the tests.
 
 [dependencies]
-bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
+# Branch `corepc`. hex stuff plus RC stuff (#5704, #5657, and #5710)
+bitcoin = { version = "0.33.0-beta", path = "../../rust-bitcoin/bitcoin", default-features = false, features = ["std", "serde"] }
+hex-unstable = { package = "hex-conservative", version = "0.3.0", default-features = false, features = ["alloc"] }
 env_logger = "0.9.0"
 node = { package = "corepc-node", version = "0.11.0", path = "../node", default-features = false }
 rand = "0.8.5"

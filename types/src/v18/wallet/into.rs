@@ -2,9 +2,10 @@
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::hashes::hash160;
-use bitcoin::hex::FromHex;
 use bitcoin::key::PublicKey;
-use bitcoin::{bip32, Address, Amount, ScriptBuf, Txid, WitnessProgram, WitnessVersion};
+use bitcoin::{
+    bip32, Address, Amount, RedeemScriptBuf, ScriptPubKeyBuf, Txid, WitnessProgram, WitnessVersion,
+};
 
 use super::{
     GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoEmbeddedError, GetAddressInfoError,
@@ -21,7 +22,8 @@ impl GetAddressInfo {
         use GetAddressInfoError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {
@@ -31,7 +33,7 @@ impl GetAddressInfo {
                 let witness_version =
                     WitnessVersion::try_from(v as u8).map_err(E::WitnessVersion)?;
 
-                let bytes = Vec::from_hex(&hex).map_err(E::WitnessProgramBytes)?;
+                let bytes = bitcoin::hex::decode_to_vec(&hex).map_err(E::WitnessProgramBytes)?;
                 let witness_program =
                     WitnessProgram::new(witness_version, &bytes).map_err(E::WitnessProgram)?;
 
@@ -40,8 +42,10 @@ impl GetAddressInfo {
             _ => (None, None), // TODO: Think more if catchall is ok.
         };
         let script = self.script.map(|s| s.into_model());
-        let redeem_script =
-            self.hex.map(|hex| ScriptBuf::from_hex(&hex).map_err(E::Hex)).transpose()?;
+        let redeem_script = self
+            .hex
+            .map(|hex| RedeemScriptBuf::from_hex_no_length_prefix(&hex).map_err(E::Hex))
+            .transpose()?;
         let pubkeys = self
             .pubkeys
             .map(|pubkeys| {
@@ -107,7 +111,8 @@ impl GetAddressInfoEmbedded {
         use GetAddressInfoEmbeddedError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
         let (witness_version, witness_program) = match (self.witness_version, self.witness_program)
         {
             (Some(v), Some(hex)) => {
@@ -117,7 +122,7 @@ impl GetAddressInfoEmbedded {
                 let witness_version =
                     WitnessVersion::try_from(v as u8).map_err(E::WitnessVersion)?;
 
-                let bytes = Vec::from_hex(&hex).map_err(E::WitnessProgramBytes)?;
+                let bytes = bitcoin::hex::decode_to_vec(&hex).map_err(E::WitnessProgramBytes)?;
                 let witness_program =
                     WitnessProgram::new(witness_version, &bytes).map_err(E::WitnessProgram)?;
 
@@ -126,8 +131,10 @@ impl GetAddressInfoEmbedded {
             _ => (None, None), // TODO: Think more if catchall is ok.
         };
         let script = self.script.map(|s| s.into_model());
-        let redeem_script =
-            self.hex.map(|hex| ScriptBuf::from_hex(&hex).map_err(E::Hex)).transpose()?;
+        let redeem_script = self
+            .hex
+            .map(|hex| RedeemScriptBuf::from_hex_no_length_prefix(&hex).map_err(E::Hex))
+            .transpose()?;
         let pubkeys = None;
         let sigs_required =
             self.sigs_required.map(|s| crate::to_u32(s, "sigs_required")).transpose()?;
@@ -300,13 +307,14 @@ impl ListUnspentItem {
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let vout = crate::to_u32(self.vout, "vout")?;
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
 
         let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script
-            .map(|hex| ScriptBuf::from_hex(&hex).map_err(E::RedeemScript))
+            .map(|hex| RedeemScriptBuf::from_hex_no_length_prefix(&hex).map_err(E::RedeemScript))
             .transpose()?;
         Ok(model::ListUnspentItem {
             txid,
