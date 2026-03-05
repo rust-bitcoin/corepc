@@ -24,6 +24,7 @@ integration testing.
 
 ## Crate/directory listing
 
+- `bitreq/`: [`bitreq`](https://crates.io/crates/bitreq): Simple, minimal-dependency HTTP client, with optional features for proxies, async, and https.
 - `client/`: [`corepc-client`](https://crates.io/crates/corepc-client): A blocking JSON-RPC client used to test `corepc-types`.
 - `contrib/`: Contains scripts including one to run local regtest `bitcoind` nodes using versions specified in the config file. A template config file and bitcoind aliases are in the subdirectory `templates/`
 - `integration_test/`: Integration tests that use `corepc-client` and `corepc-node` to test `corepc-types`.
