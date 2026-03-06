@@ -276,13 +276,13 @@ impl AsyncConnection {
         timeout_at: Option<Instant>,
         client_config: Option<Arc<ClientConfig>>,
     ) -> Result<AsyncConnection, Error> {
-        let config = client_config.as_ref().map(Arc::clone);
+        let client_config_ref = &client_config;
 
         let future = async move {
             let socket = Self::connect(params).await?;
 
             if params.https {
-                Self::wrap_async_stream(socket, params.host, config).await
+                Self::wrap_async_stream(socket, params.host, client_config_ref).await
             } else {
                 Ok(AsyncHttpStream::Unsecured(socket))
             }
@@ -312,7 +312,7 @@ impl AsyncConnection {
     async fn wrap_async_stream(
         socket: AsyncTcpStream,
         host: &str,
-        client_config: Option<Arc<ClientConfig>>,
+        client_config: &Option<Arc<ClientConfig>>,
     ) -> Result<AsyncHttpStream, Error> {
         if let Some(client_config) = client_config {
             let tls_config = client_config.tls.as_ref().unwrap();
@@ -328,7 +328,7 @@ impl AsyncConnection {
     async fn wrap_async_stream(
         _socket: AsyncTcpStream,
         _host: &str,
-        _client_config: Option<Arc<ClientConfig>>,
+        _client_config: &Option<Arc<ClientConfig>>,
     ) -> Result<AsyncHttpStream, Error> {
         Err(Error::HttpsFeatureNotEnabled)
     }
