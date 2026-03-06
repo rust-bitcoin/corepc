@@ -3,6 +3,7 @@
 
 #[cfg(feature = "rustls")]
 use alloc::sync::Arc;
+#[cfg(any(feature = "rustls", feature = "native-tls"))]
 use std::io;
 use std::net::TcpStream;
 use std::sync::OnceLock;
@@ -20,9 +21,9 @@ use tokio_rustls::{client::TlsStream, TlsConnector};
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
 
-#[cfg(feature = "tokio-rustls")]
-use super::{AsyncHttpStream, AsyncTcpStream};
-#[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
+#[cfg(any(feature = "rustls", feature = "native-tls"))]
+use super::HttpStream;
+#[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
 use crate::Error;
 
@@ -50,7 +51,7 @@ fn build_client_config() -> Arc<ClientConfig> {
 }
 
 #[cfg(feature = "rustls")]
-pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, Error> {
+pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Error> {
     #[cfg(feature = "log")]
     log::trace!("Setting up TLS parameters for {host}.");
     let dns_name = ServerName::try_from(host)
@@ -58,10 +59,12 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, E
         .map_err(|err| Error::IoError(io::Error::new(io::ErrorKind::Other, err)))?;
     let sess = ClientConnection::new(CONFIG.get_or_init(build_client_config).clone(), dns_name)
         .map_err(Error::RustlsCreateConnection)?;
+    let tls = StreamOwned::new(sess, tcp);
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
-    Ok(StreamOwned::new(sess, tcp))
+
+    Ok(HttpStream::Secured(Box::new(tls), None))
 }
 
 // Async rustls TLS implementation
@@ -99,7 +102,7 @@ static CONNECTOR: OnceLock<Result<TlsConnector, Error>> = OnceLock::new();
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
 fn native_tls_err<S>(e: HandshakeError<S>) -> Error {
     match e {
-        HandshakeError::Failure(e) => Error::NativeTlsError(e),
+        HandshakeError::Failure(err) => Error::NativeTlsCreateConnection(err),
         HandshakeError::WouldBlock(_) => {
             debug_assert!(false, "We shouldn't hit a blocking error");
             Error::Other("Got a WouldBlock error from native-tls")
@@ -109,22 +112,27 @@ fn native_tls_err<S>(e: HandshakeError<S>) -> Error {
 
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
 fn build_tls_connector() -> Result<TlsConnector, Error> {
-    TlsConnector::builder().build().map_err(Error::NativeTlsError)
+    TlsConnector::builder().build().map_err(Error::from)
 }
 
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
-pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, Error> {
+pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Error> {
     #[cfg(feature = "log")]
     log::trace!("Setting up TLS parameters for {host}.");
 
     // TODO: Once we can `get_or_try_init`, so that instead
     // https://github.com/rust-lang/rust/issues/109737
-    let connector = CONNECTOR.get_or_init(build_tls_connector)?;
+    let connector = match CONNECTOR.get_or_init(build_tls_connector) {
+        Ok(c) => c.clone(),
+        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
+    };
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
 
-    connector.connect(host, tcp).map_err(native_tls_err)
+    let tls = connector.connect(host, tcp).map_err(native_tls_err)?;
+
+    Ok(HttpStream::Secured(Box::new(tls), None))
 }
 
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
@@ -140,12 +148,17 @@ pub(super) async fn wrap_async_stream(
 
     // TODO: Once we can `get_or_try_init`, so that instead
     // https://github.com/rust-lang/rust/issues/109737
-    let connector = AsyncTlsConnector::from(CONNECTOR.get_or_init(build_tls_connector)?.clone());
+    let sync_connector = match CONNECTOR.get_or_init(build_tls_connector) {
+        Ok(c) => c.clone(),
+        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
+    };
+
+    let async_connector = AsyncTlsConnector::from(sync_connector);
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
 
-    let tls = connector.connect(host, tcp).await.map_err(native_tls_err)?;
+    let tls = async_connector.connect(host, tcp).await?;
 
     Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }
