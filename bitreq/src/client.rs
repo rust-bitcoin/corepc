@@ -9,7 +9,10 @@
 use std::collections::{hash_map, HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(
+    all(feature = "native-tls", feature = "tokio-native-tls"),
+    all(feature = "rustls", feature = "tokio-rustls")
+))]
 use crate::connection::certificates::{Certificates, CertificatesBuilder};
 use crate::connection::AsyncConnection;
 use crate::request::{OwnedConnectionParams as ConnectionKey, ParsedRequest};
@@ -17,24 +20,36 @@ use crate::{Error, Request, Response};
 
 #[derive(Clone)]
 pub(crate) struct ClientConfig {
-    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    #[cfg(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    ))]
     pub(crate) tls: Option<TlsConfig>,
 }
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(
+    all(feature = "native-tls", feature = "tokio-native-tls"),
+    all(feature = "rustls", feature = "tokio-rustls")
+))]
 #[derive(Clone)]
 pub(crate) struct TlsConfig {
     pub(crate) certificates: Certificates,
 }
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(
+    all(feature = "native-tls", feature = "tokio-native-tls"),
+    all(feature = "rustls", feature = "tokio-rustls")
+))]
 impl TlsConfig {
     fn new(certificates: Certificates) -> Self { Self { certificates } }
 }
 
 pub struct ClientBuilder {
     capacity: usize,
-    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    #[cfg(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    ))]
     certificates: Option<CertificatesBuilder>,
 }
 
@@ -56,11 +71,17 @@ pub struct ClientBuilder {
 /// ```
 impl ClientBuilder {
     /// Creates a new `ClientBuilder` with a default pool capacity of 10.
-    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    #[cfg(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    ))]
     pub fn new() -> Self { Self { capacity: 10, certificates: None } }
 
     /// Creates a new `ClientBuilder` with a default pool capacity of 10.
-    #[cfg(not(all(feature = "rustls", feature = "tokio-rustls")))]
+    #[cfg(not(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    )))]
     pub fn new() -> Self { Self { capacity: 10 } }
 
     /// Sets the maximum number of connections to keep in the pool.
@@ -69,7 +90,10 @@ impl ClientBuilder {
         self
     }
 
-    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    #[cfg(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    ))]
     /// Builds the `Client` with the configured settings.
     pub fn build(self) -> Result<Client, Error> {
         let build_config = if let Some(builder) = self.certificates {
@@ -92,7 +116,10 @@ impl ClientBuilder {
     }
 
     /// Builds the `Client` with the configured settings.
-    #[cfg(not(any(all(feature = "rustls", feature = "tokio-rustls"))))]
+    #[cfg(not(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    )))]
     pub fn build(self) -> Result<Client, Error> {
         Ok(Client {
             r#async: Arc::new(Mutex::new(ClientImpl {
@@ -122,7 +149,10 @@ impl ClientBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    #[cfg(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    ))]
     pub fn with_root_certificate<T: Into<Vec<u8>>>(mut self, cert_der: T) -> Result<Self, Error> {
         let cert_der = cert_der.into();
         if let Some(ref mut certificates) = self.certificates {
@@ -137,7 +167,10 @@ impl ClientBuilder {
 
     /// Disables default root certificates for TLS connections.
     /// Returns [`Error::InvalidTlsConfig`] if TLS has not been configured.
-    #[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+    #[cfg(any(
+        all(feature = "native-tls", feature = "tokio-native-tls"),
+        all(feature = "rustls", feature = "tokio-rustls")
+    ))]
     pub fn disable_default_certificates(mut self) -> Result<Self, Error> {
         match self.certificates {
             Some(ref mut certificates) => certificates.disable_default()?,

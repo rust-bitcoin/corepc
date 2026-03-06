@@ -28,7 +28,10 @@ use super::HttpStream;
     all(feature = "rustls", feature = "tokio-rustls")
 ))]
 use super::{AsyncHttpStream, AsyncTcpStream};
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(
+    all(feature = "native-tls", feature = "tokio-native-tls"),
+    all(feature = "rustls", feature = "tokio-rustls")
+))]
 use crate::connection::certificates::Certificates;
 use crate::Error;
 
@@ -217,21 +220,21 @@ pub(super) async fn wrap_async_stream(
     Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }
 
-// #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
-// pub(super) async fn wrap_async_stream_with_configs(
-//     tcp: AsyncTcpStream,
-//     host: &str,
-//     client_configs: Certificates,
-// ) -> Result<AsyncHttpStream, Error> {
-//     #[cfg(feature = "log")]
-//     log::trace!("Setting up TLS parameters for {host}.");
+#[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    client_configs: Certificates,
+) -> Result<AsyncHttpStream, Error> {
+    #[cfg(feature = "log")]
+    log::trace!("Setting up TLS parameters for {host}.");
 
-//     let async_connector = client_configs.0;
+    let async_connector = client_configs.0;
 
-//     #[cfg(feature = "log")]
-//     log::trace!("Establishing TLS session to {host}.");
+    #[cfg(feature = "log")]
+    log::trace!("Establishing TLS session to {host}.");
 
-//     let tls = async_connector.connect(host, tcp).await?;
+    let tls = async_connector.connect(host, tcp).await?;
 
-//     Ok(AsyncHttpStream::Secured(Box::new(tls)))
-// }
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
+}
