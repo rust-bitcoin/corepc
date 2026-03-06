@@ -28,6 +28,8 @@ use super::HttpStream;
     all(feature = "rustls", feature = "tokio-rustls")
 ))]
 use super::{AsyncHttpStream, AsyncTcpStream};
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+use crate::connection::certificates::Certificates;
 use crate::Error;
 
 #[cfg(feature = "rustls")]
@@ -63,6 +65,15 @@ fn build_client_config() -> Arc<ClientConfig> {
     let config = ClientConfig::builder()
         .with_safe_defaults()
         .with_root_certificates(root_certificates)
+        .with_no_client_auth();
+    Arc::new(config)
+}
+
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+fn build_rustls_client_config(certificates: Arc<RootCertStore>) -> Arc<ClientConfig> {
+    let config = ClientConfig::builder()
+        .with_safe_defaults()
+        .with_root_certificates(certificates)
         .with_no_client_auth();
     Arc::new(config)
 }
@@ -103,6 +114,30 @@ pub(super) async fn wrap_async_stream(
     };
 
     let connector = TlsConnector::from(CONFIG.get_or_init(build_client_config).clone());
+
+    #[cfg(feature = "log")]
+    log::trace!("Establishing TLS session to {host}.");
+
+    let tls = connector.connect(dns_name, tcp).await.map_err(Error::IoError)?;
+
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
+}
+
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    certificates: Certificates,
+) -> Result<AsyncHttpStream, Error> {
+    #[cfg(feature = "log")]
+    log::trace!("Setting up TLS parameters for {host}.");
+    let dns_name = match ServerName::try_from(host) {
+        Ok(result) => result,
+        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
+    };
+    let certificates = certificates.0;
+    let client_config = build_rustls_client_config(certificates);
+    let connector = TlsConnector::from(client_config);
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
