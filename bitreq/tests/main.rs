@@ -17,6 +17,33 @@ async fn test_https() {
 }
 
 #[tokio::test]
+#[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
+async fn test_https() {
+    // TODO: Implement this locally.
+    assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
+    // Test reusing the existing connection in client:
+    assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
+}
+
+#[tokio::test]
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+async fn test_https_with_client() {
+    setup();
+    let client = bitreq::Client::new(1);
+    let response = client.send_async(bitreq::get("https://example.com")).await.unwrap();
+    assert_eq!(response.status_code, 200);
+}
+
+#[tokio::test]
+#[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
+async fn test_https_with_client() {
+    setup();
+    let client = bitreq::Client::new(1);
+    let response = client.send_async(bitreq::get("https://example.com")).await.unwrap();
+    assert_eq!(response.status_code, 200);
+}
+
+#[tokio::test]
 #[cfg(feature = "json-using-serde")]
 async fn test_json_using_serde() {
     const JSON_SRC: &str = r#"{
