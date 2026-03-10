@@ -26,7 +26,7 @@ pub struct Generate(
 
 impl Generate {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::Generate, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::Generate, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|s| s.parse::<BlockHash>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::Generate(v))
     }
@@ -50,7 +50,7 @@ pub struct GenerateToAddress(
 
 impl GenerateToAddress {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GenerateToAddress, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GenerateToAddress, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|s| s.parse::<BlockHash>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GenerateToAddress(v))
     }

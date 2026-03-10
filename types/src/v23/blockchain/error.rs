@@ -10,7 +10,7 @@ use crate::NumericError;
 #[derive(Debug)]
 pub enum GetDeploymentInfoError {
     /// Conversion of the `hash field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `deployments` field failed.
     Deployment(NumericError),
 }

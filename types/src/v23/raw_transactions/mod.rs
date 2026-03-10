@@ -69,7 +69,7 @@ pub struct Proprietary {
     /// The hex string for the proprietary identifier.
     identifier: String,
     /// The number for the subtype.
-    subtype: i64,
+    subtype: u64,
     /// The hex for the key.
     key: String,
     /// The hex for the value.

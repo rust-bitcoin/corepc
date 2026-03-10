@@ -4,7 +4,7 @@ use core::fmt;
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::consensus::encode;
-use bitcoin::hex::HexToArrayError;
+use bitcoin::hex::DecodeFixedLengthBytesError;
 use bitcoin::psbt::PsbtParseError;
 
 use crate::error::write_err;
@@ -42,11 +42,11 @@ impl std::error::Error for DescriptorProcessPsbtError {
 #[derive(Debug)]
 pub enum SubmitPackageError {
     /// Conversion of key from `tx_results` map failed.
-    TxResultKey(HexToArrayError),
+    TxResultKey(DecodeFixedLengthBytesError),
     /// Conversion of value from `tx_results` map failed.
     TxResultValue(SubmitPackageTxResultError),
     /// Conversion of a list item from `replaced_transactions` field failed.
-    ReplaceTransactions(HexToArrayError),
+    ReplaceTransactions(DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for SubmitPackageError {
@@ -79,9 +79,9 @@ pub enum SubmitPackageTxResultError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `txid` field failed.
-    Txid(HexToArrayError),
+    Txid(DecodeFixedLengthBytesError),
     /// Conversion of the `other_wtxid` field failed.
-    OtherWtxid(HexToArrayError),
+    OtherWtxid(DecodeFixedLengthBytesError),
     /// Conversion of the `fees` field failed.
     Fees(SubmitPackageTxResultFeesError),
 }
@@ -122,7 +122,7 @@ pub enum SubmitPackageTxResultFeesError {
     /// Conversion of the `effective_fee_rate` field failed.
     EffectiveFeeRate(ParseAmountError),
     /// Conversion of a list item from `effective_includes` field failed.
-    EffectiveIncludes(HexToArrayError),
+    EffectiveIncludes(DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for SubmitPackageTxResultFeesError {

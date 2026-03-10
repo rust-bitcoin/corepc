@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::consensus::encode;
-use bitcoin::hashes::hex::FromHex;
 use bitcoin::{Transaction, Txid, Wtxid};
 
 use super::{
@@ -58,8 +56,8 @@ impl GetOrphanTxsVerboseTwoEntry {
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let wtxid = self.wtxid.parse::<Wtxid>().map_err(E::Wtxid)?;
-        let v = Vec::from_hex(&self.hex).map_err(E::Hex)?;
-        let transaction = encode::deserialize::<Transaction>(&v).map_err(E::Transaction)?;
+        let v = bitcoin::hex::decode_to_vec(&self.hex).map_err(E::Hex)?;
+        let transaction = encoding::decode_from_slice::<Transaction>(&v).map_err(E::Transaction)?;
 
         Ok(model::GetOrphanTxsVerboseTwoEntry {
             txid,

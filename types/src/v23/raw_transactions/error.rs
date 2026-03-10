@@ -16,9 +16,9 @@ pub enum DecodePsbtError {
     /// Conversion of the `global_xpubs` field failed.
     GlobalXpubs(GlobalXpubError),
     /// Conversion of the `proprietary` field failed.
-    Proprietary(hex::HexToBytesError),
+    Proprietary(hex::DecodeVariableLengthBytesError),
     /// Conversion of one the map items in the `unknown` field failed.
-    Unknown(hex::HexToBytesError),
+    Unknown(hex::DecodeVariableLengthBytesError),
     /// Conversion of one of the PSBT inputs failed.
     Inputs(PsbtInputError),
     /// Conversion of one of the PSBT outputs failed.
@@ -65,11 +65,11 @@ impl std::error::Error for DecodePsbtError {
 #[derive(Debug)]
 pub enum GlobalXpubError {
     /// Conversion of the `xpub` field failed.
-    Xpub(bip32::Error),
+    Xpub(bip32::ParseError),
     /// Conversion of the `master_fingerprint` field failed.
-    MasterFingerprint(hex::HexToArrayError),
+    MasterFingerprint(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `path` field failed.
-    Path(bip32::Error),
+    Path(bip32::ParseChildNumberError),
 }
 
 impl fmt::Display for GlobalXpubError {
@@ -106,35 +106,35 @@ pub enum PsbtInputError {
     /// Conversion of the `sighash` field failed.
     Sighash(sighash::SighashTypeParseError),
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_script` field failed.
-    WitnessScript(hex::HexToBytesError),
+    WitnessScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `bip32_derivs` field failed.
     Bip32Derivs(Bip32DerivError),
     /// Conversion of the `final_script_sig` field failed.
-    FinalScriptSig(hex::HexToBytesError),
+    FinalScriptSig(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `final_script_witness` field failed.
-    FinalScriptWitness(hex::HexToBytesError),
+    FinalScriptWitness(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `ripemd160` hash failed.
-    Ripemd160(hex::HexToArrayError),
+    Ripemd160(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `ripemd160` preimage failed.
-    Ripemd160Preimage(hex::HexToBytesError),
+    Ripemd160Preimage(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `sha256` hash failed.
-    Sha256(hex::HexToArrayError),
+    Sha256(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `sha256` preimage failed.
-    Sha256Preimage(hex::HexToBytesError),
+    Sha256Preimage(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `hash160` hash failed.
-    Hash160(hex::HexToArrayError),
+    Hash160(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `hash160` preimage failed.
-    Hash160Preimage(hex::HexToBytesError),
+    Hash160Preimage(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `hash256` hash failed.
-    Hash256(hex::HexToArrayError),
+    Hash256(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `hash256` preimage failed.
-    Hash256Preimage(hex::HexToBytesError),
+    Hash256Preimage(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `proprietary` field failed.
-    Proprietary(hex::HexToBytesError),
+    Proprietary(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `unknown` field failed.
-    Unknown(hex::HexToBytesError),
+    Unknown(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for PsbtInputError {
@@ -207,15 +207,15 @@ impl std::error::Error for PsbtInputError {
 #[derive(Debug)]
 pub enum PsbtOutputError {
     /// Conversion of the `redeem_script` field failed.
-    RedeemScript(hex::HexToBytesError),
+    RedeemScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_script` field failed.
-    WitnessScript(hex::HexToBytesError),
+    WitnessScript(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `bip32_derivs` field failed.
     Bip32Derivs(Bip32DerivError),
     /// Conversion of the `proprietary` field failed.
-    Proprietary(hex::HexToBytesError),
+    Proprietary(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `unknown` field failed.
-    Unknown(hex::HexToBytesError),
+    Unknown(hex::DecodeVariableLengthBytesError),
 }
 
 impl fmt::Display for PsbtOutputError {
@@ -251,7 +251,7 @@ impl std::error::Error for PsbtOutputError {
 #[derive(Debug)]
 pub enum DecodeScriptError {
     /// Conversion of the transaction `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the transaction `address` field failed.
     Address(address::ParseError),
     /// Conversion of the transaction `addresses` field failed.

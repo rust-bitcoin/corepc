@@ -2,7 +2,7 @@
 
 use core::fmt;
 
-use bitcoin::error::UnprefixedHexError;
+use bitcoin::parse_int::UnprefixedHexError;
 
 use crate::error::write_err;
 

@@ -38,7 +38,7 @@ pub enum WaitForBlockError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for WaitForBlockError {
@@ -70,7 +70,7 @@ pub enum WaitForBlockHeightError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for WaitForBlockHeightError {
@@ -102,7 +102,7 @@ pub enum WaitForNewBlockError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for WaitForNewBlockError {

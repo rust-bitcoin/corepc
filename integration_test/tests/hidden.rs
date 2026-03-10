@@ -7,15 +7,15 @@
 #[cfg(not(feature = "v28_and_below"))]
 use std::collections::HashMap;
 
-#[cfg(not(feature = "v28_and_below"))]
-use bitcoin::hashes::Hash;
-#[cfg(not(feature = "v28_and_below"))]
-use bitcoin::hex::DisplayHex;
+#[allow(unused_imports)] // Because of feature gated tests.
+use bitcoin::ext::*;
 #[cfg(not(feature = "v28_and_below"))]
 use bitcoin::{
-    absolute, consensus, transaction, Amount, OutPoint, ScriptBuf, Sequence, Transaction, TxIn,
+    absolute, consensus, transaction, Amount, OutPoint, ScriptSigBuf, Sequence, Transaction, TxIn,
     TxOut, Txid, Witness,
 };
+#[cfg(not(feature = "v28_and_below"))]
+use hex_unstable::DisplayHex;
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::mtype;
 use node::vtype::*; // All the version specific types.
@@ -110,17 +110,14 @@ fn hidden__get_orphan_txs__modelled() {
         .map(|i| Transaction {
             version: transaction::Version::ONE,
             lock_time: absolute::LockTime::ZERO,
-            input: vec![TxIn {
-                previous_output: OutPoint {
-                    txid: Txid::from_raw_hash(Txid::from_byte_array([i; 32]).into()),
-                    vout: 0,
-                },
-                script_sig: ScriptBuf::new(),
+            inputs: vec![TxIn {
+                previous_output: OutPoint { txid: Txid::from_byte_array([i; 32]), vout: 0 },
+                script_sig: ScriptSigBuf::new(),
                 sequence: Sequence::MAX,
                 witness: Witness::new(),
             }],
-            output: vec![TxOut {
-                value: Amount::from_sat(100_000),
+            outputs: vec![TxOut {
+                amount: Amount::from_sat_u32(100_000),
                 script_pubkey: address.script_pubkey(),
             }],
         })

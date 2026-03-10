@@ -57,8 +57,7 @@ impl SubmitPackageTxResultFees {
         let effective_fee_rate = self
             .effective_fee_rate
             .map(|f| crate::btc_per_kb(f).map_err(E::EffectiveFeeRate))
-            .transpose()?
-            .flatten();
+            .transpose()?;
         let effective_includes = self
             .effective_includes
             .unwrap_or_default()

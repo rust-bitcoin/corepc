@@ -8,8 +8,9 @@ use bitcoin::hex;
 #[derive(Debug)]
 pub enum Error {
     JsonRpc(jsonrpc::error::Error),
-    HexToArray(hex::HexToArrayError),
-    HexToBytes(hex::HexToBytesError),
+    // TODO: Consider renaming these two variants now the inner type changed.
+    HexToArray(hex::DecodeFixedLengthBytesError),
+    HexToBytes(hex::DecodeVariableLengthBytesError),
     Json(serde_json::error::Error),
     BitcoinSerialization(bitcoin::consensus::encode::FromHexError),
     Io(io::Error),
@@ -28,12 +29,12 @@ impl From<jsonrpc::error::Error> for Error {
     fn from(e: jsonrpc::error::Error) -> Error { Error::JsonRpc(e) }
 }
 
-impl From<hex::HexToArrayError> for Error {
-    fn from(e: hex::HexToArrayError) -> Self { Self::HexToArray(e) }
+impl From<hex::DecodeFixedLengthBytesError> for Error {
+    fn from(e: hex::DecodeFixedLengthBytesError) -> Self { Self::HexToArray(e) }
 }
 
-impl From<hex::HexToBytesError> for Error {
-    fn from(e: hex::HexToBytesError) -> Self { Self::HexToBytes(e) }
+impl From<hex::DecodeVariableLengthBytesError> for Error {
+    fn from(e: hex::DecodeVariableLengthBytesError) -> Self { Self::HexToBytes(e) }
 }
 
 impl From<serde_json::error::Error> for Error {

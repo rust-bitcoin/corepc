@@ -26,6 +26,7 @@ pub struct GenerateBlock {
     /// Hash of generated block.
     pub hash: BlockHash,
     /// Hex of generated block, only present when submit=false.
+    #[serde(with = "bitcoin::as_consensus::opt")]
     pub hex: Option<Block>,
 }
 

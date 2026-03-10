@@ -13,7 +13,7 @@ pub enum ScanBlocksStartError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `relevant_blocks` field failed.
-    RelevantBlocks(hex::HexToArrayError),
+    RelevantBlocks(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ScanBlocksStartError {

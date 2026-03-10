@@ -47,7 +47,7 @@ impl std::error::Error for PsbtBumpFeeError {
 #[derive(Debug)]
 pub enum SendError {
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `hex` field failed.
     Hex(encode::FromHexError),
     /// Conversion of the `psbt` field failed.

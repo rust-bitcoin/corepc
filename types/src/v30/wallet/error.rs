@@ -50,7 +50,7 @@ impl From<NumericError> for GetWalletInfoError {
 #[derive(Debug)]
 pub enum LastProcessedBlockError {
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `height` field failed.
     Height(NumericError),
 }

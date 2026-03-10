@@ -54,7 +54,9 @@ impl GetBlockchainInfo {
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
@@ -77,7 +79,9 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
@@ -185,7 +189,7 @@ impl GetMempoolInfo {
 
 impl GetRawMempool {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempool, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetRawMempool, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempool(v))
     }
@@ -208,7 +212,9 @@ impl GetRawMempoolVerbose {
 
 impl GetRawMempoolSequence {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempoolSequence, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetRawMempoolSequence, hex::DecodeFixedLengthBytesError> {
         let txids = self.txids.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempoolSequence { txids, mempool_sequence: self.mempool_sequence })
     }

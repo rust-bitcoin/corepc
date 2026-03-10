@@ -39,8 +39,7 @@ impl MempoolAcceptance {
                 let effective_feerate = s
                     .effective_feerate
                     .map(|f| crate::btc_per_kb(f).map_err(E::Feerate))
-                    .transpose()?
-                    .flatten();
+                    .transpose()?;
 
                 Ok::<_, MempoolAcceptanceError>(model::MempoolAcceptanceFees {
                     base: Amount::from_btc(s.base).map_err(E::Base)?,

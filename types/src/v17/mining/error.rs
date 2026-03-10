@@ -3,8 +3,8 @@
 use core::fmt;
 
 use bitcoin::amount::ParseAmountError;
-use bitcoin::error::UnprefixedHexError;
-use bitcoin::hex::HexToBytesError;
+use bitcoin::hex::DecodeVariableLengthBytesError;
+use bitcoin::parse_int::UnprefixedHexError;
 use bitcoin::{consensus, hex};
 
 use crate::error::write_err;
@@ -16,11 +16,11 @@ pub enum GetBlockTemplateError {
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
     /// Conversion of the `previous_block_hash` field failed.
-    PreviousBlockHash(hex::HexToArrayError),
+    PreviousBlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `transactions` field failed.
     Transactions(BlockTemplateTransactionError),
     /// Conversion of the `target` field failed.
-    Target(HexToBytesError),
+    Target(DecodeVariableLengthBytesError),
     /// Conversion of the `bits` field failed.
     Bits(UnprefixedHexError),
 }
@@ -64,9 +64,9 @@ pub enum BlockTemplateTransactionError {
     /// Conversion of the `data` field failed.
     Data(consensus::encode::FromHexError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `hash` field to `wtxid` failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
 }

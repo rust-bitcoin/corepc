@@ -2,7 +2,7 @@
 
 use alloc::collections::BTreeMap;
 
-use bitcoin::{hex, Amount, ScriptBuf, Txid, Wtxid};
+use bitcoin::{hex, Amount, ScriptPubKeyBuf, Txid, Wtxid};
 
 use super::{
     GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
@@ -14,7 +14,9 @@ use crate::model;
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
@@ -37,7 +39,9 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
@@ -115,7 +119,7 @@ impl MempoolEntry {
 
 impl GetRawMempool {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempool, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetRawMempool, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempool(v))
     }
@@ -164,7 +168,8 @@ impl ScanTxOutSetUnspent {
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
-        let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
+        let script_pubkey = ScriptPubKeyBuf::from_hex_no_length_prefix(&self.script_pubkey)
+            .map_err(E::ScriptPubKey)?;
 
         Ok(model::ScanTxOutSetUnspent {
             txid,

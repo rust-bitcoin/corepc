@@ -3,7 +3,7 @@
 use core::fmt;
 
 use bitcoin::amount::ParseAmountError;
-use bitcoin::error::UnprefixedHexError;
+use bitcoin::parse_int::UnprefixedHexError;
 
 use super::NextBlockInfoError;
 use crate::error::write_err;
