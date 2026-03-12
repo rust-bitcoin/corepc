@@ -3,8 +3,8 @@
 #[cfg(feature = "simple_http")]
 pub mod simple_http;
 
-#[cfg(feature = "bitreq_http_sync")]
-pub mod bitreq_http_sync;
+#[cfg(feature = "bitreq_http")]
+pub mod bitreq_http;
 
 #[cfg(feature = "bitreq_http_async")]
 pub mod bitreq_http_async;

@@ -5,7 +5,7 @@
 use std::os::unix::net::UnixStream;
 use std::{error, fmt, io, path, time};
 
-use crate::client_sync::Transport;
+use crate::client::Transport;
 use crate::{Request, Response};
 
 /// Simple synchronous UDS transport.
@@ -115,7 +115,7 @@ mod tests {
     use std::{fs, process, thread};
 
     use super::*;
-    use crate::client_sync::Client;
+    use crate::Client;
 
     // Test a dummy request / response over an UDS
     #[test]
