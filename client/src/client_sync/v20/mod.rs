@@ -20,7 +20,7 @@ use crate::types::v20::*;
 pub use crate::client_sync::{
     v17::{
         AddressType, AddNodeCommand, ImportMultiRequest, ImportMultiScriptPubKey, ImportMultiTimestamp, Input, Output, SetBanCommand, TemplateRequest, TemplateRules,
-        WalletCreateFundedPsbtInput,
+        WalletCreateFundedPsbtInput, FeeEstimateMode,
     },
 };
 

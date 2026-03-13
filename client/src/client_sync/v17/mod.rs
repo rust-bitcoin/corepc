@@ -321,3 +321,15 @@ impl Serialize for ImportMultiTimestamp {
         }
     }
 }
+
+/// Arg for the `estimatesmartfee` method.
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum FeeEstimateMode {
+    /// Use default settings based on other criteria
+    Unset,
+    /// Force estimatesmartfee to use non-conservative estimates
+    Economical,
+    /// Force estimatesmartfee to use conservative estimates
+    Conservative,
+}
