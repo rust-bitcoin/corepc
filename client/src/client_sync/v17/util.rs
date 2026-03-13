@@ -33,6 +33,14 @@ macro_rules! impl_client_v17__estimate_smart_fee {
             pub fn estimate_smart_fee(&self, blocks: u32) -> Result<EstimateSmartFee> {
                 self.call("estimatesmartfee", &[blocks.into()])
             }
+
+            pub fn estimate_smart_fee_with_mode(
+                &self,
+                blocks: u32,
+                mode: FeeEstimateMode,
+            ) -> Result<EstimateSmartFee> {
+                self.call("estimatesmartfee", &[blocks.into(), into_json(mode)?])
+            }
         }
     };
 }
