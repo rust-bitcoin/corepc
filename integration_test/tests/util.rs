@@ -7,8 +7,8 @@
 
 use bitcoin::{address, amount, sign_message, PrivateKey, PublicKey};
 use integration_test::{Node, NodeExt as _, Wallet};
-use node::mtype;
 use node::vtype::*;
+use node::{mtype, FeeEstimateMode};
 
 #[test]
 fn util__create_multisig__modelled() {
@@ -71,6 +71,21 @@ fn util__estimate_smart_fee__modelled() {
     let json: EstimateSmartFee = node.client.estimate_smart_fee(6).expect("estimatesmartfee");
     let model: Result<mtype::EstimateSmartFee, amount::ParseAmountError> = json.into_model();
     model.unwrap();
+}
+
+#[test]
+fn util__estimate_smart_fee_with_mode__modelled() {
+    let node = Node::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+
+    const MODES: [FeeEstimateMode; 3] =
+        [FeeEstimateMode::Unset, FeeEstimateMode::Economical, FeeEstimateMode::Conservative];
+    for mode in MODES {
+        let json: EstimateSmartFee =
+            node.client.estimate_smart_fee_with_mode(6, mode).expect("estimatesmartfee");
+        let model: Result<mtype::EstimateSmartFee, amount::ParseAmountError> = json.into_model();
+        model.unwrap();
+    }
 }
 
 #[test]
