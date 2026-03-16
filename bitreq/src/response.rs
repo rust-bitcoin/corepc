@@ -3,7 +3,7 @@ use core::str;
 #[cfg(feature = "async")]
 use std::future::Future;
 #[cfg(feature = "std")]
-use std::io::{self, BufReader, Bytes, Read};
+use std::io::{self, BufReader, Read};
 
 #[cfg(feature = "async")]
 use tokio::io::{AsyncRead, AsyncReadExt};
@@ -72,6 +72,49 @@ impl Response {
         let ResponseLazy { status_code, reason_phrase, headers, url, .. } = parent;
 
         Ok(Response { status_code, reason_phrase, headers, url, body })
+    }
+
+    /// Like [`create`](Self::create), but recovers the underlying [`HttpStream`] for
+    /// connection reuse when the server indicated `Connection: keep-alive`.
+    #[cfg(all(feature = "std", not(feature = "async")))]
+    pub(crate) fn create_pooled(
+        mut parent: ResponseLazy,
+        is_head: bool,
+        max_body_size: Option<usize>,
+    ) -> Result<(Response, Option<HttpStream>), Error> {
+        let mut body = Vec::new();
+        if !is_head && parent.status_code != 204 && parent.status_code != 304 {
+            for byte in &mut parent {
+                let (byte, length) = byte?;
+                if max_body_size.is_some_and(|max| body.len().saturating_add(length) > max) {
+                    return Err(Error::BodyOverflow);
+                }
+                body.reserve(length);
+                body.push(byte);
+            }
+        }
+
+        let keep_alive = parent
+            .headers
+            .get("connection")
+            .map_or(false, |h| h.eq_ignore_ascii_case("keep-alive"));
+
+        let ResponseLazy { status_code, reason_phrase, headers, url, stream, .. } = parent;
+
+        let recovered_stream = if keep_alive {
+            let buf_reader = stream.into_buf_reader();
+            // Only recover the stream if the BufReader's buffer is empty, ensuring
+            // no unread bytes remain that would corrupt the next response.
+            if buf_reader.buffer().is_empty() {
+                Some(buf_reader.into_inner())
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
+        Ok((Response { status_code, reason_phrase, headers, url, body }, recovered_stream))
     }
 
     #[cfg(feature = "async")]
@@ -308,15 +351,51 @@ pub struct ResponseLazy {
     /// <http://example.com/?foo=bar>).
     pub url: String,
 
-    stream: HttpStreamBytes,
+    stream: StreamBytes,
     state: HttpStreamState,
     max_trailing_headers_size: Option<usize>,
     max_body_size: Option<usize>,
     bytes_read: usize,
 }
 
+/// A byte iterator over an [`HttpStream`] that allows recovering the inner stream.
+///
+/// This is equivalent to [`std::io::Bytes`] but provides [`into_buf_reader`] to
+/// extract the underlying [`BufReader`] (and ultimately the [`HttpStream`]) after
+/// the response has been fully read, enabling connection reuse.
+///
+/// [`into_buf_reader`]: StreamBytes::into_buf_reader
 #[cfg(feature = "std")]
-type HttpStreamBytes = Bytes<BufReader<HttpStream>>;
+struct StreamBytes {
+    inner: BufReader<HttpStream>,
+}
+
+#[cfg(feature = "std")]
+impl StreamBytes {
+    fn new(stream: HttpStream, capacity: usize) -> Self {
+        StreamBytes { inner: BufReader::with_capacity(capacity, stream) }
+    }
+
+    #[cfg(not(feature = "async"))]
+    fn into_buf_reader(self) -> BufReader<HttpStream> { self.inner }
+}
+
+#[cfg(feature = "std")]
+impl Iterator for StreamBytes {
+    type Item = Result<u8, io::Error>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut byte = 0;
+        loop {
+            return match self.inner.read(core::slice::from_mut(&mut byte)) {
+                Ok(0) => None,
+                Ok(..) => Some(Ok(byte)),
+                Err(ref e) if e.kind() == io::ErrorKind::Interrupted => continue,
+                Err(e) => Some(Err(e)),
+            };
+        }
+    }
+}
 
 #[cfg(feature = "std")]
 impl ResponseLazy {
@@ -326,7 +405,7 @@ impl ResponseLazy {
         max_status_line_len: Option<usize>,
         max_body_size: Option<usize>,
     ) -> Result<ResponseLazy, Error> {
-        let mut stream = BufReader::with_capacity(BACKING_READ_BUFFER_LENGTH, stream).bytes();
+        let mut stream = StreamBytes::new(stream, BACKING_READ_BUFFER_LENGTH);
         let ResponseMetadata {
             status_code,
             reason_phrase,
@@ -356,7 +435,7 @@ impl ResponseLazy {
             reason_phrase: response.reason_phrase,
             headers: response.headers,
             url: response.url,
-            stream: BufReader::with_capacity(1, http_stream).bytes(),
+            stream: StreamBytes::new(http_stream, 1),
             state: HttpStreamState::EndOnClose,
             max_trailing_headers_size: None,
             // Body was already fully loaded and size-checked by send_async
@@ -700,7 +779,7 @@ macro_rules! define_read_methods {
 }
 
 #[cfg(feature = "std")]
-define_read_methods!((read_until_closed, read_with_content_length, read_trailers, read_chunked, read_metadata, read_line)<>, HttpStreamBytes);
+define_read_methods!((read_until_closed, read_with_content_length, read_trailers, read_chunked, read_metadata, read_line)<>, StreamBytes);
 #[cfg(feature = "async")]
 define_read_methods!((read_until_closed_async, read_with_content_length_async, read_trailers_async, read_chunked_async, read_metadata_async, read_line_async)<R: AsyncRead | Unpin>, R, async, await);
 

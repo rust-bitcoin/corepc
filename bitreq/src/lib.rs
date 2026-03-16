@@ -58,8 +58,9 @@
 //! [`send_lazy_async()`](struct.Request.html#method.send_lazy_async) methods
 //! that return futures for non-blocking operation.
 //!
-//! It also enables [`Client`](struct.Client.html) to reuse TCP connections
-//! across requests.
+//! When this feature is enabled the [`Client`](struct.Client.html) connection
+//! pool uses async connections. Without it, a blocking [`Client`] is provided
+//! instead.
 //!
 //! ## `async-https` or `async-https-rustls`
 //!
@@ -263,7 +264,7 @@ mod request;
 mod response;
 mod url;
 
-#[cfg(feature = "async")]
+#[cfg(feature = "std")]
 pub use client::{Client, RequestExt};
 pub use error::*;
 #[cfg(feature = "proxy")]
