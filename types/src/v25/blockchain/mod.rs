@@ -34,7 +34,7 @@ pub struct GetBlockStats {
     // FIXME: Remember these docs will become silently stale when unit changes in a later version of Core.
     /// Average feerate (in satoshis per virtual byte).
     #[serde(rename = "avgfeerate")]
-    pub average_fee_rate: u64,
+    pub average_fee_rate: u32,
     /// Average transaction size.
     #[serde(rename = "avgtxsize")]
     pub average_tx_size: i64,
@@ -44,7 +44,7 @@ pub struct GetBlockStats {
     /// Feerates at the 10th, 25th, 50th, 75th, and 90th percentile weight unit (in satoshis per
     /// virtual byte).
     #[serde(rename = "feerate_percentiles")]
-    pub fee_rate_percentiles: [u64; 5],
+    pub fee_rate_percentiles: [u32; 5],
     /// The height of the block.
     pub height: i64,
     /// The number of inputs (excluding coinbase).
@@ -55,7 +55,7 @@ pub struct GetBlockStats {
     pub max_fee: u64,
     /// Maximum feerate (in satoshis per virtual byte).
     #[serde(rename = "maxfeerate")]
-    pub max_fee_rate: u64,
+    pub max_fee_rate: u32,
     /// Maximum transaction size.
     #[serde(rename = "maxtxsize")]
     pub max_tx_size: i64,
@@ -73,7 +73,7 @@ pub struct GetBlockStats {
     pub minimum_fee: u64,
     /// Minimum feerate (in satoshis per virtual byte).
     #[serde(rename = "minfeerate")]
-    pub minimum_fee_rate: u64,
+    pub minimum_fee_rate: u32,
     /// Minimum transaction size.
     #[serde(rename = "mintxsize")]
     pub minimum_tx_size: i64,

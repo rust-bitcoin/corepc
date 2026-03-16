@@ -20,7 +20,7 @@ mod wallet;
 mod zmq;
 
 use bitcoin::address::NetworkUnchecked;
-use bitcoin::{Address, ScriptBuf};
+use bitcoin::{Address, ScriptPubKeyBuf};
 use serde::{Deserialize, Serialize};
 
 #[doc(inline)]
@@ -87,7 +87,7 @@ pub use self::{
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct ScriptPubKey {
     /// The script_pubkey parsed from hex.
-    pub script_pubkey: ScriptBuf,
+    pub script_pubkey: ScriptPubKeyBuf,
     /// Number of required signatures - deprecated in Core v22.
     ///
     /// Only returned in versions prior to 22 or for version 22 onwards if

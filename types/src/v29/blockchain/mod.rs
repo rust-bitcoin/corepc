@@ -220,7 +220,7 @@ pub struct GetRawTransactionVerboseWithPrevout {
     /// The transaction's weight (between vsize*4-3 and vsize*4).
     pub weight: u64,
     /// The version.
-    pub version: i32,
+    pub version: u32,
     /// The lock time.
     #[serde(rename = "locktime")]
     pub lock_time: u32,

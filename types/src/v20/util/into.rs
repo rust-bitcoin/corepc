@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::{Address, ScriptBuf};
+use bitcoin::{Address, RedeemScriptBuf};
 
 use super::{CreateMultisig, CreateMultisigError};
 use crate::model;
@@ -11,7 +11,8 @@ impl CreateMultisig {
         use CreateMultisigError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let redeem_script = ScriptBuf::from_hex(&self.redeem_script).map_err(E::RedeemScript)?;
+        let redeem_script = RedeemScriptBuf::from_hex_no_length_prefix(&self.redeem_script)
+            .map_err(E::RedeemScript)?;
 
         Ok(model::CreateMultisig {
             address,

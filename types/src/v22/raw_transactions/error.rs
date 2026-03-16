@@ -12,7 +12,7 @@ use crate::NumericError;
 #[derive(Debug)]
 pub enum DecodeScriptError {
     /// Conversion of the transaction `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the transaction `address` field failed.
     Address(address::ParseError),
     /// Conversion of the transaction `addresses` field failed.
@@ -80,9 +80,9 @@ pub enum MempoolAcceptanceError {
     /// Conversion of a numeric field failed.
     Numeric(NumericError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
+    Wtxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `base` fee field failed.
     Base(ParseAmountError),
 }

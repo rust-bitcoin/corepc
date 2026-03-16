@@ -14,7 +14,9 @@ use crate::model;
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
@@ -37,7 +39,9 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
@@ -150,7 +154,7 @@ impl GetMempoolInfo {
             max_mempool,
             mempool_min_fee,
             min_relay_tx_fee,
-            incremental_relay_fee,
+            incremental_relay_fee: Some(incremental_relay_fee),
             unbroadcast_count,
             full_rbf: Some(self.full_rbf),
             permit_bare_multisig: None,

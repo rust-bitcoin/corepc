@@ -70,7 +70,7 @@ pub struct Proprietary {
     /// The hex string for the proprietary identifier.
     identifier: String,
     /// The number for the subtype.
-    subtype: i64,
+    subtype: u64,
     /// The hex for the key.
     key: String,
     /// The hex for the value.
@@ -254,11 +254,10 @@ pub struct Musig2PartialSig {
 pub mod taproot {
     use core::fmt;
 
-    use bitcoin::hex::{self, FromHex as _};
     use bitcoin::sighash::InvalidSighashTypeError;
     // Re-export this because this module is named the same as the one from `bitcoin`.
     pub use bitcoin::taproot::Signature;
-    use bitcoin::{secp256k1, taproot, TapSighashType};
+    use bitcoin::{hex, secp256k1, taproot, TapSighashType};
 
     use crate::error::write_err;
 
@@ -266,7 +265,7 @@ pub mod taproot {
     pub fn signature_from_str(sig: &str) -> Result<taproot::Signature, Error> {
         use Error as E;
 
-        let bytes = Vec::from_hex(sig).map_err(E::Hex)?;
+        let bytes = bitcoin::hex::decode_to_vec(sig).map_err(E::Hex)?;
         let (sighash_byte, signature) = bytes.split_last().ok_or(E::EmptySignature)?;
         Ok(Signature {
             signature: secp256k1::schnorr::Signature::from_slice(signature)
@@ -281,7 +280,7 @@ pub mod taproot {
     #[non_exhaustive]
     pub enum Error {
         /// Hex decoding error.
-        Hex(hex::HexToBytesError),
+        Hex(hex::DecodeVariableLengthBytesError),
         /// Non-standard sighash type.
         SighashType(InvalidSighashTypeError),
         /// Signature was empty.

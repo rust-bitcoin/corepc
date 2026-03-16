@@ -20,15 +20,15 @@ pub enum GetTransactionError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wallet_conflicts` field failed.
-    WalletConflicts(hex::HexToArrayError),
+    WalletConflicts(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaced_by_txid` field failed.
-    ReplacedByTxid(hex::HexToArrayError),
+    ReplacedByTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaces_txid` field failed.
-    ReplacesTxid(hex::HexToArrayError),
+    ReplacesTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the transaction `hex` field failed.
     Tx(encode::FromHexError),
     /// Conversion of the `details` field failed.
@@ -43,7 +43,7 @@ pub enum ListSinceBlockError {
     /// Conversion of the `removed` field failed.
     Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
-    LastBlock(hex::HexToArrayError),
+    LastBlock(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ListSinceBlockError {
@@ -81,15 +81,15 @@ pub enum TransactionItemError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wallet_conflicts` field failed.
-    WalletConflicts(hex::HexToArrayError),
+    WalletConflicts(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaced_by_txid` field failed.
-    ReplacedByTxid(hex::HexToArrayError),
+    ReplacedByTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaces_txid` field failed.
-    ReplacesTxid(hex::HexToArrayError),
+    ReplacesTxid(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for TransactionItemError {

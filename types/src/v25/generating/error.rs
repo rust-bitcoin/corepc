@@ -11,7 +11,7 @@ use crate::error::write_err;
 #[derive(Debug)]
 pub enum GenerateBlockError {
     /// Conversion of the `hash` field failed.
-    Hash(hex::HexToArrayError),
+    Hash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `hex` field failed.
     Hex(encode::FromHexError),
 }

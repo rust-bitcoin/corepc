@@ -12,9 +12,9 @@ use crate::NumericError;
 #[derive(Debug)]
 pub enum GetHdKeysError {
     /// Conversion of the `xpub` field failed.
-    Xpub(bip32::Error),
+    Xpub(bip32::ParseError),
     /// Conversion of the `xpriv` field failed.
-    Xpriv(bip32::Error),
+    Xpriv(bip32::ParseError),
     /// Conversion of numeric type to expected type failed.
     Numeric(NumericError),
 }
@@ -52,7 +52,7 @@ pub enum ListSinceBlockError {
     /// Conversion of the `removed` field failed.
     Removed(TransactionItemError),
     /// Conversion of the `last_block` field failed.
-    LastBlock(hex::HexToArrayError),
+    LastBlock(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for ListSinceBlockError {
@@ -90,17 +90,17 @@ pub enum TransactionItemError {
     /// Conversion of the `fee` field failed.
     Fee(ParseAmountError),
     /// Conversion of the `block_hash` field failed.
-    BlockHash(hex::HexToArrayError),
+    BlockHash(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `txid` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wtxid` field failed.
-    Wtxid(hex::HexToArrayError),
+    Wtxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `wallet_conflicts` field failed.
-    WalletConflicts(hex::HexToArrayError),
+    WalletConflicts(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaced_by_txid` field failed.
-    ReplacedByTxid(hex::HexToArrayError),
+    ReplacedByTxid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `replaces_txid` field failed.
-    ReplacesTxid(hex::HexToArrayError),
+    ReplacesTxid(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for TransactionItemError {

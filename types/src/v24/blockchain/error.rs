@@ -9,9 +9,9 @@ use crate::error::write_err;
 #[derive(Debug)]
 pub enum GetTxSpendingPrevoutError {
     /// Conversion of the `outpoint` field failed.
-    Txid(hex::HexToArrayError),
+    Txid(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `spending_txid` field failed.
-    SpendingTxid(hex::HexToArrayError),
+    SpendingTxid(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetTxSpendingPrevoutError {

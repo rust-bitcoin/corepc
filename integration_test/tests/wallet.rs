@@ -11,9 +11,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use bitcoin::address::{self, Address, KnownHrp, NetworkChecked};
 use bitcoin::bip32::{Xpriv, Xpub};
+use bitcoin::ext::*;
 use bitcoin::{
     amount, hex, key, psbt, secp256k1, sign_message, Amount, CompressedPublicKey, FeeRate, Network,
-    PrivateKey, PublicKey,
+    NetworkKind, PrivateKey, PublicKey,
 };
 use integration_test::{Node, NodeExt as _, Wallet};
 use node::vtype::*; // All the version specific types.
@@ -36,7 +37,7 @@ fn wallet__abandon_transaction() {
     let block_hash = block_hashes.expect("blockhash").0[0];
 
     let dest_addr = node.client.new_address().expect("newaddress");
-    let amount = bitcoin::Amount::from_sat(1_000_000);
+    let amount = bitcoin::Amount::from_sat_u32(1_000_000);
 
     let txid = node
         .client
@@ -118,7 +119,7 @@ fn wallet__bump_fee__modelled() {
 
     let txid = node
         .client
-        .send_to_address_rbf(&address, Amount::from_sat(10_000))
+        .send_to_address_rbf(&address, Amount::from_sat_u32(10_000))
         .expect("sendtoaddress")
         .txid()
         .unwrap();
@@ -140,18 +141,13 @@ fn wallet__create_wallet_descriptor() {
     let node = Node::with_wallet(Wallet::Default, &[]);
 
     // BIP32 HD xprv/xpub for the creation of a descriptor with a private key that is in the wallet.
-    let secp = secp256k1::Secp256k1::new();
     let seed = [0u8; 32];
-    let xprv = Xpriv::new_master(Network::Regtest, &seed).unwrap();
-    let xpub = Xpub::from_priv(&secp, &xprv);
+    let xprv = Xpriv::new_master(Network::Regtest, &seed);
+    let xpub = Xpub::from_priv(&xprv);
     let hdkey = xpub.to_string();
 
     // Import the private key into the wallet.
-    let privkey = bitcoin::PrivateKey {
-        compressed: true,
-        network: Network::Regtest.into(),
-        inner: xprv.private_key,
-    };
+    let privkey = bitcoin::PrivateKey::from_secp(xprv.private_key, NetworkKind::Test);
     let wif = privkey.to_wif();
     let raw_descriptor = format!("wpkh({})", wif);
     let info = node.client.get_descriptor_info(&raw_descriptor).expect("get_descriptor_info");
@@ -344,7 +340,7 @@ fn wallet__get_raw_change_address__modelled() {
 
 #[test]
 fn wallet__get_received_by_address__modelled() {
-    let amount = Amount::from_sat(10_000);
+    let amount = Amount::from_sat_u32(10_000);
 
     let node = Node::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -370,7 +366,7 @@ fn wallet__get_received_by_label__modelled() {
     let label = "test-label";
 
     // Send some coins to the label
-    let amount = Amount::from_sat(10_000);
+    let amount = Amount::from_sat_u32(10_000);
     let address = node.client.new_address_with_label(label).unwrap().assume_checked();
     let _ = node.client.send_to_address(&address, amount).unwrap();
     node.mine_a_block();
@@ -390,7 +386,7 @@ fn wallet__get_transaction__modelled() {
 
     let txid = node
         .client
-        .send_to_address(&address, Amount::from_sat(10_000))
+        .send_to_address(&address, Amount::from_sat_u32(10_000))
         .expect("sendtoaddress")
         .txid()
         .unwrap();
@@ -454,9 +450,8 @@ fn wallet__import_address() {
         PrivateKey::from_wif("cVt4o7BGAig1UXywgGSmARhxMdzP5qvQsxKkSsc1XEkw3tDTQFpy").unwrap();
 
     // Derive the address from the private key
-    let secp = bitcoin::secp256k1::Secp256k1::new();
-    let pubkey = privkey.public_key(&secp);
-    let addr = bitcoin::Address::p2pkh(pubkey, privkey.network);
+    let pubkey = privkey.public_key();
+    let addr = bitcoin::Address::p2pkh(pubkey, privkey.network());
 
     let _: () = node.client.import_address(&addr).expect("importaddress");
 }
@@ -483,10 +478,10 @@ fn wallet__import_descriptors() {
     // 2. Use a known private key, derive the address from it and send some coins to it.
     let privkey =
         PrivateKey::from_wif("cVt4o7BGAig1UXywgGSmARhxMdzP5qvQsxKkSsc1XEkw3tDTQFpy").unwrap();
-    let secp = secp256k1::Secp256k1::new();
-    let pubkey = privkey.public_key(&secp);
-    let address = Address::p2wpkh(&CompressedPublicKey(pubkey.inner), KnownHrp::Regtest);
-    let amount = Amount::from_sat(10_000);
+    let pubkey = privkey.public_key();
+    let address =
+        Address::p2wpkh(CompressedPublicKey::from_secp(pubkey.to_inner()), KnownHrp::Regtest);
+    let amount = Amount::from_sat_u32(10_000);
     let _txid = node.client.send_to_address(&address, amount).expect("sendtoaddress");
 
     // 3. Get the descriptor from the private key.
@@ -557,7 +552,7 @@ fn wallet__list_address_groupings__modelled() {
     node.fund_wallet();
 
     let address = node.client.new_address().expect("failed to create new address");
-    let amount = Amount::from_sat(10_000);
+    let amount = Amount::from_sat_u32(10_000);
     node.client.send_to_address(&address, amount).expect("sendtoaddress").txid().unwrap();
     node.mine_a_block();
 
@@ -588,7 +583,7 @@ fn wallet__list_received_by_label__modelled() {
     let label = "test-label";
 
     // Send some coins to the label
-    let amount = Amount::from_sat(10_000);
+    let amount = Amount::from_sat_u32(10_000);
     let address = node.client.new_address_with_label(label).unwrap().assume_checked();
     let _ = node.client.send_to_address(&address, amount).unwrap();
     node.mine_a_block();
@@ -605,7 +600,7 @@ fn wallet__list_received_by_address__modelled() {
     let node = Node::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
-    let amount = Amount::from_sat(10_000);
+    let amount = Amount::from_sat_u32(10_000);
     let _ = node.client.send_to_address(&address, amount).expect("sendtoaddress");
     node.mine_a_block();
 
@@ -623,7 +618,7 @@ fn wallet__list_since_block__modelled() {
     let node = Node::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let addr = node.client.new_address().expect("newaddress");
-    let amount = Amount::from_sat(5_000);
+    let amount = Amount::from_sat_u32(5_000);
     node.client.send_to_address(&addr, amount).expect("sendtoaddress");
     node.mine_a_block();
 
@@ -641,7 +636,7 @@ fn wallet__list_transactions__modelled() {
 
     node.fund_wallet();
     let addr = node.client.new_address().expect("newaddress");
-    let amount = Amount::from_sat(5_000);
+    let amount = Amount::from_sat_u32(5_000);
     node.client.send_to_address(&addr, amount).expect("sendtoaddress");
     node.mine_a_block();
 
@@ -892,7 +887,7 @@ fn wallet__psbt_bump_fee__modelled() {
 
     let txid = node
         .client
-        .send_to_address_rbf(&address, Amount::from_sat(10_000))
+        .send_to_address_rbf(&address, Amount::from_sat_u32(10_000))
         .expect("sendtoaddress")
         .txid()
         .unwrap();
@@ -954,18 +949,18 @@ fn wallet__send_many__modelled() {
     let addr2 = node.client.new_address().expect("newaddress");
 
     let mut amounts = BTreeMap::new();
-    amounts.insert(addr1, Amount::from_sat(100_000));
-    amounts.insert(addr2, Amount::from_sat(100_000));
+    amounts.insert(addr1, Amount::from_sat_u32(100_000));
+    amounts.insert(addr2, Amount::from_sat_u32(100_000));
 
     let json: SendMany = node.client.send_many(amounts.clone()).expect("sendmany");
-    let model: Result<mtype::SendMany, hex::HexToArrayError> = json.into_model();
+    let model: Result<mtype::SendMany, hex::DecodeFixedLengthBytesError> = json.into_model();
     model.unwrap();
 
     #[cfg(not(feature = "v20_and_below"))]
     {
         let json_verbose: SendManyVerbose =
             node.client.send_many_verbose(amounts).expect("sendmany verbose");
-        let model_verbose: Result<mtype::SendManyVerbose, hex::HexToArrayError> =
+        let model_verbose: Result<mtype::SendManyVerbose, hex::DecodeFixedLengthBytesError> =
             json_verbose.into_model();
         model_verbose.unwrap();
     }
@@ -1007,8 +1002,8 @@ fn wallet__send_to_address__modelled() {
     let address = node.client.new_address().expect("failed to create new address");
 
     let json: SendToAddress =
-        node.client.send_to_address(&address, Amount::from_sat(10_000)).expect("sendtddress");
-    let model: Result<mtype::SendToAddress, hex::HexToArrayError> = json.into_model();
+        node.client.send_to_address(&address, Amount::from_sat_u32(10_000)).expect("sendtddress");
+    let model: Result<mtype::SendToAddress, hex::DecodeFixedLengthBytesError> = json.into_model();
     model.unwrap();
 }
 
@@ -1020,7 +1015,7 @@ fn wallet__set_tx_fee() {
     #[cfg(not(feature = "v29_and_below"))]
     let node = Node::with_wallet(Wallet::Default, &["-deprecatedrpc=settxfee"]);
 
-    let fee_rate = FeeRate::from_sat_per_vb(2).expect("2 sat/vb is valid");
+    let fee_rate = FeeRate::from_sat_per_vb(2);
 
     let json: SetTxFee = node.client.set_tx_fee(fee_rate).expect("settxfee");
     assert!(json.0);
@@ -1076,7 +1071,7 @@ fn wallet__simulate_raw_transaction() {
     node.fund_wallet();
 
     let address = node.client.new_address().expect("failed to create new address");
-    let amount = Amount::from_sat(10_000);
+    let amount = Amount::from_sat_u32(10_000);
 
     let txid1 =
         node.client.send_to_address(&address, amount).expect("sendtoaddress").txid().unwrap();
@@ -1104,7 +1099,7 @@ fn wallet__wallet_create_funded_psbt__modelled() {
     node.fund_wallet();
 
     let addr = node.client.new_address().expect("newaddress");
-    let outputs = BTreeMap::from([(addr, Amount::from_sat(100_000))]);
+    let outputs = BTreeMap::from([(addr, Amount::from_sat_u32(100_000))]);
     let json: WalletCreateFundedPsbt = node
         .client
         .wallet_create_funded_psbt(vec![], vec![outputs])
@@ -1123,7 +1118,7 @@ fn wallet__wallet_process_psbt__modelled() {
     node.fund_wallet();
 
     let addr = node.client.new_address().expect("newaddress");
-    let outputs = BTreeMap::from([(addr, Amount::from_sat(50_000))]);
+    let outputs = BTreeMap::from([(addr, Amount::from_sat_u32(50_000))]);
     let funded_psbt: WalletCreateFundedPsbt = node
         .client
         .wallet_create_funded_psbt(vec![], vec![outputs])

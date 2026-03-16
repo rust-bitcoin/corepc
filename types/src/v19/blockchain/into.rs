@@ -2,8 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use bitcoin::hex::{self, FromHex as _};
-use bitcoin::{bip158, Amount, BlockHash, Network, Txid, Work, Wtxid};
+use bitcoin::{hex, Amount, BlockHash, Network, Txid, Work, Wtxid};
 
 use super::error::{
     GetBlockFilterError, GetBlockchainInfoError, MapMempoolEntryError, MempoolEntryError,
@@ -62,8 +61,8 @@ impl GetBlockFilter {
     pub fn into_model(self) -> Result<model::GetBlockFilter, GetBlockFilterError> {
         use GetBlockFilterError as E;
 
-        let filter = Vec::from_hex(&self.filter).map_err(E::Filter)?;
-        let header = self.header.parse::<bip158::FilterHash>().map_err(E::Header)?;
+        let filter = bitcoin::hex::decode_to_vec(&self.filter).map_err(E::Filter)?;
+        let header = self.header.parse::<p2p::message_filter::FilterHash>().map_err(E::Header)?;
         Ok(model::GetBlockFilter { filter, header })
     }
 }
@@ -97,7 +96,9 @@ impl GetChainTxStats {
 
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestors, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolAncestors(v))
     }
@@ -120,7 +121,9 @@ impl GetMempoolAncestorsVerbose {
 
 impl GetMempoolDescendants {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendants, hex::HexToArrayError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendants, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetMempoolDescendants(v))
     }
@@ -241,7 +244,7 @@ impl GetMempoolInfo {
 
 impl GetRawMempool {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::GetRawMempool, hex::HexToArrayError> {
+    pub fn into_model(self) -> Result<model::GetRawMempool, hex::DecodeFixedLengthBytesError> {
         let v = self.0.iter().map(|t| t.parse::<Txid>()).collect::<Result<Vec<_>, _>>()?;
         Ok(model::GetRawMempool(v))
     }

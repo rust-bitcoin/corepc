@@ -17,17 +17,17 @@ pub enum GetAddressInfoError {
     /// Conversion of the `address` field failed.
     Address(address::ParseError),
     /// Conversion of the `script_pubkey` field failed.
-    ScriptPubKey(hex::HexToBytesError),
+    ScriptPubKey(hex::DecodeVariableLengthBytesError),
     /// The `witness_version` field's value was too big for a u8.
     WitnessVersionValue(i64),
     /// Conversion of the `witness_version` field failed.
     WitnessVersion(witness_version::TryFromError),
     /// Conversion of the `witness_program` field hex string to bytes failed.
-    WitnessProgramBytes(hex::HexToBytesError),
+    WitnessProgramBytes(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `witness_program` field failed.
     WitnessProgram(witness_program::Error),
     /// Conversion of the `hex` field failed.
-    Hex(hex::HexToBytesError),
+    Hex(hex::DecodeVariableLengthBytesError),
     /// Conversion of the `pubkeys` field failed.
     PubKeys(key::ParsePublicKeyError),
     /// Conversion of the `pubkey` field failed.
@@ -35,11 +35,11 @@ pub enum GetAddressInfoError {
     /// Conversion of the `embedded` field failed.
     Embedded(GetAddressInfoEmbeddedError),
     /// Conversion of the `hd_key_path` field failed.
-    HdKeyPath(bip32::Error),
+    HdKeyPath(bip32::ParseChildNumberError),
     /// Conversion of the `hd_seed_id` field failed.
-    HdSeedId(hex::HexToArrayError),
+    HdSeedId(hex::DecodeFixedLengthBytesError),
     /// Conversion of the `hd_master_fingerprint` field failed.
-    HdMasterFingerprint(hex::HexToArrayError),
+    HdMasterFingerprint(hex::DecodeFixedLengthBytesError),
 }
 
 impl fmt::Display for GetAddressInfoError {
