@@ -119,7 +119,7 @@ macro_rules! impl_async_client_check_expected_server_version {
             pub async fn check_expected_server_version(&self) -> Result<()> {
                 let server_version = self.server_version().await?;
                 if !$expected_versions.contains(&server_version) {
-                    return Err($crate::client_async::error::UnexpectedServerVersionError {
+                    return Err($crate::bdk_client::error::UnexpectedServerVersionError {
                         got: server_version,
                         expected: $expected_versions.to_vec(),
                     })?;
