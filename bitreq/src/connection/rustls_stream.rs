@@ -28,6 +28,8 @@ use super::HttpStream;
     all(feature = "rustls", feature = "tokio-rustls")
 ))]
 use super::{AsyncHttpStream, AsyncTcpStream};
+#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+use crate::connection::tls_config::TlsConfig;
 use crate::Error;
 
 #[cfg(feature = "rustls")]
@@ -67,6 +69,15 @@ fn build_client_config() -> Arc<ClientConfig> {
     Arc::new(config)
 }
 
+#[cfg(feature = "tokio-rustls")]
+fn build_rustls_client_config(certificates: Arc<RootCertStore>) -> Arc<ClientConfig> {
+    let config = ClientConfig::builder()
+        .with_safe_defaults()
+        .with_root_certificates(certificates)
+        .with_no_client_auth();
+    Arc::new(config)
+}
+
 #[cfg(feature = "rustls")]
 pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Error> {
     #[cfg(feature = "log")]
@@ -87,10 +98,10 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Erro
 
 // Async rustls TLS implementation
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(feature = "tokio-rustls")]
 pub type AsyncSecuredStream = TlsStream<tokio::net::TcpStream>;
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(feature = "tokio-rustls")]
 pub(super) async fn wrap_async_stream(
     tcp: AsyncTcpStream,
     host: &str,
@@ -103,6 +114,30 @@ pub(super) async fn wrap_async_stream(
     };
 
     let connector = TlsConnector::from(CONFIG.get_or_init(build_client_config).clone());
+
+    #[cfg(feature = "log")]
+    log::trace!("Establishing TLS session to {host}.");
+
+    let tls = connector.connect(dns_name, tcp).await.map_err(Error::IoError)?;
+
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
+}
+
+#[cfg(feature = "tokio-rustls")]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    tls_config: TlsConfig,
+) -> Result<AsyncHttpStream, Error> {
+    #[cfg(feature = "log")]
+    log::trace!("Setting up TLS parameters for {host}.");
+    let dns_name = match ServerName::try_from(host) {
+        Ok(result) => result,
+        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
+    };
+    let certificates = tls_config.certificates;
+    let client_config = build_rustls_client_config(certificates);
+    let connector = TlsConnector::from(client_config);
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
@@ -157,6 +192,18 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Erro
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 pub type AsyncSecuredStream = tokio_native_tls::TlsStream<tokio::net::TcpStream>;
 
+// =======
+// Temp method, required for compilation
+#[cfg(all(feature = "tokio-native-tls", not(feature = "rustls")))]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    _client_configs: Option<()>,
+) -> Result<AsyncHttpStream, Error> {
+    wrap_async_stream(tcp, host).await
+}
+// =======
+
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 pub(super) async fn wrap_async_stream(
     tcp: AsyncTcpStream,
@@ -181,22 +228,3 @@ pub(super) async fn wrap_async_stream(
 
     Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }
-
-// #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
-// pub(super) async fn wrap_async_stream_with_configs(
-//     tcp: AsyncTcpStream,
-//     host: &str,
-//     client_configs: Certificates,
-// ) -> Result<AsyncHttpStream, Error> {
-//     #[cfg(feature = "log")]
-//     log::trace!("Setting up TLS parameters for {host}.");
-
-//     let async_connector = client_configs.0;
-
-//     #[cfg(feature = "log")]
-//     log::trace!("Establishing TLS session to {host}.");
-
-//     let tls = async_connector.connect(host, tcp).await?;
-
-//     Ok(AsyncHttpStream::Secured(Box::new(tls)))
-// }
