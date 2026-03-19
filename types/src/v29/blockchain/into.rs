@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use alloc::collections::BTreeMap;
-use core::str::FromStr;
 
 use bitcoin::consensus::encode;
 use bitcoin::hashes::hex::FromHex;
@@ -405,14 +404,14 @@ impl GetDescriptorActivity {
                         let amount = Amount::from_btc(spend.amount).map_err(E::Amount)?;
                         let block_hash = spend
                             .block_hash
-                            .map(|s| BlockHash::from_str(&s))
+                            .map(|s| s.parse::<BlockHash>())
                             .transpose()
                             .map_err(E::BlockHash)?;
                         let height =
                             spend.height.map(|h| crate::to_u32(h, "height")).transpose()?;
-                        let spend_txid = Txid::from_str(&spend.spend_txid).map_err(E::SpendTxid)?;
+                        let spend_txid = spend.spend_txid.parse::<Txid>().map_err(E::SpendTxid)?;
                         let prevout_txid =
-                            Txid::from_str(&spend.prevout_txid).map_err(E::PrevoutTxid)?;
+                            spend.prevout_txid.parse::<Txid>().map_err(E::PrevoutTxid)?;
                         let prevout_spk = spend.prevout_spk.into_model().map_err(E::PrevoutSpk)?;
 
                         Ok(model::ActivityEntry::Spend(model::SpendActivity {
@@ -430,12 +429,12 @@ impl GetDescriptorActivity {
                         let amount = Amount::from_btc(receive.amount).map_err(E::Amount)?;
                         let block_hash = receive
                             .block_hash
-                            .map(|s| BlockHash::from_str(&s))
+                            .map(|s| s.parse::<BlockHash>())
                             .transpose()
                             .map_err(E::BlockHash)?;
                         let height =
                             receive.height.map(|h| crate::to_u32(h, "height")).transpose()?; // Uses From<NumericError>
-                        let txid = Txid::from_str(&receive.txid).map_err(E::Txid)?;
+                        let txid = receive.txid.parse::<Txid>().map_err(E::Txid)?;
                         let output_spk = receive.output_spk.into_model().map_err(E::OutputSpk)?;
 
                         Ok(model::ActivityEntry::Receive(model::ReceiveActivity {
