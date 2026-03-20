@@ -33,7 +33,7 @@ type UnsecuredStream = TcpStream;
 
 #[cfg(any(feature = "rustls", feature = "native-tls"))]
 mod rustls_stream;
-#[cfg(feature = "tokio-rustls")]
+#[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
 pub(crate) mod tls_config;
 #[cfg(any(feature = "rustls", feature = "native-tls"))]
 type SecuredStream = rustls_stream::SecuredStream;
@@ -304,20 +304,8 @@ impl AsyncConnection {
         }))))
     }
 
-    // =======
-    /// Temp method. Required to compile
-    #[cfg(all(feature = "tokio-native-tls", not(feature = "tokio-rustls")))]
-    async fn wrap_async_stream(
-        socket: AsyncTcpStream,
-        host: &str,
-        _client_config: &Option<Arc<ClientConfig>>,
-    ) -> Result<AsyncHttpStream, Error> {
-        rustls_stream::wrap_async_stream(socket, host).await
-    }
-    // =======
-
     /// Call the correct wrapper function depending on whether client_configs are present
-    #[cfg(feature = "tokio-rustls")]
+    #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
     async fn wrap_async_stream(
         socket: AsyncTcpStream,
         host: &str,

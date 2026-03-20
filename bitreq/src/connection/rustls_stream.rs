@@ -25,7 +25,7 @@ use webpki_roots::TLS_SERVER_ROOTS;
 use super::HttpStream;
 #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
 use crate::connection::tls_config::TlsConfig;
 use crate::Error;
 
@@ -167,22 +167,10 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Erro
     Ok(HttpStream::Secured(Box::new(tls), None))
 }
 
-#[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
+#[cfg(all(feature = "tokio-native-tls", not(feature = "rustls")))]
 pub type AsyncSecuredStream = tokio_native_tls::TlsStream<tokio::net::TcpStream>;
 
-// =======
-// Temp method, required for compilation
 #[cfg(all(feature = "tokio-native-tls", not(feature = "rustls")))]
-pub(super) async fn wrap_async_stream_with_configs(
-    tcp: AsyncTcpStream,
-    host: &str,
-    _client_configs: Option<()>,
-) -> Result<AsyncHttpStream, Error> {
-    wrap_async_stream(tcp, host).await
-}
-// =======
-
-#[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 pub(super) async fn wrap_async_stream(
     tcp: AsyncTcpStream,
     host: &str,
@@ -198,6 +186,25 @@ pub(super) async fn wrap_async_stream(
     };
 
     let async_connector = AsyncTlsConnector::from(sync_connector);
+
+    #[cfg(feature = "log")]
+    log::trace!("Establishing TLS session to {host}.");
+
+    let tls = async_connector.connect(host, tcp).await?;
+
+    Ok(AsyncHttpStream::Secured(Box::new(tls)))
+}
+
+#[cfg(all(feature = "tokio-native-tls", not(feature = "rustls")))]
+pub(super) async fn wrap_async_stream_with_configs(
+    tcp: AsyncTcpStream,
+    host: &str,
+    tls_config: TlsConfig,
+) -> Result<AsyncHttpStream, Error> {
+    #[cfg(feature = "log")]
+    log::trace!("Setting up TLS parameters for {host}.");
+
+    let async_connector = tls_config.connector;
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
