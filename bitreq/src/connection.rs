@@ -13,8 +13,6 @@ use std::sync::{Arc, Mutex};
 use std::task::{Context, Poll};
 use std::time::Instant;
 
-#[cfg(all(feature = "async", feature = "proxy"))]
-use tokio::io::AsyncReadExt;
 #[cfg(feature = "async")]
 use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt, ReadHalf, WriteHalf};
 #[cfg(feature = "async")]
@@ -337,36 +335,8 @@ impl AsyncConnection {
         #[cfg(feature = "proxy")]
         match &params.proxy {
             Some(proxy) => {
-                // do proxy things
                 let mut tcp = Self::tcp_connect(&proxy.server, proxy.port).await?;
-
-                let proxy_request = proxy.connect(params.host, params.port);
-                tcp.write_all(proxy_request.as_bytes()).await?;
-                tcp.flush().await?;
-
-                // Max proxy response size to prevent unbounded memory allocation
-                const MAX_PROXY_RESPONSE_SIZE: usize = 16 * 1024;
-                let mut proxy_response = Vec::new();
-                let mut buf = [0; 256];
-
-                loop {
-                    let n = tcp.read(&mut buf).await?;
-                    if n == 0 {
-                        // EOF reached
-                        break;
-                    }
-                    proxy_response.extend_from_slice(&buf[..n]);
-                    if proxy_response.len() > MAX_PROXY_RESPONSE_SIZE {
-                        return Err(Error::ProxyConnect);
-                    }
-                    if n < buf.len() {
-                        // Partial read indicates end of response
-                        break;
-                    }
-                }
-
-                crate::Proxy::verify_response(&proxy_response)?;
-
+                proxy.handshake_async(&mut tcp, params.host, params.port).await?;
                 Ok(tcp)
             }
             None => Self::tcp_connect(params.host, params.port).await,
@@ -710,35 +680,8 @@ impl Connection {
         #[cfg(feature = "proxy")]
         match &params.proxy {
             Some(proxy) => {
-                // do proxy things
                 let mut tcp = Self::tcp_connect(&proxy.server, proxy.port, timeout_at)?;
-
-                write!(tcp, "{}", proxy.connect(params.host, params.port))?;
-                tcp.flush()?;
-
-                // Max proxy response size to prevent unbounded memory allocation
-                const MAX_PROXY_RESPONSE_SIZE: usize = 16 * 1024;
-                let mut proxy_response = Vec::new();
-                let mut buf = [0; 256];
-
-                loop {
-                    let n = tcp.read(&mut buf)?;
-                    if n == 0 {
-                        // EOF reached
-                        break;
-                    }
-                    proxy_response.extend_from_slice(&buf[..n]);
-                    if proxy_response.len() > MAX_PROXY_RESPONSE_SIZE {
-                        return Err(Error::ProxyConnect);
-                    }
-                    if n < buf.len() {
-                        // Partial read indicates end of response
-                        break;
-                    }
-                }
-
-                crate::Proxy::verify_response(&proxy_response)?;
-
+                proxy.handshake_sync(&mut tcp, params.host, params.port)?;
                 Ok(tcp)
             }
             None => Self::tcp_connect(params.host, params.port, timeout_at),
