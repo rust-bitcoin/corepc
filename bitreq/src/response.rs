@@ -459,6 +459,7 @@ macro_rules! maybe_await {
         $e
     };
 }
+pub(crate) use maybe_await;
 
 #[cfg(feature = "async")]
 /// We need to mungle [`AsyncRead`] to look like an iterator, which we do here.
@@ -703,7 +704,7 @@ define_read_methods!((read_until_closed, read_with_content_length, read_trailers
 define_read_methods!((read_until_closed_async, read_with_content_length_async, read_trailers_async, read_chunked_async, read_metadata_async, read_line_async)<R: AsyncRead | Unpin>, R, async, await);
 
 #[cfg(feature = "std")]
-fn parse_status_line(line: &str) -> (i32, String) {
+pub(crate) fn parse_status_line(line: &str) -> (i32, String) {
     // sample status line format
     // HTTP/1.1 200 OK
     let mut status_code = String::with_capacity(3);

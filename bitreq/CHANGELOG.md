@@ -1,6 +1,7 @@
 # Unreleased
 
 * Use `Duration` for `Request::with_timeout` [#642](https://github.com/rust-bitcoin/corepc/pull/642)
+* Add SOCKS5 proxy support [#533](https://github.com/rust-bitcoin/corepc/pull/533)
 
 # 0.3.7 - 2026-05-28
 

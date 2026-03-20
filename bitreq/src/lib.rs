@@ -83,7 +83,7 @@
 //!
 //! ## `proxy`
 //!
-//! This feature enables HTTP proxy support.
+//! This feature enables proxy support (HTTP CONNECT and SOCKS5).
 //!
 //! # Examples
 //!
@@ -203,8 +203,8 @@
 //! `.with_proxy()` on your request.
 //!
 //! Supported proxy formats are `host:port` and
-//! `user:password@proxy:host`. Only HTTP CONNECT proxies are
-//! supported at this time.
+//! `user:password@proxy:host`. Both HTTP CONNECT and SOCKS5
+//! proxies are supported.
 //!
 //! ```no_run
 //! # #[cfg(feature = "std")]
