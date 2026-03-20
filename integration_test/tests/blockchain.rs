@@ -197,45 +197,53 @@ fn blockchain__get_block_header__modelled() {
 #[test]
 fn blockchain__get_block_stats__modelled() {
     // Version 17 and 18 cannot call `getblockstats` if `-txindex` is not enabled.
-    #[cfg(not(feature = "v18_and_below"))]
-    getblockstats();
-
-    // All versions including 17 and 18 can `getblockstats` if `-txindex` is enabled.
-    getblockstats_txindex();
-}
-
-#[cfg(not(feature = "v18_and_below"))]
-fn getblockstats() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    // newer versions do not.
+    let node = if cfg!(feature = "v18_and_below") {
+        Node::with_wallet(Wallet::Default, &["-txindex"])
+    } else {
+        Node::with_wallet(Wallet::Default, &[])
+    };
     node.fund_wallet();
 
-    let json: GetBlockStats = node.client.get_block_stats_by_height(1).expect("getblockstats");
-    let model: Result<mtype::GetBlockStats, GetBlockStatsError> = json.into_model();
-    model.unwrap();
-
-    // No need for explicit types, used explicitly in test below.
-    let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
-    let json: GetBlockStats =
-        node.client.get_block_stats_by_block_hash(&block_hash).expect("getblockstats");
-    let model: Result<mtype::GetBlockStats, GetBlockStatsError> = json.into_model();
-    model.unwrap();
+    get_block_stats_by_height(&node);
+    get_block_stats_by_block_hash(&node);
+    get_block_stats_with_stats(&node);
 }
 
-fn getblockstats_txindex() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
-    node.fund_wallet();
+fn get_block_stats_by_height(node: &Node) {
+    let json: GetBlockStats =
+        node.client.get_block_stats_by_height(101, None).expect("getblockstats");
 
-    // Get block stats by height.
-    let json: GetBlockStats = node.client.get_block_stats_by_height(101).expect("getblockstats");
     let model: Result<mtype::GetBlockStats, GetBlockStatsError> = json.into_model();
-    model.unwrap();
+    let model = model.unwrap();
 
-    // Get block stats by block hash.
+    assert_eq!(model.height, Some(101));
+    assert!(model.block_hash.is_some());
+}
+
+fn get_block_stats_by_block_hash(node: &Node) {
     let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
     let json: GetBlockStats =
-        node.client.get_block_stats_by_block_hash(&block_hash).expect("getblockstats");
-    let model: Result<mtype::GetBlockStats, GetBlockStatsError> = json.into_model();
-    model.unwrap();
+        node.client.get_block_stats_by_block_hash(&block_hash, None).expect("getblockstats");
+
+    let model = json.into_model().unwrap(); // Explicit error type already used above.
+
+    assert_eq!(model.block_hash, Some(block_hash));
+    assert!(model.height.is_some());
+}
+
+fn get_block_stats_with_stats(node: &Node) {
+    let json: GetBlockStats = node
+        .client
+        .get_block_stats_by_height(101, Some(&["minfeerate", "avgfeerate"]))
+        .expect("getblockstats");
+
+    let model = json.into_model().unwrap(); // Explicit error type already used above.
+
+    assert!(model.minimum_fee_rate.is_some());
+    assert!(model.average_fee_rate.is_some());
+    assert!(model.block_hash.is_none());
+    assert!(model.height.is_none());
 }
 
 #[test]

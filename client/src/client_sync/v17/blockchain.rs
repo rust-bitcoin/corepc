@@ -112,12 +112,20 @@ macro_rules! impl_client_v17__get_block_header {
 macro_rules! impl_client_v17__get_block_stats {
     () => {
         impl Client {
-            pub fn get_block_stats_by_height(&self, height: u32) -> Result<GetBlockStats> {
-                self.call("getblockstats", &[into_json(height)?])
+            pub fn get_block_stats_by_height(
+                &self,
+                height: u32,
+                stats: Option<&[&str]>,
+            ) -> Result<GetBlockStats> {
+                self.call("getblockstats", &[into_json(height)?, into_json(stats)?])
             }
 
-            pub fn get_block_stats_by_block_hash(&self, hash: &BlockHash) -> Result<GetBlockStats> {
-                self.call("getblockstats", &[into_json(hash)?])
+            pub fn get_block_stats_by_block_hash(
+                &self,
+                hash: &BlockHash,
+                stats: Option<&[&str]>,
+            ) -> Result<GetBlockStats> {
+                self.call("getblockstats", &[into_json(hash)?, into_json(stats)?])
             }
         }
     };
