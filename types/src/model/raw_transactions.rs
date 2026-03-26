@@ -280,7 +280,7 @@ pub struct MempoolAcceptanceFees {
     pub base: Amount,
     /// The effective feerate in BTC per KvB. May differ from the base feerate if, for example, there
     /// are modified fees from `prioritisetransaction` or a package feerate was used.
-    pub effective_feerate: Option<FeeRate>,
+    pub effective_fee_rate: Option<FeeRate>,
     /// Transactions whose fees and vsizes are included in `effective_feerate`.
     pub effective_includes: Option<Vec<Wtxid>>,
 }

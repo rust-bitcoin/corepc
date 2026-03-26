@@ -59,7 +59,7 @@ pub struct MempoolAcceptanceFees {
     /// The effective feerate in BTC per KvB. May differ from the base feerate if, for example, there
     /// are modified fees from `prioritisetransaction` or a package feerate was used.
     #[serde(rename = "effective-feerate", default)]
-    pub effective_feerate: Option<f64>,
+    pub effective_fee_rate: Option<f64>,
     /// Transactions whose fees and vsizes are included in `effective_feerate`.
     #[serde(rename = "effective-includes", default)]
     pub effective_includes: Vec<String>,

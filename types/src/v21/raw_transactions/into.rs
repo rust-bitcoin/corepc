@@ -26,7 +26,7 @@ impl MempoolAcceptance {
                 let base = Amount::from_btc(s.base).map_err(E::Base)?;
                 Some(model::MempoolAcceptanceFees {
                     base,
-                    effective_feerate: None,  // v25 and later only.
+                    effective_fee_rate: None, // v25 and later only.
                     effective_includes: None, // v25 and later only.
                 })
             }
