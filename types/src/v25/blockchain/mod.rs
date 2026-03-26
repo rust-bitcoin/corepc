@@ -15,9 +15,6 @@ pub use super::{GetBlockStatsError, ScanTxOutSetError};
 /// Result of JSON-RPC method `getblockstats`.
 ///
 /// > getblockstats hash_or_height ( stats )
-///
-/// > Returns the number of blocks in the longest blockchain.
-/// > getblockstats hash_or_height ( stats )
 /// >
 /// > Compute per block statistics for a given window. All amounts are in satoshis.
 /// > It won't work for some heights with pruning.
@@ -25,6 +22,12 @@ pub use super::{GetBlockStatsError, ScanTxOutSetError};
 /// >
 /// > Arguments:
 /// > 1. "hash_or_height"     (string or numeric, required) The block hash or height of the target block
+/// > 2. "stats"              (json array, optional, default=all values) Values to plot (see result below)
+/// >    [
+/// >        "height",     (string) Selected statistic
+/// >        "time",       (string) Selected statistic
+/// >        ...
+/// >    ]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct GetBlockStats {
