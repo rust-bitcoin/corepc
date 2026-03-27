@@ -384,66 +384,68 @@ pub struct GetBlockHeaderVerbose {
 }
 
 /// Models the result of JSON-RPC method `getblockstats`.
+///
+/// All fields are optional because the caller can select which stats to compute.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetBlockStats {
     /// Average fee in the block.
-    pub average_fee: Amount,
+    pub average_fee: Option<Amount>,
     /// Average feerate.
     pub average_fee_rate: Option<FeeRate>,
     /// Average transaction size.
-    pub average_tx_size: u32,
+    pub average_tx_size: Option<u32>,
     /// The block hash (to check for potential reorgs).
-    pub block_hash: BlockHash,
+    pub block_hash: Option<BlockHash>,
     /// Feerates at the 10th, 25th, 50th, 75th, and 90th percentile weight unit (in satoshis per virtual byte).
-    pub fee_rate_percentiles: Vec<Option<FeeRate>>,
+    pub fee_rate_percentiles: Option<Vec<Option<FeeRate>>>,
     /// The height of the block.
-    pub height: u32,
+    pub height: Option<u32>,
     /// The number of inputs (excluding coinbase).
-    pub inputs: u32,
+    pub inputs: Option<u32>,
     /// Maximum fee in the block.
-    pub max_fee: Amount,
+    pub max_fee: Option<Amount>,
     /// Maximum feerate (in satoshis per virtual byte).
     pub max_fee_rate: Option<FeeRate>,
     /// Maximum transaction size.
-    pub max_tx_size: u32,
+    pub max_tx_size: Option<u32>,
     /// Truncated median fee in the block.
-    pub median_fee: Amount,
+    pub median_fee: Option<Amount>,
     /// The block median time past.
-    pub median_time: u32,
+    pub median_time: Option<u32>,
     /// Truncated median transaction size
-    pub median_tx_size: u32,
+    pub median_tx_size: Option<u32>,
     /// Minimum fee in the block.
-    pub minimum_fee: Amount,
+    pub minimum_fee: Option<Amount>,
     /// Minimum feerate (in satoshis per virtual byte).
     pub minimum_fee_rate: Option<FeeRate>,
     /// Minimum transaction size.
-    pub minimum_tx_size: u32,
+    pub minimum_tx_size: Option<u32>,
     /// The number of outputs.
-    pub outputs: u32,
+    pub outputs: Option<u32>,
     /// The block subsidy.
-    pub subsidy: Amount,
+    pub subsidy: Option<Amount>,
     /// Total size of all segwit transactions.
-    pub segwit_total_size: u32,
+    pub segwit_total_size: Option<u32>,
     /// Total weight of all segwit transactions divided by segwit scale factor (4).
     pub segwit_total_weight: Option<Weight>,
     /// The number of segwit transactions.
-    pub segwit_txs: u32,
+    pub segwit_txs: Option<u32>,
     /// The block time.
-    pub time: u32,
+    pub time: Option<u32>,
     /// Total amount in all outputs (excluding coinbase and thus reward [ie subsidy + totalfee]).
-    pub total_out: Amount,
+    pub total_out: Option<Amount>,
     /// Total size of all non-coinbase transactions.
-    pub total_size: u32,
+    pub total_size: Option<u32>,
     /// Total weight of all non-coinbase transactions divided by segwit scale factor (4).
     pub total_weight: Option<Weight>,
     /// The fee total.
-    pub total_fee: Amount,
+    pub total_fee: Option<Amount>,
     /// The number of transactions (excluding coinbase).
-    pub txs: u32,
+    pub txs: Option<u32>,
     /// The increase/decrease in the number of unspent outputs.
-    pub utxo_increase: i32,
+    pub utxo_increase: Option<i32>,
     /// The increase/decrease in size for the utxo index (not discounting op_return and similar).
-    pub utxo_size_increase: i32,
+    pub utxo_size_increase: Option<i32>,
     /// The increase/decrease in the number of unspent outputs, not counting unspendables.
     /// v25 and later only.
     pub utxo_increase_actual: Option<i32>,
