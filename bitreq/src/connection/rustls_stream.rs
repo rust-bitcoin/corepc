@@ -12,7 +12,11 @@ use std::sync::OnceLock;
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
 use native_tls::{HandshakeError, TlsConnector, TlsStream};
 #[cfg(feature = "rustls")]
-use rustls::{self, ClientConfig, ClientConnection, RootCertStore, ServerName, StreamOwned};
+use rustls::{
+    self,
+    pki_types::{ServerName, TrustAnchor},
+    ClientConfig, ClientConnection, RootCertStore, StreamOwned,
+};
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 use tokio_native_tls::TlsConnector as AsyncTlsConnector;
 #[cfg(feature = "tokio-rustls")]
@@ -47,19 +51,14 @@ fn build_client_config() -> Arc<ClientConfig> {
     }
 
     #[cfg(feature = "rustls-webpki")]
-    #[allow(deprecated)] // Need to use add_server_trust_anchors to compile with rustls 0.21.1
-    root_certificates.add_server_trust_anchors(TLS_SERVER_ROOTS.iter().map(|ta| {
-        rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-            ta.subject,
-            ta.spki,
-            ta.name_constraints,
-        )
+    root_certificates.extend(TLS_SERVER_ROOTS.iter().map(|ta| TrustAnchor {
+        subject: ta.subject.into(),
+        subject_public_key_info: ta.spki.into(),
+        name_constraints: ta.name_constraints.map(Into::into),
     }));
 
-    let config = ClientConfig::builder()
-        .with_safe_defaults()
-        .with_root_certificates(root_certificates)
-        .with_no_client_auth();
+    let config =
+        ClientConfig::builder().with_root_certificates(root_certificates).with_no_client_auth();
     Arc::new(config)
 }
 
@@ -71,8 +70,9 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, E
         Ok(result) => result,
         Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
     };
-    let sess = ClientConnection::new(CONFIG.get_or_init(build_client_config).clone(), dns_name)
-        .map_err(Error::RustlsCreateConnection)?;
+    let sess =
+        ClientConnection::new(CONFIG.get_or_init(build_client_config).clone(), dns_name.to_owned())
+            .map_err(Error::RustlsCreateConnection)?;
 
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
@@ -101,7 +101,7 @@ pub(super) async fn wrap_async_stream(
     #[cfg(feature = "log")]
     log::trace!("Establishing TLS session to {host}.");
 
-    let tls = connector.connect(dns_name, tcp).await.map_err(Error::IoError)?;
+    let tls = connector.connect(dns_name.to_owned(), tcp).await.map_err(Error::IoError)?;
 
     Ok(AsyncHttpStream::Secured(Box::new(tls)))
 }
