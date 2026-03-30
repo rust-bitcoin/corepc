@@ -59,6 +59,7 @@ crate::impl_client_v17__get_tx_out_proof!();
 crate::impl_client_v26__get_tx_out_set_info!();
 crate::impl_client_v24__get_tx_spending_prevout!();
 crate::impl_client_v26__import_mempool!();
+crate::impl_client_v26__load_tx_out_set!();
 crate::impl_client_v17__precious_block!();
 crate::impl_client_v17__prune_blockchain!();
 crate::impl_client_v23__save_mempool!();
