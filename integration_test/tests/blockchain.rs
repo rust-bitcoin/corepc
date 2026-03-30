@@ -35,6 +35,101 @@ fn blockchain__dump_tx_out_set__modelled() {
 }
 
 #[test]
+#[cfg(not(feature = "v25_and_below"))]
+fn blockchain__load_tx_out_set__modelled() {
+    // Regtest `loadtxoutset` requires replicating Bitcoin Core's C++
+    // TestChain100Setup to produce the exact chain whose height at `110`
+    // assumeutxo snapshot hash is hardcoded in chainparams.
+    //
+    // The C++ test framework uses:
+    //   - SetMockTime(1598887952), incrementing by 1 after each block
+    //   - P2PK coinbase output to compressed pubkey of private key 0x01
+    //   - 110 coinbase-only blocks (no wallet transactions)
+    //
+    // Matching these exactly helps us arrive at the expected hash at snapshot
+
+    #[cfg(feature = "v29_and_below")]
+    let expected_block_hash = "696e92821f65549c7ee134edceeeeaaa4105647a3c4fd9f298c0aec0ab50425c";
+    #[cfg(not(feature = "v29_and_below"))]
+    let expected_block_hash = "6affe030b7965ab538f820a56ef56c8149b7dc1d1c144af57113be080db7c397";
+
+    let snapshot_height = 110;
+
+    // Compressed public key for private key 0x01
+    let coinbase_descriptor =
+        "pk(0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798)";
+
+    let exe = node::exe_path().expect("failed to get bitcoind executable");
+    let mut conf_a = node::Conf::default();
+    conf_a.p2p = node::P2P::Yes;
+    let node_a = Node::with_conf(&exe, &conf_a).expect("failed to create miner node");
+
+    // TestChain100Setup mocktime matched to the exact
+    const MOCK_TIME_START: u64 = 1598887952;
+    for i in 0..snapshot_height {
+        let mock_time = MOCK_TIME_START + i;
+        let _: node::serde_json::Value = node_a
+            .client
+            .call("setmocktime", &[node::serde_json::json!(mock_time)])
+            .expect("setmocktime");
+        node_a.client.generate_to_descriptor(1, coinbase_descriptor).expect("generatetodescriptor");
+    }
+
+    let hash_at_height = node_a
+        .client
+        .get_block_hash(snapshot_height)
+        .expect("getblockhash")
+        .block_hash()
+        .expect("parse block hash");
+    assert_eq!(
+        hash_at_height.to_string(),
+        expected_block_hash,
+        "block hash at height {} does not match hardcoded assumeutxo entry",
+        snapshot_height
+    );
+
+    let temp_path = integration_test::random_tmp_file();
+    let dump_path = temp_path.to_str().expect("temp path should be valid UTF-8");
+    #[cfg(feature = "v28_and_below")]
+    {
+        let _: DumpTxOutSet = node_a.client.dump_tx_out_set(dump_path).expect("dumptxoutset");
+    }
+    #[cfg(not(feature = "v28_and_below"))]
+    {
+        let _: DumpTxOutSet =
+            node_a.client.dump_tx_out_set(dump_path, "latest").expect("dumptxoutset");
+    }
+    let mut conf_b = node::Conf::default();
+    conf_b.wallet = None;
+    conf_b.p2p = node::P2P::No;
+    let node_b = Node::with_conf(&exe, &conf_b).expect("failed to create loader node");
+
+    for h in 1..=snapshot_height {
+        let bh = node_a
+            .client
+            .get_block_hash(h)
+            .expect("getblockhash")
+            .block_hash()
+            .expect("parse block hash");
+        let header = node_a
+            .client
+            .get_block_header(&bh)
+            .expect("getblockheader")
+            .block_header()
+            .expect("parse block header");
+        node_b.client.submit_header(&header).expect("submitheader");
+    }
+
+    let loaded: LoadTxOutSet =
+        node_b.client.load_tx_out_set(dump_path).expect("loadtxoutset should succeed");
+
+    let model = loaded.into_model().expect("into_model");
+    assert_eq!(model.base_height, snapshot_height as u32);
+    assert_eq!(model.tip_hash, hash_at_height);
+    assert_eq!(model.coins_loaded, bitcoin::Amount::from_btc(110.0).unwrap());
+}
+
+#[test]
 fn blockchain__get_best_block_hash__modelled() {
     let node = Node::with_wallet(Wallet::None, &[]);
 
