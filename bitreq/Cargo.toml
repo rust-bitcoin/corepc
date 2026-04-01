@@ -21,7 +21,7 @@ serde_json = { version = "1.0.0", default-features = false, features = ["std"], 
 base64 = { version = "0.22", default-features = false, features = ["alloc"], optional = true }
 
 # For rustls-based TLS:
-rustls = { version = "0.23.37", default-features = false, optional = true }
+rustls = { version = "0.23.37", default-features = false, features = ["ring", "std"], optional = true }
 rustls-native-certs = { version = "0.6.1", default-features = false, optional = true }
 webpki-roots = { version = "0.25.2", default-features = false, optional = true }
 rustls-webpki = { version = "0.101.0", default-features = false, optional = true }
