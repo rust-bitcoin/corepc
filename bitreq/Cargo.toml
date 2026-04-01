@@ -54,8 +54,8 @@ json-using-serde = ["serde", "serde_json"]
 proxy = ["base64", "std"]
 
 https = ["https-rustls"]
-https-rustls = ["rustls", "webpki-roots", "rustls-webpki"]
-https-rustls-probe = ["rustls", "rustls-native-certs"]
+https-rustls = ["rustls", "webpki-roots", "rustls-webpki", "rustls/std"]
+https-rustls-probe = ["rustls", "rustls-native-certs", "rustls/std"]
 https-native-tls = ["native-tls"]
 
 async = ["tokio", "std"]
