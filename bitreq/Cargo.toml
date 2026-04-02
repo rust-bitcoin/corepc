@@ -21,7 +21,7 @@ serde_json = { version = "1.0.0", default-features = false, features = ["std"], 
 base64 = { version = "0.22", default-features = false, features = ["alloc"], optional = true }
 
 # For rustls-based TLS:
-rustls = { version = "0.21.1", default-features = false, optional = true }
+rustls = { version = "0.23.37", default-features = false, optional = true }
 rustls-native-certs = { version = "0.6.1", default-features = false, optional = true }
 webpki-roots = { version = "0.25.2", default-features = false, optional = true }
 rustls-webpki = { version = "0.101.0", default-features = false, optional = true }
@@ -31,7 +31,7 @@ native-tls = { version = "0.2", default-features = false, optional = true }
 
 # For the async feature:
 tokio = { version = "1.0", default-features = false, features = ["rt", "net", "io-util", "time", "sync"], optional = true }
-tokio-rustls = { version = "0.24", default-features = false, optional = true }
+tokio-rustls = { version = "0.26", default-features = false, optional = true }
 tokio-native-tls = { version = "0.3", default-features = false, optional = true }
 
 log = { version = "0.4.0", default-features = false, optional = true }
@@ -54,8 +54,8 @@ json-using-serde = ["serde", "serde_json"]
 proxy = ["base64", "std"]
 
 https = ["https-rustls"]
-https-rustls = ["rustls", "webpki-roots", "rustls-webpki"]
-https-rustls-probe = ["rustls", "rustls-native-certs"]
+https-rustls = ["rustls", "webpki-roots", "rustls-webpki", "rustls/std"]
+https-rustls-probe = ["rustls", "rustls-native-certs", "rustls/std"]
 https-native-tls = ["native-tls"]
 
 async = ["tokio", "std"]
