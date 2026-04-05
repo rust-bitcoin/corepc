@@ -336,8 +336,14 @@ impl AsyncConnection {
     async fn connect(params: ConnectionParams<'_>) -> Result<AsyncTcpStream, Error> {
         #[cfg(feature = "proxy")]
         match &params.proxy {
+            Some(proxy) if proxy.is_socks5() => {
+                // SOCKS5 proxy
+                let mut tcp = Self::tcp_connect(&proxy.server, proxy.port).await?;
+                proxy.socks5_handshake_async(&mut tcp, params.host, params.port).await?;
+                Ok(tcp)
+            }
             Some(proxy) => {
-                // do proxy things
+                // HTTP CONNECT proxy
                 let mut tcp = Self::tcp_connect(&proxy.server, proxy.port).await?;
 
                 let proxy_request = proxy.connect(params.host, params.port);
@@ -709,8 +715,14 @@ impl Connection {
     ) -> Result<TcpStream, Error> {
         #[cfg(feature = "proxy")]
         match &params.proxy {
+            Some(proxy) if proxy.is_socks5() => {
+                // SOCKS5 proxy
+                let mut tcp = Self::tcp_connect(&proxy.server, proxy.port, timeout_at)?;
+                proxy.socks5_handshake_sync(&mut tcp, params.host, params.port)?;
+                Ok(tcp)
+            }
             Some(proxy) => {
-                // do proxy things
+                // HTTP CONNECT proxy
                 let mut tcp = Self::tcp_connect(&proxy.server, proxy.port, timeout_at)?;
 
                 write!(tcp, "{}", proxy.connect(params.host, params.port))?;
