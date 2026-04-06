@@ -45,6 +45,10 @@ url = { version = "2.4" }
 [package.metadata.docs.rs]
 all-features = true
 
+[package.metadata.rbmt.lint]
+# Unavoidable TLS/crypto dep-graph version conflicts.
+allowed_duplicates = ["base64", "windows-sys"]
+
 [features]
 default = ["std"]
 std = []
