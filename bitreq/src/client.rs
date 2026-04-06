@@ -66,7 +66,7 @@ impl Client {
 
         // Try to get cached connection
         let conn_opt = {
-            let state = self.r#async.lock().unwrap();
+            let state = lock!(self.r#async);
 
             if let Some(conn) = state.connections.get(&owned_key) {
                 Some(Arc::clone(conn))
@@ -80,7 +80,7 @@ impl Client {
             let connection = AsyncConnection::new(key, parsed_request.timeout_at).await?;
             let connection = Arc::new(connection);
 
-            let mut state = self.r#async.lock().unwrap();
+            let mut state = lock!(self.r#async);
             if let hash_map::Entry::Vacant(entry) = state.connections.entry(owned_key) {
                 entry.insert(Arc::clone(&connection));
                 state.lru_order.push_back(key.into());
