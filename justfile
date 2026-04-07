@@ -39,7 +39,7 @@ lint-verify:
   $REPO_DIR/contrib/lint-verify.sh
 
 lint-integration-tests:
-  $REPO_DIR/contrib/lint-integtation-tests.sh
+  $REPO_DIR/contrib/lint-integration-tests.sh
 
 # Run cargo fmt
 fmt:
