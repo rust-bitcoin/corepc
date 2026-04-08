@@ -8,6 +8,7 @@ documentation = "https://docs.rs/elecrtsd/"
 license = "MIT"
 edition = "2018"
 categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
+exclude = ["tests", "contrib"]
 
 [dependencies]
 bitcoind = { version = "0.37.0", path = "../bitcoind" }
