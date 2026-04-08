@@ -43,6 +43,7 @@ electrs_0_9_1 = ["download"]
 electrs_0_9_11 = ["download"]
 electrs_0_10_6 = ["download"]
 
+corepc-node_30_2 = ["corepc-node/download", "corepc-node/30_2"]
 corepc-node_29_0 = ["corepc-node/download", "corepc-node/29_0"]
 corepc-node_28_2 = ["corepc-node/download", "corepc-node/28_2"]
 corepc-node_27_2 = ["corepc-node/download", "corepc-node/27_2"]
