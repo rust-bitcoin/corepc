@@ -12,14 +12,14 @@ use bitcoin::opcodes::all::*;
 use bitcoin::{
     absolute, consensus, hex, psbt, script, transaction, Amount, ScriptBuf, Transaction, TxOut,
 };
-use integration_test::{test_keys, Node, NodeExt as _, Wallet};
-use node::vtype::*;
-use node::{mtype, Input, Output}; // All the version specific types.
+use integration_test::{test_keys, BitcoinD, BitcoinDExt as _, Wallet};
+use bitcoind::vtype::*;
+use bitcoind::{mtype, Input, Output}; // All the version specific types.
 
 #[test]
 #[cfg(not(feature = "v17"))] // analyzepsbt was added in v0.18.
 fn raw_transactions__analyze_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let psbt = create_a_psbt(&node);
@@ -30,7 +30,7 @@ fn raw_transactions__analyze_psbt__modelled() {
 
 #[test]
 fn raw_transactions__combine_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let (_addr, txid) = node.create_mempool_transaction(); // A million sats.
@@ -83,7 +83,7 @@ fn raw_transactions__combine_psbt__modelled() {
 
 #[test]
 fn raw_transactions__combine_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     let (_, txid) = node.create_mempool_transaction();
@@ -104,7 +104,7 @@ fn raw_transactions__combine_raw_transaction__modelled() {
 
 #[test]
 fn raw_transactions__convert_to_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     let tx = create_a_raw_transaction(&node);
@@ -116,14 +116,14 @@ fn raw_transactions__convert_to_psbt__modelled() {
 
 #[test]
 fn raw_transactions__create_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
     let _ = create_a_psbt(&node);
 }
 
 #[test]
 fn raw_transactions__create_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
     create_sign_send(&node);
 }
@@ -132,7 +132,7 @@ fn raw_transactions__create_raw_transaction__modelled() {
 // Version-specific assertions are gated below.
 #[test]
 fn raw_transactions__decode_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     // v17: utxoupdatepsbt unavailable
@@ -183,7 +183,7 @@ fn raw_transactions__decode_psbt__modelled() {
 
 #[test]
 fn raw_transactions__decode_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     let (_, txid) = node.create_mempool_transaction();
@@ -199,7 +199,7 @@ fn raw_transactions__decode_raw_transaction__modelled() {
 #[test]
 // FIXME: Seems the returned fields are  different depending on the script. Needs more thorough testing.
 fn raw_transactions__decode_script__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     let p2pkh = arbitrary_p2pkh_script();
@@ -248,7 +248,7 @@ fn arbitrary_multisig_script() -> ScriptBuf {
 
 #[test]
 fn raw_transactions__finalize_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     // Create a PSBT and call finalizepsbt directly without signing.
@@ -264,21 +264,21 @@ fn raw_transactions__finalize_psbt__modelled() {
 
 #[test]
 fn raw_transactions__fund_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     create_fund_sign_send(&node);
 }
 
 #[test]
 fn raw_transactions__send_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     create_sign_send(&node); // Calls `sendrawtransaction`.
 }
 
 #[test]
 fn raw_transactions__get_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     // Get raw transaction using a mined transaction and verbose = false.
@@ -311,7 +311,7 @@ fn raw_transactions__get_raw_transaction__modelled() {
 #[test]
 #[cfg(not(feature = "v17"))]
 fn raw_transactions__join_psbts__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let psbt1 = create_a_psbt(&node);
@@ -327,7 +327,7 @@ fn raw_transactions__join_psbts__modelled() {
 
 #[test]
 fn raw_transactions__sign_raw_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     create_sign_send(&node);
 }
@@ -336,7 +336,7 @@ fn raw_transactions__sign_raw_transaction__modelled() {
 #[test]
 #[cfg(feature = "v22_and_below")] // In v23 dumpprivkey no longer works.
 fn raw_transactions__sign_raw_transaction_with_key__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
     create_sign_with_key_send(&node)
 }
@@ -345,7 +345,7 @@ fn raw_transactions__sign_raw_transaction_with_key__modelled() {
 #[test]
 #[cfg(all(feature = "v27_and_below", not(feature = "v26_and_below")))]
 fn raw_transactions__submit_package__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
 
     // Submitting the empty package should simply fail.
     assert!(node.client.submit_package(&[]).is_err());
@@ -371,7 +371,7 @@ fn raw_transactions__submit_package__modelled() {
 #[test]
 #[cfg(not(feature = "v27_and_below"))]
 fn raw_transactions__submit_package__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
 
     // Submitting the empty package should simply fail.
     assert!(node.client.submit_package(&[], None, None).is_err());
@@ -395,7 +395,7 @@ fn raw_transactions__submit_package__modelled() {
 
 #[test]
 fn raw_transactions__test_mempool_accept__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let tx = create_a_raw_transaction(&node);
 
@@ -425,7 +425,7 @@ fn raw_transactions__test_mempool_accept__modelled() {
 #[test]
 #[cfg(not(feature = "v17"))]
 fn raw_transactions__utxo_update_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let psbt = create_a_psbt(&node);
@@ -442,7 +442,7 @@ fn raw_transactions__utxo_update_psbt__modelled() {
 // - create_raw_transaction
 // - sign_raw_transaction_with_wallet
 // - send_raw_transaction
-fn create_sign_send(node: &Node) {
+fn create_sign_send(node: &BitcoinD) {
     let (_addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
@@ -500,7 +500,7 @@ fn create_sign_send(node: &Node) {
 //
 // TODO: Work out how to get a private key without using `dumpprivkey`.
 #[cfg(feature = "v22_and_below")] // In v23 dumpprivkey no longer works.
-fn create_sign_with_key_send(node: &Node) {
+fn create_sign_with_key_send(node: &BitcoinD) {
     let (addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
@@ -557,7 +557,7 @@ fn create_sign_with_key_send(node: &Node) {
 // - sign_raw_transaction_with_wallet (sign_raw_transaction was deprecated in v0.17).
 // - send_raw_transaction
 #[allow(clippy::inconsistent_digit_grouping)] // Sats to btc is a common use case.
-fn create_fund_sign_send(node: &Node) {
+fn create_fund_sign_send(node: &BitcoinD) {
     let (_addr, _tx, txid, _tx_out, vout) = create_utxo(node);
 
     // We need to add an input so that transaction is consensus encoded to hex correctly (because of
@@ -598,7 +598,7 @@ fn create_fund_sign_send(node: &Node) {
 }
 
 // Creates a transaction using client to do RPC call `create_raw_transaction`.
-fn create_a_raw_transaction(node: &Node) -> Transaction {
+fn create_a_raw_transaction(node: &BitcoinD) -> Transaction {
     let (_addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.
@@ -634,7 +634,7 @@ fn create_a_raw_transaction(node: &Node) -> Transaction {
 
 // Sends a transaction, mines a block then grabs a million sat UTXO from the mined transaction.
 fn create_utxo(
-    node: &Node,
+    node: &BitcoinD,
 ) -> (bitcoin::Address, bitcoin::Transaction, bitcoin::Txid, bitcoin::TxOut, u64) {
     // TODO: We should probably pass this into `create_mined_transaction`.
     const MILLION_SATS: bitcoin::Amount = bitcoin::Amount::from_sat(1000000);
@@ -668,7 +668,7 @@ fn create_utxo(
 }
 
 // Creates a PSBT using client to do RPC call `create_psbt`.
-fn create_a_psbt(node: &Node) -> bitcoin::Psbt {
+fn create_a_psbt(node: &BitcoinD) -> bitcoin::Psbt {
     let (_addr, _tx, txid, tx_out, vout) = create_utxo(node);
 
     // Assumes tx_out has a million sats in it.

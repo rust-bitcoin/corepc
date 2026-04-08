@@ -5,12 +5,12 @@ use std::path::PathBuf;
 use bitcoin::bip32::{Fingerprint, Xpriv, Xpub};
 use bitcoin::secp256k1::{Secp256k1, XOnlyPublicKey};
 use bitcoin::Network;
-use node::{Conf, P2P};
+use bitcoind::{Conf, P2P};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 
 #[rustfmt::skip]    // Keep public re-exports separate.
-pub use node::Node; // Re-export this to make test imports more terse.
+pub use bitcoind::BitcoinD; // Re-export this to make test imports more terse.
 
 /// Initialize a logger (configure with `RUST_LOG=trace cargo test`).
 #[allow(dead_code)] // Not all tests use this function.
@@ -27,9 +27,9 @@ pub enum Wallet {
     None,
 }
 
-pub trait NodeExt {
+pub trait BitcoinDExt {
     /// Returns a handle to a `bitcoind` instance after leading wallet if present.
-    fn with_wallet(wallet: Wallet, args: &[&str]) -> Node;
+    fn with_wallet(wallet: Wallet, args: &[&str]) -> BitcoinD;
 
     /// Generates 101 blocks to an address controlled by the loaded wallet.
     fn fund_wallet(&self);
@@ -57,11 +57,11 @@ pub trait NodeExt {
     fn peers_connected(&self) -> usize;
 }
 
-impl NodeExt for Node {
-    fn with_wallet(wallet: Wallet, args: &[&str]) -> Node {
-        let exe = node::exe_path().expect("failed to get bitcoind executable");
+impl BitcoinDExt for BitcoinD {
+    fn with_wallet(wallet: Wallet, args: &[&str]) -> BitcoinD {
+        let exe = bitcoind::exe_path().expect("failed to get bitcoind executable");
 
-        let mut conf = node::Conf::default();
+        let mut conf = bitcoind::Conf::default();
         match wallet {
             Wallet::Default => {} // conf.wallet = Some("default")
             Wallet::Load(w) => conf.wallet = Some(w.to_owned()),
@@ -72,7 +72,7 @@ impl NodeExt for Node {
             conf.args.push(arg);
         }
 
-        Node::with_conf(exe, &conf).expect("failed to create node")
+        BitcoinD::with_conf(exe, &conf).expect("failed to create node")
     }
 
     fn fund_wallet(&self) {
@@ -126,27 +126,27 @@ pub fn random_tmp_file() -> PathBuf {
 }
 
 /// Creates a Bitcoin network with three connected nodes.
-pub fn three_node_network() -> (Node, Node, Node) {
-    let exe = node::exe_path().expect("failed to get bitcoind executable");
+pub fn three_node_network() -> (BitcoinD, BitcoinD, BitcoinD) {
+    let exe = bitcoind::exe_path().expect("failed to get bitcoind executable");
 
-    // Create Node 1 and listen for p2p connections.
+    // Create BitcoinD 1 and listen for p2p connections.
     let mut conf_node1 = Conf::default();
     conf_node1.p2p = P2P::Yes;
-    let node1 = Node::with_conf(&exe, &conf_node1).unwrap();
+    let node1 = BitcoinD::with_conf(&exe, &conf_node1).unwrap();
     assert_eq!(node1.peers_connected(), 0);
 
-    // Create Node 2 connected Node 1.
+    // Create BitcoinD 2 connected BitcoinD 1.
     let mut conf_node2 = Conf::default();
     conf_node2.p2p = node1.p2p_connect(true).unwrap();
-    let node2 = Node::with_conf(&exe, &conf_node2).unwrap();
+    let node2 = BitcoinD::with_conf(&exe, &conf_node2).unwrap();
     assert_eq!(node2.peers_connected(), 1);
 
     // For some reason using only two nodes still errors.
 
-    // Create Node 3 connected Node 2.
+    // Create BitcoinD 3 connected BitcoinD 2.
     let mut conf_node3 = Conf::default();
     conf_node3.p2p = node2.p2p_connect(true).unwrap();
-    let node3 = Node::with_conf(&exe, &conf_node3).unwrap();
+    let node3 = BitcoinD::with_conf(&exe, &conf_node3).unwrap();
     assert!(node3.peers_connected() >= 1); // FIXME: Why not 2?
 
     (node1, node2, node3)

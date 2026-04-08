@@ -6,14 +6,14 @@
 
 use bitcoin::consensus::encode;
 use bitcoin::hex;
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::vtype::*; // All the version specific types.
-use node::{mtype, Input, Output};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
+use bitcoind::vtype::*; // All the version specific types.
+use bitcoind::{mtype, Input, Output};
 
 #[test]
 #[cfg(not(feature = "v25_and_below"))]
 fn blockchain__dump_tx_out_set__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
 
@@ -59,18 +59,18 @@ fn blockchain__load_tx_out_set__modelled() {
     let coinbase_descriptor =
         "pk(0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798)";
 
-    let exe = node::exe_path().expect("failed to get bitcoind executable");
-    let mut conf_a = node::Conf::default();
-    conf_a.p2p = node::P2P::Yes;
-    let node_a = Node::with_conf(&exe, &conf_a).expect("failed to create miner node");
+    let exe = bitcoind::exe_path().expect("failed to get bitcoind executable");
+    let mut conf_a = bitcoind::Conf::default();
+    conf_a.p2p = bitcoind::P2P::Yes;
+    let node_a = BitcoinD::with_conf(&exe, &conf_a).expect("failed to create miner node");
 
     // TestChain100Setup mocktime matched to the exact
     const MOCK_TIME_START: u64 = 1598887952;
     for i in 0..snapshot_height {
         let mock_time = MOCK_TIME_START + i;
-        let _: node::serde_json::Value = node_a
+        let _: bitcoind::serde_json::Value = node_a
             .client
-            .call("setmocktime", &[node::serde_json::json!(mock_time)])
+            .call("setmocktime", &[bitcoind::serde_json::json!(mock_time)])
             .expect("setmocktime");
         node_a.client.generate_to_descriptor(1, coinbase_descriptor).expect("generatetodescriptor");
     }
@@ -99,10 +99,10 @@ fn blockchain__load_tx_out_set__modelled() {
         let _: DumpTxOutSet =
             node_a.client.dump_tx_out_set(dump_path, "latest").expect("dumptxoutset");
     }
-    let mut conf_b = node::Conf::default();
+    let mut conf_b = bitcoind::Conf::default();
     conf_b.wallet = None;
-    conf_b.p2p = node::P2P::No;
-    let node_b = Node::with_conf(&exe, &conf_b).expect("failed to create loader node");
+    conf_b.p2p = bitcoind::P2P::No;
+    let node_b = BitcoinD::with_conf(&exe, &conf_b).expect("failed to create loader node");
 
     for h in 1..=snapshot_height {
         let bh = node_a
@@ -132,7 +132,7 @@ fn blockchain__load_tx_out_set__modelled() {
 
 #[test]
 fn blockchain__get_best_block_hash__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let json: GetBestBlockHash = node.client.get_best_block_hash().expect("getbestblockhash");
     let model: Result<mtype::GetBestBlockHash, hex::HexToArrayError> = json.into_model();
@@ -141,7 +141,7 @@ fn blockchain__get_best_block_hash__modelled() {
 
 #[test]
 fn blockchain__get_block__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
 
     let json: GetBlockVerboseZero =
@@ -156,7 +156,7 @@ fn blockchain__get_block__modelled() {
 
     #[cfg(not(feature = "v28_and_below"))]
     {
-        let node = Node::with_wallet(Wallet::Default, &[]);
+        let node = BitcoinD::with_wallet(Wallet::Default, &[]);
         node.fund_wallet();
         let (_address, mined_tx) = node.create_mined_transaction();
         let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
@@ -206,7 +206,7 @@ fn blockchain__get_block__modelled() {
 
 #[test]
 fn blockchain__get_blockchain_info__modelled() {
-    let node = Node::with_wallet(Wallet::None, &["-prune=10000"]);
+    let node = BitcoinD::with_wallet(Wallet::None, &["-prune=10000"]);
 
     let json: GetBlockchainInfo = node.client.get_blockchain_info().expect("rpc");
     let model: Result<mtype::GetBlockchainInfo, GetBlockchainInfoError> = json.into_model();
@@ -215,7 +215,7 @@ fn blockchain__get_blockchain_info__modelled() {
 
 #[test]
 fn blockchain__get_block_count__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let json: GetBlockCount = node.client.get_block_count().unwrap();
     let _: mtype::GetBlockCount = json.into_model();
@@ -224,7 +224,7 @@ fn blockchain__get_block_count__modelled() {
 #[test]
 #[cfg(not(feature = "v18_and_below"))]
 fn blockchain__get_block_filter__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &["-blockfilterindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-blockfilterindex"]);
     node.mine_a_block();
     let hash = node.client.best_block_hash().expect("best_block_hash failed");
 
@@ -266,7 +266,7 @@ fn blockchain__get_block_from_peer() {
 
 #[test]
 fn blockchain__get_block_hash__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let json: GetBlockHash = node.client.get_block_hash(0).expect("getblockhash");
     let model: Result<mtype::GetBlockHash, hex::HexToArrayError> = json.into_model();
@@ -275,7 +275,7 @@ fn blockchain__get_block_hash__modelled() {
 
 #[test]
 fn blockchain__get_block_header__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
 
     // verbose = false
@@ -295,9 +295,9 @@ fn blockchain__get_block_stats__modelled() {
     // Version 17 and 18 cannot call `getblockstats` if `-txindex` is not enabled.
     // newer versions do not.
     let node = if cfg!(feature = "v18_and_below") {
-        Node::with_wallet(Wallet::Default, &["-txindex"])
+        BitcoinD::with_wallet(Wallet::Default, &["-txindex"])
     } else {
-        Node::with_wallet(Wallet::Default, &[])
+        BitcoinD::with_wallet(Wallet::Default, &[])
     };
     node.fund_wallet();
 
@@ -306,7 +306,7 @@ fn blockchain__get_block_stats__modelled() {
     get_block_stats_with_stats(&node);
 }
 
-fn get_block_stats_by_height(node: &Node) {
+fn get_block_stats_by_height(node: &BitcoinD) {
     let json: GetBlockStats =
         node.client.get_block_stats_by_height(101, None).expect("getblockstats");
 
@@ -317,7 +317,7 @@ fn get_block_stats_by_height(node: &Node) {
     assert!(model.block_hash.is_some());
 }
 
-fn get_block_stats_by_block_hash(node: &Node) {
+fn get_block_stats_by_block_hash(node: &BitcoinD) {
     let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
     let json: GetBlockStats =
         node.client.get_block_stats_by_block_hash(&block_hash, None).expect("getblockstats");
@@ -328,7 +328,7 @@ fn get_block_stats_by_block_hash(node: &Node) {
     assert!(model.height.is_some());
 }
 
-fn get_block_stats_with_stats(node: &Node) {
+fn get_block_stats_with_stats(node: &BitcoinD) {
     let json: GetBlockStats = node
         .client
         .get_block_stats_by_height(101, Some(&["minfeerate", "avgfeerate"]))
@@ -345,7 +345,7 @@ fn get_block_stats_with_stats(node: &Node) {
 #[test]
 #[cfg(not(feature = "v25_and_below"))]
 fn blockchain__get_chain_states__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
 
@@ -358,7 +358,7 @@ fn blockchain__get_chain_states__modelled() {
 
 #[test]
 fn blockchain__get_chain_tips__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let json: GetChainTips = node.client.get_chain_tips().expect("getchaintips");
     let model: Result<mtype::GetChainTips, ChainTipsError> = json.into_model();
@@ -367,7 +367,7 @@ fn blockchain__get_chain_tips__modelled() {
 
 #[test]
 fn blockchain__get_chain_tx_stats__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
 
@@ -381,7 +381,7 @@ fn blockchain__get_chain_tx_stats__modelled() {
 #[test]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_deployment_info__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     node.mine_a_block();
     node.mine_a_block();
@@ -411,7 +411,7 @@ fn blockchain__get_deployment_info__modelled() {
 #[test]
 #[cfg(not(feature = "v28_and_below"))]
 fn blockchain__get_descriptor_activity__modelled() {
-    let node = Node::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);
+    let node = BitcoinD::with_wallet(Wallet::None, &["-coinstatsindex=1", "-txindex=1"]);
 
     // In Core v30, `getdescriptoractivity` requires `blockhashes` and `scanobjects` arguments.
     // Older versions accepted omitting them.
@@ -438,7 +438,7 @@ fn blockchain__get_descriptor_activity__modelled() {
 
 #[test]
 fn blockchain__get_difficulty__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let json: GetDifficulty = node.client.get_difficulty().expect("getdifficulty");
     let _: mtype::GetDifficulty = json.into_model();
@@ -446,7 +446,7 @@ fn blockchain__get_difficulty__modelled() {
 
 #[test]
 fn blockchain__get_mempool_ancestors__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, parent_txid) = node.create_mempool_transaction();
     let child_txid = create_child_spending_parent(&node, parent_txid);
@@ -461,7 +461,7 @@ fn blockchain__get_mempool_ancestors__modelled() {
 
 #[test]
 fn blockchain__get_mempool_ancestors_verbose__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, parent_txid) = node.create_mempool_transaction();
     let child_txid = create_child_spending_parent(&node, parent_txid);
@@ -476,7 +476,7 @@ fn blockchain__get_mempool_ancestors_verbose__modelled() {
 
 #[test]
 fn blockchain__get_mempool_descendants__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, parent_txid) = node.create_mempool_transaction();
     let child_txid = create_child_spending_parent(&node, parent_txid);
@@ -491,7 +491,7 @@ fn blockchain__get_mempool_descendants__modelled() {
 
 #[test]
 fn blockchain__get_mempool_descendants_verbose__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, parent_txid) = node.create_mempool_transaction();
     let child_txid = create_child_spending_parent(&node, parent_txid);
@@ -509,7 +509,7 @@ fn blockchain__get_mempool_descendants_verbose__modelled() {
 
 #[test]
 fn blockchain__get_mempool_entry__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, txid) = node.create_mempool_transaction();
 
@@ -520,7 +520,7 @@ fn blockchain__get_mempool_entry__modelled() {
 
 #[test]
 fn blockchain__get_mempool_info__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _txid) = node.create_mempool_transaction();
 
@@ -534,7 +534,7 @@ fn blockchain__get_mempool_info__modelled() {
 
 #[test]
 fn blockchain__get_raw_mempool__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _txid) = node.create_mempool_transaction();
 
@@ -567,7 +567,7 @@ fn blockchain__get_raw_mempool__modelled() {
 
 #[test]
 fn blockchain__get_tx_out__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, tx) = node.create_mined_transaction();
     let txid = tx.compute_txid();
@@ -580,7 +580,7 @@ fn blockchain__get_tx_out__modelled() {
 
 #[test]
 fn blockchain__get_tx_out_proof() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, tx) = node.create_mined_transaction();
     let txid = tx.compute_txid();
@@ -590,7 +590,7 @@ fn blockchain__get_tx_out_proof() {
 
 #[test]
 fn blockchain__get_tx_out_set_info__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
 
@@ -602,7 +602,7 @@ fn blockchain__get_tx_out_set_info__modelled() {
 #[test]
 #[cfg(not(feature = "v23_and_below"))]
 fn blockchain__get_tx_spending_prevout__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let (_address1, txid_1) = node.create_mempool_transaction();
@@ -626,7 +626,7 @@ fn blockchain__get_tx_spending_prevout__modelled() {
 #[test]
 #[cfg(not(feature = "v25_and_below"))]
 fn blockchain__import_mempool() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
 
@@ -637,7 +637,7 @@ fn blockchain__import_mempool() {
 
 #[test]
 fn blockchain__precious_block() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.mine_a_block();
     let hash = node.client.best_block_hash().expect("best_block_hash failed");
     node.mine_a_block();
@@ -649,7 +649,7 @@ fn blockchain__precious_block() {
 fn blockchain__prune_blockchain() {
     const NBLOCKS: usize = 1;
 
-    let node = Node::with_wallet(Wallet::Default, &["-prune=550"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-prune=550"]);
     let address = node.client.new_address().expect("Failed to get new address");
 
     let gen_result = node
@@ -669,7 +669,7 @@ fn blockchain__prune_blockchain() {
 
 #[test]
 fn blockchain__savemempool() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_addr, _txid) = node.create_mempool_transaction();
 
@@ -687,7 +687,7 @@ fn blockchain__savemempool() {
 #[test]
 #[cfg(not(feature = "v24_and_below"))]
 fn blockchain__scan_blocks_modelled() {
-    let node = Node::with_wallet(Wallet::None, &["-blockfilterindex=1"]);
+    let node = BitcoinD::with_wallet(Wallet::None, &["-blockfilterindex=1"]);
 
     // Arbitrary scan descriptor
     let scan_desc = "pkh(022afc20bf379bc96a2f4e9e63ffceb8652b2b6a097f63fbee6ecec2a49a48010e)";
@@ -713,9 +713,9 @@ fn blockchain__scan_blocks_modelled() {
 fn blockchain__scan_tx_out_set_modelled() {
     let node = match () {
         #[cfg(feature = "v21_and_below")]
-        () => Node::with_wallet(Wallet::None, &[]),
+        () => BitcoinD::with_wallet(Wallet::None, &[]),
         #[cfg(not(feature = "v21_and_below"))]
-        () => Node::with_wallet(Wallet::None, &["-coinstatsindex=1"]),
+        () => BitcoinD::with_wallet(Wallet::None, &["-coinstatsindex=1"]),
     };
 
     let dummy_pubkey_hex = "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798";
@@ -734,14 +734,14 @@ fn blockchain__scan_tx_out_set_modelled() {
 
 #[test]
 fn blockchain__verify_chain() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let _: Result<VerifyChain, _> = node.client.verify_chain();
 }
 
 #[test]
 fn blockchain__verify_tx_out_proof__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let (_address, tx) = node.create_mined_transaction();
@@ -759,7 +759,7 @@ fn blockchain__verify_tx_out_proof__modelled() {
 
 #[test]
 fn blockchain__wait_for_block__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
     let block_hash = node.client.best_block_hash().expect("bestblockhash");
@@ -772,7 +772,7 @@ fn blockchain__wait_for_block__modelled() {
 
 #[test]
 fn blockchain__wait_for_block_height__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, _tx) = node.create_mined_transaction();
     let height = node.client.get_block_count().expect("getblockcount").0;
@@ -814,7 +814,7 @@ fn blockchain__wait_for_new_block__modelled() {
 
 /// Create and broadcast a child transaction spending vout 0 of the given parent mempool txid.
 /// Returns the child's txid.
-fn create_child_spending_parent(node: &Node, parent_txid: bitcoin::Txid) -> bitcoin::Txid {
+fn create_child_spending_parent(node: &BitcoinD, parent_txid: bitcoin::Txid) -> bitcoin::Txid {
     let inputs = vec![Input { txid: parent_txid, vout: 0, sequence: None }];
     let spend_address = node.client.new_address().expect("newaddress");
     let outputs = vec![Output::new(spend_address, bitcoin::Amount::from_sat(100_000))];

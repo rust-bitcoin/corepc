@@ -5,7 +5,7 @@ pub enum Error {
     Io(std::io::Error),
 
     /// Wrapper of bitcoind Error
-    Bitcoind(corepc_node::Error),
+    Bitcoind(bitcoind::Error),
 
     /// Wrapper of electrum_client Error
     ElectrumClient(electrum_client::Error),
@@ -55,8 +55,8 @@ impl From<std::io::Error> for Error {
     }
 }
 
-impl From<corepc_node::Error> for Error {
-    fn from(e: corepc_node::Error) -> Self {
+impl From<bitcoind::Error> for Error {
+    fn from(e: bitcoind::Error) -> Self {
         Error::Bitcoind(e)
     }
 }

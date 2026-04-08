@@ -11,33 +11,33 @@ edition = "2021"
 # - `cargo test --all-features` does not work - select a single version.
 # - `cargo test --no-default-features` skips all tests.
 [features]
-download = ["node/download"]
+download = ["bitcoind/download"]
 
 latest = ["30_2"]
 
-# Enable the same feature in `node` and the version feature here.
+# Enable the same feature in `bitcoind` and the version feature here.
 # All minor releases of the latest four versions.
-30_2 = ["v30_and_below", "node/30_2"]
+30_2 = ["v30_and_below", "bitcoind/30_2"]
 # Skip v30.1 due to wallet migration bug.
-30_0 = ["v30_and_below", "node/30_0"]
-29_0 = ["v29_and_below", "node/29_0"]
-28_2 = ["v28_and_below", "node/28_2"]
-28_1 = ["v28_and_below", "node/28_1"]
-28_0 = ["v28_and_below", "node/28_0"]
-27_2 = ["v27_and_below", "node/27_2"]
-27_1 = ["v27_and_below", "node/27_1"]
-27_0 = ["v27_and_below", "node/27_0"]
+30_0 = ["v30_and_below", "bitcoind/30_0"]
+29_0 = ["v29_and_below", "bitcoind/29_0"]
+28_2 = ["v28_and_below", "bitcoind/28_2"]
+28_1 = ["v28_and_below", "bitcoind/28_1"]
+28_0 = ["v28_and_below", "bitcoind/28_0"]
+27_2 = ["v27_and_below", "bitcoind/27_2"]
+27_1 = ["v27_and_below", "bitcoind/27_1"]
+27_0 = ["v27_and_below", "bitcoind/27_0"]
 # Only the latest minor version for older versions.
-26_2 = ["v26_and_below", "node/26_2"]
-25_2 = ["v25_and_below", "node/25_2"]
-24_2 = ["v24_and_below", "node/24_2"]
-23_2 = ["v23_and_below", "node/23_2"]
-22_1 = ["v22_and_below", "node/22_1"]
-0_21_2 = ["v21_and_below", "node/0_21_2"]
-0_20_2 = ["v20_and_below", "node/0_20_2"]
-0_19_1 = ["v19_and_below", "node/0_19_1"]
-0_18_1 = ["v18_and_below", "node/0_18_1"]
-0_17_2 = ["v17", "node/0_17_2"]
+26_2 = ["v26_and_below", "bitcoind/26_2"]
+25_2 = ["v25_and_below", "bitcoind/25_2"]
+24_2 = ["v24_and_below", "bitcoind/24_2"]
+23_2 = ["v23_and_below", "bitcoind/23_2"]
+22_1 = ["v22_and_below", "bitcoind/22_1"]
+0_21_2 = ["v21_and_below", "bitcoind/0_21_2"]
+0_20_2 = ["v20_and_below", "bitcoind/0_20_2"]
+0_19_1 = ["v19_and_below", "bitcoind/0_19_1"]
+0_18_1 = ["v18_and_below", "bitcoind/0_18_1"]
+0_17_2 = ["v17", "bitcoind/0_17_2"]
 
 # These features are just for internal use (feature gating).
 # Each major version is tested with the same client.
@@ -63,7 +63,7 @@ TODO = []                       # This is a dirty hack while writing the tests.
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
 env_logger = "0.9.0"
-node = { package = "corepc-node", version = "0.12.0", path = "../node", default-features = false }
+bitcoind = { package = "bitcoind", version = "0.37.0", path = "../bitcoind", default-features = false }
 rand = "0.8.5"
 # Just so we can enable the feature.
 types = { package = "corepc-types", version = "0.12.0", path = "../types", features = ["serde-deny-unknown-fields"] }
@@ -77,8 +77,8 @@ path = "../client"
 [patch.crates-io.jsonrpc]
 path = "../jsonrpc"
 
-[patch.crates-io.corepc-node]
-path = "../node"
+[patch.crates-io.bitcoind]
+path = "../bitcoind"
 
 [patch.crates-io.corepc-types]
 path = "../types"

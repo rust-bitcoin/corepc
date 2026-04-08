@@ -23,12 +23,12 @@ When you don't use the auto-download feature you have the following options:
 
 ```rust
 if let Ok(exe_path) = corepc_node::exe_path() {
-  let node = corepc_node::Node::new(exe_path).unwrap();
+  let node = corepc_node::BitcoinD::new(exe_path).unwrap();
   assert_eq!(0, node.client.get_blockchain_info().unwrap().blocks);
 }
 ```
 
-Startup options could be configured via the [`Conf`] struct using [`Node::with_conf`] or
+Startup options could be configured via the [`Conf`] struct using [`BitcoinD::with_conf`] or
 `Node::from_downloaded_with_conf`
 
 ## Features

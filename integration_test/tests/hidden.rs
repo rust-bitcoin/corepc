@@ -16,11 +16,11 @@ use bitcoin::{
     absolute, consensus, transaction, Amount, OutPoint, ScriptBuf, Sequence, Transaction, TxIn,
     TxOut, Txid, Witness,
 };
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::mtype;
-use node::vtype::*; // All the version specific types.
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
+use bitcoind::mtype;
+use bitcoind::vtype::*; // All the version specific types.
 #[cfg(not(feature = "v21_and_below"))]
-use node::P2P;
+use bitcoind::P2P;
 
 #[test]
 #[cfg(not(feature = "v21_and_below"))]
@@ -54,7 +54,7 @@ fn hidden__add_connection() {
 
 #[test]
 fn hidden__estimate_raw_fee__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     node.fund_wallet();
 
@@ -200,7 +200,7 @@ fn hidden__get_orphan_txs__modelled() {
 
 #[test]
 fn hidden__sync_with_validation_interface_queue() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     // Create activity that causes validation callbacks.
@@ -214,7 +214,7 @@ fn hidden__sync_with_validation_interface_queue() {
 
 #[test]
 fn hidden__reconsider_block() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     node.mine_a_block();
@@ -258,7 +258,7 @@ fn hidden__reconsider_block() {
 #[test]
 #[cfg(not(feature = "v19_and_below"))]
 fn hidden__mock_scheduler() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let _: () = node.client.mock_scheduler(1).expect("mockscheduler");
 }
@@ -266,7 +266,7 @@ fn hidden__mock_scheduler() {
 #[test]
 #[cfg(not(feature = "v25_and_below"))]
 fn hidden__get_raw_addrman() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     // Add a peer address so the address manager has something.
     let peer_address = "1.2.3.4";

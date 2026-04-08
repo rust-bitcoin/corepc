@@ -5,14 +5,14 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
 use bitcoin::hex;
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::mtype;
-use node::vtype::*; // All the version specific types.
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
+use bitcoind::mtype;
+use bitcoind::vtype::*; // All the version specific types.
 
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
 fn generating__generate_block__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let mining_addr = node.client.new_address().expect("failed to get new address");
     let dest_addr = node.client.new_address().expect("failed to get new address");
@@ -53,7 +53,7 @@ fn generating__generate_block__modelled() {
 #[cfg(feature = "v17")]
 fn generating__generate__modelled() {
     const NBLOCKS: usize = 10;
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let json: Generate = node.client.generate(NBLOCKS).expect("generate");
 
@@ -65,7 +65,7 @@ fn generating__generate__modelled() {
 fn generating__generate_to_address__modelled() {
     const NBLOCKS: usize = 1;
 
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let address = node.client.new_address().expect("failed to get new address");
 
     let json: GenerateToAddress =
@@ -80,7 +80,7 @@ fn generating__generate_to_address__modelled() {
 fn generating__generate_to_descriptor__modelled() {
     const NBLOCKS: usize = 1;
 
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let address = node.client.new_address().expect("failed to get new address");
     let descriptor = format!("addr({})", address);
 
@@ -95,7 +95,7 @@ fn generating__generate_to_descriptor__modelled() {
 fn generating__invalidate_block() {
     const NBLOCKS: usize = 1;
 
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let address = node.client.new_address().expect("failed to get new address");
     let old_best_block =

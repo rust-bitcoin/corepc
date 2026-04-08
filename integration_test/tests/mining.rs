@@ -5,9 +5,9 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
 use bitcoin::SignedAmount;
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::vtype::*;
-use node::{mtype, TemplateRequest, TemplateRules}; // All the version specific types.
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
+use bitcoind::vtype::*;
+use bitcoind::{mtype, TemplateRequest, TemplateRules}; // All the version specific types.
 
 #[test]
 fn mining__get_block_template__modelled() {
@@ -38,7 +38,7 @@ fn mining__get_block_template__modelled() {
 
 #[test]
 fn mining__get_mining_info() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let json: GetMiningInfo = node.client.get_mining_info().expect("rpc");
@@ -58,7 +58,7 @@ fn mining__get_mining_info() {
 
 #[test]
 fn mining__get_network_hash_ps() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let _ = node.client.get_network_hash_ps().expect("rpc");
 }
@@ -66,7 +66,7 @@ fn mining__get_network_hash_ps() {
 #[test]
 #[cfg(not(feature = "v25_and_below"))]
 fn mining__get_prioritised_transactions() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let _ = node.client.get_prioritised_transactions().expect("getprioritisedtransactions");
@@ -74,7 +74,7 @@ fn mining__get_prioritised_transactions() {
 
 #[test]
 fn mining__prioritise_transaction() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let (_addr, txid) = node.create_mempool_transaction();
@@ -106,7 +106,7 @@ fn mining__submit_block() {
 // Code copied from BDK - thanks!
 // FIXME: Submitting this block sometimes works and sometimes returns 'inconclusive'.
 #[allow(dead_code)]
-fn submit_empty_block(node: &Node, bt: &mtype::GetBlockTemplate) {
+fn submit_empty_block(node: &BitcoinD, bt: &mtype::GetBlockTemplate) {
     use bitcoin::hashes::Hash as _;
     use bitcoin::{
         absolute, block, transaction, Amount, Block, OutPoint, ScriptBuf, ScriptHash, Sequence,
@@ -161,7 +161,7 @@ fn submit_empty_block(node: &Node, bt: &mtype::GetBlockTemplate) {
 
 // FIXME: Submitting this block returns 'inconclusive'.
 #[allow(dead_code)]
-fn mining__submit_block_with_dummy_coinbase(node: &Node, bt: &mtype::GetBlockTemplate) {
+fn mining__submit_block_with_dummy_coinbase(node: &BitcoinD, bt: &mtype::GetBlockTemplate) {
     use bitcoin::hashes::Hash as _;
     use bitcoin::{
         absolute, block, transaction, Amount, Block, OutPoint, ScriptBuf, Sequence, Transaction,
@@ -220,7 +220,7 @@ fn mining__submit_block_with_dummy_coinbase(node: &Node, bt: &mtype::GetBlockTem
 #[test]
 #[cfg(not(feature = "v17"))]
 fn mining__submit_header() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     node.mine_a_block();
 

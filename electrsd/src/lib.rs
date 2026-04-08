@@ -10,11 +10,11 @@ mod error;
 mod ext;
 mod versions;
 
-use corepc_node::anyhow::Context;
-use corepc_node::get_available_port;
-use corepc_node::serde_json::Value;
-use corepc_node::tempfile::TempDir;
-use corepc_node::{anyhow, Node};
+use bitcoind::anyhow::Context;
+use bitcoind::get_available_port;
+use bitcoind::serde_json::Value;
+use bitcoind::tempfile::TempDir;
+use bitcoind::{anyhow, BitcoinD};
 use electrum_client::raw_client::{ElectrumPlaintextStream, RawClient};
 use log::{debug, error, warn};
 use std::env;
@@ -23,8 +23,8 @@ use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::time::Duration;
 
-// re-export corepc_node
-pub use corepc_node;
+// re-export bitcoind
+pub use bitcoind;
 // re-export corepc_client
 pub use corepc_client;
 // re-export electrum_client because calling RawClient methods requires the ElectrumApi trait
@@ -142,14 +142,14 @@ impl DataDir {
 
 impl ElectrsD {
     /// Create a new electrs process connected with the given bitcoind and default args.
-    pub fn new<S: AsRef<OsStr>>(exe: S, bitcoind: &Node) -> anyhow::Result<ElectrsD> {
+    pub fn new<S: AsRef<OsStr>>(exe: S, bitcoind: &BitcoinD) -> anyhow::Result<ElectrsD> {
         ElectrsD::with_conf(exe, bitcoind, &Conf::default())
     }
 
     /// Create a new electrs process using given [Conf] connected with the given bitcoind
     pub fn with_conf<S: AsRef<OsStr>>(
         exe: S,
-        bitcoind: &Node,
+        bitcoind: &BitcoinD,
         conf: &Conf,
     ) -> anyhow::Result<ElectrsD> {
         let response = bitcoind.client.call::<Value>("getblockchaininfo", &[])?;
@@ -422,7 +422,7 @@ pub fn exe_path() -> anyhow::Result<String> {
 mod test {
     use crate::exe_path;
     use crate::ElectrsD;
-    use corepc_node::P2P;
+    use bitcoind::P2P;
     use electrum_client::ElectrumApi;
     use log::{debug, log_enabled, Level};
     use std::env;
@@ -473,16 +473,16 @@ mod test {
         assert!(electrsd.client.ping().is_err());
     }
 
-    pub(crate) fn setup_nodes() -> (String, corepc_node::Node, ElectrsD) {
+    pub(crate) fn setup_nodes() -> (String, bitcoind::BitcoinD, ElectrsD) {
         let (bitcoind_exe, electrs_exe) = init();
         debug!("bitcoind: {}", &bitcoind_exe);
         debug!("electrs: {}", &electrs_exe);
-        let mut conf = corepc_node::Conf::default();
+        let mut conf = bitcoind::Conf::default();
         conf.view_stdout = log_enabled!(Level::Debug);
         if !cfg!(feature = "electrs_0_8_10") && !cfg!(feature = "esplora_a33e97e1") {
             conf.p2p = P2P::Yes;
         }
-        let bitcoind = corepc_node::Node::with_conf(&bitcoind_exe, &conf).unwrap();
+        let bitcoind = bitcoind::BitcoinD::with_conf(&bitcoind_exe, &conf).unwrap();
         let electrs_conf = crate::Conf {
             view_stderr: log_enabled!(Level::Debug),
             ..Default::default()
@@ -493,7 +493,7 @@ mod test {
 
     fn init() -> (String, String) {
         let _ = env_logger::try_init();
-        let bitcoind_exe_path = corepc_node::exe_path().unwrap();
+        let bitcoind_exe_path = bitcoind::exe_path().unwrap();
         let electrs_exe_path = exe_path().unwrap();
         (bitcoind_exe_path, electrs_exe_path)
     }

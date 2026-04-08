@@ -1,5 +1,5 @@
 [workspace]
-members = [ "bitreq", "client", "fuzz", "jsonrpc", "node", "types"]
+members = ["bitcoind", "bitreq", "client", "fuzz", "jsonrpc", "types"]
 exclude = ["integration_test", "verify", "electrsd"]
 resolver = "2"
 rust-version = "1.75.0"
@@ -10,8 +10,8 @@ path = "client"
 [patch.crates-io.jsonrpc]
 path = "jsonrpc"
 
-[patch.crates-io.corepc-node]
-path = "node"
+[patch.crates-io.bitcoind]
+path = "bitcoind"
 
 [patch.crates-io.corepc-types]
 path = "types"
