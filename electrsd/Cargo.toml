@@ -6,7 +6,8 @@ description = "Utility to run a regtest electrs process, useful in integration t
 repository = "https://github.com/rust-bitcoin/corepc"
 documentation = "https://docs.rs/elecrtsd/"
 license = "MIT"
-edition = "2018"
+edition = "2021"
+rust-version = "1.75.0"
 categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
 exclude = ["tests", "contrib"]
 
@@ -28,7 +29,7 @@ zip = { version = "0.6", default-features = false, optional = true, features = [
   "bzip2",
   "deflate",
 ] }
-minreq = { version = "2.9.0", default-features = false, optional = true, features = [
+bitreq = { version = "0.3.4", path = "../bitreq", default-features = false, optional = true, features = [
   "https",
 ] }
 
@@ -36,7 +37,7 @@ minreq = { version = "2.9.0", default-features = false, optional = true, feature
 legacy = []
 
 # download is not supposed to be used directly only through selecting one of the version feature
-download = ["bitcoin_hashes", "zip", "minreq"]
+download = ["bitcoin_hashes", "zip", "bitreq"]
 
 esplora_a33e97e1 = ["download", "legacy"]
 electrs_0_8_10 = ["download"]

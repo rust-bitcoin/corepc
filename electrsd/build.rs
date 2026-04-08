@@ -61,7 +61,7 @@ mod download {
                 std::env::var("ELECTRSD_DOWNLOAD_ENDPOINT").unwrap_or(GITHUB_URL.to_string());
             let url = format!("{}/{}", download_endpoint, download_filename);
 
-            let downloaded_bytes = minreq::get(url).send().unwrap().into_bytes();
+            let downloaded_bytes = bitreq::get(url).send().unwrap().into_bytes();
 
             let downloaded_hash = sha256::Hash::hash(&downloaded_bytes);
             assert_eq!(expected_hash, downloaded_hash);
