@@ -16,11 +16,11 @@ use bitcoin::{
     absolute, consensus, transaction, Amount, OutPoint, ScriptBuf, Sequence, Transaction, TxIn,
     TxOut, Txid, Witness,
 };
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::mtype;
 use bitcoind::vtype::*; // All the version specific types.
 #[cfg(not(feature = "v21_and_below"))]
 use bitcoind::P2P;
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 #[cfg(not(feature = "v21_and_below"))]

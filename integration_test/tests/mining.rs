@@ -5,9 +5,9 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
 use bitcoin::SignedAmount;
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*;
-use bitcoind::{mtype, TemplateRequest, TemplateRules}; // All the version specific types.
+use bitcoind::{mtype, TemplateRequest, TemplateRules};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet}; // All the version specific types.
 
 #[test]
 fn mining__get_block_template__modelled() {

@@ -4,9 +4,9 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*; // All the version specific types.
 use bitcoind::{mtype, AddNodeCommand, SetBanCommand};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 fn network__add_node() {

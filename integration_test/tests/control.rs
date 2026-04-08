@@ -4,8 +4,8 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
-use bitcoind::vtype::*; // All the version specific types.
+use bitcoind::vtype::*;
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet}; // All the version specific types.
 
 #[test]
 fn control__get_memory_info() {

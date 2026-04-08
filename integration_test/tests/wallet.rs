@@ -15,7 +15,6 @@ use bitcoin::{
     amount, hex, key, psbt, secp256k1, sign_message, Amount, CompressedPublicKey, FeeRate, Network,
     PrivateKey, PublicKey,
 };
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*; // All the version specific types.
 #[cfg(not(feature = "v20_and_below"))]
 use bitcoind::ImportDescriptorsRequest;
@@ -23,6 +22,7 @@ use bitcoind::{
     mtype, AddressType, ImportMultiRequest, ImportMultiScriptPubKey, ImportMultiTimestamp,
     WalletCreateFundedPsbtInput,
 };
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 fn wallet__abandon_transaction() {

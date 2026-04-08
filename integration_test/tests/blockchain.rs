@@ -6,9 +6,9 @@
 
 use bitcoin::consensus::encode;
 use bitcoin::hex;
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*; // All the version specific types.
 use bitcoind::{mtype, Input, Output};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 #[cfg(not(feature = "v25_and_below"))]

@@ -5,8 +5,8 @@
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 #![allow(unused_imports)] // Because of feature gated tests.
 
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
-use bitcoind::vtype::*; // All the version specific types.
+use bitcoind::vtype::*;
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet}; // All the version specific types.
 
 #[test]
 #[cfg(not(feature = "v17"))]

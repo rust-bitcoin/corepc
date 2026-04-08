@@ -7,9 +7,9 @@
 
 use bitcoin::address::{NetworkUnchecked, ParseError};
 use bitcoin::Address;
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*;
-use bitcoind::{mtype, Input, Output}; // All the version specific types.
+use bitcoind::{mtype, Input, Output};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet}; // All the version specific types.
 
 #[test]
 #[cfg(unix)]

@@ -666,7 +666,7 @@ mod test {
     use tempfile::TempDir;
 
     use super::*;
-    use crate::{exe_path, get_available_port, Conf, BitcoinD, LOCAL_IP, P2P};
+    use crate::{exe_path, get_available_port, BitcoinD, Conf, LOCAL_IP, P2P};
 
     #[test]
     fn test_local_ip() {

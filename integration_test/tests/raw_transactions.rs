@@ -12,9 +12,9 @@ use bitcoin::opcodes::all::*;
 use bitcoin::{
     absolute, consensus, hex, psbt, script, transaction, Amount, ScriptBuf, Transaction, TxOut,
 };
-use integration_test::{test_keys, BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*;
-use bitcoind::{mtype, Input, Output}; // All the version specific types.
+use bitcoind::{mtype, Input, Output};
+use integration_test::{test_keys, BitcoinD, BitcoinDExt as _, Wallet}; // All the version specific types.
 
 #[test]
 #[cfg(not(feature = "v17"))] // analyzepsbt was added in v0.18.

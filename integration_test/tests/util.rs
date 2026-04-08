@@ -6,9 +6,9 @@
 #![allow(unused_imports)] // Because of feature gated tests.
 
 use bitcoin::{address, amount, sign_message, PrivateKey, PublicKey};
-use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 use bitcoind::vtype::*;
 use bitcoind::{mtype, FeeEstimateMode};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 fn util__create_multisig__modelled() {
