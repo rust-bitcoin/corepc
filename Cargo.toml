@@ -4,18 +4,6 @@ exclude = ["integration_test", "verify", "electrsd"]
 resolver = "2"
 rust-version = "1.75.0"
 
-[patch.crates-io.corepc-client]
-path = "client"
-
-[patch.crates-io.jsonrpc]
-path = "jsonrpc"
-
-[patch.crates-io.bitcoind]
-path = "bitcoind"
-
-[patch.crates-io.corepc-types]
-path = "types"
-
 [workspace.metadata.rbmt.toolchains]
 nightly = "nightly-2025-09-12"
 stable = "1.94.1"

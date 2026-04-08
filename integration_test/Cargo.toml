@@ -69,16 +69,3 @@ rand = "0.8.5"
 types = { package = "corepc-types", version = "0.12.0", path = "../types", features = ["serde-deny-unknown-fields"] }
 
 [dev-dependencies]
-
-
-[patch.crates-io.corepc-client]
-path = "../client"
-
-[patch.crates-io.jsonrpc]
-path = "../jsonrpc"
-
-[patch.crates-io.bitcoind]
-path = "../bitcoind"
-
-[patch.crates-io.corepc-types]
-path = "../types"
