@@ -1,6 +1,6 @@
 [workspace]
 members = [ "bitreq", "client", "fuzz", "jsonrpc", "node", "types"]
-exclude = ["integration_test", "verify"]
+exclude = ["integration_test", "verify", "electrsd"]
 resolver = "2"
 rust-version = "1.75.0"
 
