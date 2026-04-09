@@ -233,7 +233,7 @@
 //! | unloadwallet                       | returns nothing |                                        |
 //! | upgradewallet                      | version         |                                        |
 //! | walletcreatefundedpsbt             | version + model |                                        |
-//! | walletdisplayaddress               | version + model | UNTESTED                               |
+//! | walletdisplayaddress               | version + model |                                        |
 //! | walletlock                         | returns nothing |                                        |
 //! | walletpassphrase                   | returns nothing |                                        |
 //! | walletpassphrasechange             | returns nothing |                                        |
