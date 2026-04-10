@@ -98,7 +98,7 @@ impl GetBlockchainInfo {
         let prune_height =
             self.prune_height.map(|h| crate::to_u32(h, "prune_height")).transpose()?;
         let prune_target_size =
-            self.prune_target_size.map(|h| crate::to_u32(h, "prune_target_size")).transpose()?;
+            self.prune_target_size.map(|h| crate::to_u64(h, "prune_target_size")).transpose()?;
         let softforks = BTreeMap::new(); // TODO: Handle softforks stuff.
 
         Ok(model::GetBlockchainInfo {

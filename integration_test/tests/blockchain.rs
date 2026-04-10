@@ -206,7 +206,7 @@ fn blockchain__get_block__modelled() {
 
 #[test]
 fn blockchain__get_blockchain_info__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = Node::with_wallet(Wallet::None, &["-prune=10000"]);
 
     let json: GetBlockchainInfo = node.client.get_blockchain_info().expect("rpc");
     let model: Result<mtype::GetBlockchainInfo, GetBlockchainInfoError> = json.into_model();

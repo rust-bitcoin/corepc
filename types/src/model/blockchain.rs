@@ -241,7 +241,7 @@ pub struct GetBlockchainInfo {
     /// Whether automatic pruning is enabled (only present if pruning is enabled).
     pub automatic_pruning: Option<bool>,
     /// The target size used by pruning (only present if automatic pruning is enabled).
-    pub prune_target_size: Option<u32>,
+    pub prune_target_size: Option<u64>,
     /// Status of softforks in progress, maps softfork name -> [`Softfork`] (empty from v29 onwards).
     pub softforks: BTreeMap<String, Softfork>,
     /// The block challenge (aka. block script)
