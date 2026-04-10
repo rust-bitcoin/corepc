@@ -210,6 +210,23 @@ jobs:
       ELECTRS_EXEC: "/home/runner/.cargo-install/electrs/bin/electrs"
     steps:
       - uses: dtolnay/rust-toolchain@stable
+      - name: Install LLVM and Clang
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang libclang-dev llvm-dev
+
+          llvm_config="$(command -v llvm-config || true)"
+          if [[ -z "$llvm_config" ]]; then
+            llvm_config="$(command -v llvm-config-18 || true)"
+          fi
+
+          if [[ -z "$llvm_config" ]]; then
+            echo "llvm-config not found after installing LLVM packages" >&2
+            exit 1
+          fi
+
+          echo "LLVM_CONFIG_PATH=$llvm_config" >> "$GITHUB_ENV"
+          echo "LIBCLANG_PATH=$($llvm_config --libdir)" >> "$GITHUB_ENV"
       - name: Install electrs
         # Automatically cache installed binaries to avoid compiling them each run
         uses: baptiste0928/cargo-install@v2
@@ -219,4 +236,4 @@ jobs:
       - name: Checkout Crate
         uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --features 'bitcoind_25_2'
+      - run: cd electrsd && cargo test --features 'bitcoind_25_2'
