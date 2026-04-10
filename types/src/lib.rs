@@ -63,6 +63,11 @@ pub fn to_u32(value: i64, field: &str) -> Result<u32, NumericError> {
     u32::try_from(value).map_err(|_| NumericError::Overflow { value, field: field.to_owned() })
 }
 
+/// Converts an `i64` numeric type to a `u64`.
+pub fn to_u64(value: i64, field: &str) -> Result<u64, NumericError> {
+    u64::try_from(value).map_err(|_| NumericError::Negative { value, field: field.to_owned() })
+}
+
 /// Error converting an `i64` to a `u32`.
 ///
 /// If we expect a numeric value to sanely fit inside a `u32` we use that type in the `model`
