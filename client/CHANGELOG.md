@@ -4,6 +4,7 @@
   [#388](https://github.com/rust-bitcoin/corepc/pull/388).
 - Bump MSRV to 1.75.0 [#405](https://github.com/rust-bitcoin/corepc/pull/405)
 - Update to use latest `types v0.11.0`.
+- Support a bunch more RPC methods (incl. hidden ones).
 
 # 0.10.0 - 2025-10-07
 
