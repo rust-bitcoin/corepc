@@ -2,6 +2,7 @@
 members = [ "bitreq", "client", "fuzz", "jsonrpc", "node", "types"]
 exclude = ["integration_test", "verify"]
 resolver = "2"
+rust-version = "1.75.0"
 
 [patch.crates-io.corepc-client]
 path = "client"
@@ -14,3 +15,31 @@ path = "node"
 
 [patch.crates-io.corepc-types]
 path = "types"
+
+[workspace.metadata.rbmt.toolchains]
+nightly = "nightly-2025-09-12"
+stable = "1.94.1"
+
+[workspace.metadata.rbmt.integration]
+package = "integration-test"
+versions = [
+    "30_2",
+    "30_0",
+    "29_0",
+    "28_2",
+    "28_1",
+    "28_0",
+    "27_2",
+    "27_1",
+    "27_0",
+    "26_2",
+    "25_2",
+    "24_2",
+    "23_2",
+    "22_1",
+    "0_21_2",
+    "0_20_2",
+    "0_19_1",
+    "0_18_1",
+    "0_17_2",
+]

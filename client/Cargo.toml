@@ -16,6 +16,10 @@ exclude = ["tests", "contrib"]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
+[package.metadata.rbmt.lint]
+# `base64`: bitcoin (via corepc-types) uses v0.21 while jsonrpc uses v0.22.
+allowed_duplicates = ["base64"]
+
 [features]
 # Enable this feature to get a blocking JSON-RPC client.
 client-sync = ["jsonrpc"]

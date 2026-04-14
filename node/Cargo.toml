@@ -73,3 +73,17 @@ latest = ["30_2"]
 [package.metadata.docs.rs]
 features = ["28_2"]
 rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.rbmt.lint]
+# The node crate requires a version feature to compile; use `latest` for per-package lint.
+features = ["latest"]
+# Duplicates from build-dep/dep splits, --target=all, or upstream version conflicts.
+allowed_duplicates = [
+    "anyhow",           # build-dep and regular dep, same version
+    "base64",           # bitcoin uses v0.21, jsonrpc uses v0.22
+    "bitcoin_hashes",   # build-dep (download) and transitive dep via bitcoin, same version
+    "bitreq",           # build-dep (download) and regular dep via jsonrpc, same version
+    "linux-raw-sys",    # same version, appears twice under --target=all
+    "rustix",           # same version, appears twice under --target=all
+    "windows-sys",      # ring/rustls pin v0.52, tar/tempfile/rustix pin v0.59
+]

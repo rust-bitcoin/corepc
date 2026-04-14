@@ -383,6 +383,7 @@ impl Url {
     pub fn as_str(&self) -> &str { &self.serialization }
 
     /// Returns `true` if the URL scheme is "https" or "wss".
+    #[cfg(feature = "std")]
     pub(crate) fn is_https(&self) -> bool { matches!(self.scheme(), "https" | "wss") }
 
     /// Returns `true` if a non-default port was explicitly specified in the URL.
@@ -401,6 +402,7 @@ impl Url {
     ///
     /// The returned string includes the leading `/` (if present) and the `?`
     /// separator (if there's a query string). Returns "/" if the path is empty.
+    #[cfg(feature = "std")]
     pub(crate) fn path_and_query(&self) -> String {
         let path = self.path();
         let path = if path.is_empty() { "/" } else { path };
