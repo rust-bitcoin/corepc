@@ -267,7 +267,7 @@ impl GetBlockchainInfo {
         let prune_height =
             self.prune_height.map(|h| crate::to_u32(h, "prune_height")).transpose()?;
         let prune_target_size =
-            self.prune_target_size.map(|h| crate::to_u32(h, "prune_target_size")).transpose()?;
+            self.prune_target_size.map(|h| crate::to_u64(h, "prune_target_size")).transpose()?;
         let signet_challenge =
             self.signet_challenge.as_ref().map(|s| ScriptBuf::from_hex(s)).transpose()?;
 
