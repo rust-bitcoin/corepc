@@ -1,8 +1,17 @@
-# 0.11.0 - 2025-11-18
+# 0.12.0 - 2026-04-13
 
 - Bump MSRV to 1.75.0 [#405](https://github.com/rust-bitcoin/corepc/pull/405)
-- Update to use latest `client v0.11.0`.
+- Update to use latest `client v0.12.0`.
 - Add support for Bitcoin Core 30.0
+
+# 0.11.0 - 2025-11-18
+
+**NON-EXISTENT**
+
+Turns out we prepped this release then forgot to pull the trigger
+because of a fix that had to be done upstream.
+
+Just bump straight to `v0.12.0` to stay in sync with the other corepc crates.
 
 # 0.10.1 2025-11-18
 

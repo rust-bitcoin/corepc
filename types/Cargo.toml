@@ -1,6 +1,6 @@
 [package]
 name = "corepc-types"
-version = "0.11.0"
+version = "0.12.0"
 authors = ["Tobin C. Harding <me@tobin.cc>", "Jamil Lambert <Jamil.Lambert@proton.me>"]
 license = "CC0-1.0"
 repository = "https://github.com/rust-bitcoin/corepc"

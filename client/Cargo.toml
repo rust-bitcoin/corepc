@@ -1,6 +1,6 @@
 [package]
 name = "corepc-client"
-version = "0.11.0"
+version = "0.12.0"
 authors = ["Tobin C. Harding <me@tobin.cc>", "Jamil Lambert <Jamil.Lambert@proton.me>"]
 license = "CC0-1.0"
 repository = "https://github.com/rust-bitcoin/corepc"
@@ -25,7 +25,7 @@ bitcoin = { version = "0.32.0", default-features = false, features = ["std", "se
 log = "0.4"
 serde = { version = "1.0.103", default-features = false, features = [ "derive", "alloc" ] }
 serde_json = { version = "1.0.117" }
-types = { package = "corepc-types", version = "0.11.0", path = "../types", default-features = false, features = ["std"] }
+types = { package = "corepc-types", version = "0.12.0", path = "../types", default-features = false, features = ["std"] }
 
 jsonrpc = { version = "0.19.0", path = "../jsonrpc", features = ["bitreq_http"], optional = true }
 

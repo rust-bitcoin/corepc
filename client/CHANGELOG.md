@@ -1,4 +1,8 @@
-# 0.11.0 - 2025-11-18
+# 0.12.0 - 2026-04-13
+
+- Upgrade to latest `corepc-types v0.12.0`.
+
+# 0.11.0 - 2026-04-09
 
 - Add support for Bitcoin Core 30.0 [#387](https://github.com/rust-bitcoin/corepc/pull/387),
   [#388](https://github.com/rust-bitcoin/corepc/pull/388).

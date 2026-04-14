@@ -1,3 +1,15 @@
+# 0.12.0 - 2026-04-13
+
+- Update `GetBlockStats` fields to be optional [#534](https://github.com/rust-bitcoin/corepc/pull/534)
+- Model `merkle_root` as `TxMerkleNode` [#519](https://github.com/rust-bitcoin/corepc/pull/519)
+- Add `getblock` verbosity 2/3 support for v29 onward [#485](https://github.com/rust-bitcoin/corepc/pull/485)
+- Implement `scantxoutset` method and test [#428](https://github.com/rust-bitcoin/corepc/pull/428)
+- Implement hidden methods:
+  - [#432](https://github.com/rust-bitcoin/corepc/pull/432)
+  - [#433](https://github.com/rust-bitcoin/corepc/pull/433)
+  - [#435](https://github.com/rust-bitcoin/corepc/pull/435)
+  - [#439](https://github.com/rust-bitcoin/corepc/pull/439)
+
 # 0.11.0 - 2025-11-18
 
 - Add support for Bitcoin Core 30.0 [#387](https://github.com/rust-bitcoin/corepc/pull/387),
