@@ -59,7 +59,7 @@ impl std::error::Error for ParseError {}
 ///
 /// **Note:** This type currently only supports encoded URLs. IDNs or non-ASCII URLs must be
 /// properly punycoded/%-encoded prior to parsing.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Url {
     /// The full serialized URL string.
     serialization: String,
