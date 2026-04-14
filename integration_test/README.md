@@ -28,7 +28,8 @@ alias test23='BITCOIND_EXE=/opt/bitcoin-23.2/bin/bitcoind cargo test --features=
 alias test24='BITCOIND_EXE=/opt/bitcoin-24.2/bin/bitcoind cargo test --features=24_2'
 alias test25='BITCOIND_EXE=/opt/bitcoin-25.2/bin/bitcoind cargo test --features=25_2'
 alias test26='BITCOIND_EXE=/opt/bitcoin-26.2/bin/bitcoind cargo test --features=26_2'
-alias test27='BITCOIND_EXE=/opt/bitcoin-27.1/bin/bitcoind cargo test --features=27_2'
-alias test28='BITCOIND_EXE=/opt/bitcoin-28.0/bin/bitcoind cargo test --features=28_0'
+alias test27='BITCOIND_EXE=/opt/bitcoin-27.2/bin/bitcoind cargo test --features=27_2'
+alias test28='BITCOIND_EXE=/opt/bitcoin-28.2/bin/bitcoind cargo test --features=28_2'
 alias test29='BITCOIND_EXE=/opt/bitcoin-29.0/bin/bitcoind cargo test --features=29_0'
+alias test30='BITCOIND_EXE=/opt/bitcoin-30.2/bin/bitcoind cargo test --features=30_2'
 ```
