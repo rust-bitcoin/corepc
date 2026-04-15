@@ -15,18 +15,18 @@ use bitcoin::{
     amount, hex, key, psbt, secp256k1, sign_message, Amount, CompressedPublicKey, FeeRate, Network,
     PrivateKey, PublicKey,
 };
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::vtype::*; // All the version specific types.
+use bitcoind::vtype::*; // All the version specific types.
 #[cfg(not(feature = "v20_and_below"))]
-use node::ImportDescriptorsRequest;
-use node::{
+use bitcoind::ImportDescriptorsRequest;
+use bitcoind::{
     mtype, AddressType, ImportMultiRequest, ImportMultiScriptPubKey, ImportMultiTimestamp,
     WalletCreateFundedPsbtInput,
 };
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 fn wallet__abandon_transaction() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let mining_addr = node.client.new_address().expect("newaddress");
     let json: GenerateToAddress =
@@ -52,7 +52,7 @@ fn wallet__abandon_transaction() {
 
 #[test]
 fn wallet__abort_rescan() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let json: AbortRescan = node.client.abort_rescan().expect("abortrescan");
     assert!(!json.0); // No rescan running, abort should return false
@@ -65,10 +65,10 @@ fn wallet__add_multisig_address__modelled() {
 
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -90,7 +90,7 @@ fn wallet__add_multisig_address__modelled() {
 fn wallet__backup_wallet() { backup_and_restore_wallet() }
 
 fn backup_and_restore_wallet() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let file_path = integration_test::random_tmp_file();
 
     let _: () = node.client.backup_wallet(&file_path).expect("backupwallet");
@@ -101,7 +101,7 @@ fn backup_and_restore_wallet() {
     #[cfg(not(feature = "v22_and_below"))]
     {
         let wallet_name = "test_wallet";
-        let node2 = Node::with_wallet(Wallet::None, &[]);
+        let node2 = BitcoinD::with_wallet(Wallet::None, &[]);
         let restored_wallet: RestoreWallet =
             node2.client.restore_wallet(wallet_name, &file_path).expect("restorewallet");
         assert_eq!(restored_wallet.name, wallet_name);
@@ -112,7 +112,7 @@ fn backup_and_restore_wallet() {
 
 #[test]
 fn wallet__bump_fee__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let address = node.client.new_address().expect("failed to create new address");
     let _ = node.client.generate_to_address(101, &address).expect("generatetoaddress");
 
@@ -131,13 +131,13 @@ fn wallet__bump_fee__modelled() {
 #[test]
 fn wallet__create_wallet__modelled() {
     // Implicitly tests `createwallet` because we create the default wallet.
-    let _ = Node::with_wallet(Wallet::Default, &[]);
+    let _ = BitcoinD::with_wallet(Wallet::Default, &[]);
 }
 
 #[test]
 #[cfg(not(feature = "v27_and_below"))]
 fn wallet__create_wallet_descriptor() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     // BIP32 HD xprv/xpub for the creation of a descriptor with a private key that is in the wallet.
     let secp = secp256k1::Secp256k1::new();
@@ -175,7 +175,7 @@ fn wallet__dump_priv_key__modelled() {
     // support dumping private keys. Legacy wallets are supported upto v25 it seems.
     #[cfg(all(feature = "v25_and_below", not(feature = "v22_and_below")))]
     {
-        let node = Node::with_wallet(Wallet::None, &[]);
+        let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
         node.client.create_legacy_wallet("legacy_wallet").expect("legacy create_wallet");
         let address = node
@@ -192,7 +192,7 @@ fn wallet__dump_priv_key__modelled() {
 
     #[cfg(feature = "v22_and_below")]
     {
-        let node = Node::with_wallet(Wallet::Default, &[]);
+        let node = BitcoinD::with_wallet(Wallet::Default, &[]);
         let address = node.client.new_address().expect("failed to get new address");
 
         let json: DumpPrivKey = node.client.dump_priv_key(&address).expect("dumpprivkey");
@@ -208,7 +208,7 @@ fn wallet__dump_wallet() {
     // support dumping private keys. Legacy wallets are supported upto v25 it seems.
     #[cfg(all(feature = "v25_and_below", not(feature = "v22_and_below")))]
     {
-        let node = Node::with_wallet(Wallet::None, &[]);
+        let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
         node.client.create_legacy_wallet("legacy_wallet").expect("legacy create_wallet");
         let out = integration_test::random_tmp_file();
@@ -218,7 +218,7 @@ fn wallet__dump_wallet() {
 
     #[cfg(feature = "v22_and_below")]
     {
-        let node = Node::with_wallet(Wallet::Default, &[]);
+        let node = BitcoinD::with_wallet(Wallet::Default, &[]);
         let out = integration_test::random_tmp_file();
 
         let _: DumpWallet = node.client.dump_wallet(&out).expect("dumpwallet");
@@ -227,14 +227,14 @@ fn wallet__dump_wallet() {
 
 #[test]
 fn wallet__encrypt_wallet() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let _: EncryptWallet = node.client.encrypt_wallet("test-passphrase").expect("encryptwallet");
 }
 
 #[test]
 fn wallet__get_addresses_by_label__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let label = "some-label";
     let addr = node.client.new_address_with_label(label).expect("failed to get new address");
 
@@ -250,7 +250,7 @@ fn wallet__get_addresses_by_label__modelled() {
 
 #[test]
 fn wallet__get_address_info__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     // Test an address with a label.
     let label_name = "test-label";
@@ -283,7 +283,7 @@ fn wallet__get_address_info__modelled() {
 
 #[test]
 fn wallet__get_balance__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let json: GetBalance = node.client.get_balance().expect("getbalance");
     let model: Result<mtype::GetBalance, amount::ParseAmountError> = json.into_model();
@@ -299,7 +299,7 @@ fn wallet__get_balance__modelled() {
 #[test]
 #[cfg(not(feature = "v18_and_below"))]
 fn wallet__get_balances() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let json: GetBalances = node.client.get_balances().expect("getbalances");
@@ -310,7 +310,7 @@ fn wallet__get_balances() {
 #[test]
 #[cfg(not(feature = "v27_and_below"))]
 fn wallet__get_hd_keys__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let json: GetHdKeys = node.client.get_hd_keys().expect("gethdkeys");
     let model: Result<mtype::GetHdKeys, GetHdKeysError> = json.into_model();
@@ -322,7 +322,7 @@ fn wallet__get_hd_keys__modelled() {
 
 #[test]
 fn wallet__get_new_address__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     // Implicitly tests `getnewaddress`.
     let _ = node.client.new_address().unwrap();
@@ -335,7 +335,7 @@ fn wallet__get_new_address__modelled() {
 
 #[test]
 fn wallet__get_raw_change_address__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let json: GetRawChangeAddress =
         node.client.get_raw_change_address().expect("getrawchangeaddress");
     let model: Result<mtype::GetRawChangeAddress, address::ParseError> = json.into_model();
@@ -346,7 +346,7 @@ fn wallet__get_raw_change_address__modelled() {
 fn wallet__get_received_by_address__modelled() {
     let amount = Amount::from_sat(10_000);
 
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
 
@@ -365,7 +365,7 @@ fn wallet__get_received_by_address__modelled() {
 #[test]
 #[cfg(not(feature = "v17"))]
 fn wallet__get_received_by_label__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let label = "test-label";
 
@@ -384,7 +384,7 @@ fn wallet__get_received_by_label__modelled() {
 
 #[test]
 fn wallet__get_transaction__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
 
@@ -403,7 +403,7 @@ fn wallet__get_transaction__modelled() {
 #[test]
 #[cfg(feature = "v29_and_below")]
 fn wallet__get_unconfirmed_balance__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let json: GetUnconfirmedBalance =
         node.client.get_unconfirmed_balance().expect("getunconfirmedbalance");
     let model: Result<mtype::GetUnconfirmedBalance, amount::ParseAmountError> = json.into_model();
@@ -412,7 +412,7 @@ fn wallet__get_unconfirmed_balance__modelled() {
 
 #[test]
 fn wallet__get_wallet_info__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.mine_a_block();
 
     let json: GetWalletInfo = node.client.get_wallet_info().expect("getwalletinfo");
@@ -441,10 +441,10 @@ fn wallet__get_wallet_info__modelled() {
 fn wallet__import_address() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -464,7 +464,7 @@ fn wallet__import_address() {
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
 fn wallet__import_descriptors() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let wallet_name = "desc_wallet";
 
     #[cfg(feature = "v22_and_below")]
@@ -508,7 +508,7 @@ fn wallet__import_descriptors() {
 
 #[test]
 fn wallet__import_pruned_funds() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     let (_, tx) = node.create_mined_transaction();
@@ -526,10 +526,10 @@ fn wallet__import_pruned_funds() {
 fn wallet__import_wallet() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -546,14 +546,14 @@ fn wallet__import_wallet() {
 
 #[test]
 fn wallet__keypool_refill() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let _: () = node.client.key_pool_refill().expect("keypoolrefill");
 }
 
 #[test]
 fn wallet__list_address_groupings__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let address = node.client.new_address().expect("failed to create new address");
@@ -571,7 +571,7 @@ fn wallet__list_address_groupings__modelled() {
 
 #[test]
 fn wallet__list_labels__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let label = "list-label-test";
     let _ = node.client.new_address_with_label(label).expect("newaddress");
 
@@ -583,7 +583,7 @@ fn wallet__list_labels__modelled() {
 #[test]
 #[cfg(not(feature = "v17"))]
 fn wallet__list_received_by_label__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let label = "test-label";
 
@@ -602,7 +602,7 @@ fn wallet__list_received_by_label__modelled() {
 
 #[test]
 fn wallet__list_received_by_address__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
     let amount = Amount::from_sat(10_000);
@@ -620,7 +620,7 @@ fn wallet__list_received_by_address__modelled() {
 
 #[test]
 fn wallet__list_since_block__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let addr = node.client.new_address().expect("newaddress");
     let amount = Amount::from_sat(5_000);
@@ -637,7 +637,7 @@ fn wallet__list_since_block__modelled() {
 
 #[test]
 fn wallet__list_transactions__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     node.fund_wallet();
     let addr = node.client.new_address().expect("newaddress");
@@ -658,10 +658,10 @@ fn wallet__list_transactions__modelled() {
 fn wallet__import_multi() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -722,10 +722,10 @@ fn wallet__import_multi() {
 fn wallet__import_privkey() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -742,10 +742,10 @@ fn wallet__import_privkey() {
 fn wallet__import_pubkey() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -761,7 +761,7 @@ fn wallet__import_pubkey() {
 #[test]
 #[cfg(not(feature = "v21_and_below"))]
 fn wallet__list_descriptors() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let wallet_name = "desc_wallet";
 
     #[cfg(feature = "v22_and_below")]
@@ -781,7 +781,7 @@ fn wallet__list_descriptors() {
 
 #[test]
 fn wallet__list_lock_unspent__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let json: ListUnspent = node.client.list_unspent().expect("listunspent");
@@ -801,9 +801,9 @@ fn wallet__list_lock_unspent__modelled() {
 fn wallet__list_unspent__modelled() {
     let node = match () {
         #[cfg(feature = "v17")]
-        () => Node::with_wallet(Wallet::Default, &["-deprecatedrpc=accounts"]),
+        () => BitcoinD::with_wallet(Wallet::Default, &["-deprecatedrpc=accounts"]),
         #[cfg(not(feature = "v17"))]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
     };
 
     node.fund_wallet();
@@ -817,7 +817,7 @@ fn wallet__list_unspent__modelled() {
 #[cfg(not(feature = "v17"))]
 fn wallet__list_wallet_dir() {
     let wallet_name = "test-wallet";
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
     node.client.create_wallet(wallet_name).expect("failed to create wallet");
 
     let wallet_dir = node.client.list_wallet_dir().expect("listwalletdir");
@@ -828,7 +828,7 @@ fn wallet__list_wallet_dir() {
 
 #[test]
 fn wallet__list_wallets__modelled() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let wallet_1 = "test_wallet_1";
     let wallet_2 = "test_wallet_2";
@@ -846,7 +846,7 @@ fn wallet__load_wallet__modelled() { create_load_unload_wallet(); }
 
 #[test]
 fn wallet__lock_unspent() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let json: ListUnspent = node.client.list_unspent().expect("listunspent");
@@ -866,7 +866,7 @@ fn wallet__lock_unspent() {
 fn wallet__migrate_wallet() {
     // In v30 it is no longer possible to create a legacy wallet.
     // It is tested in v29 and has no documented changes in v30.
-    let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+    let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
     let wallet_name = "legacy_wallet";
     node.client.create_legacy_wallet(wallet_name).expect("createlegacywallet");
 
@@ -878,7 +878,7 @@ fn wallet__migrate_wallet() {
 #[test]
 #[cfg(all(feature = "v29_and_below", not(feature = "v22_and_below")))]
 fn wallet__new_keypool() {
-    let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+    let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
     node.client.create_legacy_wallet("legacy_wallet").expect("createlegacywallet");
     let _: () = node.client.new_keypool().expect("newkeypool");
 }
@@ -886,7 +886,7 @@ fn wallet__new_keypool() {
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
 fn wallet__psbt_bump_fee__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let address = node.client.new_address().expect("failed to create new address");
     let _ = node.client.generate_to_address(101, &address).expect("generatetoaddress");
 
@@ -904,7 +904,7 @@ fn wallet__psbt_bump_fee__modelled() {
 
 #[test]
 fn wallet__remove_pruned_funds() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     node.fund_wallet();
 
     let (_, tx) = node.create_mined_transaction();
@@ -921,7 +921,7 @@ fn wallet__remove_pruned_funds() {
 
 #[test]
 fn wallet__rescan_blockchain__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let mining_addr = node.client.new_address().expect("newaddress");
     let _ = node.client.generate_to_address(3, &mining_addr).expect("generatetoaddress");
@@ -947,7 +947,7 @@ fn wallet__unload_wallet() { create_load_unload_wallet(); }
 
 #[test]
 fn wallet__send_many__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let addr1 = node.client.new_address().expect("newaddress");
@@ -976,7 +976,7 @@ fn wallet__send_many__modelled() {
 fn wallet__send__modelled() {
     use std::collections::BTreeMap;
 
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
 
@@ -991,7 +991,7 @@ fn wallet__send__modelled() {
 #[test]
 #[cfg(not(feature = "v23_and_below"))]
 fn wallet__send_all__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
 
@@ -1002,7 +1002,7 @@ fn wallet__send_all__modelled() {
 
 #[test]
 fn wallet__send_to_address__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let address = node.client.new_address().expect("failed to create new address");
 
@@ -1016,9 +1016,9 @@ fn wallet__send_to_address__modelled() {
 #[cfg(feature = "v30_and_below")]
 fn wallet__set_tx_fee() {
     #[cfg(feature = "v29_and_below")]
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     #[cfg(not(feature = "v29_and_below"))]
-    let node = Node::with_wallet(Wallet::Default, &["-deprecatedrpc=settxfee"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-deprecatedrpc=settxfee"]);
 
     let fee_rate = FeeRate::from_sat_per_vb(2).expect("2 sat/vb is valid");
 
@@ -1029,7 +1029,7 @@ fn wallet__set_tx_fee() {
 #[test]
 #[cfg(not(feature = "v18_and_below"))]
 fn wallet__set_wallet_flag() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let json: SetWalletFlag = node.client.set_wallet_flag("avoid_reuse").expect("setwalletflag");
     assert_eq!(json.flag_name, "avoid_reuse");
@@ -1041,10 +1041,10 @@ fn wallet__set_wallet_flag() {
 fn wallet__set_hd_seed() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
-        () => Node::with_wallet(Wallet::Default, &[]),
+        () => BitcoinD::with_wallet(Wallet::Default, &[]),
         #[cfg(not(feature = "v22_and_below"))]
         () => {
-            let node = Node::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
+            let node = BitcoinD::with_wallet(Wallet::None, &["-deprecatedrpc=create_bdb"]);
             node.client.create_legacy_wallet("wallet_name").expect("createlegacywallet");
             node
         }
@@ -1057,7 +1057,7 @@ fn wallet__set_hd_seed() {
 
 #[test]
 fn wallet__sign_message__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let address = node.client.new_address_with_type(AddressType::Legacy).unwrap();
@@ -1072,7 +1072,7 @@ fn wallet__sign_message__modelled() {
 #[test]
 #[cfg(not(feature = "v23_and_below"))]
 fn wallet__simulate_raw_transaction() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let address = node.client.new_address().expect("failed to create new address");
@@ -1100,7 +1100,7 @@ fn wallet__simulate_raw_transaction() {
 
 #[test]
 fn wallet__wallet_create_funded_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let addr = node.client.new_address().expect("newaddress");
@@ -1119,7 +1119,7 @@ fn wallet__wallet_create_funded_psbt__modelled() {
 
 #[test]
 fn wallet__wallet_process_psbt__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let addr = node.client.new_address().expect("newaddress");
@@ -1145,7 +1145,7 @@ fn wallet__wallet_process_psbt__modelled() {
 
 #[test]
 fn wallet__wallet_lock() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     node.client.create_wallet("wallet_name").expect("createwallet");
     node.client.encrypt_wallet("passphrase").expect("encryptwallet");
@@ -1155,7 +1155,7 @@ fn wallet__wallet_lock() {
 
 #[test]
 fn wallet__wallet_passphrase() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     node.client.create_wallet("wallet_name").expect("createwallet");
     node.client.encrypt_wallet("passphrase").expect("encryptwallet");
@@ -1166,7 +1166,7 @@ fn wallet__wallet_passphrase() {
 
 #[test]
 fn wallet__wallet_passphrase_change() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     node.client.create_wallet("wallet name").expect("createwallet");
     node.client.encrypt_wallet("old passphrase").expect("encryptwallet");
@@ -1178,7 +1178,7 @@ fn wallet__wallet_passphrase_change() {
 }
 
 fn create_load_unload_wallet() {
-    let node = Node::with_wallet(Wallet::None, &[]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
 
     let wallet = format!("wallet-{}", rand::random::<u32>()).to_string();
     node.client.create_wallet(&wallet).expect("failed to create wallet");
@@ -1200,7 +1200,7 @@ fn create_load_unload_wallet() {
 #[test]
 #[cfg(all(feature = "v29_and_below", not(feature = "v20_and_below")))]
 fn wallet__upgrade_wallet() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let _: UpgradeWallet = node.client.upgrade_wallet().expect("upgradewallet");
 }

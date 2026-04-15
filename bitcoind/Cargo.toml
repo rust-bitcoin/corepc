@@ -1,6 +1,6 @@
 [package]
-name = "corepc-node"
-version = "0.12.0"
+name = "bitcoind"
+version = "0.37.0"
 authors = ["Riccardo Casatta <riccardo@casatta.it>", "Tobin C. Harding <me@tobin.cc>"]
 license = "MIT"
 repository = "https://github.com/rust-bitcoin/corepc"
@@ -75,7 +75,7 @@ features = ["28_2"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [package.metadata.rbmt.lint]
-# The node crate requires a version feature to compile; use `latest` for per-package lint.
+# The bitcoind crate requires a version feature to compile; use `latest` for per-package lint.
 features = ["latest"]
 # Duplicates from build-dep/dep splits, --target=all, or upstream version conflicts.
 allowed_duplicates = [

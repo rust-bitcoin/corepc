@@ -10,7 +10,7 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 ALL_FEATURE_CRATES=(bitreq client fuzz jsonrpc types verify)
 
 # Targets with conflicting features and only speficic features are used.
-SPECIFIC_FEATURES_CRATES=(integration_test node)
+SPECIFIC_FEATURES_CRATES=(integration_test bitcoind)
 SPECIFIC_FEATURES=(latest)
 
 update_lock_files() {

@@ -162,3 +162,78 @@ jobs:
         env:
           BITCOIND_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/corepc/bitcoind
         run: cd integration_test && cargo test --features=${{ matrix.version }},download
+
+  # The jobs below copied from electrsd repo during import. Not too
+  # much further thought given to it.
+  test-electrs:
+    name: Test Electrs
+    runs-on: ubuntu-24.04
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_LOG: debug
+    strategy:
+      matrix:
+        features:
+          - bitcoind_22_1,electrs_0_8_10
+          - bitcoind_22_1,electrs_0_9_1
+          - bitcoind_22_1,electrs_0_9_11
+          - bitcoind_22_1,electrs_0_10_6
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cd electrsd && cargo test --features ${{ matrix.features }}
+
+
+  test-electrs-esplora:
+    name: Test Electrs Esplora
+    runs-on: ubuntu-24.04
+    env:
+      CARGO_TERM_COLOR: always
+    strategy:
+      matrix:
+        features: ["bitcoind_22_1,legacy,esplora_a33e97e1"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cd electrsd && cargo test --features ${{ matrix.features }}
+
+  test-electrs-no-download:
+    name: Test Electrs no auto-download features
+    runs-on: ubuntu-24.04
+    env:
+      CARGO_TERM_COLOR: always
+      ELECTRS_EXEC: "/home/runner/.cargo-install/electrs/bin/electrs"
+    steps:
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install LLVM and Clang
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y clang libclang-dev llvm-dev
+
+          llvm_config="$(command -v llvm-config || true)"
+          if [[ -z "$llvm_config" ]]; then
+            llvm_config="$(command -v llvm-config-18 || true)"
+          fi
+
+          if [[ -z "$llvm_config" ]]; then
+            echo "llvm-config not found after installing LLVM packages" >&2
+            exit 1
+          fi
+
+          echo "LLVM_CONFIG_PATH=$llvm_config" >> "$GITHUB_ENV"
+          echo "LIBCLANG_PATH=$($llvm_config --libdir)" >> "$GITHUB_ENV"
+      - name: Install electrs
+        # Automatically cache installed binaries to avoid compiling them each run
+        uses: baptiste0928/cargo-install@v2
+        with:
+          crate: electrs
+      - run: "echo $ELECTRS_EXEC"
+      - name: Checkout Crate
+        uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+      - run: cd electrsd && cargo test --features 'bitcoind_25_2'

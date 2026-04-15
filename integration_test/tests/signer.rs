@@ -7,9 +7,9 @@
 
 use bitcoin::address::{NetworkUnchecked, ParseError};
 use bitcoin::Address;
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::vtype::*;
-use node::{mtype, Input, Output}; // All the version specific types.
+use bitcoind::vtype::*;
+use bitcoind::{mtype, Input, Output};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet}; // All the version specific types.
 
 #[test]
 #[cfg(unix)]
@@ -29,7 +29,7 @@ fn signer__enumerate_signers() {
     std::fs::set_permissions(&script_path, std::fs::Permissions::from_mode(0o755)).expect("chmod");
 
     let signer_arg = format!("-signer={}", script_path.to_str().unwrap());
-    let node = Node::with_wallet(Wallet::None, &[&signer_arg]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[&signer_arg]);
     let json: EnumerateSigners = node.client.enumerate_signers().expect("enumeratesigners");
     let first_tx = json.signers.first().expect("no signers found");
 
@@ -69,7 +69,7 @@ esac
     std::fs::set_permissions(&script_path, std::fs::Permissions::from_mode(0o755)).expect("chmod");
 
     let signer_arg = format!("-signer={}", script_path.to_str().unwrap());
-    let node = Node::with_wallet(Wallet::None, &[&signer_arg]);
+    let node = BitcoinD::with_wallet(Wallet::None, &[&signer_arg]);
 
     let _: CreateWallet = node
         .client

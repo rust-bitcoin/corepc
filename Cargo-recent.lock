@@ -140,6 +140,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "bitcoind"
+version = "0.37.0"
+dependencies = [
+ "anyhow",
+ "bitcoin_hashes",
+ "bitreq",
+ "corepc-client",
+ "env_logger",
+ "flate2",
+ "log",
+ "serde_json",
+ "tar",
+ "tempfile",
+ "which",
+ "zip",
+]
+
+[[package]]
 name = "bitflags"
 version = "2.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -246,24 +264,6 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "corepc-node"
-version = "0.12.0"
-dependencies = [
- "anyhow",
- "bitcoin_hashes",
- "bitreq",
- "corepc-client",
- "env_logger",
- "flate2",
- "log",
- "serde_json",
- "tar",
- "tempfile",
- "which",
- "zip",
 ]
 
 [[package]]

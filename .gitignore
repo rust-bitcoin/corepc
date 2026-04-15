@@ -2,3 +2,7 @@
 
 Cargo.lock
 **/target
+
+# Copied from electsd repo during import.
+.idea/
+bin/

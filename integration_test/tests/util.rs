@@ -6,9 +6,9 @@
 #![allow(unused_imports)] // Because of feature gated tests.
 
 use bitcoin::{address, amount, sign_message, PrivateKey, PublicKey};
-use integration_test::{Node, NodeExt as _, Wallet};
-use node::vtype::*;
-use node::{mtype, FeeEstimateMode};
+use bitcoind::vtype::*;
+use bitcoind::{mtype, FeeEstimateMode};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 fn util__create_multisig__modelled() {
@@ -22,7 +22,7 @@ fn util__create_multisig__modelled() {
         .parse::<PublicKey>()
         .unwrap();
 
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let json: CreateMultisig =
         node.client.create_multisig(nrequired, vec![pubkey1, pubkey2]).expect("createmultisig");
     let model: Result<mtype::CreateMultisig, CreateMultisigError> = json.into_model();
@@ -32,7 +32,7 @@ fn util__create_multisig__modelled() {
 #[test]
 #[cfg(not(feature = "v17"))]
 fn util__derive_addresses__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     // Use a valid, deterministic public key from the pubkey_sort test vectors and the checksum for it.
     let descriptor =
@@ -65,7 +65,7 @@ fn util__derive_addresses__modelled() {
 
 #[test]
 fn util__estimate_smart_fee__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let json: EstimateSmartFee = node.client.estimate_smart_fee(6).expect("estimatesmartfee");
@@ -75,7 +75,7 @@ fn util__estimate_smart_fee__modelled() {
 
 #[test]
 fn util__estimate_smart_fee_with_mode__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     const MODES: [FeeEstimateMode; 3] =
@@ -91,7 +91,7 @@ fn util__estimate_smart_fee_with_mode__modelled() {
 #[test]
 #[cfg(not(feature = "v17"))]
 fn util__get_descriptor_info() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     // Use a valid, deterministic public key from the pubkey_sort test vectors
     let descriptor = "pkh(02ff12471208c14bd580709cb2358d98975247d8765f92bc25eab3b2763ed605f8)";
@@ -102,7 +102,7 @@ fn util__get_descriptor_info() {
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
 fn util__get_index_info() {
-    let node = Node::with_wallet(Wallet::Default, &["-txindex"]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex"]);
     let index_info: GetIndexInfo = node.client.get_index_info().expect("getindexinfo");
 
     let txindex_info = index_info.0.get("txindex").unwrap();
@@ -114,7 +114,7 @@ fn util__get_index_info() {
 
 #[test]
 fn util__sign_message_with_priv_key__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let privkey =
@@ -141,7 +141,7 @@ fn util__sign_message_with_priv_key__modelled() {
 
 #[test]
 fn util__validate_address__modelled() {
-    let node = Node::with_wallet(Wallet::Default, &[]);
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
     let addr = node.client.new_address().expect("new_address");
