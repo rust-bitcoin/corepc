@@ -2,7 +2,6 @@
 members = [ "bitreq", "client", "fuzz", "jsonrpc", "node", "types"]
 exclude = ["integration_test", "verify"]
 resolver = "2"
-rust-version = "1.75.0"
 
 [patch.crates-io.corepc-client]
 path = "client"
