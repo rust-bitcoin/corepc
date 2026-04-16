@@ -2,9 +2,12 @@
 *       @tcharding
 
 # Owners for specific directories
-/bitreq/        @oleonardolima @TheBlueMatt @tnull
-/client/        @jamillambert
-/jsonrpc/       @apoelstra
-/node/          @RCasatta
-/types/         @jamillambert
+/bitcoind/          @tcharding @jamillambert @RCasatta
+/bitreq/            @TheBlueMatt @tnull @oleonardolima 
+/client/            @tcharding @jamillambert
+/electrsd/          @RCasatta @tcharding @jamillambert
+/integration_test/  @tcharding @jamillambert
+/jsonrpc/           @apoelstra @tcharding @jamillambert
+/types/             @tcharding @jamillambert
+/verify/            @tcharding @jamillambert
 
