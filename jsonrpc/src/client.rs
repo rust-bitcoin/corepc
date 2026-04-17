@@ -124,7 +124,7 @@ impl Client {
     }
 }
 
-impl fmt::Debug for crate::Client {
+impl fmt::Debug for Client {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "jsonrpc::Client(")?;
         self.transport.fmt_target(f)?;
