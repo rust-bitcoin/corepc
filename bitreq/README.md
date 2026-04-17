@@ -7,10 +7,29 @@ This crate is a fork for the very nice
 rename it because I wanted to totally gut it and provide a crate with
 different goals. Many thanks to the original author.
 
-Simple, minimal-dependency HTTP client. Optional features for http
-proxies (`proxy`), async support (`async`, `async-https`), and https
-with various TLS implementations (`https-rustls`, `https-rustls-probe`,
-and `https` which is an alias for `https-rustls`).
+Simple, minimal-dependency HTTP client. Optional features for HTTP
+proxies and SOCKS5 proxies (`proxy`), async support (`async`,
+`async-https`), and https with various TLS implementations
+(`https-rustls`, `https-rustls-probe`, and `https` which is an alias
+for `https-rustls`).
+
+### Proxy Support
+
+The `proxy` feature enables both HTTP CONNECT and SOCKS5 proxies:
+
+```rust
+// HTTP CONNECT proxy
+let proxy = bitreq::Proxy::new_http("http://proxy.example.com:8080").unwrap();
+let response = bitreq::get("http://example.com").with_proxy(proxy).send();
+
+// SOCKS5 proxy (e.g., Tor)
+let proxy = bitreq::Proxy::new_socks5("127.0.0.1:9050").unwrap();
+let response = bitreq::get("http://example.com").with_proxy(proxy).send();
+```
+
+SOCKS5 proxies use domain-based addressing (RFC 1928 ATYP 0x03), so
+DNS resolution happens at the proxy. This is required for `.onion`
+routing through Tor.
 
 Without any optional features, my casual testing indicates about 100
 KB additional executable size for stripped release builds using this
