@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+name: Audit
+
+jobs:
+  audit:
+    name: Security audit - ${{ matrix.lockfile }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      checks: write
+    strategy:
+      fail-fast: false
+      matrix:
+        lockfile: [Cargo-minimal.lock, Cargo-recent.lock]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use ${{ matrix.lockfile }}
+        run: cp ${{ matrix.lockfile }} Cargo.lock
+      - uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
