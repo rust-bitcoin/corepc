@@ -2,7 +2,6 @@
 members = ["bitcoind", "bitreq", "client", "fuzz", "jsonrpc", "types"]
 exclude = ["integration_test", "verify", "electrsd"]
 resolver = "2"
-rust-version = "1.75.0"
 
 [workspace.metadata.rbmt.toolchains]
 nightly = "nightly-2025-09-12"
