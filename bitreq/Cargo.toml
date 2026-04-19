@@ -21,17 +21,17 @@ serde_json = { version = "1.0.0", default-features = false, features = ["std"], 
 base64 = { version = "0.22", default-features = false, features = ["alloc"], optional = true }
 
 # For rustls-based TLS:
-rustls = { version = "0.21.1", default-features = false, optional = true }
-rustls-native-certs = { version = "0.6.1", default-features = false, optional = true }
-webpki-roots = { version = "0.25.2", default-features = false, optional = true }
-rustls-webpki = { version = "0.101.0", default-features = false, optional = true }
+rustls = { version = "0.23.38", default-features = false, features = ["ring", "std", "tls12"], optional = true }
+rustls-native-certs = { version = "0.8.3", default-features = false, optional = true }
+webpki-roots = { version = "1.0.7", default-features = false, optional = true }
+rustls-webpki = { version = "0.103.12", default-features = false, optional = true }
 
 # For native-tls-based TLS:
 native-tls = { version = "0.2", default-features = false, optional = true }
 
 # For the async feature:
 tokio = { version = "1.0", default-features = false, features = ["rt", "net", "io-util", "time", "sync"], optional = true }
-tokio-rustls = { version = "0.24", default-features = false, optional = true }
+tokio-rustls = { version = "0.26.4", default-features = false, optional = true }
 tokio-native-tls = { version = "0.3", default-features = false, optional = true }
 
 log = { version = "0.4.0", default-features = false, optional = true }
@@ -47,7 +47,7 @@ all-features = true
 
 [package.metadata.rbmt.lint]
 # Unavoidable TLS/crypto dep-graph version conflicts.
-allowed_duplicates = ["base64", "windows-sys"]
+allowed_duplicates = ["base64", "core-foundation", "getrandom", "openssl-probe", "security-framework", "windows-sys"]
 
 [features]
 default = ["std"]

@@ -3,8 +3,6 @@
 
 #[cfg(feature = "rustls")]
 use alloc::sync::Arc;
-#[cfg(feature = "rustls")]
-use core::convert::TryFrom;
 use std::io;
 use std::net::TcpStream;
 use std::sync::OnceLock;
@@ -12,7 +10,9 @@ use std::sync::OnceLock;
 #[cfg(all(feature = "native-tls", not(feature = "rustls")))]
 use native_tls::{HandshakeError, TlsConnector, TlsStream};
 #[cfg(feature = "rustls")]
-use rustls::{self, ClientConfig, ClientConnection, RootCertStore, ServerName, StreamOwned};
+use rustls::pki_types::ServerName;
+#[cfg(feature = "rustls")]
+use rustls::{self, ClientConfig, ClientConnection, RootCertStore, StreamOwned};
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 use tokio_native_tls::TlsConnector as AsyncTlsConnector;
 #[cfg(feature = "tokio-rustls")]
@@ -36,30 +36,16 @@ static CONFIG: OnceLock<Arc<ClientConfig>> = OnceLock::new();
 fn build_client_config() -> Arc<ClientConfig> {
     let mut root_certificates = RootCertStore::empty();
 
-    // Try to load native certs
     #[cfg(feature = "https-rustls-probe")]
-    if let Ok(os_roots) = rustls_native_certs::load_native_certs() {
-        for root_cert in os_roots {
-            // Ignore erroneous OS certificates, there's nothing
-            // to do differently in that situation anyways.
-            let _ = root_certificates.add(&rustls::Certificate(root_cert.0));
-        }
+    for cert in rustls_native_certs::load_native_certs().certs {
+        let _ = root_certificates.add(cert);
     }
 
     #[cfg(feature = "rustls-webpki")]
-    #[allow(deprecated)] // Need to use add_server_trust_anchors to compile with rustls 0.21.1
-    root_certificates.add_server_trust_anchors(TLS_SERVER_ROOTS.iter().map(|ta| {
-        rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-            ta.subject,
-            ta.spki,
-            ta.name_constraints,
-        )
-    }));
+    root_certificates.extend(TLS_SERVER_ROOTS.iter().cloned());
 
-    let config = ClientConfig::builder()
-        .with_safe_defaults()
-        .with_root_certificates(root_certificates)
-        .with_no_client_auth();
+    let config =
+        ClientConfig::builder().with_root_certificates(root_certificates).with_no_client_auth();
     Arc::new(config)
 }
 
@@ -67,10 +53,9 @@ fn build_client_config() -> Arc<ClientConfig> {
 pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, Error> {
     #[cfg(feature = "log")]
     log::trace!("Setting up TLS parameters for {host}.");
-    let dns_name = match ServerName::try_from(host) {
-        Ok(result) => result,
-        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
-    };
+    let dns_name = ServerName::try_from(host)
+        .map(|name| name.to_owned())
+        .map_err(|err| Error::IoError(io::Error::new(io::ErrorKind::Other, err)))?;
     let sess = ClientConnection::new(CONFIG.get_or_init(build_client_config).clone(), dns_name)
         .map_err(Error::RustlsCreateConnection)?;
 
@@ -91,10 +76,9 @@ pub(super) async fn wrap_async_stream(
 ) -> Result<AsyncHttpStream, Error> {
     #[cfg(feature = "log")]
     log::trace!("Setting up TLS parameters for {host}.");
-    let dns_name = match ServerName::try_from(host) {
-        Ok(result) => result,
-        Err(err) => return Err(Error::IoError(io::Error::new(io::ErrorKind::Other, err))),
-    };
+    let dns_name = ServerName::try_from(host)
+        .map(|name| name.to_owned())
+        .map_err(|err| Error::IoError(io::Error::new(io::ErrorKind::Other, err)))?;
 
     let connector = TlsConnector::from(CONFIG.get_or_init(build_client_config).clone());
 
