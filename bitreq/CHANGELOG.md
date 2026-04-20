@@ -1,3 +1,13 @@
+# 0.3.5 - 2026-04-20
+
+* Fix `tokio-rustls` feature gating for async rustls support [#563](https://github.com/rust-bitcoin/corepc/pull/563)
+* Bump `rustls` and related crates to latest versions to pick up recent fixes [#556](https://github.com/rust-bitcoin/corepc/pull/556)
+* Derive `Hash` for `Url` so it can be used in hashed collections [#550](https://github.com/rust-bitcoin/corepc/pull/550)
+
+# 0.3.4 - 2026-02-18
+
+* Miscellaneous crate housekeeping [#504](https://github.com/rust-bitcoin/corepc/pull/504)
+
 # 0.3.3 - 2026-02-12
 
 * Make `Url::append_query_pairs` and `preserve_fragment_from` public methods [#500](https://github.com/rust-bitcoin/corepc/pull/500)

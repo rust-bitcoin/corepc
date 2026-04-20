@@ -1,3 +1,7 @@
+# 0.13.0 - 2026-04-20
+
+- Update to use latest `jsonrpc v0.20.0`.
+
 # 0.12.0 - 2026-04-13
 
 - Upgrade to latest `corepc-types v0.12.0`.
