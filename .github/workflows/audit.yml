@@ -18,10 +18,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lockfile: [Cargo-minimal.lock, Cargo-recent.lock]
+        lockfile: [Cargo.lock, Cargo-minimal.lock, Cargo-recent.lock]
     steps:
       - uses: actions/checkout@v4
+      - name: Generate fresh Cargo.lock
+        if: ${{ matrix.lockfile == 'Cargo.lock' }}
+        run: cargo generate-lockfile
       - name: Use ${{ matrix.lockfile }}
+        if: ${{ matrix.lockfile != 'Cargo.lock' }}
         run: cp ${{ matrix.lockfile }} Cargo.lock
       - uses: rustsec/audit-check@v2.0.0
         with:
