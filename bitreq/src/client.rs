@@ -15,8 +15,17 @@ use crate::{Error, Request, Response};
 
 /// A client that caches connections for reuse.
 ///
-/// The client maintains a pool of up to `capacity` connections, evicting
-/// the least recently used connection when the cache is full.
+/// The client maintains a cache of up to `max_idle` connections, evicting the least
+/// recently used entry when the cache is full.
+///
+/// # Bound applies to cached entries, not live connections
+///
+/// `max_idle` bounds the number of connections held in the cache, not the number of
+/// connections the client may have open at any one time. Concurrent requests whose
+/// cached connection is absent (or currently checked out for another in-flight
+/// request) each open a fresh socket; any surplus streams simply fail to re-enter
+/// the cache on put-back once it is full. To bound concurrency — rather than idle
+/// reuse — a caller must arrange a separate semaphore on top.
 ///
 /// # Example
 ///
@@ -24,7 +33,7 @@ use crate::{Error, Request, Response};
 /// # async fn request() {
 /// use bitreq::{Client, RequestExt};
 ///
-/// let client = Client::new(10); // Cache up to 10 connections
+/// let client = Client::new(10); // Cache up to 10 idle connections
 /// let response = bitreq::get("https://example.com")
 ///     .send_async_with_client(&client)
 ///     .await;
@@ -38,22 +47,23 @@ pub struct Client {
 struct ClientImpl<T> {
     connections: HashMap<ConnectionKey, Arc<T>>,
     lru_order: VecDeque<ConnectionKey>,
-    capacity: usize,
+    max_idle: usize,
 }
 
 impl Client {
-    /// Creates a new `Client` with the specified connection cache capacity.
+    /// Creates a new `Client` with the specified idle-cache size.
     ///
     /// # Arguments
     ///
-    /// * `capacity` - Maximum number of cached connections. When this limit is
-    ///   reached, the least recently used connection is evicted.
-    pub fn new(capacity: usize) -> Self {
+    /// * `max_idle` - Maximum number of cached idle connections. When this limit is
+    ///   reached, the least recently used connection is evicted. See the [type-level
+    ///   docs](Client) for why this does not bound the number of live connections.
+    pub fn new(max_idle: usize) -> Self {
         Client {
             r#async: Arc::new(Mutex::new(ClientImpl {
                 connections: HashMap::new(),
                 lru_order: VecDeque::new(),
-                capacity,
+                max_idle,
             })),
         }
     }
@@ -84,7 +94,7 @@ impl Client {
             if let hash_map::Entry::Vacant(entry) = state.connections.entry(owned_key) {
                 entry.insert(Arc::clone(&connection));
                 state.lru_order.push_back(key.into());
-                if state.connections.len() > state.capacity {
+                if state.connections.len() > state.max_idle {
                     if let Some(oldest_key) = state.lru_order.pop_front() {
                         state.connections.remove(&oldest_key);
                     }
