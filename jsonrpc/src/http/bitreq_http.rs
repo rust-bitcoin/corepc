@@ -51,17 +51,29 @@ impl BitreqHttpTransport {
     /// Returns a builder for [`BitreqHttpTransport`].
     pub fn builder() -> Builder { Builder::new() }
 
+    /// Returns the timeout in whole seconds, rounding positive sub-second values up to one.
+    fn timeout_secs(&self) -> u64 {
+        let secs = self.timeout.as_secs();
+        if secs == 0 && self.timeout > Duration::from_secs(0) {
+            1
+        } else {
+            secs
+        }
+    }
+
     fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
     where
         R: for<'a> serde::de::Deserialize<'a>,
     {
+        let timeout_secs = self.timeout_secs();
+
         let req = match &self.basic_auth {
             Some(auth) => bitreq::Request::new(bitreq::Method::Post, &self.url)
-                .with_timeout(self.timeout.as_secs())
+                .with_timeout(timeout_secs)
                 .with_header("Authorization", auth)
                 .with_json(&req)?,
             None => bitreq::Request::new(bitreq::Method::Post, &self.url)
-                .with_timeout(self.timeout.as_secs())
+                .with_timeout(timeout_secs)
                 .with_json(&req)?,
         };
 
