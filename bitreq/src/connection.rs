@@ -22,6 +22,8 @@ use tokio::net::TcpStream as AsyncTcpStream;
 #[cfg(feature = "async")]
 use tokio::sync::Mutex as AsyncMutex;
 
+#[cfg(feature = "async")]
+use crate::client::ClientConfig;
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 #[cfg(feature = "async")]
 use crate::Response;
@@ -29,14 +31,16 @@ use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
-#[cfg(feature = "rustls")]
+#[cfg(any(feature = "rustls", feature = "native-tls"))]
 mod rustls_stream;
-#[cfg(feature = "rustls")]
+#[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
+pub(crate) mod tls_config;
+#[cfg(any(feature = "rustls", feature = "native-tls"))]
 type SecuredStream = rustls_stream::SecuredStream;
 
 pub(crate) enum HttpStream {
     Unsecured(UnsecuredStream, Option<Instant>),
-    #[cfg(feature = "rustls")]
+    #[cfg(any(feature = "rustls", feature = "native-tls"))]
     Secured(Box<SecuredStream>, Option<Instant>),
     #[cfg(feature = "async")]
     Buffer(std::io::Cursor<Vec<u8>>),
@@ -81,7 +85,7 @@ impl Read for HttpStream {
                 timeout(inner, *timeout_at)?;
                 inner.read(buf)
             }
-            #[cfg(feature = "rustls")]
+            #[cfg(any(feature = "rustls", feature = "native-tls"))]
             HttpStream::Secured(inner, timeout_at) => {
                 timeout(inner.get_ref(), *timeout_at)?;
                 inner.read(buf)
@@ -111,7 +115,7 @@ impl Write for HttpStream {
                 set_socket_write_timeout(inner, *timeout_at)?;
                 inner.write(buf)
             }
-            #[cfg(feature = "rustls")]
+            #[cfg(any(feature = "rustls", feature = "native-tls"))]
             HttpStream::Secured(inner, timeout_at) => {
                 set_socket_write_timeout(inner.get_ref(), *timeout_at)?;
                 inner.write(buf)
@@ -137,7 +141,7 @@ impl Write for HttpStream {
                 set_socket_write_timeout(inner, *timeout_at)?;
                 inner.flush()
             }
-            #[cfg(feature = "rustls")]
+            #[cfg(any(feature = "rustls", feature = "native-tls"))]
             HttpStream::Secured(inner, timeout_at) => {
                 set_socket_write_timeout(inner.get_ref(), *timeout_at)?;
                 inner.flush()
@@ -158,13 +162,13 @@ impl Write for HttpStream {
     }
 }
 
-#[cfg(feature = "tokio-rustls")]
+#[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
 type AsyncSecuredStream = rustls_stream::AsyncSecuredStream;
 
 #[cfg(feature = "async")]
 pub(crate) enum AsyncHttpStream {
     Unsecured(AsyncTcpStream),
-    #[cfg(feature = "tokio-rustls")]
+    #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
     Secured(Box<AsyncSecuredStream>),
 }
 
@@ -177,7 +181,7 @@ impl AsyncRead for AsyncHttpStream {
     ) -> Poll<io::Result<()>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_read(cx, buf),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_read(cx, buf),
         }
     }
@@ -192,7 +196,7 @@ impl AsyncWrite for AsyncHttpStream {
     ) -> Poll<io::Result<usize>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_write(cx, buf),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_write(cx, buf),
         }
     }
@@ -200,7 +204,7 @@ impl AsyncWrite for AsyncHttpStream {
     fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_flush(cx),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_flush(cx),
         }
     }
@@ -208,7 +212,7 @@ impl AsyncWrite for AsyncHttpStream {
     fn poll_shutdown(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_shutdown(cx),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_shutdown(cx),
         }
     }
@@ -238,6 +242,7 @@ struct AsyncConnectionState {
     /// Defaults to 60 seconds after open to align with nginx's default timeout of 75 seconds, but
     /// can be overridden by the `Keep-Alive` header.
     socket_new_requests_timeout: Mutex<Instant>,
+    client_config: Option<Arc<ClientConfig>>,
 }
 
 #[cfg(feature = "async")]
@@ -266,15 +271,15 @@ impl AsyncConnection {
     pub(crate) async fn new(
         params: ConnectionParams<'_>,
         timeout_at: Option<Instant>,
+        client_config: Option<Arc<ClientConfig>>,
     ) -> Result<AsyncConnection, Error> {
+        let client_config_ref = &client_config;
+
         let future = async move {
             let socket = Self::connect(params).await?;
 
             if params.https {
-                #[cfg(not(feature = "tokio-rustls"))]
-                return Err(Error::HttpsFeatureNotEnabled);
-                #[cfg(feature = "tokio-rustls")]
-                rustls_stream::wrap_async_stream(socket, params.host).await
+                Self::wrap_async_stream(socket, params.host, client_config_ref).await
             } else {
                 Ok(AsyncHttpStream::Unsecured(socket))
             }
@@ -295,7 +300,33 @@ impl AsyncConnection {
             readable_request_id: AtomicUsize::new(0),
             min_dropped_reader_id: AtomicUsize::new(usize::MAX),
             socket_new_requests_timeout: Mutex::new(Instant::now() + Duration::from_secs(60)),
+            client_config,
         }))))
+    }
+
+    /// Call the correct wrapper function depending on whether client_configs are present
+    #[cfg(any(feature = "tokio-rustls", feature = "tokio-native-tls"))]
+    async fn wrap_async_stream(
+        socket: AsyncTcpStream,
+        host: &str,
+        client_config: &Option<Arc<ClientConfig>>,
+    ) -> Result<AsyncHttpStream, Error> {
+        if let Some(client_config) = client_config {
+            let tls_config = client_config.tls.as_ref().unwrap().clone();
+            rustls_stream::wrap_async_stream_with_configs(socket, host, tls_config).await
+        } else {
+            rustls_stream::wrap_async_stream(socket, host).await
+        }
+    }
+
+    /// Error treatment function, should not be called under normal circustances
+    #[cfg(not(any(feature = "tokio-rustls", feature = "tokio-native-tls")))]
+    async fn wrap_async_stream(
+        _socket: AsyncTcpStream,
+        _host: &str,
+        _client_config: &Option<Arc<ClientConfig>>,
+    ) -> Result<AsyncHttpStream, Error> {
+        Err(Error::HttpsFeatureNotEnabled)
     }
 
     async fn tcp_connect(host: &str, port: u16) -> Result<AsyncTcpStream, Error> {
@@ -446,9 +477,13 @@ impl AsyncConnection {
                     retry_new_connection!(_internal);
                 };
                 (_internal) => {
-                    let new_connection =
-                        AsyncConnection::new(request.connection_params(), request.timeout_at)
-                            .await?;
+                    let config = conn.client_config.as_ref().map(Arc::clone);
+                    let new_connection = AsyncConnection::new(
+                        request.connection_params(),
+                        request.timeout_at,
+                        config,
+                    )
+                    .await?;
                     *self.0.lock().unwrap() = Arc::clone(&*new_connection.0.lock().unwrap());
                     core::mem::drop(read);
                     // Note that this cannot recurse infinitely as we'll always be able to send at
@@ -653,13 +688,10 @@ impl Connection {
         let socket = Self::connect(params, timeout_at)?;
 
         let stream = if params.https {
-            #[cfg(not(feature = "rustls"))]
+            #[cfg(not(any(feature = "rustls", feature = "native-tls")))]
             return Err(Error::HttpsFeatureNotEnabled);
-            #[cfg(feature = "rustls")]
-            {
-                let tls = rustls_stream::wrap_stream(socket, params.host)?;
-                HttpStream::Secured(Box::new(tls), timeout_at)
-            }
+            #[cfg(any(feature = "rustls", feature = "native-tls"))]
+            rustls_stream::wrap_stream(socket, params.host)?
         } else {
             HttpStream::create_unsecured(socket, timeout_at)
         };
@@ -806,7 +838,8 @@ async fn async_handle_redirects(
             let new_connection;
             if needs_new_connection {
                 new_connection =
-                    AsyncConnection::new(request.connection_params(), request.timeout_at).await?;
+                    AsyncConnection::new(request.connection_params(), request.timeout_at, None)
+                        .await?;
                 connection = &new_connection;
             }
             connection.send(request).await
