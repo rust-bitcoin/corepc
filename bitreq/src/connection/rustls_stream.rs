@@ -15,12 +15,12 @@ use rustls::pki_types::ServerName;
 use rustls::{self, ClientConfig, ClientConnection, RootCertStore, StreamOwned};
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 use tokio_native_tls::TlsConnector as AsyncTlsConnector;
-#[cfg(feature = "tokio-rustls")]
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 use tokio_rustls::{client::TlsStream, TlsConnector};
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
 
-#[cfg(feature = "tokio-rustls")]
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
 #[cfg(all(feature = "native-tls", not(feature = "rustls"), feature = "tokio-native-tls"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
@@ -66,10 +66,10 @@ pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<SecuredStream, E
 
 // Async rustls TLS implementation
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 pub type AsyncSecuredStream = TlsStream<tokio::net::TcpStream>;
 
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 pub(super) async fn wrap_async_stream(
     tcp: AsyncTcpStream,
     host: &str,
