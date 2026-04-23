@@ -83,10 +83,7 @@ pub struct Conf<'a> {
 
 impl Default for Conf<'_> {
     fn default() -> Self {
-        let args = if cfg!(feature = "electrs_0_9_1")
-            || cfg!(feature = "electrs_0_8_10")
-            || cfg!(feature = "esplora_a33e97e1")
-        {
+        let args = if cfg!(any(esplora_a33e97e1_only, electrs_0_8_10_only, electrs_0_9_1_only)) {
             vec!["-vvv"]
         } else {
             vec![]
@@ -179,7 +176,7 @@ impl ElectrsD {
         args.push("--network");
         args.push(conf.network);
 
-        let cookie_value = if versions::USE_LEGACY_COOKIE {
+        let cookie_value = if cfg!(esplora_a33e97e1_only) {
             use std::io::Read;
             args.push("--cookie");
             let mut cookie = String::new();
@@ -196,7 +193,7 @@ impl ElectrsD {
         args.push(&rpc_socket);
 
         let p2p_socket;
-        if cfg!(feature = "electrs_0_8_10") || cfg!(feature = "esplora_a33e97e1") {
+        if cfg!(any(electrs_0_8_10_only, esplora_a33e97e1_only)) {
             args.push("--jsonrpc-import");
         } else {
             args.push("--daemon-p2p-addr");
@@ -436,7 +433,7 @@ mod test {
         debug!("electrs: {}", &electrs_exe);
         let mut conf = bitcoind::Conf::default();
         conf.view_stdout = log_enabled!(Level::Debug);
-        if !cfg!(feature = "electrs_0_8_10") && !cfg!(feature = "esplora_a33e97e1") {
+        if !cfg!(any(electrs_0_8_10_only, esplora_a33e97e1_only)) {
             conf.p2p = P2P::Yes;
         }
         let bitcoind = bitcoind::BitcoinD::with_conf(&bitcoind_exe, &conf).unwrap();

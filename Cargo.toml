@@ -1,6 +1,14 @@
 [workspace]
-members = ["bitcoind", "bitreq", "client", "fuzz", "jsonrpc", "types"]
-exclude = ["integration_test", "verify", "electrsd"]
+members = [
+    "bitcoind",
+    "bitreq",
+    "client",
+    "electrsd",
+    "fuzz",
+    "jsonrpc",
+    "types",
+]
+exclude = ["integration_test", "verify"]
 resolver = "2"
 
 [workspace.metadata.rbmt.toolchains]

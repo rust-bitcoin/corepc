@@ -10,7 +10,7 @@ use electrum_client::ElectrumApi;
 use crate::ElectrsD;
 
 impl ElectrsD {
-    #[cfg(not(feature = "electrs_0_8_10"))]
+    #[cfg(not(electrs_0_8_10_only))]
     /// wait up to a minute the electrum server has indexed up to the given height.
     pub fn wait_height(&self, height: usize) {
         for _ in 0..600 {
@@ -56,7 +56,7 @@ mod test {
 
     use crate::test::setup_nodes;
 
-    #[cfg(not(feature = "electrs_0_8_10"))]
+    #[cfg(not(electrs_0_8_10_only))]
     #[test]
     fn test_wait_height() {
         let (_, bitcoind, electrsd) = setup_nodes();
@@ -85,7 +85,7 @@ mod test {
             .txid()
             .unwrap();
 
-        #[cfg(feature = "electrs_0_8_10")]
+        #[cfg(electrs_0_8_10_only)]
         {
             // the 0.8.10 version doesn't have a mempool, so we need to mine the tx
             bitcoind.client.generate_to_address(1, &generate_address).unwrap();

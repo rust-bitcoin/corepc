@@ -35,17 +35,15 @@ bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, opti
 ] }
 
 [features]
-default = ["electrs_0_10_6", "download"]
-# download is not supposed to be used directly only through selecting one of the version feature
 download = ["bitcoin_hashes", "zip", "bitreq"]
-
-esplora_a33e97e1 = ["download"]
-electrs_0_8_10 = ["download"]
-electrs_0_9_1 = ["download"]
-electrs_0_9_11 = ["download"]
-electrs_0_10_6 = ["download"]
-
 bitcoind_download = ["bitcoind/download", "download"]
+default = ["electrs_0_10_6", "download"]
+
+electrs_0_10_6 = ["electrs_0_9_11"]
+electrs_0_9_11 = ["electrs_0_9_1"]
+electrs_0_9_1 = ["electrs_0_8_10"]
+electrs_0_8_10 = ["esplora_a33e97e1"]
+esplora_a33e97e1 = []
 
 bitcoind_30_2 = ["bitcoind/30_2"]
 bitcoind_29_0 = ["bitcoind/29_0"]

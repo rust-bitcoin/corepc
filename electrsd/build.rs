@@ -1,8 +1,28 @@
-#[cfg(not(feature = "download"))]
-fn main() {}
+fn main() {
+    emit_resolved_version_cfgs();
+    #[cfg(feature = "download")]
+    download::download();
+}
 
-#[cfg(feature = "download")]
-fn main() { download::download() }
+fn emit_resolved_version_cfgs() {
+    let versions =
+        ["electrs_0_10_6", "electrs_0_9_11", "electrs_0_9_1", "electrs_0_8_10", "esplora_a33e97e1"];
+
+    // Puts all versions in the cfg namespace.
+    // Tells rust these are valid and expected configs.
+    for v in versions {
+        println!("cargo:rustc-check-cfg=cfg({}_only)", v);
+    }
+
+    for v in versions {
+        let env_name = format!("CARGO_FEATURE_{}", v.to_uppercase());
+        if std::env::var_os(&env_name).is_some() {
+            // Emits cfg for the highest enabled version only and then returns.
+            println!("cargo:rustc-cfg={}_only", v);
+            return;
+        }
+    }
+}
 
 #[cfg(feature = "download")]
 mod download {
