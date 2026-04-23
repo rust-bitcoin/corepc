@@ -158,13 +158,13 @@ impl Write for HttpStream {
     }
 }
 
-#[cfg(feature = "tokio-rustls")]
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 type AsyncSecuredStream = rustls_stream::AsyncSecuredStream;
 
 #[cfg(feature = "async")]
 pub(crate) enum AsyncHttpStream {
     Unsecured(AsyncTcpStream),
-    #[cfg(feature = "tokio-rustls")]
+    #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
     Secured(Box<AsyncSecuredStream>),
 }
 
@@ -177,7 +177,7 @@ impl AsyncRead for AsyncHttpStream {
     ) -> Poll<io::Result<()>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_read(cx, buf),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_read(cx, buf),
         }
     }
@@ -192,7 +192,7 @@ impl AsyncWrite for AsyncHttpStream {
     ) -> Poll<io::Result<usize>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_write(cx, buf),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_write(cx, buf),
         }
     }
@@ -200,7 +200,7 @@ impl AsyncWrite for AsyncHttpStream {
     fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_flush(cx),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_flush(cx),
         }
     }
@@ -208,7 +208,7 @@ impl AsyncWrite for AsyncHttpStream {
     fn poll_shutdown(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
         match &mut *self {
             AsyncHttpStream::Unsecured(inner) => Pin::new(inner).poll_shutdown(cx),
-            #[cfg(feature = "tokio-rustls")]
+            #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
             AsyncHttpStream::Secured(inner) => Pin::new(inner).poll_shutdown(cx),
         }
     }
@@ -271,9 +271,12 @@ impl AsyncConnection {
             let socket = Self::connect(params).await?;
 
             if params.https {
-                #[cfg(not(feature = "tokio-rustls"))]
+                #[cfg(not(any(
+                    feature = "async-https-rustls",
+                    feature = "async-https-rustls-probe"
+                )))]
                 return Err(Error::HttpsFeatureNotEnabled);
-                #[cfg(feature = "tokio-rustls")]
+                #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
                 rustls_stream::wrap_async_stream(socket, params.host).await
             } else {
                 Ok(AsyncHttpStream::Unsecured(socket))
