@@ -24,7 +24,7 @@ base64 = { version = "0.22", default-features = false, features = ["alloc"], opt
 rustls = { version = "0.23.38", default-features = false, features = ["ring", "std", "tls12"], optional = true }
 rustls-native-certs = { version = "0.8.3", default-features = false, optional = true }
 webpki-roots = { version = "1.0.7", default-features = false, optional = true }
-rustls-webpki = { version = "0.103.12", default-features = false, optional = true }
+rustls-webpki = { version = "0.103.13", default-features = false, optional = true }
 
 # For native-tls-based TLS:
 native-tls = { version = "0.2", default-features = false, optional = true }
