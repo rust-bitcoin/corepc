@@ -31,6 +31,10 @@ const VERSION: &str = "v0.10.6";
 )))]
 const VERSION: &str = "NA";
 
+#[allow(unused)] // this is not used in `build.rs`
+pub const USE_LEGACY_COOKIE: bool =
+    cfg!(all(feature = "esplora_a33e97e1", not(feature = "electrs_0_8_10")));
+
 pub const HAS_FEATURE: bool = cfg!(any(
     feature = "electrs_0_8_10",
     feature = "electrs_0_9_1",

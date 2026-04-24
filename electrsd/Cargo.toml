@@ -34,12 +34,10 @@ bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, opti
 ] }
 
 [features]
-legacy = []
-
 # download is not supposed to be used directly only through selecting one of the version feature
 download = ["bitcoin_hashes", "zip", "bitreq"]
 
-esplora_a33e97e1 = ["download", "legacy"]
+esplora_a33e97e1 = ["download"]
 electrs_0_8_10 = ["download"]
 electrs_0_9_1 = ["download"]
 electrs_0_9_11 = ["download"]

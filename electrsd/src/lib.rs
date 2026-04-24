@@ -86,7 +86,6 @@ impl Default for Conf<'_> {
         let args = if cfg!(feature = "electrs_0_9_1")
             || cfg!(feature = "electrs_0_8_10")
             || cfg!(feature = "esplora_a33e97e1")
-            || cfg!(feature = "legacy")
         {
             vec!["-vvv"]
         } else {
@@ -180,36 +179,24 @@ impl ElectrsD {
         args.push("--network");
         args.push(conf.network);
 
-        #[cfg(not(feature = "legacy"))]
-        let cookie_file;
-        #[cfg(not(feature = "legacy"))]
-        {
-            args.push("--cookie-file");
-            cookie_file = format!("{}", bitcoind.params.cookie_file.display());
-            args.push(&cookie_file);
-        }
-
-        #[cfg(feature = "legacy")]
-        let mut cookie_value;
-        #[cfg(feature = "legacy")]
-        {
+        let cookie_value = if versions::USE_LEGACY_COOKIE {
             use std::io::Read;
             args.push("--cookie");
-            let mut cookie = std::fs::File::open(&bitcoind.params.cookie_file)?;
-            cookie_value = String::new();
-            cookie.read_to_string(&mut cookie_value)?;
-            args.push(&cookie_value);
-        }
+            let mut cookie = String::new();
+            std::fs::File::open(&bitcoind.params.cookie_file)?.read_to_string(&mut cookie)?;
+            cookie
+        } else {
+            args.push("--cookie-file");
+            bitcoind.params.cookie_file.display().to_string()
+        };
+        args.push(&cookie_value);
 
         args.push("--daemon-rpc-addr");
         let rpc_socket = bitcoind.params.rpc_socket.to_string();
         args.push(&rpc_socket);
 
         let p2p_socket;
-        if cfg!(feature = "electrs_0_8_10")
-            || cfg!(feature = "esplora_a33e97e1")
-            || cfg!(feature = "legacy")
-        {
+        if cfg!(feature = "electrs_0_8_10") || cfg!(feature = "esplora_a33e97e1") {
             args.push("--jsonrpc-import");
         } else {
             args.push("--daemon-p2p-addr");
