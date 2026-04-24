@@ -85,6 +85,13 @@ mod test {
             .txid()
             .unwrap();
 
+        #[cfg(feature = "electrs_0_8_10")]
+        {
+            // the 0.8.10 version doesn't have a mempool, so we need to mine the tx
+            bitcoind.client.generate_to_address(1, &generate_address).unwrap();
+            electrsd.trigger().unwrap();
+        }
+
         electrsd.wait_tx(&txid);
         let history = electrsd.client.script_get_history(&address.script_pubkey()).unwrap();
         assert_eq!(history.len(), 1);
