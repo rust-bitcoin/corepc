@@ -8,7 +8,7 @@ use std::io;
 use self::setup::*;
 
 #[tokio::test]
-#[cfg(feature = "rustls")]
+#[cfg(any(feature = "https-rustls", feature = "https-rustls-probe"))]
 async fn test_https() {
     // TODO: Implement this locally.
     assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
@@ -17,7 +17,10 @@ async fn test_https() {
 }
 
 #[tokio::test]
-#[cfg(all(feature = "async-https-native-tls", not(feature = "rustls")))]
+#[cfg(all(
+    feature = "async-https-native-tls",
+    not(any(feature = "https-rustls", feature = "https-rustls-probe"))
+))]
 async fn test_https() {
     // TODO: Implement this locally.
     assert_eq!(get_status_code(bitreq::get("https://example.com")).await, 200);
@@ -26,7 +29,7 @@ async fn test_https() {
 }
 
 #[tokio::test]
-#[cfg(all(feature = "rustls", feature = "tokio-rustls"))]
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 async fn test_https_with_client() {
     setup();
     let client = bitreq::Client::new(1);
@@ -35,7 +38,10 @@ async fn test_https_with_client() {
 }
 
 #[tokio::test]
-#[cfg(all(feature = "async-https-native-tls", not(feature = "rustls")))]
+#[cfg(all(
+    feature = "async-https-native-tls",
+    not(any(feature = "https-rustls", feature = "https-rustls-probe"))
+))]
 async fn test_https_with_client() {
     setup();
     let client = bitreq::Client::new(1);

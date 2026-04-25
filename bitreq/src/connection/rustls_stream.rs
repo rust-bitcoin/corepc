@@ -1,22 +1,17 @@
 //! Rustls-based TLS connection handling functionality.
 
-#[cfg(feature = "rustls")]
 use alloc::sync::Arc;
-#[cfg(feature = "rustls")]
 use std::io;
 use std::net::TcpStream;
 use std::sync::OnceLock;
 
-#[cfg(feature = "rustls")]
 use rustls::pki_types::ServerName;
-#[cfg(feature = "rustls")]
 use rustls::{self, ClientConfig, ClientConnection, RootCertStore, StreamOwned};
 #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 use tokio_rustls::{client::TlsStream, TlsConnector};
 #[cfg(feature = "rustls-webpki")]
 use webpki_roots::TLS_SERVER_ROOTS;
 
-#[cfg(feature = "rustls")]
 use super::HttpStream;
 #[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
 use super::{AsyncHttpStream, AsyncTcpStream};
@@ -24,13 +19,10 @@ use crate::Error;
 
 // === SYNC rustls ===
 
-#[cfg(feature = "rustls")]
 pub type SecuredStream = StreamOwned<ClientConnection, TcpStream>;
 
-#[cfg(feature = "rustls")]
 static CONFIG: OnceLock<Arc<ClientConfig>> = OnceLock::new();
 
-#[cfg(feature = "rustls")]
 fn build_client_config() -> Arc<ClientConfig> {
     let mut root_certificates = RootCertStore::empty();
 
@@ -47,7 +39,6 @@ fn build_client_config() -> Arc<ClientConfig> {
     Arc::new(config)
 }
 
-#[cfg(feature = "rustls")]
 pub(super) fn wrap_stream(tcp: TcpStream, host: &str) -> Result<HttpStream, Error> {
     #[cfg(feature = "log")]
     log::trace!("Setting up TLS parameters for {host}.");
