@@ -31,9 +31,11 @@ zip = { version = "0.6", default-features = false, optional = true, features = [
 ] }
 bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, optional = true, features = [
   "https",
+  "std"
 ] }
 
 [features]
+default = ["electrs_0_10_6", "download"]
 # download is not supposed to be used directly only through selecting one of the version feature
 download = ["bitcoin_hashes", "zip", "bitreq"]
 
