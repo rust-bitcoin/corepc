@@ -208,6 +208,7 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       ELECTRS_EXEC: "/home/runner/.cargo-install/electrs/bin/electrs"
+      ELECTRSD_SKIP_DOWNLOAD: "1"
     steps:
       - uses: dtolnay/rust-toolchain@stable
       - name: Install LLVM and Clang
@@ -232,8 +233,9 @@ jobs:
         uses: baptiste0928/cargo-install@v2
         with:
           crate: electrs
-      - run: "echo $ELECTRS_EXEC"
+          version: 0.10.6
+          locked: true
       - name: Checkout Crate
         uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
-      - run: cd electrsd && cargo test --features 'bitcoind_25_2,bitcoind_download'
+      - run: cd electrsd && cargo test --no-default-features --features 'bitcoind_25_2,electrs_0_10_6,bitcoind_download'
