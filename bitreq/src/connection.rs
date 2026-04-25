@@ -29,14 +29,33 @@ use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
-#[cfg(any(feature = "rustls", feature = "https-native-tls"))]
+#[cfg(any(feature = "https-rustls", feature = "https-rustls-probe"))]
 mod rustls_stream;
-#[cfg(any(feature = "rustls", feature = "https-native-tls"))]
-type SecuredStream = rustls_stream::SecuredStream;
+
+#[cfg(all(
+    feature = "https-native-tls",
+    not(any(feature = "https-rustls", feature = "https-rustls-probe"))
+))]
+mod native_tls_stream;
+
+#[cfg(all(
+    feature = "https-native-tls",
+    not(any(feature = "https-rustls", feature = "https-rustls-probe"))
+))]
+use self::native_tls_stream as tls_stream;
+#[cfg(any(feature = "https-rustls", feature = "https-rustls-probe"))]
+use self::rustls_stream as tls_stream;
+
+#[cfg(any(feature = "https-rustls", feature = "https-rustls-probe", feature = "https-native-tls"))]
+type SecuredStream = tls_stream::SecuredStream;
 
 pub(crate) enum HttpStream {
     Unsecured(UnsecuredStream, Option<Instant>),
-    #[cfg(any(feature = "rustls", feature = "https-native-tls"))]
+    #[cfg(any(
+        feature = "https-rustls",
+        feature = "https-rustls-probe",
+        feature = "https-native-tls"
+    ))]
     Secured(Box<SecuredStream>, Option<Instant>),
     #[cfg(feature = "async")]
     Buffer(std::io::Cursor<Vec<u8>>),
@@ -81,7 +100,11 @@ impl Read for HttpStream {
                 timeout(inner, *timeout_at)?;
                 inner.read(buf)
             }
-            #[cfg(any(feature = "rustls", feature = "https-native-tls"))]
+            #[cfg(any(
+                feature = "https-rustls",
+                feature = "https-rustls-probe",
+                feature = "https-native-tls"
+            ))]
             HttpStream::Secured(inner, timeout_at) => {
                 timeout(inner.get_ref(), *timeout_at)?;
                 inner.read(buf)
@@ -111,7 +134,11 @@ impl Write for HttpStream {
                 set_socket_write_timeout(inner, *timeout_at)?;
                 inner.write(buf)
             }
-            #[cfg(any(feature = "rustls", feature = "https-native-tls"))]
+            #[cfg(any(
+                feature = "https-rustls",
+                feature = "https-rustls-probe",
+                feature = "https-native-tls"
+            ))]
             HttpStream::Secured(inner, timeout_at) => {
                 set_socket_write_timeout(inner.get_ref(), *timeout_at)?;
                 inner.write(buf)
@@ -137,7 +164,11 @@ impl Write for HttpStream {
                 set_socket_write_timeout(inner, *timeout_at)?;
                 inner.flush()
             }
-            #[cfg(any(feature = "rustls", feature = "https-native-tls"))]
+            #[cfg(any(
+                feature = "https-rustls",
+                feature = "https-rustls-probe",
+                feature = "https-native-tls"
+            ))]
             HttpStream::Secured(inner, timeout_at) => {
                 set_socket_write_timeout(inner.get_ref(), *timeout_at)?;
                 inner.flush()
@@ -163,7 +194,7 @@ impl Write for HttpStream {
     feature = "async-https-rustls-probe",
     feature = "async-https-native-tls"
 ))]
-type AsyncSecuredStream = rustls_stream::AsyncSecuredStream;
+type AsyncSecuredStream = tls_stream::AsyncSecuredStream;
 
 #[cfg(feature = "async")]
 pub(crate) enum AsyncHttpStream {
@@ -328,7 +359,7 @@ impl AsyncConnection {
         socket: AsyncTcpStream,
         host: &str,
     ) -> Result<AsyncHttpStream, Error> {
-        rustls_stream::wrap_async_stream(socket, host).await
+        tls_stream::wrap_async_stream(socket, host).await
     }
 
     /// Error treatment function, should not be called under normal circustances
@@ -699,10 +730,18 @@ impl Connection {
         let socket = Self::connect(params, timeout_at)?;
 
         let stream = if params.https {
-            #[cfg(not(any(feature = "rustls", feature = "https-native-tls")))]
+            #[cfg(not(any(
+                feature = "https-rustls",
+                feature = "https-rustls-probe",
+                feature = "https-native-tls"
+            )))]
             return Err(Error::HttpsFeatureNotEnabled);
-            #[cfg(any(feature = "rustls", feature = "https-native-tls"))]
-            rustls_stream::wrap_stream(socket, params.host)?
+            #[cfg(any(
+                feature = "https-rustls",
+                feature = "https-rustls-probe",
+                feature = "https-native-tls"
+            ))]
+            tls_stream::wrap_stream(socket, params.host)?
         } else {
             HttpStream::create_unsecured(socket, timeout_at)
         };
