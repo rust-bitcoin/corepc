@@ -29,12 +29,23 @@ use crate::{Error, Method, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
-#[cfg(any(feature = "https-rustls", feature = "https-rustls-probe"))]
+#[cfg(any(
+    feature = "https-rustls",
+    feature = "https-rustls-probe",
+    feature = "async-https-rustls",
+    feature = "async-https-rustls-probe"
+))]
 mod rustls_stream;
 
-#[cfg(all(
-    feature = "https-native-tls",
-    not(any(feature = "https-rustls", feature = "https-rustls-probe"))
+#[cfg(any(
+    all(
+        feature = "https-native-tls",
+        not(any(feature = "https-rustls", feature = "https-rustls-probe"))
+    ),
+    all(
+        feature = "async-https-native-tls",
+        not(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))
+    )
 ))]
 mod native_tls_stream;
 
@@ -42,12 +53,19 @@ mod native_tls_stream;
     feature = "https-native-tls",
     not(any(feature = "https-rustls", feature = "https-rustls-probe"))
 ))]
-use self::native_tls_stream as tls_stream;
+use self::native_tls_stream as sync_tls_stream;
+#[cfg(all(
+    feature = "async-https-native-tls",
+    not(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))
+))]
+use self::native_tls_stream as async_tls_stream;
 #[cfg(any(feature = "https-rustls", feature = "https-rustls-probe"))]
-use self::rustls_stream as tls_stream;
+use self::rustls_stream as sync_tls_stream;
+#[cfg(any(feature = "async-https-rustls", feature = "async-https-rustls-probe"))]
+use self::rustls_stream as async_tls_stream;
 
 #[cfg(any(feature = "https-rustls", feature = "https-rustls-probe", feature = "https-native-tls"))]
-type SecuredStream = tls_stream::SecuredStream;
+type SecuredStream = sync_tls_stream::SecuredStream;
 
 pub(crate) enum HttpStream {
     Unsecured(UnsecuredStream, Option<Instant>),
@@ -194,7 +212,7 @@ impl Write for HttpStream {
     feature = "async-https-rustls-probe",
     feature = "async-https-native-tls"
 ))]
-type AsyncSecuredStream = tls_stream::AsyncSecuredStream;
+type AsyncSecuredStream = async_tls_stream::AsyncSecuredStream;
 
 #[cfg(feature = "async")]
 pub(crate) enum AsyncHttpStream {
@@ -359,7 +377,7 @@ impl AsyncConnection {
         socket: AsyncTcpStream,
         host: &str,
     ) -> Result<AsyncHttpStream, Error> {
-        tls_stream::wrap_async_stream(socket, host).await
+        async_tls_stream::wrap_async_stream(socket, host).await
     }
 
     /// Error treatment function, should not be called under normal circustances
@@ -741,7 +759,7 @@ impl Connection {
                 feature = "https-rustls-probe",
                 feature = "https-native-tls"
             ))]
-            tls_stream::wrap_stream(socket, params.host)?
+            sync_tls_stream::wrap_stream(socket, params.host)?
         } else {
             HttpStream::create_unsecured(socket, timeout_at)
         };
