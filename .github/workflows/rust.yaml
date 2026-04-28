@@ -200,7 +200,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
       - uses: dtolnay/rust-toolchain@stable
-      - run: cd electrsd && RUST_LOG=debug cargo test --features ${{ matrix.features }}
+      - run: cd electrsd && RUST_LOG=debug cargo test --no-default-features --features ${{ matrix.features }}
 
   test-electrs-no-download:
     name: Test Electrs no auto-download features
