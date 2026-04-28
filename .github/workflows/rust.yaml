@@ -174,10 +174,10 @@ jobs:
     strategy:
       matrix:
         features:
-          - bitcoind_22_1,electrs_0_8_10
-          - bitcoind_22_1,electrs_0_9_1
-          - bitcoind_22_1,electrs_0_9_11
-          - bitcoind_22_1,electrs_0_10_6
+          - bitcoind_22_1,bitcoind_download,electrs_0_8_10
+          - bitcoind_22_1,bitcoind_download,electrs_0_9_1
+          - bitcoind_22_1,bitcoind_download,electrs_0_9_11
+          - bitcoind_22_1,bitcoind_download,electrs_0_10_6
       fail-fast: false
 
     steps:
@@ -194,7 +194,7 @@ jobs:
       CARGO_TERM_COLOR: always
     strategy:
       matrix:
-        features: ["bitcoind_22_1,legacy,esplora_a33e97e1"]
+        features: ["bitcoind_22_1,bitcoind_download,legacy,esplora_a33e97e1"]
 
     steps:
       - uses: actions/checkout@v3
@@ -236,4 +236,4 @@ jobs:
       - name: Checkout Crate
         uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
-      - run: cd electrsd && cargo test --features 'bitcoind_25_2'
+      - run: cd electrsd && cargo test --features 'bitcoind_25_2,bitcoind_download'
