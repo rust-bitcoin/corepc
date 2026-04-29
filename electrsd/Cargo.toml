@@ -1,10 +1,10 @@
 [package]
 name = "electrsd"
-version = "0.38.0"
+version = "0.38.1"
 authors = ["Riccardo Casatta <riccardo@casatta.it>"]
 description = "Utility to run a regtest electrs process, useful in integration testing environment"
 repository = "https://github.com/rust-bitcoin/corepc"
-documentation = "https://docs.rs/elecrtsd/"
+documentation = "https://docs.rs/electrsd/"
 license = "MIT"
 edition = "2021"
 rust-version = "1.75.0"

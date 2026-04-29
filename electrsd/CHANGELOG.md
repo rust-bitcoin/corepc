@@ -1,3 +1,8 @@
+# 0.38.1 - 2026-05-01
+
+- Fix typo in manifest `documentation` field.
+- Fix stale documented way to depend on this crate.
+
 # 0.38.0 - 2026-04-20
 
 - Update to latest `bitcoind v0.38.0`, optional `bitreq v0.3.5`, and
