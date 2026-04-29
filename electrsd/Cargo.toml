@@ -61,3 +61,19 @@ bitcoind_0_20_2 = ["bitcoind/0_20_2"]
 bitcoind_0_19_1 = ["bitcoind/0_19_1"]
 bitcoind_0_18_1 = ["bitcoind/0_18_1"]
 bitcoind_0_17_2 = ["bitcoind/0_17_2"]
+
+[package.metadata.rbmt.lint]
+# The electrsd crate requires a version feature to compile
+features = ["electrs_0_10_6"]
+# Duplicates from build-dep/dep splits, --target=all, or upstream version conflicts.
+allowed_duplicates = [
+    "anyhow",           # build-dep and regular dep, same version
+    "base64",           # upstream version conflicts
+    "bitcoin_hashes",   # build-dep (download) and transitive dep, same version
+    "bitflags",         # upstream version conflicts
+    "bitreq",           # build-dep (download) and regular dep, same version
+    "libc",             # same version, appears twice under --target=all
+    "linux-raw-sys",    # same version, appears twice under --target=all
+    "rustix",           # same version, appears twice under --target=all
+    "windows-sys",      # upstream version conflicts
+]
