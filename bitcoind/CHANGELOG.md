@@ -1,3 +1,18 @@
+# 0.38.0 - 2026-04-20
+
+- Update to use latest `bitreq v0.3.5`.
+- Update to use latest `corepc-client v0.13.0`.
+
+# 0.37.0 - 2026-04-16
+
+This release continues the `corepc-node` history under the restored `bitcoind`
+crate name. The rename back to `bitcoind` happened in
+[#542](https://github.com/rust-bitcoin/corepc/pull/542).
+Version `0.37.0` was chosen to continue past the older standalone `bitcoind`
+crate releases that existed before this repository.
+
+- Add support for Bitcoin Core 30.2 [#542](https://github.com/rust-bitcoin/corepc/pull/542)
+
 # 0.12.0 - 2026-04-13
 
 - Bump MSRV to 1.75.0 [#405](https://github.com/rust-bitcoin/corepc/pull/405)

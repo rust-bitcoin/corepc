@@ -63,7 +63,7 @@ TODO = []                       # This is a dirty hack while writing the tests.
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
 env_logger = "0.9.0"
-bitcoind = { package = "bitcoind", version = "0.37.0", path = "../bitcoind", default-features = false }
+bitcoind = { package = "bitcoind", version = "0.38.0", path = "../bitcoind", default-features = false }
 rand = "0.8.5"
 # Just so we can enable the feature.
 types = { package = "corepc-types", version = "0.12.0", path = "../types", features = ["serde-deny-unknown-fields"] }

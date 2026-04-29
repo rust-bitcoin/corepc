@@ -1,3 +1,11 @@
+# 0.20.0 - 2026-04-20
+
+* Add async support [#558](https://github.com/rust-bitcoin/corepc/pull/558)
+* Update to use latest `bitreq v0.3.5`.
+* This is a semver-breaking release because `jsonrpc v0.19.0` was released
+  against `bitreq v0.2.0`, and `bitreq::Error` is part of the public API via
+  `Error::Bitreq`.
+
 # 0.19.0 - 2025-10-31
 
 * Depend on `bitreq` [399](https://github.com/rust-bitcoin/corepc/pull/399)
