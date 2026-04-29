@@ -39,6 +39,4 @@ pub const HAS_FEATURE: bool = cfg!(any(
     feature = "esplora_a33e97e1",
 ));
 
-pub fn electrs_name() -> String {
-    format!("electrs_{}_{}", OS, VERSION)
-}
+pub fn electrs_name() -> String { format!("electrs_{}_{}", OS, VERSION) }
