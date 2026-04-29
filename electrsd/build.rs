@@ -2,18 +2,17 @@
 fn main() {}
 
 #[cfg(feature = "download")]
-fn main() {
-    download::download()
-}
+fn main() { download::download() }
 
 #[cfg(feature = "download")]
 mod download {
-    use bitcoin_hashes::{sha256, Hash};
     use std::fs::File;
     use std::io::{BufRead, BufReader, Cursor};
     use std::os::unix::fs::PermissionsExt;
     use std::path::Path;
     use std::str::FromStr;
+
+    use bitcoin_hashes::{sha256, Hash};
 
     include!("src/versions.rs");
 
@@ -45,17 +44,13 @@ mod download {
         let expected_hash = get_expected_sha256(&download_filename).unwrap();
         let out_dir = std::env::var_os("OUT_DIR").unwrap();
         let electrs_exe_home = Path::new(&out_dir).join("electrs");
-        let destination_filename = electrs_exe_home
-            .join(&download_filename_without_extension)
-            .join("electrs");
+        let destination_filename =
+            electrs_exe_home.join(&download_filename_without_extension).join("electrs");
 
         dbg!(&destination_filename);
 
         if !destination_filename.exists() {
-            println!(
-                "filename:{} version:{} hash:{}",
-                download_filename, VERSION, expected_hash
-            );
+            println!("filename:{} version:{} hash:{}", download_filename, VERSION, expected_hash);
 
             let download_endpoint =
                 std::env::var("ELECTRSD_DOWNLOAD_ENDPOINT").unwrap_or(GITHUB_URL.to_string());
@@ -73,11 +68,8 @@ mod download {
             let mut outfile = std::fs::File::create(&destination_filename).unwrap();
 
             std::io::copy(&mut file, &mut outfile).unwrap();
-            std::fs::set_permissions(
-                &destination_filename,
-                std::fs::Permissions::from_mode(0o755),
-            )
-            .unwrap();
+            std::fs::set_permissions(&destination_filename, std::fs::Permissions::from_mode(0o755))
+                .unwrap();
         }
     }
 }
