@@ -437,7 +437,7 @@ mod test {
     fn test_kill() {
         let (_, bitcoind, mut electrsd) = setup_nodes();
         let _ = bitcoind.client.get_network_info().unwrap(); // without using bitcoind, it is dropped and all the rest fails.
-        let _ = electrsd.client.ping().unwrap();
+        electrsd.client.ping().unwrap();
         assert!(electrsd.client.ping().is_ok());
         electrsd.kill().unwrap();
         assert!(electrsd.client.ping().is_err());

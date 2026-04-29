@@ -21,7 +21,7 @@ mod download {
 
     fn get_expected_sha256(filename: &str) -> Result<sha256::Hash, ()> {
         let file = File::open("sha256").map_err(|_| ())?;
-        for line in BufReader::new(file).lines().flatten() {
+        for line in BufReader::new(file).lines().map_while(Result::ok) {
             let tokens: Vec<_> = line.split("  ").collect();
             if tokens.len() == 2 && filename == tokens[1] {
                 return sha256::Hash::from_str(tokens[0]).map_err(|_| ());
