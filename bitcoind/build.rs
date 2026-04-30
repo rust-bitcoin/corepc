@@ -84,15 +84,23 @@ mod download {
         std::fs::create_dir_all(&bitcoin_exe_home)
             .with_context(|| format!("cannot create dir {:?}", bitcoin_exe_home))?;
 
-        let mut existing_filename =
-            bitcoin_exe_home.join(format!("bitcoin-{}", VERSION)).join("bin");
+        let version_dir = bitcoin_exe_home.join(format!("bitcoin-{}", VERSION));
+        let mut existing_filename = version_dir.join("bin");
         if cfg!(target_os = "windows") {
             existing_filename.push("bitcoind.exe");
         } else {
             existing_filename.push("bitcoind");
         }
 
-        if !existing_filename.exists() {
+        #[cfg(not(target_os = "windows"))]
+        let cache_complete = existing_filename.exists()
+            && version_dir.join("bin").join("bitcoin-cli").exists()
+            && (!cfg!(feature = "30_0")
+                || version_dir.join("libexec").join("bitcoin-node").exists());
+        #[cfg(target_os = "windows")]
+        let cache_complete = existing_filename.exists();
+
+        if !cache_complete {
             let download_filename = download_filename();
             println!("download_filename: {}", download_filename);
             let expected_hash = get_expected_sha256(&download_filename)?;
@@ -139,10 +147,15 @@ mod download {
             if download_filename.ends_with(".tar.gz") {
                 let d = GzDecoder::new(&tarball_bytes[..]);
 
+                let targets: &[&Path] = &[
+                    Path::new("bin/bitcoind"),
+                    Path::new("bin/bitcoin-cli"),
+                    Path::new("libexec/bitcoin-node"),
+                ];
                 let mut archive = Archive::new(d);
                 for mut entry in archive.entries().unwrap().flatten() {
                     if let Ok(file) = entry.path() {
-                        if file.ends_with("bitcoind") {
+                        if targets.iter().any(|t| file.ends_with(t)) {
                             entry.unpack_in(&bitcoin_exe_home).unwrap();
                         }
                     }
@@ -175,24 +188,31 @@ mod download {
             {
                 use std::process::Command;
 
-                let signing_status = Command::new("codesign")
-                    .arg("-v")
-                    .arg(&existing_filename)
-                    .status()
-                    .with_context(|| "failed to verify bitcoind code signature")?;
+                let to_sign = [
+                    version_dir.join("bin").join("bitcoind"),
+                    version_dir.join("bin").join("bitcoin-cli"),
+                    version_dir.join("libexec").join("bitcoin-node"),
+                ];
+                for binary in to_sign.iter().filter(|p| p.exists()) {
+                    let signing_status =
+                        Command::new("codesign").arg("-v").arg(binary).status().with_context(
+                            || format!("failed to verify code signature on {:?}", binary),
+                        )?;
 
-                if !signing_status.success() {
-                    let status = Command::new("codesign")
-                        .arg("-s")
-                        .arg("-")
-                        .arg(&existing_filename)
-                        .status()
-                        .with_context(|| "failed to sign bitcoind")?;
-                    if !status.success() {
-                        return Err(anyhow::anyhow!(
-                            "codesign failed with exit code {}",
-                            status.code().unwrap_or(-1)
-                        ));
+                    if !signing_status.success() {
+                        let status = Command::new("codesign")
+                            .arg("-s")
+                            .arg("-")
+                            .arg(binary)
+                            .status()
+                            .with_context(|| format!("failed to sign {:?}", binary))?;
+                        if !status.success() {
+                            return Err(anyhow::anyhow!(
+                                "codesign failed for {:?} with exit code {}",
+                                binary,
+                                status.code().unwrap_or(-1)
+                            ));
+                        }
                     }
                 }
             }
