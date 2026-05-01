@@ -27,7 +27,7 @@ jobs:
             );
 
             const filePathsToLabels = {
-              'node/': 'C-node',
+              'bitcoind/': 'C-bitcoind',
               'client/': 'C-client',
               'integration_test/': 'C-integration-test',
               'jsonrpc/': 'C-jsonrpc',

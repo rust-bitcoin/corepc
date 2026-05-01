@@ -8,7 +8,7 @@ When the auto-download feature is enabled, starting a regtest node is as simple 
 // the download feature must be enabled with a specific version, for example `25_1` or `24_0_1`
 #[cfg(feature = "download")]
 {
-  let node = corepc_node::Node::from_downloaded().unwrap();
+  let node = bitcoind::BitcoinD::from_downloaded().unwrap();
   assert_eq!(0, node.client.get_blockchain_info().unwrap().blocks);
 }
 ```
@@ -22,19 +22,19 @@ When you don't use the auto-download feature you have the following options:
 * provide the `bitcoind` executable via the `BITCOIND_EXE` env var
 
 ```rust
-if let Ok(exe_path) = corepc_node::exe_path() {
-  let node = corepc_node::BitcoinD::new(exe_path).unwrap();
+if let Ok(exe_path) = bitcoind::exe_path() {
+  let node = bitcoind::BitcoinD::new(exe_path).unwrap();
   assert_eq!(0, node.client.get_blockchain_info().unwrap().blocks);
 }
 ```
 
 Startup options could be configured via the [`Conf`] struct using [`BitcoinD::with_conf`] or
-`Node::from_downloaded_with_conf`
+`BitcoinD::from_downloaded_with_conf`
 
 ## Features
 
   * Waits until bitcoind daemon becomes ready to accept RPC commands
-  * `node` uses a temporary directory as datadir. You can specify the root of your temp
+  * `bitcoind` uses a temporary directory as datadir. You can specify the root of your temp
     directories so that you have the node's datadir in a RAM disk (eg `/dev/shm`)
   * Free ports are requested from the OS. Since you can't reserve the given port, a low probability
     race condition is still possible, for this reason the process attempts spawning 3 times with
