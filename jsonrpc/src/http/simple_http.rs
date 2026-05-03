@@ -39,6 +39,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_millis(1);
 #[derive(Clone, Debug)]
 pub struct SimpleHttpTransport {
     addr: net::SocketAddr,
+    host_header: String,
     path: String,
     timeout: Duration,
     /// The value of the `Authorization` HTTP header.
@@ -57,6 +58,7 @@ impl Default for SimpleHttpTransport {
                 net::IpAddr::V4(net::Ipv4Addr::new(127, 0, 0, 1)),
                 DEFAULT_PORT,
             ),
+            host_header: format!("127.0.0.1:{}", DEFAULT_PORT),
             path: "/".to_owned(),
             timeout: DEFAULT_TIMEOUT,
             basic_auth: None,
@@ -83,7 +85,8 @@ impl SimpleHttpTransport {
     pub fn set_url(&mut self, url: &str) -> Result<(), Error> {
         let url = check_url(url)?;
         self.addr = url.0;
-        self.path = url.1;
+        self.host_header = url.1;
+        self.path = url.2;
         Ok(())
     }
 
@@ -150,7 +153,7 @@ impl SimpleHttpTransport {
         request_bytes.write_all(b" HTTP/1.1\r\n")?;
         // Write headers
         request_bytes.write_all(b"host: ")?;
-        request_bytes.write_all(self.addr.to_string().as_bytes())?;
+        request_bytes.write_all(self.host_header.as_bytes())?;
         request_bytes.write_all(b"\r\n")?;
         request_bytes.write_all(b"Content-Type: application/json\r\n")?;
         request_bytes.write_all(b"Content-Length: ")?;
@@ -279,7 +282,7 @@ impl SimpleHttpTransport {
 
 /// Does some very basic manual URL parsing because the uri/url crates
 /// all have unicode-normalization as a dependency and that's broken.
-fn check_url(url: &str) -> Result<(SocketAddr, String), Error> {
+fn check_url(url: &str) -> Result<(SocketAddr, String, String), Error> {
     // The fallback port in case no port was provided.
     // This changes when the http or https scheme was provided.
     let mut fallback_port = DEFAULT_PORT;
@@ -319,6 +322,11 @@ fn check_url(url: &str) -> Result<(SocketAddr, String), Error> {
         split.next().unwrap_or(s)
     };
 
+    // The Host header value is the URL's authority verbatim — including an
+    // explicit port if present, omitting it otherwise. Brackets around IPv6
+    // literals are preserved (RFC 7230 §2.7.1).
+    let host_header = after_auth.to_owned();
+
     // (4) Parse into socket address.
     // At this point we either have <host_name> or <host_name_>:<port>
     // `std::net::ToSocketAddrs` requires `&str` to have <host_name_>:<port> format.
@@ -331,7 +339,7 @@ fn check_url(url: &str) -> Result<(SocketAddr, String), Error> {
     };
 
     match addr.next() {
-        Some(a) => Ok((a, path.to_owned())),
+        Some(a) => Ok((a, host_header, path.to_owned())),
         None => Err(Error::url(url, "invalid hostname: error extracting socket address")),
     }
 }
@@ -665,9 +673,10 @@ mod tests {
             "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]",
         ];
         for u in &valid_urls {
-            let (addr, path) = check_url(u).unwrap();
+            let (addr, host_header, path) = check_url(u).unwrap();
             let builder = Builder::new().url(u).unwrap_or_else(|_| panic!("error for: {}", u));
             assert_eq!(builder.tp.addr, addr);
+            assert_eq!(builder.tp.host_header, host_header);
             assert_eq!(builder.tp.path, path);
             assert_eq!(builder.tp.timeout, DEFAULT_TIMEOUT);
             assert_eq!(builder.tp.basic_auth, None);
@@ -787,5 +796,65 @@ mod tests {
         let result2 = client.send_request(request)
             .expect("This second request should not be an Err like `Err(Transport(HttpResponseTooShort { actual: 0, needed: 12 }))`");
         assert_eq!(result2.id, Value::Number(Number::from(1)));
+    }
+
+    /// `check_url` must return the URL's authority component verbatim as the
+    /// host header value, regardless of how the hostname later resolves.
+    #[test]
+    fn check_url_host_header() {
+        let cases = [
+            ("http://example.com/", "example.com"),
+            ("http://example.com:8080/", "example.com:8080"),
+            ("https://example.com/walletname", "example.com"),
+            ("https://example.com:443/", "example.com:443"),
+            ("localhost:22", "localhost:22"),
+            ("http://me:weak@localhost:22/wallet", "localhost:22"),
+            ("http://127.0.0.1:8332/", "127.0.0.1:8332"),
+            (
+                "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8300",
+                "[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:8300",
+            ),
+        ];
+        for (url, expected) in cases {
+            let (_, host_header, _) =
+                check_url(url).unwrap_or_else(|e| panic!("check_url failed for {}: {:?}", url, e));
+            assert_eq!(host_header, expected, "host header mismatch for {}", url);
+        }
+    }
+
+    /// Regression test: the on-the-wire `Host` header must be the URL's
+    /// hostname, not the resolved IP. Otherwise host-routed reverse proxies
+    /// cannot match vhost rules.
+    /// See RFC 9110 §7.2 and RFC 9112 §3.2.
+    #[cfg(all(not(feature = "proxy"), not(jsonrpc_fuzz)))]
+    #[test]
+    fn request_uses_url_host_in_host_header() {
+        use std::net::TcpListener;
+        use std::thread;
+
+        let listener = TcpListener::bind("localhost:0").expect("bind");
+        let port = listener.local_addr().unwrap().port();
+
+        // `localhost` resolves to 127.0.0.1 (or ::1); the Host header must still say `localhost:<port>`.
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().expect("accept");
+            let mut buf = [0u8; 4096];
+            let n = stream.read(&mut buf).unwrap();
+            let host = std::str::from_utf8(&buf[..n])
+                .unwrap()
+                .lines()
+                .find_map(|l| l.strip_prefix("host: "))
+                .map(str::to_owned);
+            // Acknowledge so the client unblocks its read of the response.
+            let _ = stream.write_all(b"HTTP/1.1 200\r\nContent-Length: 0\r\n\r\n");
+            host
+        });
+
+        let url = format!("http://localhost:{}/", port);
+        let client = Client::simple_http(&url, None, None).unwrap();
+        let _ = client.send_request(client.build_request("ping", None));
+
+        let expected = format!("localhost:{}", port);
+        assert_eq!(server.join().unwrap().as_deref(), Some(expected.as_str()));
     }
 }
