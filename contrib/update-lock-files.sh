@@ -9,7 +9,8 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 # Targets where `--all-features` is used.
 ALL_FEATURE_CRATES=(bitreq client fuzz jsonrpc types verify)
 
-# Targets with conflicting features and only speficic features are used.
+# Targets with conflicting features where only specific features are used.
+# Cannot be replaced by `cargo rbmt lock` because of the SPECIFIC_FEATURES_CRATES handling below.
 SPECIFIC_FEATURES_CRATES=(integration_test bitcoind)
 SPECIFIC_FEATURES=(latest)
 
