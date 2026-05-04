@@ -27,12 +27,13 @@ jobs:
             );
 
             const filePathsToLabels = {
-              'node/': 'C-node',
+              'bitcoind/': 'C-bitcoind',
               'client/': 'C-client',
+              'electrsd/': 'C-electrsd',
               'integration_test/': 'C-integration-test',
               'jsonrpc/': 'C-jsonrpc',
               'types/': 'C-types',
-              'verify/': 'C-verify'
+              'verify/': 'C-verify',
             };
 
             const labelsToAdd = new Set();
