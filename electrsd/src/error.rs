@@ -44,32 +44,22 @@ impl std::error::Error for Error {
 }
 
 impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{:?}", self) }
 }
 
 impl From<std::io::Error> for Error {
-    fn from(e: std::io::Error) -> Self {
-        Error::Io(e)
-    }
+    fn from(e: std::io::Error) -> Self { Error::Io(e) }
 }
 
 impl From<bitcoind::Error> for Error {
-    fn from(e: bitcoind::Error) -> Self {
-        Error::Bitcoind(e)
-    }
+    fn from(e: bitcoind::Error) -> Self { Error::Bitcoind(e) }
 }
 
 impl From<electrum_client::Error> for Error {
-    fn from(e: electrum_client::Error) -> Self {
-        Error::ElectrumClient(e)
-    }
+    fn from(e: electrum_client::Error) -> Self { Error::ElectrumClient(e) }
 }
 
 #[cfg(not(target_os = "windows"))]
 impl From<nix::Error> for Error {
-    fn from(e: nix::Error) -> Self {
-        Error::Nix(e)
-    }
+    fn from(e: nix::Error) -> Self { Error::Nix(e) }
 }

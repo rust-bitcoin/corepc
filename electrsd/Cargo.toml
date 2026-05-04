@@ -31,21 +31,19 @@ zip = { version = "0.6", default-features = false, optional = true, features = [
 ] }
 bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, optional = true, features = [
   "https",
+  "std"
 ] }
 
 [features]
-legacy = []
-
-# download is not supposed to be used directly only through selecting one of the version feature
 download = ["bitcoin_hashes", "zip", "bitreq"]
-
-esplora_a33e97e1 = ["download", "legacy"]
-electrs_0_8_10 = ["download"]
-electrs_0_9_1 = ["download"]
-electrs_0_9_11 = ["download"]
-electrs_0_10_6 = ["download"]
-
 bitcoind_download = ["bitcoind/download", "download"]
+default = ["electrs_0_10_6", "download"]
+
+electrs_0_10_6 = ["electrs_0_9_11"]
+electrs_0_9_11 = ["electrs_0_9_1"]
+electrs_0_9_1 = ["electrs_0_8_10"]
+electrs_0_8_10 = ["esplora_a33e97e1"]
+esplora_a33e97e1 = []
 
 bitcoind_30_2 = ["bitcoind/30_2"]
 bitcoind_29_0 = ["bitcoind/29_0"]
@@ -54,10 +52,26 @@ bitcoind_27_2 = ["bitcoind/27_2"]
 bitcoind_26_2 = ["bitcoind/26_2"]
 bitcoind_25_2 = ["bitcoind/25_2"]
 bitcoind_24_2 = ["bitcoind/24_2"]
-bitcoind_23_1 = ["bitcoind/23_2"]
+bitcoind_23_2 = ["bitcoind/23_2"]
 bitcoind_22_1 = ["bitcoind/22_1"]
 bitcoind_0_21_2 = ["bitcoind/0_21_2"]
 bitcoind_0_20_2 = ["bitcoind/0_20_2"]
 bitcoind_0_19_1 = ["bitcoind/0_19_1"]
 bitcoind_0_18_1 = ["bitcoind/0_18_1"]
 bitcoind_0_17_2 = ["bitcoind/0_17_2"]
+
+[package.metadata.rbmt.lint]
+# The electrsd crate requires a version feature to compile
+features = ["electrs_0_10_6"]
+# Duplicates from build-dep/dep splits, --target=all, or upstream version conflicts.
+allowed_duplicates = [
+    "anyhow",           # build-dep and regular dep, same version
+    "base64",           # upstream version conflicts
+    "bitcoin_hashes",   # build-dep (download) and transitive dep, same version
+    "bitflags",         # upstream version conflicts
+    "bitreq",           # build-dep (download) and regular dep, same version
+    "libc",             # same version, appears twice under --target=all
+    "linux-raw-sys",    # same version, appears twice under --target=all
+    "rustix",           # same version, appears twice under --target=all
+    "windows-sys",      # upstream version conflicts
+]
