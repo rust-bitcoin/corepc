@@ -1,8 +1,8 @@
 # Integration testing
 
 This crate is used to run tests against all the supported versions of
-Core. It runs Core by using `corepc-node` with the `download` feature
-enabled. However `node` allows setting the environment variable
+Core. It runs Core by using `bitcoind` with the `download` feature
+enabled. However `bitcoind` allows setting the environment variable
 `BITCOIND_EXE` to override downloading the Core executable. E.g. 
 
 `BITCOIND_EXE=/opt/bitcoin-28.0/bin/bitcoind cargo test --features=28_0`
