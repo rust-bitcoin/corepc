@@ -27,6 +27,9 @@ use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 use crate::Response;
 use crate::{Error, Method, ResponseLazy};
 
+#[cfg(feature = "async")]
+const BACKING_READ_BUFFER_LENGTH: usize = 16 * 1024;
+
 type UnsecuredStream = TcpStream;
 
 #[cfg(feature = "rustls")]
@@ -217,7 +220,7 @@ impl AsyncWrite for AsyncHttpStream {
 #[cfg(feature = "async")]
 struct AsyncConnectionState {
     write: AsyncMutex<WriteHalf<AsyncHttpStream>>,
-    read: AsyncMutex<ReadHalf<AsyncHttpStream>>,
+    read: AsyncMutex<tokio::io::BufReader<ReadHalf<AsyncHttpStream>>>,
     /// The ID of the next request we'll send. If this reaches [`usize::MAX`] no further requests
     /// can be sent on this socket and a new connection must be made. Thus, in order to limit the
     /// connection to sending N new requests, this may be set to [`usize::MAX`] - N.
@@ -292,7 +295,10 @@ impl AsyncConnection {
         let (read, write) = tokio::io::split(stream);
 
         Ok(AsyncConnection(Mutex::new(Arc::new(AsyncConnectionState {
-            read: AsyncMutex::new(read),
+            read: AsyncMutex::new(tokio::io::BufReader::with_capacity(
+                BACKING_READ_BUFFER_LENGTH,
+                read,
+            )),
             write: AsyncMutex::new(write),
             next_request_id: AtomicUsize::new(0),
             readable_request_id: AtomicUsize::new(0),
