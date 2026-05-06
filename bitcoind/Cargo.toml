@@ -44,9 +44,12 @@ default = ["0_17_2"]
 
 download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "bitreq", "zip"]
 
+# While have the 31_0 feature, we don't make it "latest" yet as it is
+# still missing support on the corepc client.
 latest = ["30_2"]
 
 # We support all minor releases of the latest four versions.
+31_0 = ["30_2"]
 30_2 = ["30_0"]
 # Skip v30.1 due to wallet migration bug.
 30_0 = ["29_0"]
