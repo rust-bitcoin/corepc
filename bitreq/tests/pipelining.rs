@@ -52,7 +52,6 @@ fn find_double_crlf(buf: &[u8]) -> Option<usize> {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-#[ignore="enable once fixed"]
 async fn pipelined_requests_on_keep_alive_max_one() {
     // Number of pipelined requests to fire after the priming request.
     const PIPELINED_REQUESTS: usize = 100;
