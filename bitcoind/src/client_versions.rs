@@ -60,26 +60,6 @@ pub use corepc_client::{client_sync::v18::*, types::v18 as vtype};
 #[cfg(all(feature = "0_17_2", not(feature = "0_18_1")))]
 pub use corepc_client::{client_sync::v17::*, types::v17 as vtype};
 
-/// This is meaningless but we need it otherwise we can't get far enough into
-/// the build process to trigger the `compile_error!` in `./versions.rs`.
-#[cfg(all(
-    not(feature = "30_0"),
-    not(feature = "29_0"),
-    not(feature = "28_2"),
-    not(feature = "28_1"),
-    not(feature = "28_0"),
-    not(feature = "27_2"),
-    not(feature = "27_1"),
-    not(feature = "27_0"),
-    not(feature = "26_2"),
-    not(feature = "25_2"),
-    not(feature = "24_2"),
-    not(feature = "23_2"),
-    not(feature = "22_1"),
-    not(feature = "0_21_2"),
-    not(feature = "0_20_2"),
-    not(feature = "0_19_1"),
-    not(feature = "0_18_1"),
-    not(feature = "0_17_2"),
-))]
+// This makes the build error more succinct if someone tries to build with --no-default-features.
+#[cfg(not(feature = "0_17_2"))]
 pub use corepc_client::{client_sync::v28::*, types::v28 as vtype};
