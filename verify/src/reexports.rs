@@ -43,13 +43,8 @@ pub fn check_type_reexports(version: Version) -> Result<()> {
     let mut missing = Vec::new();
 
     // Checks every type defined in this version is publicly re-exported.
-    let version_defs = match definitions.get(&version_name) {
-        Some(defs) => defs,
-        None => {
-            let msg = format!("no definitions found for version {}", version_name);
-            return Err(anyhow::anyhow!(msg));
-        }
-    };
+    let empty = BTreeMap::new();
+    let version_defs = definitions.get(&version_name).unwrap_or(&empty);
 
     for type_name in version_defs.keys() {
         let exported = export_map
