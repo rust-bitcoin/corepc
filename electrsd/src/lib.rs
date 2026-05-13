@@ -313,7 +313,7 @@ impl Drop for ElectrsD {
 
 /// Provide the electrs executable path if a version feature has been specified and `ELECTRSD_SKIP_DOWNLOAD` is not set.
 pub fn downloaded_exe_path() -> Option<String> {
-    if versions::HAS_FEATURE && std::env::var_os("ELECTRSD_SKIP_DOWNLOAD").is_none() {
+    if std::env::var_os("ELECTRSD_SKIP_DOWNLOAD").is_none() {
         Some(format!("{}/electrs/{}/electrs", env!("OUT_DIR"), versions::electrs_name(),))
     } else {
         None

@@ -34,6 +34,8 @@ bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, opti
 ] }
 
 [features]
+default = ["electrs_0_10_6"]
+
 legacy = []
 
 # download is not supposed to be used directly only through selecting one of the version feature
@@ -64,6 +66,10 @@ bitcoind_0_17_2 = ["bitcoind/0_17_2"]
 
 # This flag should never be manually set. Used to handle `--all-features` was used.
 all_features = []
+
+[package.metadata.docs.rs]
+features = ["electrs_0_10_6"]
+rustdoc-args = ["--cfg", "docsrs"]
 
 [package.metadata.rbmt.lint]
 # The electrsd crate requires a version feature to compile
