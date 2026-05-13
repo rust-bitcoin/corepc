@@ -62,6 +62,9 @@ bitcoind_0_19_1 = ["bitcoind/0_19_1"]
 bitcoind_0_18_1 = ["bitcoind/0_18_1"]
 bitcoind_0_17_2 = ["bitcoind/0_17_2"]
 
+# This flag should never be manually set. Used to handle `--all-features` was used.
+all_features = []
+
 [package.metadata.rbmt.lint]
 # The electrsd crate requires a version feature to compile
 features = ["electrs_0_10_6"]
