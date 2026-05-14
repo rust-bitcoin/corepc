@@ -16,8 +16,10 @@ getdeploymentinfo ( "blockhash" )
 getdescriptoractivity ["blockhash",...] [scanobjects,...] ( include_mempool )
 getdifficulty
 getmempoolancestors "txid" ( verbose )
+getmempoolcluster "txid"
 getmempooldescendants "txid" ( verbose )
 getmempoolentry "txid"
+getmempoolfeeratediagram
 getmempoolinfo
 getrawmempool ( verbose mempool_sequence )
 gettxout "txid" n ( include_mempool )
@@ -55,6 +57,7 @@ submitblock "hexdata" ( "dummy" )
 submitheader "hexdata"
 
 == Network ==
+abortprivatebroadcast "txid"
 addnode "node" "command" ( v2transport )
 clearbanned
 disconnectnode ( "address" nodeid )
@@ -65,6 +68,7 @@ getnettotals
 getnetworkinfo
 getnodeaddresses ( count "network" )
 getpeerinfo
+getprivatebroadcastinfo
 listbanned
 ping
 setban "subnet" "command" ( bantime absolute )
@@ -149,7 +153,6 @@ sendall ["address",{"address":amount,...},...] ( conf_target "estimate_mode" fee
 sendmany ( "" ) {"address":amount,...} ( minconf "comment" ["address",...] replaceable conf_target "estimate_mode" fee_rate verbose )
 sendtoaddress "address" amount ( "comment" "comment_to" subtractfeefromamount replaceable conf_target "estimate_mode" avoid_reuse fee_rate verbose )
 setlabel "address" "label"
-settxfee amount
 setwalletflag "flag" ( value )
 signmessage "address" "message"
 signrawtransactionwithwallet "hexstring" ( [{"txid":"hex","vout":n,"scriptPubKey":"hex","redeemScript":"hex","witnessScript":"hex","amount":amount},...] "sighashtype" )

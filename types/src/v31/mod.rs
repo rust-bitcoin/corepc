@@ -43,8 +43,10 @@
 //! | getdescriptoractivity              | version + model | TODO                                   |
 //! | getdifficulty                      | version + model | TODO                                   |
 //! | getmempoolancestors                | version + model | TODO                                   |
+//! | getmempoolcluster                  | version + model | TODO                                   |
 //! | getmempooldescendants              | version + model | TODO                                   |
 //! | getmempoolentry                    | version + model | TODO                                   |
+//! | getmempoolfeeratediagram           | version + model | TODO                                   |
 //! | getmempoolinfo                     | version + model | TODO                                   |
 //! | getrawmempool                      | version + model | TODO                                   |
 //! | gettxout                           | version + model | TODO                                   |
@@ -100,6 +102,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
+//! | abortprivatebroadcast              | version + model | TODO                                   |
 //! | addnode                            | returns nothing | TODO                                   |
 //! | clearbanned                        | returns nothing | TODO                                   |
 //! | disconnectnode                     | returns nothing | TODO                                   |
@@ -110,6 +113,7 @@
 //! | getnetworkinfo                     | version + model | TODO                                   |
 //! | getnodeaddresses                   | version         | TODO                                   |
 //! | getpeerinfo                        | version         | TODO                                   |
+//! | getprivatebroadcastinfo            | version + model | TODO                                   |
 //! | listbanned                         | version         | TODO                                   |
 //! | ping                               | returns nothing | TODO                                   |
 //! | setban                             | returns nothing | TODO                                   |
@@ -218,7 +222,6 @@
 //! | sendmany                           | version + model | TODO                                   |
 //! | sendtoaddress                      | version + model | TODO                                   |
 //! | setlabel                           | returns nothing | TODO                                   |
-//! | settxfee                           | version         | TODO                                   |
 //! | setwalletflag                      | version         | TODO                                   |
 //! | signmessage                        | version + model | TODO                                   |
 //! | signrawtransactionwithwallet       | version + model | TODO                                   |
@@ -265,7 +268,7 @@ pub use crate::{
         PartialSignatureError, PruneBlockchain, RawFeeDetail, RawFeeRange, RawTransactionError,
         RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScanTxOutSetAbort,
         ScanTxOutSetError, ScanTxOutSetStatus, ScriptType, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
+        SetNetworkActive, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
         SignRawTransaction, SignRawTransactionError, SignRawTransactionWithKey,
         SignRawTransactionWithWallet, TransactionCategory, UploadTarget, ValidateAddress,
         ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock,
