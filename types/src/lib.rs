@@ -31,6 +31,7 @@ pub mod v27;
 pub mod v28;
 pub mod v29;
 pub mod v30;
+pub mod v31;
 
 // JSON types that model _all_ `bitcoind` versions.
 pub mod model;

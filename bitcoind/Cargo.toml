@@ -44,9 +44,10 @@ default = ["0_17_2"]
 
 download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "bitreq", "zip"]
 
-latest = ["30_2"]
+latest = ["31_0"]
 
 # We support all minor releases of the latest four versions.
+31_0 = ["30_2"]
 30_2 = ["30_0"]
 # Skip v30.1 due to wallet migration bug.
 30_0 = ["29_0"]

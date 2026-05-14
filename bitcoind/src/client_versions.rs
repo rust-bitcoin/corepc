@@ -6,7 +6,10 @@
 
 #![allow(unused_imports)] // Not all users need the json types.
 
-#[cfg(feature = "30_0")]
+#[cfg(feature = "31_0")]
+pub use corepc_client::{client_sync::v31::*, types::v31 as vtype};
+
+#[cfg(all(feature = "30_0", not(feature = "31_0")))]
 pub use corepc_client::{client_sync::v30::*, types::v30 as vtype};
 
 #[cfg(all(feature = "29_0", not(feature = "30_0")))]
@@ -63,6 +66,7 @@ pub use corepc_client::{client_sync::v17::*, types::v17 as vtype};
 /// This is meaningless but we need it otherwise we can't get far enough into
 /// the build process to trigger the `compile_error!` in `./versions.rs`.
 #[cfg(all(
+    not(feature = "31_0"),
     not(feature = "30_0"),
     not(feature = "29_0"),
     not(feature = "28_2"),

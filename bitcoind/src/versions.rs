@@ -1,6 +1,7 @@
 // An explicit version of Bitcoin Core must be selected by enabling some feature.
 // We check this here instead of in `lib.rs` because this file is included in `build.rs`.
 #[cfg(all(
+    not(feature = "31_0"),
     not(feature = "30_2"),
     not(feature = "30_0"),
     not(feature = "29_0"),
@@ -23,8 +24,11 @@
 ))]
 compile_error!("enable a feature in order to select the version of Bitcoin Core to use");
 
-#[cfg(feature = "30_2")]
+#[cfg(feature = "31_0")]
 #[allow(dead_code)] // Triggers in --all-features builds.
+pub const VERSION: &str = "31.0";
+
+#[cfg(all(feature = "30_2", not(feature = "31_0")))]
 pub const VERSION: &str = "30.2";
 
 #[cfg(all(feature = "30_0", not(feature = "30_2")))]
@@ -81,26 +85,6 @@ pub const VERSION: &str = "0.18.1";
 #[cfg(all(feature = "0_17_2", not(feature = "0_18_1")))]
 pub const VERSION: &str = "0.17.2";
 
-/// This is meaningless but we need it otherwise we can't get far enough into
-/// the build process to trigger the `compile_error!` in `./versions.rs`.
-#[cfg(all(
-    not(feature = "30_0"),
-    not(feature = "29_0"),
-    not(feature = "28_2"),
-    not(feature = "28_1"),
-    not(feature = "28_0"),
-    not(feature = "27_2"),
-    not(feature = "27_1"),
-    not(feature = "27_0"),
-    not(feature = "26_2"),
-    not(feature = "25_2"),
-    not(feature = "24_2"),
-    not(feature = "23_2"),
-    not(feature = "22_1"),
-    not(feature = "0_21_2"),
-    not(feature = "0_20_2"),
-    not(feature = "0_19_1"),
-    not(feature = "0_18_1"),
-    not(feature = "0_17_2")
-))]
+// This makes the build error more succinct if someone tries to build with --no-default-features.
+#[cfg(not(feature = "0_17_2"))]
 pub const VERSION: &str = "never-used";
