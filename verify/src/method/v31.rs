@@ -28,12 +28,18 @@ pub const METHODS: &[Method] = &[
     ),
     Method::new_modelled("getdifficulty", "GetDifficulty", "get_difficulty"),
     Method::new_modelled("getmempoolancestors", "GetMempoolAncestors", "get_mempool_ancestors"),
+    Method::new_modelled("getmempoolcluster", "GetMempoolCluster", "get_mempool_cluster"),
     Method::new_modelled(
         "getmempooldescendants",
         "GetMempoolDescendants",
         "get_mempool_descendants",
     ),
     Method::new_modelled("getmempoolentry", "GetMempoolEntry", "get_mempool_entry"),
+    Method::new_modelled(
+        "getmempoolfeeratediagram",
+        "GetMempoolFeerateDiagram",
+        "get_mempool_feerate_diagram",
+    ),
     Method::new_modelled("getmempoolinfo", "GetMempoolInfo", "get_mempool_info"),
     Method::new_modelled("getrawmempool", "GetRawMempool", "get_raw_mempool"),
     Method::new_modelled("gettxout", "GetTxOut", "get_tx_out"),
@@ -72,6 +78,11 @@ pub const METHODS: &[Method] = &[
     Method::new_nothing("submitblock", "submit_block"),
     Method::new_nothing("submitheader", "submit_header"),
     // network
+    Method::new_modelled(
+        "abortprivatebroadcast",
+        "AbortPrivateBroadcast",
+        "abort_private_broadcast",
+    ),
     Method::new_nothing("addnode", "add_node"),
     Method::new_nothing("clearbanned", "clear_banned"),
     Method::new_nothing("disconnectnode", "disconnect_node"),
@@ -82,6 +93,11 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getnetworkinfo", "GetNetworkInfo", "get_network_info"),
     Method::new_no_model("getnodeaddresses", "GetNodeAddresses", "get_node_addresses"),
     Method::new_no_model("getpeerinfo", "GetPeerInfo", "get_peer_info"),
+    Method::new_modelled(
+        "getprivatebroadcastinfo",
+        "GetPrivateBroadcastInfo",
+        "get_private_broadcast_info",
+    ),
     Method::new_no_model("listbanned", "ListBanned", "list_banned"),
     Method::new_nothing("ping", "ping"),
     Method::new_nothing("setban", "set_ban"),
@@ -185,7 +201,6 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("sendmany", "SendMany", "send_many"),
     Method::new_modelled("sendtoaddress", "SendToAddress", "send_to_address"),
     Method::new_nothing("setlabel", "set_label"),
-    Method::new_no_model("settxfee", "SetTxFee", "set_tx_fee"),
     Method::new_no_model("setwalletflag", "SetWalletFlag", "set_wallet_flag"),
     Method::new_modelled("signmessage", "SignMessage", "sign_message"),
     Method::new_modelled(
