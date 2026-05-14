@@ -24,14 +24,13 @@ nix = { version = "0.25.0" }
 env_logger = { version = "0.10" }
 
 [build-dependencies]
+anyhow = { version = "1.0.66", default-features = false, features = ["std"], optional = true }
 bitcoin_hashes = { version = "0.14", optional = true }
 zip = { version = "0.6", default-features = false, optional = true, features = [
   "bzip2",
   "deflate",
 ] }
-bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, optional = true, features = [
-  "https",
-] }
+bitreq = { version = "0.3.5", path = "../bitreq", features = ["https"], optional = true }
 
 [features]
 default = ["electrs_0_10_6"]
@@ -39,7 +38,7 @@ default = ["electrs_0_10_6"]
 legacy = []
 
 # download is not supposed to be used directly only through selecting one of the version feature
-download = ["bitcoin_hashes", "zip", "bitreq"]
+download = ["anyhow", "bitcoin_hashes", "zip", "bitreq"]
 
 esplora_a33e97e1 = ["download", "legacy"]
 electrs_0_8_10 = ["download"]
