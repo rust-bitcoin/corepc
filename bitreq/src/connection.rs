@@ -301,6 +301,25 @@ impl AsyncConnection {
         }))))
     }
 
+    /// Returns the deadline until which this connection may accept further requests,
+    /// or `None` if the inner socket has been poisoned and must not be reused.
+    ///
+    /// A `None` result means the connection's `next_request_id` has been set to
+    /// `usize::MAX` — every failure path in [`AsyncConnection::send`] (write error,
+    /// read error, `Connection: close`, malformed `Keep-Alive`) raises that flag,
+    /// so callers can treat `None` as "drop from the pool". A `Some(instant)`
+    /// result is the current value of `socket_new_requests_timeout`, which
+    /// [`AsyncConnection::send`] refreshes from the server's `Keep-Alive: timeout=N`
+    /// header.
+    pub(crate) fn reusable_until(&self) -> Option<Instant> {
+        let state = Arc::clone(&*self.0.lock().unwrap());
+        if state.next_request_id.load(Ordering::Acquire) == usize::MAX {
+            None
+        } else {
+            Some(*state.socket_new_requests_timeout.lock().unwrap())
+        }
+    }
+
     async fn tcp_connect(host: &str, port: u16) -> Result<AsyncTcpStream, Error> {
         #[cfg(feature = "log")]
         log::trace!("Looking up host {host}");
