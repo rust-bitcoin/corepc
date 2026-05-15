@@ -78,7 +78,7 @@
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | getblocktemplate                   | version + model |                                        |
 //! | getmininginfo                      | version + model |                                        |
-//! | getnetworkhashps                   | returns boolean |                                        |
+//! | getnetworkhashps                   | returns numeric |                                        |
 //! | prioritisetransaction              | returns boolean |                                        |
 //! | submitblock                        | returns nothing |                                        |
 //! | submitheader                       | returns nothing |                                        |

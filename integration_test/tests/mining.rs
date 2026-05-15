@@ -60,7 +60,7 @@ fn mining__get_mining_info() {
 fn mining__get_network_hash_ps() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
-    let _ = node.client.get_network_hash_ps().expect("rpc");
+    let _: f64 = node.client.get_network_hash_ps().expect("rpc");
 }
 
 #[test]
