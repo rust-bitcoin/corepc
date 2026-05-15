@@ -8,7 +8,7 @@ useful in integration testing environment.
 
 ```rust
 let bitcoind = bitcoind::BitcoinD::new("/usr/local/bin/bitcoind").unwrap();
-let electrsd = electrsd::ElectrsD::new("/usr/local/bin/electrs", bitcoind).unwrap();
+let electrsd = electrsd::ElectrsD::new("/usr/local/bin/electrs", &bitcoind).unwrap();
 let header = electrsd.client.block_headers_subscribe().unwrap();
 assert_eq!(header.height, 0);
 ```
@@ -24,10 +24,19 @@ electrsd = { version= "0.23", features = ["bitcoind_30_2", "bitcoin_download", "
 Then use it:
 
 ```rust
-let bitcoind_exe = bitcoind::downloaded_exe_path().expect("bitcoind version feature must be enabled");
-let bitcoind = bitcoind::BitcoinD::new(bitcoind_exe).unwrap();
-let electrs_exe = electrsd::downloaded_exe_path().expect("electrs version feature must be enabled");
-let electrsd = electrsd::ElectrsD::new(electrs_exe, bitcoind).unwrap();
+use bitcoind::P2P;
+use electrsd::electrum_client::ElectrumApi;
+
+fn main() {
+    let bitcoind_exe = bitcoind::downloaded_exe_path().expect("bitcoind version feature must be enabled");
+    let mut conf = bitcoind::Conf::default();
+    conf.p2p = P2P::Yes;
+    let bitcoind = bitcoind::BitcoinD::with_conf(&bitcoind_exe, &conf).unwrap();
+    let electrs_exe = electrsd::downloaded_exe_path().expect("electrs version feature must be enabled");
+    let electrsd = electrsd::ElectrsD::new(&electrs_exe, &bitcoind).unwrap();
+    let header = electrsd.client.block_headers_subscribe().unwrap();
+    assert_eq!(header.height, 1);
+}
 ```
 
 When the `ELECTRSD_DOWNLOAD_ENDPOINT`/`BITCOIND_DOWNLOAD_ENDPOINT` environment variables are set,
@@ -39,9 +48,12 @@ When you don't use the auto-download feature you have the following options:
 - provide the `electrs` executable via the `ELECTRS_EXEC` env var
 
 ```rust
-if let Ok(exe_path) = electrsd::exe_path() {
-  let electrsd = electrsd::electrsD::new(exe_path).unwrap();
-}
+use bitcoind::P2P;
+
+let mut conf = bitcoind::Conf::default();
+conf.p2p = P2P::Yes;
+let bitcoind = bitcoind::BitcoinD::with_conf(bitcoind::exe_path().unwrap(), &conf).unwrap();
+let electrsd = electrsd::ElectrsD::new(electrsd::exe_path().unwrap(), &bitcoind).unwrap();
 ```
 
 Startup options could be configured via the `Conf` struct using `electrsD::with_conf` or `electrsD::from_downloaded_with_conf`.

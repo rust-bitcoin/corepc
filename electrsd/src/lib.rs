@@ -10,13 +10,6 @@ mod error;
 mod ext;
 mod versions;
 
-use bitcoind::anyhow::Context;
-use bitcoind::get_available_port;
-use bitcoind::serde_json::Value;
-use bitcoind::tempfile::TempDir;
-use bitcoind::{anyhow, BitcoinD};
-use electrum_client::raw_client::{ElectrumPlaintextStream, RawClient};
-use log::{debug, error, warn};
 use std::env;
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -25,12 +18,17 @@ use std::time::Duration;
 
 // re-export bitcoind
 pub use bitcoind;
+use bitcoind::anyhow::Context;
+use bitcoind::serde_json::Value;
+use bitcoind::tempfile::TempDir;
+use bitcoind::{anyhow, get_available_port, BitcoinD};
 // re-export corepc_client
 pub use corepc_client;
 // re-export electrum_client because calling RawClient methods requires the ElectrumApi trait
 pub use electrum_client;
-
+use electrum_client::raw_client::{ElectrumPlaintextStream, RawClient};
 pub use error::Error;
+use log::{debug, error, warn};
 
 /// Electrs configuration parameters, implements a convenient [Default] for most common use.
 ///
@@ -85,15 +83,14 @@ pub struct Conf<'a> {
 
 impl Default for Conf<'_> {
     fn default() -> Self {
-        let args = if cfg!(feature = "electrs_0_9_1")
-            || cfg!(feature = "electrs_0_8_10")
-            || cfg!(feature = "esplora_a33e97e1")
-            || cfg!(feature = "legacy")
-        {
-            vec!["-vvv"]
-        } else {
-            vec![]
-        };
+        #[allow(unused_mut)]
+        let mut args = vec![];
+
+        #[cfg(all(
+            not(feature = "all_features"),
+            any(feature = "electrs_0_9_1", feature = "electrs_0_8_10", feature = "legacy")
+        ))]
+        args.push("-vvv");
 
         Conf {
             args,
@@ -153,18 +150,11 @@ impl ElectrsD {
         conf: &Conf,
     ) -> anyhow::Result<ElectrsD> {
         let response = bitcoind.client.call::<Value>("getblockchaininfo", &[])?;
-        if response
-            .get("initialblockdownload")
-            .and_then(|v| v.as_bool())
-            .unwrap_or(false)
-        {
+        if response.get("initialblockdownload").and_then(|v| v.as_bool()).unwrap_or(false) {
             // electrum will remain idle until bitcoind is in IBD
             // bitcoind will remain in IBD if doesn't see a block from a long time, thus adding a block
             let node_address = bitcoind.client.call::<Value>("getnewaddress", &[])?;
-            bitcoind
-                .client
-                .call::<Value>("generatetoaddress", &[1.into(), node_address])
-                .unwrap();
+            bitcoind.client.call::<Value>("generatetoaddress", &[1.into(), node_address]).unwrap();
         }
 
         let mut args = conf.args.clone();
@@ -189,35 +179,28 @@ impl ElectrsD {
         args.push("--network");
         args.push(conf.network);
 
-        #[cfg(not(feature = "legacy"))]
-        let cookie_file;
-        #[cfg(not(feature = "legacy"))]
-        {
-            args.push("--cookie-file");
-            cookie_file = format!("{}", bitcoind.params.cookie_file.display());
-            args.push(&cookie_file);
-        }
-
-        #[cfg(feature = "legacy")]
-        let mut cookie_value;
-        #[cfg(feature = "legacy")]
-        {
-            use std::io::Read;
-            args.push("--cookie");
-            let mut cookie = std::fs::File::open(&bitcoind.params.cookie_file)?;
-            cookie_value = String::new();
-            cookie.read_to_string(&mut cookie_value)?;
-            args.push(&cookie_value);
-        }
+        let cookie_flag;
+        let cookie_val = if cfg!(all(feature = "legacy", not(feature = "all_features"))) {
+            cookie_flag = "--cookie";
+            std::fs::read_to_string(&bitcoind.params.cookie_file)?
+        } else {
+            cookie_flag = "--cookie-file";
+            bitcoind.params.cookie_file.display().to_string()
+        };
+        args.push(cookie_flag);
+        args.push(&cookie_val);
 
         args.push("--daemon-rpc-addr");
         let rpc_socket = bitcoind.params.rpc_socket.to_string();
         args.push(&rpc_socket);
 
         let p2p_socket;
-        if cfg!(feature = "electrs_0_8_10")
-            || cfg!(feature = "esplora_a33e97e1")
-            || cfg!(feature = "legacy")
+        if !cfg!(feature = "all_features")
+            && cfg!(any(
+                feature = "electrs_0_8_10",
+                feature = "esplora_a33e97e1",
+                feature = "legacy",
+            ))
         {
             args.push("--jsonrpc-import");
         } else {
@@ -225,7 +208,7 @@ impl ElectrsD {
             p2p_socket = bitcoind
                 .params
                 .p2p_socket
-                .expect("electrs_0_9_1 requires bitcoind with p2p port open")
+                .expect("electrs needs bitcoind with p2p port open")
                 .to_string();
             args.push(&p2p_socket);
         }
@@ -250,11 +233,7 @@ impl ElectrsD {
             None
         };
 
-        let view_stderr = if conf.view_stderr {
-            Stdio::inherit()
-        } else {
-            Stdio::null()
-        };
+        let view_stderr = if conf.view_stderr { Stdio::inherit() } else { Stdio::null() };
 
         debug!("args: {:?}", args);
         let mut process = Command::new(&exe)
@@ -282,13 +261,7 @@ impl ElectrsD {
             }
         };
 
-        Ok(ElectrsD {
-            process,
-            client,
-            work_dir,
-            electrum_url,
-            esplora_url,
-        })
+        Ok(ElectrsD { process, client, work_dir, electrum_url, esplora_url })
     }
 
     /// triggers electrs sync by sending the `SIGUSR1` signal, useful to call after a block for example
@@ -301,14 +274,10 @@ impl ElectrsD {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn trigger(&self) -> anyhow::Result<()> {
-        Ok(())
-    }
+    pub fn trigger(&self) -> anyhow::Result<()> { Ok(()) }
 
     /// Return the current workdir path of the running electrs
-    pub fn workdir(&self) -> PathBuf {
-        self.work_dir.path()
-    }
+    pub fn workdir(&self) -> PathBuf { self.work_dir.path() }
 
     /// terminate the electrs process
     pub fn kill(&mut self) -> anyhow::Result<()> {
@@ -335,25 +304,17 @@ impl ElectrsD {
     }
 
     #[cfg(target_os = "windows")]
-    fn inner_kill(&mut self) -> anyhow::Result<()> {
-        Ok(self.process.kill()?)
-    }
+    fn inner_kill(&mut self) -> anyhow::Result<()> { Ok(self.process.kill()?) }
 }
 
 impl Drop for ElectrsD {
-    fn drop(&mut self) {
-        let _ = self.kill();
-    }
+    fn drop(&mut self) { let _ = self.kill(); }
 }
 
 /// Provide the electrs executable path if a version feature has been specified and `ELECTRSD_SKIP_DOWNLOAD` is not set.
 pub fn downloaded_exe_path() -> Option<String> {
-    if versions::HAS_FEATURE && std::env::var_os("ELECTRSD_SKIP_DOWNLOAD").is_none() {
-        Some(format!(
-            "{}/electrs/{}/electrs",
-            env!("OUT_DIR"),
-            versions::electrs_name(),
-        ))
+    if std::env::var_os("ELECTRSD_SKIP_DOWNLOAD").is_none() {
+        Some(format!("{}/electrs/{}/electrs", env!("OUT_DIR"), versions::electrs_name(),))
     } else {
         None
     }
@@ -420,12 +381,13 @@ pub fn exe_path() -> anyhow::Result<String> {
 
 #[cfg(test)]
 mod test {
-    use crate::exe_path;
-    use crate::ElectrsD;
+    use std::env;
+
     use bitcoind::P2P;
     use electrum_client::ElectrumApi;
     use log::{debug, log_enabled, Level};
-    use std::env;
+
+    use crate::{exe_path, ElectrsD};
 
     #[test]
     #[ignore] // launch singularly since env are globals
@@ -467,7 +429,7 @@ mod test {
     fn test_kill() {
         let (_, bitcoind, mut electrsd) = setup_nodes();
         let _ = bitcoind.client.get_network_info().unwrap(); // without using bitcoind, it is dropped and all the rest fails.
-        let _ = electrsd.client.ping().unwrap();
+        electrsd.client.ping().unwrap();
         assert!(electrsd.client.ping().is_ok());
         electrsd.kill().unwrap();
         assert!(electrsd.client.ping().is_err());
@@ -479,14 +441,14 @@ mod test {
         debug!("electrs: {}", &electrs_exe);
         let mut conf = bitcoind::Conf::default();
         conf.view_stdout = log_enabled!(Level::Debug);
-        if !cfg!(feature = "electrs_0_8_10") && !cfg!(feature = "esplora_a33e97e1") {
+        if cfg!(feature = "all_features")
+            || !cfg!(any(feature = "electrs_0_8_10", feature = "esplora_a33e97e1"))
+        {
             conf.p2p = P2P::Yes;
         }
         let bitcoind = bitcoind::BitcoinD::with_conf(&bitcoind_exe, &conf).unwrap();
-        let electrs_conf = crate::Conf {
-            view_stderr: log_enabled!(Level::Debug),
-            ..Default::default()
-        };
+        let electrs_conf =
+            crate::Conf { view_stderr: log_enabled!(Level::Debug), ..Default::default() };
         let electrsd = ElectrsD::with_conf(&electrs_exe, &bitcoind, &electrs_conf).unwrap();
         (electrs_exe, bitcoind, electrsd)
     }

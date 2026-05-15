@@ -24,20 +24,21 @@ nix = { version = "0.25.0" }
 env_logger = { version = "0.10" }
 
 [build-dependencies]
+anyhow = { version = "1.0.66", default-features = false, features = ["std"], optional = true }
 bitcoin_hashes = { version = "0.14", optional = true }
 zip = { version = "0.6", default-features = false, optional = true, features = [
   "bzip2",
   "deflate",
 ] }
-bitreq = { version = "0.3.5", path = "../bitreq", default-features = false, optional = true, features = [
-  "https",
-] }
+bitreq = { version = "0.3.5", path = "../bitreq", features = ["https"], optional = true }
 
 [features]
+default = ["electrs_0_10_6"]
+
 legacy = []
 
 # download is not supposed to be used directly only through selecting one of the version feature
-download = ["bitcoin_hashes", "zip", "bitreq"]
+download = ["anyhow", "bitcoin_hashes", "zip", "bitreq"]
 
 esplora_a33e97e1 = ["download", "legacy"]
 electrs_0_8_10 = ["download"]
@@ -61,3 +62,26 @@ bitcoind_0_20_2 = ["bitcoind/0_20_2"]
 bitcoind_0_19_1 = ["bitcoind/0_19_1"]
 bitcoind_0_18_1 = ["bitcoind/0_18_1"]
 bitcoind_0_17_2 = ["bitcoind/0_17_2"]
+
+# This flag should never be manually set. Used to handle `--all-features` was used.
+all_features = []
+
+[package.metadata.docs.rs]
+features = ["electrs_0_10_6"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.rbmt.lint]
+# The electrsd crate requires a version feature to compile
+features = ["electrs_0_10_6"]
+# Duplicates from build-dep/dep splits, --target=all, or upstream version conflicts.
+allowed_duplicates = [
+    "anyhow",           # build-dep and regular dep, same version
+    "base64",           # upstream version conflicts
+    "bitcoin_hashes",   # build-dep (download) and transitive dep, same version
+    "bitflags",         # upstream version conflicts
+    "bitreq",           # build-dep (download) and regular dep, same version
+    "libc",             # same version, appears twice under --target=all
+    "linux-raw-sys",    # same version, appears twice under --target=all
+    "rustix",           # same version, appears twice under --target=all
+    "windows-sys",      # upstream version conflicts
+]
