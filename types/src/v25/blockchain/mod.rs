@@ -88,7 +88,7 @@ pub struct GetBlockStats {
     /// Total size of all segwit transactions.
     #[serde(rename = "swtotal_size")]
     pub segwit_total_size: Option<i64>,
-    /// Total weight of all segwit transactions divided by segwit scale factor (4).
+    /// Total weight of all segwit transactions.
     #[serde(rename = "swtotal_weight")]
     pub segwit_total_weight: Option<u64>,
     /// The number of segwit transactions.
@@ -100,12 +100,12 @@ pub struct GetBlockStats {
     pub total_out: Option<u64>,
     /// Total size of all non-coinbase transactions.
     pub total_size: Option<i64>,
-    /// Total weight of all non-coinbase transactions divided by segwit scale factor (4).
+    /// Total weight of all non-coinbase transactions.
     pub total_weight: Option<u64>,
     /// The fee total.
     #[serde(rename = "totalfee")]
     pub total_fee: Option<u64>,
-    /// The number of transactions (excluding coinbase).
+    /// The number of transactions (including coinbase).
     pub txs: Option<i64>,
     /// The increase/decrease in the number of unspent outputs.
     pub utxo_increase: Option<i32>,
