@@ -426,7 +426,7 @@ pub struct GetBlockStats {
     pub subsidy: Option<Amount>,
     /// Total size of all segwit transactions.
     pub segwit_total_size: Option<u32>,
-    /// Total weight of all segwit transactions divided by segwit scale factor (4).
+    /// Total weight of all segwit transactions.
     pub segwit_total_weight: Option<Weight>,
     /// The number of segwit transactions.
     pub segwit_txs: Option<u32>,
@@ -436,11 +436,11 @@ pub struct GetBlockStats {
     pub total_out: Option<Amount>,
     /// Total size of all non-coinbase transactions.
     pub total_size: Option<u32>,
-    /// Total weight of all non-coinbase transactions divided by segwit scale factor (4).
+    /// Total weight of all non-coinbase transactions.
     pub total_weight: Option<Weight>,
     /// The fee total.
     pub total_fee: Option<Amount>,
-    /// The number of transactions (excluding coinbase).
+    /// The number of transactions (including coinbase).
     pub txs: Option<u32>,
     /// The increase/decrease in the number of unspent outputs.
     pub utxo_increase: Option<i32>,
