@@ -14,7 +14,7 @@ exclude = ["tests", "contrib"]
 [dependencies]
 bitcoind = { version = "0.39.0", path = "../bitcoind" }
 corepc-client = { version = "0.14.0", path = "../client" }
-electrum-client = { version = "0.24.0", default-features = false }
+electrum-client = { version = "0.25.0", default-features = false }
 log = { version = "0.4" }
 
 [target.'cfg(not(windows))'.dependencies]

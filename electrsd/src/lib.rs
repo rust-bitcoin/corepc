@@ -276,7 +276,7 @@ impl ElectrsD {
                     return Err(Error::EarlyExit(status).into());
                 }
             }
-            match RawClient::new(&electrum_url, None) {
+            match RawClient::new(&electrum_url, None, None) {
                 Ok(client) => break client,
                 Err(_) => std::thread::sleep(Duration::from_millis(500)),
             }
