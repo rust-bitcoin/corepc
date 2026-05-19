@@ -272,4 +272,6 @@ pub use proxy::*;
 pub use request::*;
 #[cfg(feature = "std")]
 pub use response::{Response, ResponseLazy};
+#[cfg(feature = "https-rustls")]
+pub use rustls;
 pub use url::{ParseError as UrlParseError, Url};

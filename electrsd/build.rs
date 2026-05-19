@@ -14,6 +14,7 @@ mod download {
     use std::os::unix::fs::PermissionsExt;
     use std::path::Path;
     use std::str::FromStr;
+    use bitreq::rustls::crypto::{CryptoProvider, ring};
 
     include!("src/versions.rs");
 
@@ -35,6 +36,9 @@ mod download {
         if std::env::var_os("ELECTRSD_SKIP_DOWNLOAD").is_some() {
             return;
         }
+
+        // specify the default crypto provider for rustls
+        let _ = CryptoProvider::install_default(ring::default_provider());
 
         if !HAS_FEATURE {
             return;

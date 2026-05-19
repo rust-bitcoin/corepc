@@ -14,6 +14,7 @@ mod download {
 
     use anyhow::Context;
     use bitcoin_hashes::{sha256, Hash};
+    use bitreq::rustls::crypto::{ring, CryptoProvider};
     use flate2::read::GzDecoder;
     use tar::Archive;
 
@@ -79,6 +80,9 @@ mod download {
             return Ok(());
         }
         let out_dir = PathBuf::from(std::env::var_os("OUT_DIR").unwrap());
+
+        // specify the default crypto provider for rustls
+        let _ = CryptoProvider::install_default(ring::default_provider());
 
         let bitcoin_exe_home = download_dir(&out_dir);
         std::fs::create_dir_all(&bitcoin_exe_home)
