@@ -1,3 +1,4 @@
+use alloc::collections::BTreeMap;
 use core::time::Duration;
 #[cfg(feature = "async")]
 use std::future::Future;
@@ -23,9 +24,7 @@ use tokio::net::TcpStream as AsyncTcpStream;
 use tokio::sync::Mutex as AsyncMutex;
 
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
-#[cfg(feature = "async")]
-use crate::Response;
-use crate::{Error, Method, ResponseLazy};
+use crate::{Error, Method, Response, ResponseLazy};
 
 type UnsecuredStream = TcpStream;
 
@@ -50,6 +49,17 @@ impl HttpStream {
     #[cfg(feature = "async")]
     pub(crate) fn create_buffer(buffer: Vec<u8>) -> HttpStream {
         HttpStream::Buffer(std::io::Cursor::new(buffer))
+    }
+
+    /// Updates the timeout deadline used for read/write operations on this stream.
+    pub(crate) fn set_timeout_at(&mut self, timeout_at: Option<Instant>) {
+        match self {
+            HttpStream::Unsecured(_, t) => *t = timeout_at,
+            #[cfg(feature = "rustls")]
+            HttpStream::Secured(_, t) => *t = timeout_at,
+            #[cfg(feature = "async")]
+            HttpStream::Buffer(_) => {}
+        }
     }
 }
 
@@ -572,43 +582,18 @@ impl AsyncConnection {
                     conn.readable_request_id.fetch_add(1, Ordering::Release);
                 }
 
-                if let Some(header) = response.headers.get("keep-alive") {
-                    for param in header.split(',') {
-                        if let Some((k, v)) = param.trim().split_once('=') {
-                            if let Ok(v) = v.parse::<usize>() {
-                                match k.trim() {
-                                    "timeout" => {
-                                        let timeout_secs = (v as u64).saturating_sub(1);
-                                        *conn.socket_new_requests_timeout.lock().unwrap() =
-                                            Instant::now()
-                                                .checked_add(Duration::from_secs(timeout_secs))
-                                                .unwrap_or(Instant::now());
-                                    }
-                                    "max" => {
-                                        conn.next_request_id.fetch_max(
-                                            usize::MAX.saturating_sub(v),
-                                            Ordering::AcqRel,
-                                        );
-                                    }
-                                    _ => {
-                                        // If we can't parse the keep-alive header, don't send any
-                                        // new requests over this socket, but don't give up on
-                                        // reading pending responses.
-                                        conn.next_request_id.store(usize::MAX, Ordering::Release);
-                                    }
-                                }
-                            } else {
-                                // If we can't parse the keep-alive header, don't send any new
-                                // requests over this socket, but don't give up on reading pending
-                                // responses.
-                                conn.next_request_id.store(usize::MAX, Ordering::Release);
-                            }
-                        } else {
-                            // If we can't parse the keep-alive header, don't send any new requests
-                            // over this socket, but don't give up on reading pending responses.
-                            conn.next_request_id.store(usize::MAX, Ordering::Release);
-                        }
-                    }
+                let ka = parse_keep_alive(&response.headers);
+                if let Some(timeout) = ka.timeout {
+                    *conn.socket_new_requests_timeout.lock().unwrap() = timeout;
+                }
+                if let Some(max) = ka.max_requests {
+                    conn.next_request_id
+                        .fetch_max(usize::MAX.saturating_sub(max), Ordering::AcqRel);
+                }
+                if ka.malformed {
+                    // If we can't parse the keep-alive header, don't send any new requests
+                    // over this socket, but don't give up on reading pending responses.
+                    conn.next_request_id.store(usize::MAX, Ordering::Release);
                 }
 
                 // Now that we've processed the response, if the future is cancelled there's no
@@ -751,27 +736,165 @@ impl Connection {
         Self::tcp_connect(params.host, params.port, timeout_at)
     }
 
-    /// Sends the [`Request`](struct.Request.html), consumes this
-    /// connection, and returns a [`Response`](struct.Response.html).
-    pub(crate) fn send(mut self, request: ParsedRequest) -> Result<ResponseLazy, Error> {
-        enforce_timeout(request.timeout_at, move || {
-            // Send request
-            #[cfg(feature = "log")]
-            log::trace!("Writing HTTP request.");
-            self.stream.write_all(&request.as_bytes())?;
+    /// Creates a `Connection` from an existing [`HttpStream`].
+    ///
+    /// Used by [`Client`](crate::Client) to wrap a pooled stream for reuse.
+    pub(crate) fn from_stream(stream: HttpStream) -> Connection { Connection { stream } }
 
-            // Receive response
-            #[cfg(feature = "log")]
-            log::trace!("Reading HTTP response.");
-            let response = ResponseLazy::from_stream(
-                self.stream,
-                request.config.max_headers_size,
-                request.config.max_status_line_len,
-                request.config.max_body_size,
-            )?;
+    /// Writes the request and reads the response metadata, consuming this connection.
+    ///
+    /// The returned [`ResponseLazy`] owns the underlying stream and iterates over the body
+    /// on demand. Shared by [`Connection::send`] and [`Connection::send_pooled`].
+    fn write_and_read_lazy(mut self, request: &ParsedRequest) -> Result<ResponseLazy, Error> {
+        self.stream.set_timeout_at(request.timeout_at);
+
+        #[cfg(feature = "log")]
+        log::trace!("Writing HTTP request.");
+        self.stream.write_all(&request.as_bytes())?;
+
+        #[cfg(feature = "log")]
+        log::trace!("Reading HTTP response.");
+        ResponseLazy::from_stream(
+            self.stream,
+            request.config.max_headers_size,
+            request.config.max_status_line_len,
+            request.config.max_body_size,
+        )
+    }
+
+    /// Sends the [`Request`](struct.Request.html), consumes this
+    /// connection, and returns a [`ResponseLazy`](struct.ResponseLazy.html).
+    pub(crate) fn send(self, request: ParsedRequest) -> Result<ResponseLazy, Error> {
+        enforce_timeout(request.timeout_at, move || {
+            let response = self.write_and_read_lazy(&request)?;
             handle_redirects(request, response)
         })
     }
+
+    /// Sends the [`Request`](struct.Request.html) using `client`'s connection pool,
+    /// following redirects and returning a buffered [`Response`].
+    ///
+    /// The underlying stream is returned to the client's pool on keep-alive. On
+    /// redirect, a pooled connection to the new host is reused if available;
+    /// otherwise a fresh connection is created.
+    pub(crate) fn send_pooled(
+        self,
+        client: &crate::Client,
+        mut request: ParsedRequest,
+    ) -> Result<Response, Error> {
+        let mut connection = self;
+        loop {
+            let (response, recovered, req) = connection.send_and_buffer(request)?;
+            request = req;
+
+            if let Some(stream) = recovered {
+                let key: OwnedConnectionParams = request.connection_params().into();
+                // If the server returned a malformed `Keep-Alive:` header, don't
+                // reuse the connection — match the async path's policy.
+                let ka = parse_keep_alive(&response.headers);
+                if !ka.malformed {
+                    let expires_at =
+                        ka.timeout.unwrap_or_else(|| Instant::now() + Duration::from_secs(60));
+                    client.put_stream(key, stream, expires_at);
+                }
+            }
+
+            let status_code = response.status_code;
+            match get_redirect(request, status_code, response.headers.get("location")) {
+                NextHop::Redirect(result) => {
+                    let (next_request, _needs_new_conn) = result?;
+                    request = next_request;
+                    let key: OwnedConnectionParams = request.connection_params().into();
+                    connection = match client.take_connection(&key) {
+                        Some(c) => c,
+                        None => Connection::new(request.connection_params(), request.timeout_at)?,
+                    };
+                }
+                NextHop::Destination(_) => return Ok(response),
+            }
+        }
+    }
+
+    /// Writes the request, reads and drains the response body, and recovers the
+    /// underlying stream when the server indicated `Connection: keep-alive` and the
+    /// buffered reader has no trailing bytes.
+    fn send_and_buffer(
+        self,
+        request: ParsedRequest,
+    ) -> Result<(Response, Option<HttpStream>, ParsedRequest), Error> {
+        enforce_timeout(request.timeout_at, move || {
+            let is_head = request.config.method == Method::Head;
+            let max_body_size = request.config.max_body_size;
+
+            let mut response_lazy = self.write_and_read_lazy(&request)?;
+            request.url.write_base_url_to(&mut response_lazy.url).unwrap();
+            request.url.write_resource_to(&mut response_lazy.url).unwrap();
+
+            let keep_alive = response_lazy
+                .headers
+                .get("connection")
+                .is_some_and(|h| h.eq_ignore_ascii_case("keep-alive"));
+            let status_code = response_lazy.status_code;
+            // We only read the body for responses that carry one. For HEAD/204/304 we skip
+            // the body entirely, so we cannot know whether the socket itself is clean — a
+            // non-compliant server could have sent bytes we never drained. Don't pool the
+            // stream in that case.
+            let body_was_drained = !is_head && status_code != 204 && status_code != 304;
+            let (response, buf_reader) = response_lazy.drain_with_stream(is_head, max_body_size)?;
+            // Additionally require that the `BufReader` has no prefetched bytes so the next
+            // response read from this connection starts on a clean byte boundary.
+            let recovered = if keep_alive && body_was_drained && buf_reader.buffer().is_empty() {
+                Some(buf_reader.into_inner())
+            } else {
+                None
+            };
+            Ok((response, recovered, request))
+        })
+    }
+}
+
+/// Parsed values from a `Keep-Alive:` response header.
+#[derive(Default)]
+pub(crate) struct KeepAlive {
+    /// The absolute [`Instant`] corresponding to the header's `timeout=N` value, if
+    /// present and valid. `None` means the header was absent or had no `timeout=N`.
+    pub(crate) timeout: Option<Instant>,
+    /// The `max=N` value, if present and valid.
+    pub(crate) max_requests: Option<usize>,
+    /// `true` if the header was present but contained a parameter we could not parse
+    /// (missing `=`, unparseable number, or unknown key). Callers should treat the
+    /// connection as not-reusable for new requests in this case.
+    pub(crate) malformed: bool,
+}
+
+/// Parses the `Keep-Alive:` response header. Shared between the blocking and async
+/// paths so that both agree on the meaning of `timeout=N`, `max=N`, and malformed
+/// parameters.
+pub(crate) fn parse_keep_alive(headers: &BTreeMap<String, String>) -> KeepAlive {
+    let mut result = KeepAlive::default();
+    let header = match headers.get("keep-alive") {
+        Some(h) => h,
+        None => return result,
+    };
+    for param in header.split(',') {
+        let Some((k, v)) = param.trim().split_once('=') else {
+            result.malformed = true;
+            continue;
+        };
+        match (k.trim(), v.parse::<usize>()) {
+            ("timeout", Ok(secs)) => {
+                let timeout_secs = (secs as u64).saturating_sub(1);
+                result.timeout = Instant::now().checked_add(Duration::from_secs(timeout_secs));
+            }
+            ("max", Ok(n)) => {
+                result.max_requests = Some(n);
+            }
+            _ => {
+                result.malformed = true;
+            }
+        }
+    }
+    result
 }
 
 fn handle_redirects(

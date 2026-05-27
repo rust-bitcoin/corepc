@@ -201,7 +201,6 @@ pub fn setup() {
 
 pub fn url(req: &str) -> String { format!("http://localhost:35562{}", req) }
 
-#[cfg(feature = "async")]
 static CLIENT: std::sync::OnceLock<bitreq::Client> = std::sync::OnceLock::new();
 #[cfg(feature = "async")]
 static RUNTIME: std::sync::OnceLock<tokio::runtime::Runtime> = std::sync::OnceLock::new();
@@ -222,6 +221,25 @@ pub async fn maybe_make_request(
         }
         (Err(e), Err(lazy_e)) => assert_eq!(format!("{e:?}"), format!("{lazy_e:?}")),
         (res, lazy_res) => panic!("{res:?} != {}", lazy_res.is_err()),
+    }
+
+    // Test blocking Client path
+    {
+        let client = CLIENT.get_or_init(|| bitreq::Client::new(100));
+        let client_response = client.send(request.clone());
+        match (&response, client_response) {
+            (Ok(resp), Ok(client_resp)) => {
+                assert_eq!(client_resp.status_code, resp.status_code);
+                assert_eq!(client_resp.reason_phrase, resp.reason_phrase);
+                assert_eq!(client_resp.as_bytes(), resp.as_bytes());
+            }
+            (Err(e), Err(client_e)) => {
+                assert_eq!(format!("{e:?}"), format!("{client_e:?}"));
+            }
+            (res, client_res) => {
+                panic!("{res:?} != {client_res:?}");
+            }
+        }
     }
 
     #[cfg(feature = "async")]
