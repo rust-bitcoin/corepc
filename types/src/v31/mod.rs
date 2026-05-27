@@ -32,7 +32,7 @@
 //! | getblockchaininfo                  | version + model |                                        |
 //! | getblockcount                      | version + model |                                        |
 //! | getblockfilter                     | version + model |                                        |
-//! | getblockfrompeer                   | returns nothing | TODO: Fields have changed since v30    |
+//! | getblockfrompeer                   | returns nothing |                                        |
 //! | getblockhash                       | version + model |                                        |
 //! | getblockheader                     | version + model | Includes additional 'verbose' type     |
 //! | getblockstats                      | version + model |                                        |
@@ -63,7 +63,7 @@
 //! | verifytxoutproof                   | version + model |                                        |
 //! | waitforblock                       | version + model |                                        |
 //! | waitforblockheight                 | version + model |                                        |
-//! | waitfornewblock                    | version + model | TODO: Fields have changed since v30    |
+//! | waitfornewblock                    | version + model |                                        |
 //!
 //! </details>
 //!
@@ -86,7 +86,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | getblocktemplate                   | version + model | TODO: Fields have changed since v30    |
+//! | getblocktemplate                   | version + model |                                        |
 //! | getmininginfo                      | version + model |                                        |
 //! | getnetworkhashps                   | returns numeric |                                        |
 //! | getprioritisedtransactions         | version + model |                                        |
@@ -103,12 +103,12 @@
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | addnode                            | returns nothing |                                        |
 //! | clearbanned                        | returns nothing |                                        |
-//! | disconnectnode                     | returns nothing | TODO: Fields have changed since v30    |
+//! | disconnectnode                     | returns nothing |                                        |
 //! | getaddednodeinfo                   | version         |                                        |
 //! | getaddrmaninfo                     | version         |                                        |
 //! | getconnectioncount                 | version         |                                        |
 //! | getnettotals                       | version         |                                        |
-//! | getnetworkinfo                     | version + model | TODO: Fields have changed since v30    |
+//! | getnetworkinfo                     | version + model |                                        |
 //! | getnodeaddresses                   | version         |                                        |
 //! | getpeerinfo                        | version         | TODO: Fields have changed since v30    |
 //! | listbanned                         | version         |                                        |
