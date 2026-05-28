@@ -28,6 +28,7 @@ jobs:
 
             const filePathsToLabels = {
               'bitcoind/': 'C-bitcoind',
+              'bitreq/': 'C-bitreq',
               'client/': 'C-client',
               'electrsd/': 'C-electrsd',
               'integration_test/': 'C-integration-test',
