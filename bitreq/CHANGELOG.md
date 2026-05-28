@@ -1,3 +1,7 @@
+# 0.3.7 - 2026-05-28
+
+* Some pipeline fixes in `bitreq` [#584](https://github.com/rust-bitcoin/corepc/pull/584)
+
 # 0.3.6 - 2026-05-26
 
 * Gate `webpki_roots` import on `webpki-roots` [#597](https://github.com/rust-bitcoin/corepc/pull/597)
