@@ -82,15 +82,13 @@ impl Response {
     /// In order to avoid changing the API while fixing this, we read the full response but then
     /// return a "lazy" response that has the full contents pre-read.
     pub(crate) async fn create_async<R: AsyncRead + Unpin>(
-        stream: R,
+        mut stream: R,
         is_head: bool,
         max_headers_size: Option<usize>,
         max_status_line_len: Option<usize>,
         max_body_size: Option<usize>,
     ) -> Result<Response, Error> {
         use HttpStreamState::*;
-
-        let mut stream = tokio::io::BufReader::with_capacity(BACKING_READ_BUFFER_LENGTH, stream);
 
         let ResponseMetadata {
             status_code,
