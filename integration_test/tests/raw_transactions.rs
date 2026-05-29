@@ -699,3 +699,28 @@ fn create_a_psbt(node: &BitcoinD) -> bitcoin::Psbt {
     let psbt = model.unwrap();
     psbt.0
 }
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn raw_transactions__get_private_broadcast_info__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+
+    let json: GetPrivateBroadcastInfo =
+        node.client.get_private_broadcast_info().expect("getprivatebroadcastinfo");
+
+    // Without Tor or an active private broadcast the queue is empty.
+    assert!(json.transactions.is_empty());
+
+    let model: Result<mtype::GetPrivateBroadcastInfo, encode::FromHexError> = json.into_model();
+    assert!(model.unwrap().transactions.is_empty());
+}
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn raw_transactions__abort_private_broadcast() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+
+    // Aborting a transaction that is not in the private broadcast queue returns an error in regtest.
+    let txid = "0000000000000000000000000000000000000000000000000000000000000001";
+    assert!(node.client.abort_private_broadcast(txid).is_err());
+}
