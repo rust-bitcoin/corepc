@@ -28,7 +28,7 @@
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
 //! | dumptxoutset                       | version + model |                                        |
 //! | getbestblockhash                   | version + model |                                        |
-//! | getblock                           | version + model | TODO: Fields have changed since v30    |
+//! | getblock                           | version + model | Includes additional 'verbose' type     |
 //! | getblockchaininfo                  | version + model |                                        |
 //! | getblockcount                      | version + model |                                        |
 //! | getblockfilter                     | version + model |                                        |
@@ -39,15 +39,15 @@
 //! | getchainstates                     | version + model |                                        |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdeploymentinfo                  | version + model | TODO: Fields have changed since v30    |                                        |
+//! | getdeploymentinfo                  | version + model |                                        |
 //! | getdescriptoractivity              | version + model |                                        |
 //! | getdifficulty                      | version + model |                                        |
-//! | getmempoolancestors                | version + model | TODO: Fields have changed since v30    |
-//! | getmempoolcluster                  | version + model | TODO: New in v31                       |
-//! | getmempooldescendants              | version + model | TODO: Fields have changed since v30    |
-//! | getmempoolentry                    | version + model | TODO: Fields have changed since v30    |
-//! | getmempoolinfo                     | version + model | TODO: Fields have changed since v30    |
-//! | getrawmempool                      | version + model | TODO: Fields have changed since v30    |
+//! | getmempoolancestors                | version + model |                                        |
+//! | getmempoolcluster                  | version + model | New in v31                             |
+//! | getmempooldescendants              | version + model |                                        |
+//! | getmempoolentry                    | version + model |                                        |
+//! | getmempoolinfo                     | version + model |                                        |
+//! | getrawmempool                      | version + model |                                        |
 //! | gettxout                           | version + model |                                        |
 //! | gettxoutproof                      | returns string  |                                        |
 //! | gettxoutsetinfo                    | version + model |                                        |
@@ -75,7 +75,7 @@
 //! | getmemoryinfo                      | version         |                                        |
 //! | getrpcinfo                         | version         |                                        |
 //! | help                               | returns string  |                                        |
-//! | logging                            | version         | TODO: Fields have changed since v30    |
+//! | logging                            | version         |                                        |
 //! | stop                               | returns string  |                                        |
 //! | uptime                             | returns numeric |                                        |
 //!
@@ -110,7 +110,7 @@
 //! | getnettotals                       | version         |                                        |
 //! | getnetworkinfo                     | version + model |                                        |
 //! | getnodeaddresses                   | version         |                                        |
-//! | getpeerinfo                        | version         | TODO: Fields have changed since v30    |
+//! | getpeerinfo                        | version         |                                        |
 //! | listbanned                         | version         |                                        |
 //! | ping                               | returns nothing |                                        |
 //! | setban                             | returns nothing |                                        |
@@ -123,7 +123,7 @@
 //!
 //! | JSON-RPC Method Name               | Returns         | Notes                                  |
 //! |:-----------------------------------|:---------------:|:--------------------------------------:|
-//! | abortprivatebroadcast              | version + model | TODO: New in v31                       |
+//! | abortprivatebroadcast              | version + model | New in v31                             |
 //! | analyzepsbt                        | version + model |                                        |
 //! | combinepsbt                        | version + model |                                        |
 //! | combinerawtransaction              | version + model |                                        |
@@ -136,7 +136,7 @@
 //! | decodescript                       | version + model |                                        |
 //! | finalizepsbt                       | version + model |                                        |
 //! | fundrawtransaction                 | version + model |                                        |
-//! | getprivatebroadcastinfo            | version + model | TODO: New in v31                       |
+//! | getprivatebroadcastinfo            | version + model | New in v31                             |
 //! | getrawtransaction                  | version + model | Includes additional 'verbose' type     |
 //! | joinpsbts                          | version + model |                                        |
 //! | sendrawtransaction                 | version + model |                                        |
@@ -194,7 +194,7 @@
 //! | getreceivedbyaddress               | version + model |                                        |
 //! | getreceivedbylabel                 | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
-//! | getwalletinfo                      | version + model | Untested in v30, unchanged from v29    |
+//! | getwalletinfo                      | version + model |                                        |
 //! | importdescriptors                  | version         |                                        |
 //! | importprunedfunds                  | returns nothing |                                        |
 //! | keypoolrefill                      | returns nothing |                                        |
@@ -292,7 +292,7 @@ pub use crate::{
         PartialSignatureError, PruneBlockchain, RawFeeDetail, RawFeeRange, RawTransactionError,
         RawTransactionInput, RawTransactionOutput, RescanBlockchain, ScanTxOutSetAbort,
         ScanTxOutSetError, ScanTxOutSetStatus, ScriptType, SendRawTransaction, SendToAddress,
-        SetNetworkActive, SetTxFee, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
+        SetNetworkActive, SignFail, SignFailError, SignMessage, SignMessageWithPrivKey,
         SignRawTransaction, SignRawTransactionError, SignRawTransactionWithKey,
         SignRawTransactionWithWallet, TransactionCategory, UploadTarget, ValidateAddress,
         ValidateAddressError, VerifyChain, VerifyMessage, VerifyTxOutProof, WaitForBlock,

@@ -13,7 +13,7 @@ edition = "2021"
 [features]
 download = ["bitcoind/download"]
 
-latest = ["30_2"]
+latest = ["31_0"]
 
 # Enable the same feature in `bitcoind` and the version feature here.
 # All minor releases of the latest three versions.
