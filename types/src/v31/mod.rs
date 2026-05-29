@@ -248,6 +248,7 @@ mod blockchain;
 mod control;
 mod network;
 mod raw_transactions;
+mod wallet;
 
 #[doc(inline)]
 pub use self::{
@@ -258,6 +259,7 @@ pub use self::{
         AbortPrivateBroadcast, GetPrivateBroadcastInfo, PrivateBroadcastPeer,
         PrivateBroadcastTransaction, RemovedTransaction,
     },
+    wallet::GetWalletInfo,
 };
 #[doc(inline)]
 pub use crate::{
@@ -362,7 +364,7 @@ pub use crate::{
     v30::{
         ControlBlocksError, DecodePsbt, DecodePsbtError, GetMempoolInfo, GetMiningInfo,
         GetMiningInfoError, GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
-        GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry, GetWalletInfo, GetWalletInfoError,
+        GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry, GetWalletInfoError,
         GetWalletInfoScanning, GlobalXpub, GlobalXpubError, LastProcessedBlock,
         LastProcessedBlockError, ListWalletDir, ListWalletDirWallet, Musig2PartialSig,
         Musig2ParticipantPubKeys, Musig2Pubnonce, Proprietary, PsbtInput, PsbtInputError,
