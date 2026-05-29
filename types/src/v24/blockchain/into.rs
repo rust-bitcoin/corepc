@@ -182,6 +182,11 @@ impl GetTxSpendingPrevoutItem {
         let spending_txid =
             self.spending_txid.map(|id| id.parse::<Txid>().map_err(E::SpendingTxid)).transpose()?;
 
-        Ok(model::GetTxSpendingPrevoutItem { outpoint, spending_txid })
+        Ok(model::GetTxSpendingPrevoutItem {
+            outpoint,
+            spending_txid,
+            spending_tx: None,
+            block_hash: None,
+        })
     }
 }

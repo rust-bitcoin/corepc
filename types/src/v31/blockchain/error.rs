@@ -3,6 +3,7 @@
 use core::fmt;
 
 use bitcoin::amount::ParseAmountError;
+use bitcoin::consensus::encode;
 use bitcoin::hex;
 
 use crate::error::write_err;
@@ -177,6 +178,45 @@ impl std::error::Error for GetMempoolFeerateDiagramError {
         match *self {
             Self::Numeric(ref e) => Some(e),
             Self::Fee(ref e) => Some(e),
+        }
+    }
+}
+
+/// Error when converting a `GetTxSpendingPrevout` type into the model type.
+#[derive(Debug)]
+pub enum GetTxSpendingPrevoutError {
+    /// Conversion of the `txid` field failed.
+    Txid(hex::HexToArrayError),
+    /// Conversion of the `spendingtxid` field failed.
+    SpendingTxid(hex::HexToArrayError),
+    /// Conversion of the `spendingtx` field failed.
+    SpendingTx(encode::FromHexError),
+    /// Conversion of the `blockhash` field failed.
+    BlockHash(hex::HexToArrayError),
+}
+
+impl fmt::Display for GetTxSpendingPrevoutError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Self::Txid(ref e) => write_err!(f, "conversion of the `txid` field failed"; e),
+            Self::SpendingTxid(ref e) =>
+                write_err!(f, "conversion of the `spendingtxid` field failed"; e),
+            Self::SpendingTx(ref e) =>
+                write_err!(f, "conversion of the `spendingtx` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `blockhash` field failed"; e),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for GetTxSpendingPrevoutError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::Txid(ref e) => Some(e),
+            Self::SpendingTxid(ref e) => Some(e),
+            Self::SpendingTx(ref e) => Some(e),
+            Self::BlockHash(ref e) => Some(e),
         }
     }
 }

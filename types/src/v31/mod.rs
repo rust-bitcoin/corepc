@@ -256,7 +256,8 @@ pub use self::{
         Chunk, FeerateDiagramEntry, GetDeploymentInfo, GetMempoolAncestorsVerbose,
         GetMempoolCluster, GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
         GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError, GetMempoolInfo,
-        GetRawMempoolVerbose, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
+        GetRawMempoolVerbose, GetTxSpendingPrevout, GetTxSpendingPrevoutError,
+        GetTxSpendingPrevoutItem, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
         MempoolEntryFees, MempoolEntryFeesError,
     },
     control::Logging,
@@ -325,9 +326,8 @@ pub use crate::{
         DecodeScriptSegwit, DeploymentInfo, GetDeploymentInfoError, RestoreWallet, SaveMempool,
     },
     v24::{
-        GetMempoolAncestors, GetMempoolDescendants, GetTransactionDetail, GetTxSpendingPrevout,
-        GetTxSpendingPrevoutError, GetTxSpendingPrevoutItem, ListUnspent, ListUnspentItem,
-        MigrateWallet, SendAll, SendAllError, SimulateRawTransaction,
+        GetMempoolAncestors, GetMempoolDescendants, GetTransactionDetail, ListUnspent,
+        ListUnspentItem, MigrateWallet, SendAll, SendAllError, SimulateRawTransaction,
     },
     v25::{
         DescriptorInfo, GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors,

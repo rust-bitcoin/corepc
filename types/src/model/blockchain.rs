@@ -11,7 +11,7 @@ use bitcoin::address::NetworkUnchecked;
 use bitcoin::hashes::sha256;
 use bitcoin::{
     block, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, ScriptBuf,
-    Target, TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
+    Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
 };
 use serde::{Deserialize, Serialize};
 
@@ -930,6 +930,12 @@ pub struct GetTxSpendingPrevoutItem {
     pub outpoint: OutPoint,
     /// The transaction id of the mempool transaction spending this output (omitted if unspent).
     pub spending_txid: Option<Txid>,
+    /// The transaction spending this output (only if `return_spending_tx` is set, omitted if
+    /// unspent). v31 and later only.
+    pub spending_tx: Option<Transaction>,
+    /// The hash of the spending block (omitted if unspent or the spending tx is not confirmed).
+    /// v31 and later only.
+    pub block_hash: Option<BlockHash>,
 }
 
 /// Models the result of JSON-RPC method `loadtxoutset`.

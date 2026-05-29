@@ -690,6 +690,39 @@ fn blockchain__get_tx_spending_prevout__modelled() {
 }
 
 #[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn blockchain__get_tx_spending_prevout_spending_tx_and_block_hash__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex=1", "-txospenderindex=1"]);
+    node.fund_wallet();
+
+    // Create and confirm a transaction, then look up the (now confirmed) output it spends.
+    let (_address, tx) = node.create_mined_transaction();
+    let outpoint = tx.input[0].previous_output;
+
+    let outputs = bitcoind::serde_json::json!([
+        { "txid": outpoint.txid.to_string(), "vout": outpoint.vout }
+    ]);
+    let options =
+        bitcoind::serde_json::json!({ "mempool_only": false, "return_spending_tx": true });
+
+    let json: GetTxSpendingPrevout = node
+        .client
+        .call("gettxspendingprevout", &[outputs, options])
+        .expect("gettxspendingprevout");
+    let item = &json.0[0];
+    assert!(item.spending_txid.is_some());
+    assert!(item.spending_tx.is_some());
+    assert!(item.block_hash.is_some());
+
+    let model: Result<mtype::GetTxSpendingPrevout, GetTxSpendingPrevoutError> = json.into_model();
+    let model = model.unwrap();
+    assert_eq!(model.0[0].outpoint, outpoint);
+    assert_eq!(model.0[0].spending_txid, Some(tx.compute_txid()));
+    assert!(model.0[0].spending_tx.is_some());
+    assert!(model.0[0].block_hash.is_some());
+}
+
+#[test]
 #[cfg(not(feature = "v25_and_below"))]
 fn blockchain__import_mempool() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);

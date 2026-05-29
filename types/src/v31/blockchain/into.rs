@@ -2,12 +2,14 @@
 
 use alloc::collections::BTreeMap;
 
-use bitcoin::{Amount, Txid, Wtxid};
+use bitcoin::consensus::encode;
+use bitcoin::{Amount, BlockHash, OutPoint, Transaction, Txid, Wtxid};
 
 use super::{
     GetDeploymentInfo, GetMempoolAncestorsVerbose, GetMempoolCluster, GetMempoolClusterError,
     GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolFeerateDiagram,
     GetMempoolFeerateDiagramError, GetMempoolInfo, GetMempoolInfoError, GetRawMempoolVerbose,
+    GetTxSpendingPrevout, GetTxSpendingPrevoutError, GetTxSpendingPrevoutItem,
     MapMempoolEntryError, MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError,
 };
 use crate::model;
@@ -223,5 +225,34 @@ impl GetDeploymentInfo {
         let mut model = inner.into_model()?;
         model.script_flags = Some(self.script_flags);
         Ok(model)
+    }
+}
+
+impl GetTxSpendingPrevout {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetTxSpendingPrevout, GetTxSpendingPrevoutError> {
+        let items =
+            self.0.into_iter().map(|item| item.into_model()).collect::<Result<Vec<_>, _>>()?;
+        Ok(model::GetTxSpendingPrevout(items))
+    }
+}
+
+impl GetTxSpendingPrevoutItem {
+    /// Converts version specific type to a version nonspecific, more strongly typed type.
+    pub fn into_model(self) -> Result<model::GetTxSpendingPrevoutItem, GetTxSpendingPrevoutError> {
+        use GetTxSpendingPrevoutError as E;
+
+        let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
+        let outpoint = OutPoint { txid, vout: self.vout };
+        let spending_txid =
+            self.spending_txid.map(|id| id.parse::<Txid>().map_err(E::SpendingTxid)).transpose()?;
+        let spending_tx = self
+            .spending_tx
+            .map(|hex| encode::deserialize_hex::<Transaction>(&hex).map_err(E::SpendingTx))
+            .transpose()?;
+        let block_hash =
+            self.block_hash.map(|h| h.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
+
+        Ok(model::GetTxSpendingPrevoutItem { outpoint, spending_txid, spending_tx, block_hash })
     }
 }
