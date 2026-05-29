@@ -5,7 +5,6 @@
 #[cfg(not(feature = "v25_and_below"))]
 use bitcoin::SignedAmount;
 use bitcoind::vtype::*;
-#[cfg(feature = "v30_and_below")]
 use bitcoind::{TemplateRequest, TemplateRules};
 use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
@@ -53,7 +52,6 @@ fn generate_block_with_empty_tx_list() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_block_template_has_optional_fields() {
     let (node1, _node2, _node3) = integration_test::three_node_network();
     node1.fund_wallet();
@@ -74,7 +72,6 @@ fn get_block_template_has_optional_fields() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_block_template_includes_mempool_tx() {
     let (node1, _node2, _node3) = integration_test::three_node_network();
     node1.fund_wallet();

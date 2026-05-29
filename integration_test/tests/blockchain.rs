@@ -4,7 +4,6 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-#[cfg(feature = "v30_and_below")]
 use bitcoin::consensus::encode;
 use bitcoin::hex;
 use bitcoind::vtype::*; // All the version specific types.
@@ -238,7 +237,6 @@ fn blockchain__get_block_filter__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_block_from_peer() {
     use bitcoin::hashes::Hash;
@@ -887,7 +885,6 @@ fn blockchain__wait_for_block_height__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__wait_for_new_block__modelled() {
     let (node1, node2, _node3) = integration_test::three_node_network();
     node1.fund_wallet();

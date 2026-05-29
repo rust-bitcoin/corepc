@@ -4,10 +4,8 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-#[cfg(feature = "v30_and_below")]
-use bitcoind::mtype;
 use bitcoind::vtype::*; // All the version specific types.
-use bitcoind::{AddNodeCommand, SetBanCommand};
+use bitcoind::{mtype, AddNodeCommand, SetBanCommand};
 use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
@@ -36,7 +34,6 @@ fn network__clear_banned() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn network__disconnect_node() {
     let (_node1, node2, _node3) = integration_test::three_node_network();
 
@@ -78,7 +75,6 @@ fn network__get_net_totals() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn network__get_network_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let json: GetNetworkInfo = node.client.get_network_info().expect("getnetworkinfo");

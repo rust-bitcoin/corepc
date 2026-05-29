@@ -4,17 +4,13 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v28_and_below"))]
 use std::collections::HashMap;
 
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v28_and_below"))]
 use bitcoin::hashes::Hash;
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v28_and_below"))]
 use bitcoin::hex::DisplayHex;
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v28_and_below"))]
 use bitcoin::{
     absolute, consensus, transaction, Amount, OutPoint, ScriptBuf, Sequence, Transaction, TxIn,
@@ -22,13 +18,11 @@ use bitcoin::{
 };
 use bitcoind::mtype;
 use bitcoind::vtype::*; // All the version specific types.
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v21_and_below"))]
 use bitcoind::P2P;
 use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v21_and_below"))]
 fn hidden__add_connection() {
     let (listener, dialer, _node3) = integration_test::three_node_network();
@@ -104,7 +98,6 @@ fn hidden__estimate_raw_fee__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v28_and_below"))]
 fn hidden__get_orphan_txs__modelled() {
     // We use node1 to send node2 orphan transactions via a P2P `tx` message.

@@ -4,7 +4,6 @@
 //! rpc_txoutproof.py, rpc_scantxoutset.py, rpc_gettxspendingprevout.py,
 //! rpc_dumptxoutset.py and rpc_getblockstats.py
 
-#[cfg(feature = "v30_and_below")]
 use bitcoind::mtype;
 use bitcoind::vtype::*;
 use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
@@ -22,7 +21,6 @@ fn get_blockchain_info_pruned_node_has_prune_fields() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_chain_tx_stats_default_window_has_optional_fields() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let addr = node.client.new_address().unwrap();
@@ -39,7 +37,6 @@ fn get_chain_tx_stats_default_window_has_optional_fields() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_chain_tx_stats_pinned_to_block1_has_no_window_fields() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     let addr = node.client.new_address().unwrap();
@@ -148,7 +145,6 @@ fn get_block_hash_at_tip_matches_best() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_block_verbose_one_tx_count_matches_n_tx() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -177,7 +173,6 @@ fn get_chain_tips_active_tip_matches_best() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_mempool_entry_height_and_no_parents() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -221,7 +216,6 @@ fn scan_tx_out_set_best_block_matches_tip() {
 
 #[test]
 #[cfg(not(feature = "v22_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_deployment_info_genesis_vs_tip() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -259,7 +253,6 @@ fn get_tx_spending_prevout_for_unspent_output() {
 
 #[test]
 #[cfg(not(feature = "v28_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_block_verbose_two_non_coinbase_has_fee() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -275,7 +268,6 @@ fn get_block_verbose_two_non_coinbase_has_fee() {
 
 #[test]
 #[cfg(not(feature = "v28_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_block_verbose_three_non_coinbase_has_prevouts() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -291,7 +283,6 @@ fn get_block_verbose_three_non_coinbase_has_prevouts() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_mempool_entry_spent_by_contains_child() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -317,7 +308,6 @@ fn get_raw_mempool_sequence_includes_tx() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_mempool_ancestors_verbose_keyed_by_parent_txid() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -331,7 +321,6 @@ fn get_mempool_ancestors_verbose_keyed_by_parent_txid() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_block_verbose_one_stripped_size_le_size() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -345,7 +334,6 @@ fn get_block_verbose_one_stripped_size_le_size() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn get_block_verbose_one_next_block_hash_some_for_non_tip() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -416,7 +404,6 @@ fn get_block_stats_v25_actual_utxo_fields() {
     assert!(json.utxo_size_increase_actual.is_some());
 }
 
-#[cfg(feature = "v30_and_below")]
 fn create_child_spending_parent(node: &BitcoinD, parent: bitcoin::Txid) -> bitcoin::Txid {
     use bitcoind::{Input, Output};
     let inputs = vec![Input { txid: parent, vout: 0, sequence: None }];
