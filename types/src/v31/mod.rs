@@ -252,7 +252,13 @@ mod wallet;
 
 #[doc(inline)]
 pub use self::{
-    blockchain::{Chunk, GetMempoolCluster},
+    blockchain::{
+        Chunk, FeerateDiagramEntry, GetMempoolAncestorsVerbose, GetMempoolCluster,
+        GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
+        GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError, GetMempoolInfo,
+        GetRawMempoolVerbose, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
+        MempoolEntryFees, MempoolEntryFeesError,
+    },
     control::Logging,
     network::{ConnectionType, GetPeerInfo, PeerInfo, TransportProtocolType},
     raw_transactions::{
@@ -302,7 +308,6 @@ pub use crate::{
     v19::{
         Bip9SoftforkInfo, Bip9SoftforkStatistics, Bip9SoftforkStatus, GetBalancesMine,
         GetBalancesWatchOnly, GetBlockFilter, GetBlockFilterError, GetChainTxStats, GetRpcInfo,
-        MapMempoolEntryError, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError,
         SetWalletFlag, Softfork, SoftforkType,
     },
     v20::GenerateToDescriptor,
@@ -321,11 +326,9 @@ pub use crate::{
         RestoreWallet, SaveMempool,
     },
     v24::{
-        GetMempoolAncestors, GetMempoolAncestorsVerbose, GetMempoolDescendants,
-        GetMempoolDescendantsVerbose, GetMempoolEntry, GetRawMempoolVerbose, GetTransactionDetail,
-        GetTxSpendingPrevout, GetTxSpendingPrevoutError, GetTxSpendingPrevoutItem, ListUnspent,
-        ListUnspentItem, MempoolEntry, MigrateWallet, SendAll, SendAllError,
-        SimulateRawTransaction,
+        GetMempoolAncestors, GetMempoolDescendants, GetTransactionDetail, GetTxSpendingPrevout,
+        GetTxSpendingPrevoutError, GetTxSpendingPrevoutItem, ListUnspent, ListUnspentItem,
+        MigrateWallet, SendAll, SendAllError, SimulateRawTransaction,
     },
     v25::{
         DescriptorInfo, GenerateBlock, GenerateBlockError, GetBlockStats, ListDescriptors,
@@ -362,14 +365,13 @@ pub use crate::{
         SpendActivity, TestMempoolAccept,
     },
     v30::{
-        ControlBlocksError, DecodePsbt, DecodePsbtError, GetMempoolInfo, GetMiningInfo,
-        GetMiningInfoError, GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry,
-        GetOrphanTxsVerboseTwo, GetOrphanTxsVerboseTwoEntry, GetWalletInfoError,
-        GetWalletInfoScanning, GlobalXpub, GlobalXpubError, LastProcessedBlock,
-        LastProcessedBlockError, ListWalletDir, ListWalletDirWallet, Musig2PartialSig,
-        Musig2ParticipantPubKeys, Musig2Pubnonce, Proprietary, PsbtInput, PsbtInputError,
-        PsbtOutput, PsbtOutputError, TaprootBip32Deriv, TaprootBip32DerivsError, TaprootLeaf,
-        TaprootLeafError, TaprootScript, TaprootScriptError, TaprootScriptPathSig,
-        TaprootScriptPathSigError,
+        ControlBlocksError, DecodePsbt, DecodePsbtError, GetMiningInfo, GetMiningInfoError,
+        GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry, GetOrphanTxsVerboseTwo,
+        GetOrphanTxsVerboseTwoEntry, GetWalletInfoError, GetWalletInfoScanning, GlobalXpub,
+        GlobalXpubError, LastProcessedBlock, LastProcessedBlockError, ListWalletDir,
+        ListWalletDirWallet, Musig2PartialSig, Musig2ParticipantPubKeys, Musig2Pubnonce,
+        Proprietary, PsbtInput, PsbtInputError, PsbtOutput, PsbtOutputError, TaprootBip32Deriv,
+        TaprootBip32DerivsError, TaprootLeaf, TaprootLeafError, TaprootScript, TaprootScriptError,
+        TaprootScriptPathSig, TaprootScriptPathSigError,
     },
 };

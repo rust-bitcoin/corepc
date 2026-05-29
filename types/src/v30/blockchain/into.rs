@@ -29,6 +29,9 @@ impl GetMempoolInfo {
             full_rbf: Some(self.full_rbf),
             permit_bare_multisig: Some(self.permit_bare_multisig),
             max_data_carrier_size: Some(self.max_data_carrier_size),
+            limit_cluster_count: None,
+            limit_cluster_size: None,
+            optimal: None,
         })
     }
 }

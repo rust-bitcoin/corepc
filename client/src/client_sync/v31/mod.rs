@@ -50,6 +50,7 @@ crate::impl_client_v30__get_descriptor_activity!();
 crate::impl_client_v17__get_difficulty!();
 crate::impl_client_v17__get_mempool_ancestors!();
 crate::impl_client_v31__get_mempool_cluster!();
+crate::impl_client_v31__get_mempool_feerate_diagram!();
 crate::impl_client_v17__get_mempool_descendants!();
 crate::impl_client_v17__get_mempool_entry!();
 crate::impl_client_v17__get_mempool_info!();

@@ -464,7 +464,6 @@ fn blockchain__get_mempool_ancestors__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_ancestors_verbose__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -477,6 +476,8 @@ fn blockchain__get_mempool_ancestors_verbose__modelled() {
     let ancestors = model.unwrap();
 
     assert!(ancestors.0.contains_key(&parent_txid));
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(ancestors.0[&parent_txid].chunk_weight.is_some());
 }
 
 #[test]
@@ -495,7 +496,6 @@ fn blockchain__get_mempool_descendants__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_descendants_verbose__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -511,10 +511,11 @@ fn blockchain__get_mempool_descendants_verbose__modelled() {
     let descendants = model.unwrap();
 
     assert!(descendants.0.contains_key(&child_txid));
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(descendants.0[&child_txid].chunk_weight.is_some());
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_entry__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -522,11 +523,16 @@ fn blockchain__get_mempool_entry__modelled() {
 
     let json: GetMempoolEntry = node.client.get_mempool_entry(txid).expect("getmempoolentry");
     let model: Result<mtype::GetMempoolEntry, MempoolEntryError> = json.into_model();
-    model.unwrap();
+    let entry = model.unwrap();
+    #[cfg(not(feature = "v30_and_below"))]
+    {
+        assert!(entry.0.chunk_weight.is_some());
+        assert!(entry.0.fees.chunk.is_some());
+    }
+    let _ = entry;
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -538,10 +544,15 @@ fn blockchain__get_mempool_info__modelled() {
 
     // Sanity check.
     assert_eq!(info.size, 1);
+    #[cfg(not(feature = "v30_and_below"))]
+    {
+        assert!(info.limit_cluster_count.is_some());
+        assert!(info.limit_cluster_size.is_some());
+        assert!(info.optimal.is_some());
+    }
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_raw_mempool__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -561,6 +572,8 @@ fn blockchain__get_raw_mempool__modelled() {
     let mempool = model.unwrap();
     // Sanity check.
     assert_eq!(mempool.0.len(), 1);
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(mempool.0.values().next().expect("one entry").chunk_weight.is_some());
 
     #[cfg(not(feature = "v20_and_below"))]
     {
@@ -571,6 +584,49 @@ fn blockchain__get_raw_mempool__modelled() {
         let mempool = model.unwrap();
         // Sanity check.
         assert_eq!(mempool.txids.len(), 1);
+    }
+}
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn blockchain__get_mempool_cluster__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, parent_txid) = node.create_mempool_transaction();
+    let child_txid = create_child_spending_parent(&node, parent_txid);
+
+    let json: GetMempoolCluster =
+        node.client.get_mempool_cluster(parent_txid).expect("getmempoolcluster");
+    let model: Result<mtype::GetMempoolCluster, GetMempoolClusterError> = json.into_model();
+    let cluster = model.unwrap();
+
+    // The parent and its child are linearised in the same cluster.
+    assert_eq!(cluster.tx_count, 2);
+    assert!(cluster.cluster_weight > 0);
+    let cluster_txids: Vec<bitcoin::Txid> =
+        cluster.chunks.iter().flat_map(|c| c.txs.iter().copied()).collect();
+    assert!(cluster_txids.contains(&parent_txid));
+    assert!(cluster_txids.contains(&child_txid));
+}
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn blockchain__get_mempool_feerate_diagram__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _txid) = node.create_mempool_transaction();
+
+    let json: GetMempoolFeerateDiagram =
+        node.client.get_mempool_feerate_diagram().expect("getmempoolfeeratediagram");
+    let model: Result<mtype::GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError> =
+        json.into_model();
+    let diagram = model.unwrap();
+
+    // The diagram is non-empty and cumulative (weight and fee are non-decreasing).
+    assert!(!diagram.0.is_empty());
+    for pair in diagram.0.windows(2) {
+        assert!(pair[1].weight >= pair[0].weight);
+        assert!(pair[1].fee >= pair[0].fee);
     }
 }
 

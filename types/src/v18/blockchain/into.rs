@@ -103,6 +103,7 @@ impl MempoolEntry {
             descendant_size,
             ancestor_count,
             ancestor_size,
+            chunk_weight: None,
             wtxid,
             fees,
             depends,

@@ -20,3 +20,15 @@ macro_rules! impl_client_v31__get_mempool_cluster {
         }
     };
 }
+
+/// Implements Bitcoin Core JSON-RPC API method `getmempoolfeeratediagram`.
+#[macro_export]
+macro_rules! impl_client_v31__get_mempool_feerate_diagram {
+    () => {
+        impl Client {
+            pub fn get_mempool_feerate_diagram(&self) -> Result<GetMempoolFeerateDiagram> {
+                self.call("getmempoolfeeratediagram", &[])
+            }
+        }
+    };
+}

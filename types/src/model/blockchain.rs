@@ -731,6 +731,10 @@ pub struct MempoolEntry {
     pub ancestor_count: u32,
     /// Virtual transaction size of in-mempool ancestors (including this one).
     pub ancestor_size: u32,
+    /// Sigops-adjusted weight of all transactions in this chunk.
+    ///
+    /// This was introduced with Bitcoin Core v31 and will hence be `None` for previous versions.
+    pub chunk_weight: Option<u32>,
     /// Hash of serialized transaction, including witness data.
     pub wtxid: Wtxid,
     /// (No docs in Core v0.17). Part of `getmempoolentry`.
@@ -757,6 +761,10 @@ pub struct MempoolEntryFees {
     pub ancestor: Amount,
     /// Modified fees (see above) of in-mempool descendants (including this one).
     pub descendant: Amount,
+    /// Transaction fees of chunk.
+    ///
+    /// This was introduced with Bitcoin Core v31 and will hence be `None` for previous versions.
+    pub chunk: Option<Amount>,
 }
 
 /// Models the result of JSON-RPC method `getmempoolinfo` with verbose set to true.
@@ -777,7 +785,7 @@ pub struct GetMempoolInfo {
     pub total_fee: Option<f64>,
     /// Maximum memory usage for the mempool.
     pub max_mempool: u32,
-    /// Minimum fee rate in BTC/kB for a transaction to be accepted.
+    /// Minimum fee rate for a transaction to be accepted.
     ///
     /// This is the maximum of `minrelaytxfee` and the minimum mempool fee.
     pub mempool_min_fee: Option<FeeRate>,
@@ -794,6 +802,12 @@ pub struct GetMempoolInfo {
     pub permit_bare_multisig: Option<bool>,
     /// Maximum number of bytes that can be used by OP_RETURN outputs in the mempool.
     pub max_data_carrier_size: Option<u64>,
+    /// Maximum number of transactions that can be in a cluster (configured by -limitclustercount). v31 and later only.
+    pub limit_cluster_count: Option<u32>,
+    /// Maximum size of a cluster in virtual bytes (configured by -limitclustersize). v31 and later only.
+    pub limit_cluster_size: Option<u32>,
+    /// True if the mempool is in a known-optimal transaction ordering.
+    pub optimal: Option<bool>,
 }
 
 /// Models the result of JSON-RPC method `getrawmempool` with verbose set to false.
@@ -811,6 +825,19 @@ pub struct GetRawMempoolSequence {
     pub txids: Vec<Txid>,
     /// The mempool sequence value.
     pub mempool_sequence: u64,
+}
+
+/// Models the result of JSON-RPC method `getmempoolfeeratediagram`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetMempoolFeerateDiagram(pub Vec<FeerateDiagramEntry>);
+
+/// A point on the mempool feerate diagram. Part of `getmempoolfeeratediagram`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct FeerateDiagramEntry {
+    /// Cumulative sigops-adjusted weight.
+    pub weight: u64,
+    /// Cumulative fee.
+    pub fee: Amount,
 }
 
 /// Models the result of JSON-RPC method `gettxout`.

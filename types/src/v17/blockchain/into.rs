@@ -441,6 +441,7 @@ impl MempoolEntry {
             descendant_size,
             ancestor_count,
             ancestor_size,
+            chunk_weight: None,
             wtxid,
             fees,
             depends,
@@ -461,6 +462,7 @@ impl MempoolEntryFees {
             modified: Amount::from_btc(self.modified).map_err(E::Modified)?,
             ancestor: Amount::from_btc(self.ancestor).map_err(E::Ancestor)?,
             descendant: Amount::from_btc(self.descendant).map_err(E::Descendant)?,
+            chunk: None,
         })
     }
 }
@@ -489,6 +491,9 @@ impl GetMempoolInfo {
             full_rbf: None,
             permit_bare_multisig: None,
             max_data_carrier_size: None,
+            limit_cluster_count: None,
+            limit_cluster_size: None,
+            optimal: None,
         })
     }
 }
