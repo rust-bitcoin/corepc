@@ -253,8 +253,8 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        Chunk, FeerateDiagramEntry, GetMempoolAncestorsVerbose, GetMempoolCluster,
-        GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
+        Chunk, FeerateDiagramEntry, GetDeploymentInfo, GetMempoolAncestorsVerbose,
+        GetMempoolCluster, GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
         GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError, GetMempoolInfo,
         GetRawMempoolVerbose, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
         MempoolEntryFees, MempoolEntryFeesError,
@@ -322,8 +322,7 @@ pub use crate::{
     },
     v23::{
         Bip9Info, Bip9Statistics, CreateMultisig, DecodeScript, DecodeScriptError,
-        DecodeScriptSegwit, DeploymentInfo, GetDeploymentInfo, GetDeploymentInfoError,
-        RestoreWallet, SaveMempool,
+        DecodeScriptSegwit, DeploymentInfo, GetDeploymentInfoError, RestoreWallet, SaveMempool,
     },
     v24::{
         GetMempoolAncestors, GetMempoolDescendants, GetTransactionDetail, GetTxSpendingPrevout,

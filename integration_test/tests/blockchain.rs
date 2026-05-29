@@ -382,7 +382,6 @@ fn blockchain__get_chain_tx_stats__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_deployment_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
@@ -410,6 +409,8 @@ fn blockchain__get_deployment_info__modelled() {
     let deployment_info_tip = model_tip.unwrap();
 
     assert_eq!(deployment_info_tip.hash, tip_block_hash);
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(deployment_info_tip.script_flags.is_some());
 }
 
 #[test]

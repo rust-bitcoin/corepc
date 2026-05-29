@@ -549,6 +549,8 @@ pub struct GetDeploymentInfo {
     pub hash: BlockHash,
     /// Requested block height (or tip).
     pub height: u32,
+    /// Script verify flags for the block. v31 and later only.
+    pub script_flags: Option<Vec<String>>,
     /// Deployments info, keyed by deployment name.
     pub deployments: std::collections::BTreeMap<String, DeploymentInfo>,
 }

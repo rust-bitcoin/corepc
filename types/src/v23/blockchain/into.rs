@@ -64,7 +64,7 @@ impl GetDeploymentInfo {
                 dep.into_model().map(|d| (name, d)).map_err(GetDeploymentInfoError::Deployment)
             })
             .collect::<Result<_, _>>()?;
-        Ok(model::GetDeploymentInfo { hash, height: self.height, deployments })
+        Ok(model::GetDeploymentInfo { hash, height: self.height, script_flags: None, deployments })
     }
 }
 
