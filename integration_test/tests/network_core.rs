@@ -51,7 +51,11 @@ fn get_peer_info_synced_blocks_le_headers() {
     let json: GetPeerInfo = node1.client.get_peer_info().unwrap();
     let peer = json.0.first().unwrap();
 
+    #[cfg(feature = "v30_and_below")]
     assert!(peer.starting_height.is_some());
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(peer.starting_height.is_none());
+
     let headers = peer.synced_headers.unwrap();
     let blocks = peer.synced_blocks.unwrap();
     assert!(blocks <= headers);
