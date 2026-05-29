@@ -141,7 +141,6 @@ fn blockchain__get_best_block_hash__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_block__modelled() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
@@ -154,7 +153,10 @@ fn blockchain__get_block__modelled() {
     let json: GetBlockVerboseOne =
         node.client.get_block_verbose_one(block_hash).expect("getblock verbose=1");
     let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseOneError> = json.into_model();
-    model.unwrap();
+    let block_v1 = model.unwrap();
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(block_v1.coinbase_tx.is_some());
+    let _ = block_v1;
 
     #[cfg(not(feature = "v28_and_below"))]
     {

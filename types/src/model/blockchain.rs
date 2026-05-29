@@ -42,6 +42,23 @@ pub struct GetBestBlockHash(pub BlockHash);
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetBlockVerboseZero(pub Block);
 
+/// The coinbase transaction of a block. Part of `getblock` at verbosity 1, 2 and 3.
+///
+/// Introduced in Bitcoin Core v31.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CoinbaseTransaction {
+    /// The coinbase transaction version.
+    pub version: i32,
+    /// The coinbase transaction's locktime.
+    pub locktime: u32,
+    /// The coinbase input's sequence number (nSequence).
+    pub sequence: u32,
+    /// The coinbase input's script.
+    pub coinbase: String,
+    /// The coinbase input's first (and only) witness stack element, if present.
+    pub witness: Option<String>,
+}
+
 /// Models the result of JSON-RPC method `getblock` with verbosity set to 1.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetBlockVerboseOne {
@@ -55,6 +72,8 @@ pub struct GetBlockVerboseOne {
     pub stripped_size: Option<u32>,
     /// The block weight as defined in BIP-141.
     pub weight: Weight,
+    /// Coinbase transaction metadata (v31 and later only).
+    pub coinbase_tx: Option<CoinbaseTransaction>,
     /// The block height or index.
     pub height: u32,
     /// The block version.
@@ -98,6 +117,8 @@ pub struct GetBlockVerboseTwo {
     pub stripped_size: Option<u32>,
     /// The block weight as defined in BIP-141.
     pub weight: Weight,
+    /// Coinbase transaction metadata (v31 and later only).
+    pub coinbase_tx: Option<CoinbaseTransaction>,
     /// The block height or index.
     pub height: u32,
     /// The block version.
@@ -150,6 +171,8 @@ pub struct GetBlockVerboseThree {
     pub stripped_size: Option<u32>,
     /// The block weight as defined in BIP-141.
     pub weight: Weight,
+    /// Coinbase transaction metadata (v31 and later only).
+    pub coinbase_tx: Option<CoinbaseTransaction>,
     /// The block height or index.
     pub height: u32,
     /// The block version.

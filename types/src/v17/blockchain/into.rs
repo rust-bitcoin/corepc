@@ -68,6 +68,7 @@ impl GetBlockVerboseOne {
             size: crate::to_u32(self.size, "size")?,
             stripped_size,
             weight,
+            coinbase_tx: None,
             height: crate::to_u32(self.height, "height")?,
             version,
             merkle_root,

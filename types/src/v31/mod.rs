@@ -253,8 +253,9 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        Chunk, FeerateDiagramEntry, GetDeploymentInfo, GetMempoolAncestorsVerbose,
-        GetMempoolCluster, GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
+        Chunk, CoinbaseTransaction, FeerateDiagramEntry, GetBlockVerboseOne, GetBlockVerboseThree,
+        GetBlockVerboseTwo, GetDeploymentInfo, GetMempoolAncestorsVerbose, GetMempoolCluster,
+        GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
         GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError, GetMempoolInfo,
         GetRawMempoolVerbose, GetTxSpendingPrevout, GetTxSpendingPrevoutError,
         GetTxSpendingPrevoutItem, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
@@ -352,9 +353,8 @@ pub use crate::{
     },
     v29::{
         ActivityEntry, ChainState, DeriveAddressesMultipath, GetBlockHeader, GetBlockHeaderError,
-        GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockVerboseOne,
-        GetBlockVerboseOneError, GetBlockVerboseThree, GetBlockVerboseThreeError,
-        GetBlockVerboseThreePrevout, GetBlockVerboseThreeTransaction, GetBlockVerboseTwo,
+        GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockVerboseOneError,
+        GetBlockVerboseThreeError, GetBlockVerboseThreePrevout, GetBlockVerboseThreeTransaction,
         GetBlockVerboseTwoError, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
         GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
         GetDescriptorActivityError, GetDescriptorInfo, GetOrphanTxsError,
