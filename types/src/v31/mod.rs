@@ -245,12 +245,14 @@
 //! </details>
 
 mod blockchain;
+mod control;
 mod network;
 mod raw_transactions;
 
 #[doc(inline)]
 pub use self::{
     blockchain::{Chunk, GetMempoolCluster},
+    control::Logging,
     network::{ConnectionType, GetPeerInfo, PeerInfo, TransportProtocolType},
     raw_transactions::{
         AbortPrivateBroadcast, GetPrivateBroadcastInfo, PrivateBroadcastPeer,
@@ -339,7 +341,7 @@ pub use crate::{
     v28::{
         CreateWalletDescriptor, GetAddressInfo, GetAddressInfoEmbedded, GetHdKeys, GetHdKeysError,
         GetNetworkInfo, GetRawAddrMan, GetTransaction, HdKey, HdKeyDescriptor, ListSinceBlock,
-        ListSinceBlockError, ListTransactions, Logging, RawAddrManEntry, ScanTxOutSetStart,
+        ListSinceBlockError, ListTransactions, RawAddrManEntry, ScanTxOutSetStart,
         ScanTxOutSetUnspent, SubmitPackage, SubmitPackageError, SubmitPackageTxResult,
         SubmitPackageTxResultError, SubmitPackageTxResultFees, SubmitPackageTxResultFeesError,
         TransactionItem, TransactionItemError,

@@ -27,10 +27,12 @@ fn control__help() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn control__logging() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
-    let _: Logging = node.client.logging().unwrap();
+    let logging: Logging = node.client.logging().unwrap();
+    #[cfg(not(feature = "v30_and_below"))]
+    let _ = (logging.kernel, logging.privatebroadcast);
+    let _ = logging;
 }
 
 #[test]
