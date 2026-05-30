@@ -13,6 +13,7 @@ pub extern crate electrum_client;
 
 use std::env;
 use std::ffi::OsStr;
+use std::net::TcpStream;
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::time::Duration;
@@ -251,7 +252,20 @@ impl ElectrsD {
                     return Err(Error::EarlyExit(status).into());
                 }
             }
-            match RawClient::new(&electrum_url, None, None) {
+            let client_result = if !IS_ALL_FEATURES_BUILD
+                && cfg!(any(
+                    feature = "electrs_0_8_10",
+                    feature = "electrs_0_9_1",
+                    feature = "electrs_0_9_11"
+                )) {
+                // Old electrs servers do not handle v0.25 protocol negotiation reliably.
+                // Build RawClient directly from a plaintext stream to preserve previous behavior.
+                TcpStream::connect(&electrum_url).map(RawClient::from).map_err(Into::into)
+            } else {
+                RawClient::new(&electrum_url, Some(Duration::from_secs(3)), None)
+            };
+
+            match client_result {
                 Ok(client) => break client,
                 Err(_) => std::thread::sleep(Duration::from_millis(500)),
             }
