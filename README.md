@@ -28,6 +28,7 @@ integration testing.
 - `bitreq/`: [`bitreq`](https://crates.io/crates/bitreq): Simple, minimal-dependency HTTP client, with optional features for proxies, async, and https.
 - `client/`: [`corepc-client`](https://crates.io/crates/corepc-client): A blocking JSON-RPC client used to test `corepc-types`.
 - `contrib/`: Contains scripts including one to run local regtest `bitcoind` nodes using versions specified in the config file. A template config file and bitcoind aliases are in the subdirectory `templates/`
+- `electrsd/`: [`electrsd`](https://crates.io/crates/electrsd): Utility to run a regtest [electrs](https://crates.io/crates/electrs) process connected to a given [bitcoind](https://crates.io/crates/bitcoind) instance.
 - `integration_test/`: Integration tests that use `corepc-client` and `bitcoind` to test `corepc-types`.
 - `jsonrpc/`: [`jsonrpc`](https://crates.io/crates/jsonrpc): Rudimentary support for sending JSONRPC 2.0 requests and receiving responses.
 - `types/`: [`corepc-types`](https://crates.io/crates/corepc-types): Rust types returned by the JSON-RPC API of Bitcoin Core.
