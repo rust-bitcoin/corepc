@@ -3,7 +3,7 @@
 
 # Electrsd
 
-Utility to run a regtest [electrs](https://github.com/romanz/electrs/) process connected to a given [bitcoind](https://github.com/RCasatta/bitcoind) instance, 
+Utility to run a regtest [electrs](https://crates.io/crates/electrs) process connected to a given [bitcoind](https://crates.io/crates/bitcoind) instance,
 useful in integration testing environment.
 
 ```rust
@@ -74,7 +74,7 @@ I used integration testing based on external bash script launching needed extern
 ## Features
 
   * electrsd use a temporary directory as db dir
-  * A free port is asked to the OS (a very low probability race condition is still possible) 
+  * A free port is asked to the OS (a very low probability race condition is still possible)
   * The process is killed when the struct goes out of scope no matter how the test finishes
   * Automatically download `electrs` executable with enabled features. Since there are no official binaries, they are built using the [manual workflow](.github/workflows/build_electrs.yml) under this project. Supported version are:
     * [electrs 0.10.6](https://github.com/romanz/electrs/releases/tag/v0.10.6) (feature=electrs_0_10_6)
