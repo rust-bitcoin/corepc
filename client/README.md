@@ -1,7 +1,16 @@
 # corepc-client
 
-Rust client for the Bitcoin Core daemon's JSON-RPC API. Currently this
-is only a blocking client and is intended to be used in integration testing.
+Rust client for the Bitcoin Core daemon's JSON-RPC API.
+
+This crate provides:
+
+- A blocking client intended for integration testing (`client-sync`).
+- An async client intended for production (`client-async`).
+
+## Features
+
+- `client-sync`: Blocking JSON-RPC client.
+- `client-async`: Async JSON-RPC client.
 
 ## Minimum Supported Rust Version (MSRV)
 

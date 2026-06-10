@@ -3,6 +3,15 @@
 use std::{error, fmt, io};
 
 use bitcoin::hex;
+use types::v17::{
+    GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseOneError,
+    GetRawTransactionVerboseError,
+};
+use types::v19::GetBlockFilterError;
+use types::v29::{
+    GetBlockHeaderVerboseError as GetBlockHeaderVerboseErrorV29,
+    GetBlockVerboseOneError as GetBlockVerboseOneErrorV29,
+};
 
 /// The error type for errors produced in this library.
 #[derive(Debug)]
@@ -46,6 +55,34 @@ impl From<bitcoin::consensus::encode::FromHexError> for Error {
 
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error { Error::Io(e) }
+}
+
+impl From<GetBlockHeaderError> for Error {
+    fn from(e: GetBlockHeaderError) -> Self { Self::Returned(e.to_string()) }
+}
+
+impl From<GetBlockHeaderVerboseError> for Error {
+    fn from(e: GetBlockHeaderVerboseError) -> Self { Self::Returned(e.to_string()) }
+}
+
+impl From<GetBlockVerboseOneError> for Error {
+    fn from(e: GetBlockVerboseOneError) -> Self { Self::Returned(e.to_string()) }
+}
+
+impl From<GetRawTransactionVerboseError> for Error {
+    fn from(e: GetRawTransactionVerboseError) -> Self { Self::Returned(e.to_string()) }
+}
+
+impl From<GetBlockHeaderVerboseErrorV29> for Error {
+    fn from(e: GetBlockHeaderVerboseErrorV29) -> Self { Self::Returned(e.to_string()) }
+}
+
+impl From<GetBlockVerboseOneErrorV29> for Error {
+    fn from(e: GetBlockVerboseOneErrorV29) -> Self { Self::Returned(e.to_string()) }
+}
+
+impl From<GetBlockFilterError> for Error {
+    fn from(e: GetBlockFilterError) -> Self { Self::Returned(e.to_string()) }
 }
 
 impl fmt::Display for Error {

@@ -12,6 +12,9 @@ pub extern crate types;
 #[macro_use]
 pub mod client_sync;
 
+#[cfg(feature = "client-async")]
+pub mod client_async;
+
 /// Helper to log an RPC response.
 #[cfg(any(feature = "client-sync", feature = "client-async"))]
 pub(crate) fn log_response<E: std::fmt::Debug>(
