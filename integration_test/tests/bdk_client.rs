@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: CC0-1.0
+
+//! Tests for the async client.
+
+#![cfg(feature = "v30_and_below")]
+#![cfg(not(feature = "v24_and_below"))]
+#![allow(non_snake_case)] // Test names intentionally use double underscore.
+
+use bitcoin::address::KnownHrp;
+use bitcoin::{Address, CompressedPublicKey, PrivateKey};
+use bitcoind::mtype;
+use corepc_client::client_async::{
+    Auth, Client, GetBestBlockHashError, GetBlockCountError, GetBlockError, GetBlockFilterError,
+    GetBlockHashError, GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseError,
+    GetRawMempoolError, GetRawTransactionError, ServerVersionError,
+};
+use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
+
+fn async_client_for(node: &BitcoinD) -> Client {
+    Client::new_with_auth(&node.rpc_url(), auth_for(node)).expect("async client")
+}
+
+#[tokio::test]
+async fn async__get_best_block_hash__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let model: Result<bitcoin::BlockHash, GetBestBlockHashError> =
+        client.get_best_block_hash().await;
+    let model = model.unwrap();
+    let expected = node.client.best_block_hash().expect("best_block_hash");
+    assert_eq!(model, expected);
+}
+
+#[tokio::test]
+async fn async__get_block__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let best_hash = node.client.best_block_hash().expect("best_block_hash");
+
+    let model: Result<bitcoin::Block, GetBlockError> = client.get_block(&best_hash).await;
+    let model = model.unwrap();
+    assert_eq!(model.block_hash(), best_hash);
+
+    let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseError> =
+        client.get_block_verbose(&best_hash).await;
+    let model = model.unwrap();
+    assert_eq!(model.hash, best_hash);
+}
+
+#[tokio::test]
+async fn async__get_block_count__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let model: Result<u64, GetBlockCountError> = client.get_block_count().await;
+    let model = model.unwrap();
+    assert_eq!(model, 0);
+}
+
+#[tokio::test]
+#[cfg(not(feature = "v18_and_below"))]
+async fn async__get_block_filter__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &["-blockfilterindex"]);
+    let client = async_client_for(&node);
+
+    let best_hash = node.client.best_block_hash().expect("best_block_hash");
+    let model: Result<mtype::GetBlockFilter, GetBlockFilterError> =
+        client.get_block_filter(&best_hash).await;
+    let model = model.unwrap();
+
+    assert!(!model.filter.is_empty());
+    assert_eq!(model.header.to_string().len(), 64);
+}
+
+#[tokio::test]
+async fn async__get_block_hash__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let model: Result<bitcoin::BlockHash, GetBlockHashError> = client.get_block_hash(0).await;
+    let model = model.unwrap();
+    let expected = node.client.best_block_hash().expect("best_block_hash");
+    assert_eq!(model, expected);
+}
+
+#[tokio::test]
+async fn async__get_block_header__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let best_hash = node.client.best_block_hash().expect("best_block_hash");
+    let model: Result<bitcoin::block::Header, GetBlockHeaderError> =
+        client.get_block_header(&best_hash).await;
+    let model = model.unwrap();
+    assert_eq!(model.block_hash(), best_hash);
+
+    let model: Result<mtype::GetBlockHeaderVerbose, GetBlockHeaderVerboseError> =
+        client.get_block_header_verbose(&best_hash).await;
+    let model = model.unwrap();
+    assert_eq!(model.hash, best_hash);
+    assert_eq!(model.height, 0);
+}
+
+#[tokio::test]
+async fn async__get_raw_mempool__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let model: Result<Vec<bitcoin::Txid>, GetRawMempoolError> = client.get_raw_mempool().await;
+    let model = model.unwrap();
+    assert!(model.is_empty());
+}
+
+#[tokio::test]
+async fn async__get_raw_transaction__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &["-txindex"]);
+    let privkey =
+        PrivateKey::from_wif("cVt4o7BGAig1UXywgGSmARhxMdzP5qvQsxKkSsc1XEkw3tDTQFpy").expect("wif");
+    let secp = bitcoin::secp256k1::Secp256k1::new();
+    let pubkey = privkey.public_key(&secp);
+    let address = Address::p2wpkh(&CompressedPublicKey(pubkey.inner), KnownHrp::Regtest);
+    node.client.generate_to_address(1, &address).expect("generatetoaddress");
+
+    let client = async_client_for(&node);
+    let best_hash = node.client.best_block_hash().expect("best_block_hash");
+    let block = client.get_block(&best_hash).await.expect("getblock");
+    let txid = block.txdata[0].compute_txid();
+
+    let model: Result<bitcoin::Transaction, GetRawTransactionError> =
+        client.get_raw_transaction(&txid).await;
+    let model = model.unwrap();
+    assert_eq!(model.compute_txid(), txid);
+}
+
+fn auth_for(node: &BitcoinD) -> Auth { Auth::CookieFile(node.params.cookie_file.clone()) }
+
+#[tokio::test]
+async fn async__server_version__returns_positive_integer() {
+    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+    let client = async_client_for(&node);
+
+    let version: Result<usize, ServerVersionError> = client.server_version().await;
+    let version = version.unwrap();
+    assert!(version > 0);
+}

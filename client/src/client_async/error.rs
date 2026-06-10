@@ -2,22 +2,20 @@
 
 use std::{error, fmt, io};
 
-use bitcoin::hex;
-
-/// The error type for errors produced in this library.
+/// The general error type for the async client.
+///
+/// This covers connecting, authenticating, and performing a JSON-RPC call. Each RPC method returns
+/// its own error type (e.g. [`GetBlockError`]) which wraps this type in its `Rpc` variant.
 #[derive(Debug)]
 pub enum Error {
+    /// A JSON-RPC error occurred (transport error or the node returned an error).
     JsonRpc(jsonrpc::error::Error),
-    HexToArray(hex::HexToArrayError),
-    HexToBytes(hex::HexToBytesError),
+    /// Serializing an argument or deserializing the response failed.
     Json(serde_json::error::Error),
-    BitcoinSerialization(bitcoin::consensus::encode::FromHexError),
+    /// An I/O error occurred (e.g. reading the cookie file).
     Io(io::Error),
+    /// The cookie file was invalid.
     InvalidCookieFile,
-    /// The JSON result had an unexpected structure.
-    UnexpectedStructure,
-    /// The daemon returned an error string.
-    Returned(String),
     /// The server version did not match what was expected.
     ServerVersion(UnexpectedServerVersionError),
     /// Missing user/password.
@@ -28,20 +26,8 @@ impl From<jsonrpc::error::Error> for Error {
     fn from(e: jsonrpc::error::Error) -> Error { Error::JsonRpc(e) }
 }
 
-impl From<hex::HexToArrayError> for Error {
-    fn from(e: hex::HexToArrayError) -> Self { Self::HexToArray(e) }
-}
-
-impl From<hex::HexToBytesError> for Error {
-    fn from(e: hex::HexToBytesError) -> Self { Self::HexToBytes(e) }
-}
-
 impl From<serde_json::error::Error> for Error {
     fn from(e: serde_json::error::Error) -> Error { Error::Json(e) }
-}
-
-impl From<bitcoin::consensus::encode::FromHexError> for Error {
-    fn from(e: bitcoin::consensus::encode::FromHexError) -> Error { Error::BitcoinSerialization(e) }
 }
 
 impl From<io::Error> for Error {
@@ -54,14 +40,9 @@ impl fmt::Display for Error {
 
         match *self {
             JsonRpc(ref e) => write!(f, "JSON-RPC error: {}", e),
-            HexToArray(ref e) => write!(f, "hex to array decode error: {}", e),
-            HexToBytes(ref e) => write!(f, "hex to bytes decode error: {}", e),
             Json(ref e) => write!(f, "JSON error: {}", e),
-            BitcoinSerialization(ref e) => write!(f, "Bitcoin serialization error: {}", e),
             Io(ref e) => write!(f, "I/O error: {}", e),
             InvalidCookieFile => write!(f, "invalid cookie file"),
-            UnexpectedStructure => write!(f, "the JSON result had an unexpected structure"),
-            Returned(ref s) => write!(f, "the daemon returned an error string: {}", s),
             ServerVersion(ref e) => write!(f, "server version: {}", e),
             MissingUserPassword => write!(f, "missing user and/or password"),
         }
@@ -74,15 +55,201 @@ impl error::Error for Error {
 
         match *self {
             JsonRpc(ref e) => Some(e),
-            HexToArray(ref e) => Some(e),
-            HexToBytes(ref e) => Some(e),
             Json(ref e) => Some(e),
-            BitcoinSerialization(ref e) => Some(e),
             Io(ref e) => Some(e),
             ServerVersion(ref e) => Some(e),
-            InvalidCookieFile | UnexpectedStructure | Returned(_) | MissingUserPassword => None,
+            InvalidCookieFile | MissingUserPassword => None,
         }
     }
+}
+
+/// Defines the error type returned by a single RPC method on the async `Client`.
+///
+/// Every method error has an `Rpc` variant, holding the [`Error`] from making the call. Methods
+/// that convert the response into a model type additionally have a `Model` variant holding the
+/// conversion error. There are three forms:
+///
+/// - `Name => Type`: `Model` holds the concrete conversion error `Type`.
+/// - `Name => boxed`: `Model` holds a boxed error. Used by methods that select a version specific
+///   type at runtime and so have no single concrete conversion error type.
+/// - `Name`: no `Model` variant, for methods whose response conversion cannot fail.
+macro_rules! define_method_error {
+    // Version-agnostic (boxed) model conversion error.
+    ($(#[$doc:meta])* $name:ident => boxed) => {
+        $(#[$doc])*
+        #[derive(Debug)]
+        pub enum $name {
+            /// Making the JSON-RPC call failed.
+            Rpc(Error),
+            /// Converting the returned JSON into the model type failed.
+            Model(Box<dyn std::error::Error + Send + Sync + 'static>),
+        }
+
+        impl From<Error> for $name {
+            fn from(e: Error) -> Self { Self::Rpc(e) }
+        }
+
+        impl From<serde_json::error::Error> for $name {
+            fn from(e: serde_json::error::Error) -> Self { Self::Rpc(Error::Json(e)) }
+        }
+
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                match *self {
+                    Self::Rpc(ref e) => write!(f, "JSON-RPC call failed: {}", e),
+                    Self::Model(ref e) => write!(f, "conversion to the model type failed: {}", e),
+                }
+            }
+        }
+
+        impl error::Error for $name {
+            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+                match *self {
+                    Self::Rpc(ref e) => Some(e),
+                    Self::Model(ref e) => Some(&**e),
+                }
+            }
+        }
+    };
+    // Strongly typed model conversion error.
+    ($(#[$doc:meta])* $name:ident => $model:ty) => {
+        $(#[$doc])*
+        #[derive(Debug)]
+        pub enum $name {
+            /// Making the JSON-RPC call failed.
+            Rpc(Error),
+            /// Converting the returned JSON into the model type failed.
+            Model($model),
+        }
+
+        impl From<Error> for $name {
+            fn from(e: Error) -> Self { Self::Rpc(e) }
+        }
+
+        impl From<serde_json::error::Error> for $name {
+            fn from(e: serde_json::error::Error) -> Self { Self::Rpc(Error::Json(e)) }
+        }
+
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                match *self {
+                    Self::Rpc(ref e) => write!(f, "JSON-RPC call failed: {}", e),
+                    Self::Model(ref e) => write!(f, "conversion to the model type failed: {}", e),
+                }
+            }
+        }
+
+        impl error::Error for $name {
+            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+                match *self {
+                    Self::Rpc(ref e) => Some(e),
+                    Self::Model(ref e) => Some(e),
+                }
+            }
+        }
+    };
+    // RPC failure only (response conversion cannot fail).
+    ($(#[$doc:meta])* $name:ident) => {
+        $(#[$doc])*
+        #[derive(Debug)]
+        pub enum $name {
+            /// Making the JSON-RPC call failed.
+            Rpc(Error),
+        }
+
+        impl From<Error> for $name {
+            fn from(e: Error) -> Self { Self::Rpc(e) }
+        }
+
+        impl From<serde_json::error::Error> for $name {
+            fn from(e: serde_json::error::Error) -> Self { Self::Rpc(Error::Json(e)) }
+        }
+
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                match *self {
+                    Self::Rpc(ref e) => write!(f, "JSON-RPC call failed: {}", e),
+                }
+            }
+        }
+
+        impl error::Error for $name {
+            fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+                match *self {
+                    Self::Rpc(ref e) => Some(e),
+                }
+            }
+        }
+    };
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_block`](crate::client_async::Client::get_block).
+    GetBlockError => bitcoin::consensus::encode::FromHexError
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_block_count`](crate::client_async::Client::get_block_count).
+    GetBlockCountError
+}
+
+define_method_error! {
+    /// Error returned by [`Client::server_version`](crate::client_async::Client::server_version).
+    ServerVersionError
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_block_hash`](crate::client_async::Client::get_block_hash).
+    GetBlockHashError => bitcoin::hex::HexToArrayError
+}
+
+define_method_error! {
+    /// Error returned by
+    /// [`Client::get_best_block_hash`](crate::client_async::Client::get_best_block_hash).
+    GetBestBlockHashError => bitcoin::hex::HexToArrayError
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_block_header`](crate::client_async::Client::get_block_header).
+    GetBlockHeaderError => types::v17::GetBlockHeaderError
+}
+
+define_method_error! {
+    /// Error returned by
+    /// [`Client::get_block_header_verbose`](crate::client_async::Client::get_block_header_verbose).
+    GetBlockHeaderVerboseError => boxed
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_block_verbose`](crate::client_async::Client::get_block_verbose).
+    GetBlockVerboseError => boxed
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_block_filter`](crate::client_async::Client::get_block_filter).
+    GetBlockFilterError => types::v19::GetBlockFilterError
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_raw_mempool`](crate::client_async::Client::get_raw_mempool).
+    GetRawMempoolError => bitcoin::hex::HexToArrayError
+}
+
+define_method_error! {
+    /// Error returned by
+    /// [`Client::get_raw_transaction`](crate::client_async::Client::get_raw_transaction).
+    GetRawTransactionError => bitcoin::consensus::encode::FromHexError
+}
+
+define_method_error! {
+    /// Error returned by
+    /// [`Client::get_blockchain_info`](crate::client_async::Client::get_blockchain_info).
+    GetBlockchainInfoError => boxed
+}
+
+define_method_error! {
+    /// Error returned by [`Client::get_tx_out`](crate::client_async::Client::get_tx_out).
+    GetTxOutError => types::v17::GetTxOutError
 }
 
 /// Error returned when RPC client expects a different version than bitcoind reports.
