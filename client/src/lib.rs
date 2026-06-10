@@ -12,21 +12,24 @@ pub extern crate types;
 #[macro_use]
 pub mod client_sync;
 
-#[cfg(feature = "client-sync")]
-use crate::client_sync::Result;
+#[cfg(feature = "client-async")]
+pub mod client_async;
 
 /// Shorthand for converting a variable into a `serde_json::Value`.
-#[cfg(feature = "client-sync")]
-fn into_json<T>(val: T) -> Result<serde_json::Value>
+#[cfg(any(feature = "client-sync", feature = "client-async"))]
+fn into_json<T>(val: T) -> Result<serde_json::Value, serde_json::Error>
 where
     T: serde::ser::Serialize,
 {
-    Ok(serde_json::to_value(val)?)
+    serde_json::to_value(val)
 }
 
 /// Helper to log an RPC response.
-#[cfg(feature = "client-sync")]
-fn log_response(method: &str, resp: &Result<jsonrpc::Response>) {
+#[cfg(any(feature = "client-sync", feature = "client-async"))]
+fn log_response<E: std::fmt::Debug>(
+    method: &str,
+    resp: &std::result::Result<jsonrpc::Response, E>,
+) {
     use log::Level::{Debug, Trace, Warn};
 
     if log::log_enabled!(Warn) || log::log_enabled!(Debug) || log::log_enabled!(Trace) {

@@ -1,35 +1,47 @@
 // SPDX-License-Identifier: CC0-1.0
 
-//! JSON-RPC clients for testing against specific versions of Bitcoin Core.
+//! Async JSON-RPC client for Bitcoin Core v25 to v31.
+//!
+//! Each RPC method returns a typed error with inherent helpers for common error inspection
+//! (`is_not_found_error`, `is_transport_error`, `rpc_code`, `as_client_error`) — no trait
+//! imports required.
+//!
+//! # Examples
+//!
+//! ```rust,no_run
+//! use corepc_client::client_async::GetBlockError;
+//!
+//! fn handle_get_block_error(err: GetBlockError) {
+//!     if err.is_not_found_error() {
+//!         return;
+//!     }
+//!     match err {
+//!         GetBlockError::Model(model_err) => {
+//!             // Method-specific model-conversion branch.
+//!             let _ = model_err;
+//!         }
+//!         GetBlockError::Rpc(client_err) => {
+//!             // Top-level client error branch.
+//!             let _ = client_err;
+//!         }
+//!     }
+//! }
+//! ```
 
 mod error;
-pub mod v17;
-pub mod v18;
-pub mod v19;
-pub mod v20;
-pub mod v21;
-pub mod v22;
-pub mod v23;
-pub mod v24;
-pub mod v25;
-pub mod v26;
-pub mod v27;
-pub mod v28;
-pub mod v29;
-pub mod v30;
-pub mod v31;
+mod rpcs;
 
+use std::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-pub use crate::client_sync::error::Error;
-pub(crate) use crate::{into_json, log_response};
-
-/// Crate-specific Result type.
-///
-/// Shorthand for `std::result::Result` with our crate-specific [`Error`] type.
-pub type Result<T> = std::result::Result<T, Error>;
+pub use crate::client_async::error::{
+    Error, GetBestBlockHashError, GetBlockCountError, GetBlockError, GetBlockFilterError,
+    GetBlockHashError, GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseError,
+    GetBlockchainInfoError, GetRawMempoolError, GetRawTransactionError, GetTxOutError,
+    ServerVersionError, UnexpectedServerVersionError,
+};
 
 /// The different authentication methods for the client.
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
@@ -41,7 +53,7 @@ pub enum Auth {
 
 impl Auth {
     /// Convert into the arguments that jsonrpc::Client needs.
-    pub fn get_user_pass(self) -> Result<(Option<String>, Option<String>)> {
+    pub fn get_user_pass(self) -> Result<(Option<String>, Option<String>), Error> {
         match self {
             Auth::None => Ok((None, None)),
             Auth::UserPass(u, p) => Ok((Some(u), Some(p))),
@@ -57,103 +69,86 @@ impl Auth {
     }
 }
 
-/// Defines a `jsonrpc::Client` using `bitreq`.
-#[macro_export]
-macro_rules! define_jsonrpc_bitreq_client {
-    ($version:literal) => {
-        use std::fmt;
+/// Client implements an async JSON-RPC client for the Bitcoin Core daemon or compatible APIs.
+pub struct Client {
+    inner: jsonrpc::client_async::Client,
+}
 
-        use $crate::client_sync::{log_response, Auth, Result};
-        use $crate::client_sync::error::Error;
-
-        /// Client implements a JSON-RPC client for the Bitcoin Core daemon or compatible APIs.
-        pub struct Client {
-            inner: jsonrpc::client::Client,
-        }
-
-        impl fmt::Debug for Client {
-            fn fmt(&self, f: &mut fmt::Formatter) -> core::fmt::Result {
-                write!(
-                    f,
-                    "corepc_client::client_sync::{}::Client({:?})", $version, self.inner
-                )
-            }
-        }
-
-        impl Client {
-            /// Creates a client to a bitcoind JSON-RPC server without authentication.
-            pub fn new(url: &str) -> Self {
-                let transport = jsonrpc::http::bitreq_http::Builder::new()
-                    .url(url)
-                    .expect("jsonrpc v0.19, this function does not error")
-                    .timeout(std::time::Duration::from_secs(60))
-                    .build();
-                let inner = jsonrpc::client::Client::with_transport(transport);
-
-                Self { inner }
-            }
-
-            /// Creates a client to a bitcoind JSON-RPC server with authentication.
-            pub fn new_with_auth(url: &str, auth: Auth) -> Result<Self> {
-                if matches!(auth, Auth::None) {
-                    return Err(Error::MissingUserPassword);
-                }
-                let (user, pass) = auth.get_user_pass()?;
-
-                let transport = jsonrpc::http::bitreq_http::Builder::new()
-                    .url(url)
-                    .expect("jsonrpc v0.19, this function does not error")
-                    .timeout(std::time::Duration::from_secs(60))
-                    .basic_auth(user.unwrap(), pass)
-                    .build();
-                let inner = jsonrpc::client::Client::with_transport(transport);
-
-                Ok(Self { inner })
-            }
-
-            /// Call an RPC `method` with given `args` list.
-            pub fn call<T: for<'a> serde::de::Deserialize<'a>>(
-                &self,
-                method: &str,
-                args: &[serde_json::Value],
-            ) -> Result<T> {
-                let raw = serde_json::value::to_raw_value(args)?;
-                let req = self.inner.build_request(&method, Some(&*raw));
-                if log::log_enabled!(log::Level::Debug) {
-                    log::debug!(target: "corepc", "request: {} {}", method, serde_json::Value::from(args));
-                }
-
-                let resp = self.inner.send_request(req).map_err(Error::from);
-                log_response(method, &resp);
-                Ok(resp?.result()?)
-            }
-        }
+impl fmt::Debug for Client {
+    fn fmt(&self, f: &mut fmt::Formatter) -> core::fmt::Result {
+        write!(f, "corepc_client::client_async::Client({:?})", self.inner)
     }
 }
 
-/// Implements the `check_expected_server_version()` on `Client`.
-///
-/// Requires `Client` to be in scope and implement `server_version()`.
-/// See and/or use `impl_client_v17__getnetworkinfo`.
-///
-/// # Parameters
-///
-/// - `$expected_versions`: An vector of expected server versions e.g., `[230100, 230200]`.
-#[macro_export]
-macro_rules! impl_client_check_expected_server_version {
-    ($expected_versions:expr) => {
-        impl Client {
-            /// Checks that the JSON-RPC endpoint is for a `bitcoind` instance with the expected version.
-            pub fn check_expected_server_version(&self) -> Result<()> {
-                let server_version = self.server_version()?;
-                if !$expected_versions.contains(&server_version) {
-                    return Err($crate::client_sync::error::UnexpectedServerVersionError {
-                        got: server_version,
-                        expected: $expected_versions.to_vec(),
-                    })?;
-                }
-                Ok(())
+impl Client {
+    /// Creates a client to a bitcoind JSON-RPC server without authentication.
+    pub fn new(url: &str) -> Self {
+        let transport = jsonrpc::bitreq_http_async::Builder::new()
+            .url(url)
+            .expect("this function does not error")
+            .timeout(std::time::Duration::from_secs(60))
+            .build();
+        let inner = jsonrpc::client_async::Client::with_transport(transport);
+
+        Self { inner }
+    }
+
+    /// Creates a client to a bitcoind JSON-RPC server with authentication.
+    pub fn new_with_auth(url: &str, auth: Auth) -> Result<Self, Error> {
+        match auth {
+            Auth::None => Ok(Self::new(url)),
+            Auth::UserPass(user, pass) => {
+                let transport = jsonrpc::bitreq_http_async::Builder::new()
+                    .url(url)
+                    .expect("this function does not error")
+                    .timeout(std::time::Duration::from_secs(60))
+                    .basic_auth(user, Some(pass))
+                    .build();
+                let inner = jsonrpc::client_async::Client::with_transport(transport);
+
+                Ok(Self { inner })
+            }
+            Auth::CookieFile(path) => {
+                let (user, pass) = Auth::CookieFile(path).get_user_pass()?;
+                let user = user.ok_or(Error::InvalidCookieFile)?;
+                let pass = pass.ok_or(Error::InvalidCookieFile)?;
+                let transport = jsonrpc::bitreq_http_async::Builder::new()
+                    .url(url)
+                    .expect("this function does not error")
+                    .timeout(std::time::Duration::from_secs(60))
+                    .basic_auth(user, Some(pass))
+                    .build();
+                let inner = jsonrpc::client_async::Client::with_transport(transport);
+
+                Ok(Self { inner })
             }
         }
-    };
+    }
+
+    /// Call an RPC `method` with given `args` list.
+    pub async fn call<T: for<'a> serde::de::Deserialize<'a>>(
+        &self,
+        method: &str,
+        args: &[serde_json::Value],
+    ) -> Result<T, Error> {
+        let raw = serde_json::value::to_raw_value(args)?;
+        let req = self.inner.build_request(method, Some(&*raw));
+        if log::log_enabled!(log::Level::Debug) {
+            log::debug!(target: "corepc", "request: {} {}", method, serde_json::Value::from(args));
+        }
+
+        let resp = self.inner.send_request(req).await.map_err(Error::from);
+        crate::log_response(method, &resp);
+        Ok(resp?.result()?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Auth, Client};
+
+    #[test]
+    fn new_with_auth_accepts_auth_none() {
+        Client::new_with_auth("http://127.0.0.1:8332", Auth::None).expect("client without auth");
+    }
 }
