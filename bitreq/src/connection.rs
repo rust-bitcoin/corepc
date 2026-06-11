@@ -389,7 +389,7 @@ impl AsyncConnection {
         }
 
         #[cfg(not(feature = "proxy"))]
-        Self::tcp_connect(&params.host, params.port).await
+        Self::tcp_connect(params.host, params.port).await
     }
 
     async fn timeout<O, F: Future<Output = O>>(timeout: Option<Instant>, f: F) -> Result<O, Error> {
