@@ -3,15 +3,6 @@
 use std::{error, fmt, io};
 
 use bitcoin::hex;
-use types::v17::{
-    GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseOneError,
-    GetRawTransactionVerboseError,
-};
-use types::v19::GetBlockFilterError;
-use types::v29::{
-    GetBlockHeaderVerboseError as GetBlockHeaderVerboseErrorV29,
-    GetBlockVerboseOneError as GetBlockVerboseOneErrorV29,
-};
 
 /// The error type for errors produced in this library.
 #[derive(Debug)]
@@ -27,6 +18,8 @@ pub enum Error {
     UnexpectedStructure,
     /// The daemon returned an error string.
     Returned(String),
+    /// A model conversion error.
+    Model(IntoModelError),
     /// The server version did not match what was expected.
     ServerVersion(UnexpectedServerVersionError),
     /// Missing user/password.
@@ -57,34 +50,6 @@ impl From<io::Error> for Error {
     fn from(e: io::Error) -> Error { Error::Io(e) }
 }
 
-impl From<GetBlockHeaderError> for Error {
-    fn from(e: GetBlockHeaderError) -> Self { Self::Returned(e.to_string()) }
-}
-
-impl From<GetBlockHeaderVerboseError> for Error {
-    fn from(e: GetBlockHeaderVerboseError) -> Self { Self::Returned(e.to_string()) }
-}
-
-impl From<GetBlockVerboseOneError> for Error {
-    fn from(e: GetBlockVerboseOneError) -> Self { Self::Returned(e.to_string()) }
-}
-
-impl From<GetRawTransactionVerboseError> for Error {
-    fn from(e: GetRawTransactionVerboseError) -> Self { Self::Returned(e.to_string()) }
-}
-
-impl From<GetBlockHeaderVerboseErrorV29> for Error {
-    fn from(e: GetBlockHeaderVerboseErrorV29) -> Self { Self::Returned(e.to_string()) }
-}
-
-impl From<GetBlockVerboseOneErrorV29> for Error {
-    fn from(e: GetBlockVerboseOneErrorV29) -> Self { Self::Returned(e.to_string()) }
-}
-
-impl From<GetBlockFilterError> for Error {
-    fn from(e: GetBlockFilterError) -> Self { Self::Returned(e.to_string()) }
-}
-
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         use Error::*;
@@ -99,6 +64,7 @@ impl fmt::Display for Error {
             InvalidCookieFile => write!(f, "invalid cookie file"),
             UnexpectedStructure => write!(f, "the JSON result had an unexpected structure"),
             Returned(ref s) => write!(f, "the daemon returned an error string: {}", s),
+            Model(ref e) => write!(f, "model conversion error: {e}"),
             ServerVersion(ref e) => write!(f, "server version: {}", e),
             MissingUserPassword => write!(f, "missing user and/or password"),
         }
@@ -117,6 +83,7 @@ impl error::Error for Error {
             BitcoinSerialization(ref e) => Some(e),
             Io(ref e) => Some(e),
             ServerVersion(ref e) => Some(e),
+            Model(ref e) => Some(e),
             InvalidCookieFile | UnexpectedStructure | Returned(_) | MissingUserPassword => None,
         }
     }
@@ -146,4 +113,38 @@ impl error::Error for UnexpectedServerVersionError {}
 
 impl From<UnexpectedServerVersionError> for Error {
     fn from(e: UnexpectedServerVersionError) -> Self { Self::ServerVersion(e) }
+}
+
+/// Error returned when converting an RPC response into a model type fails.
+#[derive(Debug)]
+pub struct IntoModelError {
+    context: &'static str,
+    source: Box<dyn error::Error + Send + Sync + 'static>,
+}
+
+impl IntoModelError {
+    /// Creates a new model conversion error with caller-provided context.
+    pub fn new<E>(context: &'static str, source: E) -> Self
+    where
+        E: error::Error + Send + Sync + 'static,
+    {
+        Self { context, source: Box::new(source) }
+    }
+
+    /// Returns the context for the failed conversion.
+    pub fn context(&self) -> &'static str { self.context }
+}
+
+impl fmt::Display for IntoModelError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "conversion of {} into a model type failed", self.context)
+    }
+}
+
+impl error::Error for IntoModelError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> { Some(&*self.source) }
+}
+
+impl From<IntoModelError> for Error {
+    fn from(e: IntoModelError) -> Self { Self::Model(e) }
 }

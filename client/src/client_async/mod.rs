@@ -10,7 +10,9 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-pub use crate::client_async::error::Error;
+pub use error::{Error, IntoModelError, UnexpectedServerVersionError};
+pub use rpcs::BitcoinRpcs;
+
 pub(crate) use crate::{into_json, log_response};
 
 /// Crate-specific Result type.

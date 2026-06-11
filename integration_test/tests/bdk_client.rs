@@ -9,7 +9,7 @@
 use bitcoin::address::KnownHrp;
 use bitcoin::{Address, CompressedPublicKey, PrivateKey};
 use bitcoind::mtype;
-use corepc_client::client_async::{Auth, Client, Error as AsyncClientError};
+use corepc_client::client_async::{Auth, BitcoinRpcs as _, Client, Error as AsyncClientError};
 use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 fn async_client_for(node: &BitcoinD) -> Client {
