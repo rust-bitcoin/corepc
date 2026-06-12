@@ -46,6 +46,11 @@ latest = ["31_0"]
 
 download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "bitreq", "zip"]
 
+# Back `node.client` with the async production client (via its blocking facade) instead of the sync
+# client. Only meaningful with the `30_2` version feature (the async client targets v30). Lets the
+# integration tests run unchanged against the async client.
+client-async = ["corepc-client/blocking"]
+
 # We support all minor releases of the latest three versions.
 31_0 = ["30_2"]
 30_2 = ["29_0"]
