@@ -9,9 +9,12 @@ There are two primary purposes of this repository:
    Primarily consumers of the [`rust-bitcoin`](https://crates.io/crates/bitcoin) library. And enable
    doing so against multiple versions of Bitcoin Core.
 
-If you require a JSON RPC client in production software it is expected you write your own and only
-use the `corepc-types` crate in your dependency graph. Feel free to copy/steal/plagiarise or
-otherwise enjoy yourself with anything in this repository - no attribution required.
+If you require a blocking JSON RPC client in production software it is expected you write your own
+and only use the `corepc-types` crate in your dependency graph. The `corepc-client` crate also
+ships a generated async client (behind the `client-async` feature) that is intended for production
+use; it is generated from Bitcoin Core's OpenRPC export by the `codegen/` tool. Feel free to
+copy/steal/plagiarise or otherwise enjoy yourself with anything in this repository - no attribution
+required.
 
 ## Contributing
 
@@ -20,13 +23,16 @@ PRs, feature requests, and bug reports against `corepc-types` most welcome and a
 PRs, feature requests, and bug reports against the other crates welcome if you are using them for
 integration testing.
 
-**Please do not use `corepc-client` in production and raise bugs, issues, or feature requests.**
+**Please do not use the blocking `corepc-client` in production and raise bugs, issues, or feature
+requests against it.** Bug reports against the generated async client (the `client-async` feature)
+are welcome.
 
 ## Crate/directory listing
 
 - `bitcoind/`: [`bitcoind`](https://crates.io/crates/bitcoind): Runs `bitcoind` regtest nodes.
 - `bitreq/`: [`bitreq`](https://crates.io/crates/bitreq): Simple, minimal-dependency HTTP client, with optional features for proxies, async, and https.
-- `client/`: [`corepc-client`](https://crates.io/crates/corepc-client): A blocking JSON-RPC client used to test `corepc-types`.
+- `client/`: [`corepc-client`](https://crates.io/crates/corepc-client): A blocking JSON-RPC client used to test `corepc-types`, plus a generated async client for production use.
+- `codegen/`: Generator that produces the async client bindings and response types from Bitcoin Core's OpenRPC export.
 - `contrib/`: Contains scripts including one to run local regtest `bitcoind` nodes using versions specified in the config file. A template config file and bitcoind aliases are in the subdirectory `templates/`
 - `electrsd/`: [`electrsd`](https://crates.io/crates/electrsd): Utility to run a regtest [electrs](https://crates.io/crates/electrs) process connected to a given [bitcoind](https://crates.io/crates/bitcoind) instance.
 - `integration_test/`: Integration tests that use `corepc-client` and `bitcoind` to test `corepc-types`.
