@@ -2,7 +2,7 @@
 
 //! JSON-RPC clients for testing against specific versions of Bitcoin Core.
 
-mod error;
+pub mod error;
 pub mod v17;
 pub mod v18;
 pub mod v19;

@@ -28,6 +28,10 @@ client-sync = ["jsonrpc"]
 # Pulls in `jsonrpc` with its async `bitreq` HTTP transport and the `corepc-types`
 # raw types for the active version feature (e.g. `30_0`, default).
 client-async = ["jsonrpc", "jsonrpc/bitreq_http_async", "30_0"]
+# A blocking, sync-API facade over the async client (drives it on a single-thread runtime). It
+# reuses the sync client's method macros, so the sync integration tests run unchanged against the
+# async transport.
+blocking = ["client-sync", "client-async", "dep:tokio"]
 
 # Bitcoin Core version selection for the async client. v30 is the only generated
 # version today; more features are added here as their bindings are generated.
@@ -41,6 +45,7 @@ serde_json = { version = "1.0.117" }
 types = { package = "corepc-types", version = "0.14.0", path = "../types", default-features = false, features = ["std"] }
 
 jsonrpc = { version = "0.20.0", path = "../jsonrpc", features = ["bitreq_http"], optional = true }
+tokio = { version = "1", features = ["rt"], optional = true }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }

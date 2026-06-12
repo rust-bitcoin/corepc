@@ -8,6 +8,9 @@
 mod auth;
 mod client;
 
+#[cfg(feature = "blocking")]
+pub mod blocking;
+
 pub mod error;
 pub mod v30;
 
