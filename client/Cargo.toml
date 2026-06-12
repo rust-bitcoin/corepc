@@ -23,6 +23,15 @@ allowed_duplicates = ["base64"]
 [features]
 # Enable this feature to get a blocking JSON-RPC client.
 client-sync = ["jsonrpc"]
+# Enable this feature to get the async production JSON-RPC client.
+#
+# Pulls in `jsonrpc` with its async `bitreq` HTTP transport and the `corepc-types`
+# raw types for the active version feature (e.g. `30_0`, default).
+client-async = ["jsonrpc", "jsonrpc/bitreq_http_async", "30_0"]
+
+# Bitcoin Core version selection for the async client. v30 is the only generated
+# version today; more features are added here as their bindings are generated.
+"30_0" = []
 
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
@@ -34,3 +43,4 @@ types = { package = "corepc-types", version = "0.14.0", path = "../types", defau
 jsonrpc = { version = "0.20.0", path = "../jsonrpc", features = ["bitreq_http"], optional = true }
 
 [dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }

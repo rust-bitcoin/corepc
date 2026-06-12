@@ -11,16 +11,9 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-
 use types::v30::generated::{
-    CreateMultisig,
-    DeriveAddresses,
-    EstimateSmartFee,
-    GetDescriptorInfo,
-    GetIndexInfo,
-    SignMessageWithPrivKey,
-    ValidateAddress,
-    VerifyMessage,
+    CreateMultisig, DeriveAddresses, EstimateSmartFee, GetDescriptorInfo, GetIndexInfo,
+    SignMessageWithPrivKey, ValidateAddress, VerifyMessage,
 };
 
 use crate::client_async::error::Result;
@@ -54,8 +47,8 @@ pub struct DeriveAddressesOptions {
 #[serde(rename_all = "camelCase")]
 pub struct EstimateSmartFeeOptions {
     /// The fee estimate mode.
-    /// unset, economical, conservative 
-    /// unset means no mode set (default mode will be used). 
+    /// unset, economical, conservative
+    /// unset means no mode set (default mode will be used).
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -78,7 +71,11 @@ impl Client {
     ///
     /// Creates a multi-signature address with n signatures of m keys required.
     /// It returns a json object with the address and redeemScript.
-    pub async fn create_multisig(&self, n_required: i64, keys: Vec<String>) -> Result<CreateMultisig> {
+    pub async fn create_multisig(
+        &self,
+        n_required: i64,
+        keys: Vec<String>,
+    ) -> Result<CreateMultisig> {
         self.call_raw("createmultisig", &[json!(n_required), json!(keys)]).await
     }
 
@@ -86,8 +83,14 @@ impl Client {
     ///
     /// Creates a multi-signature address with n signatures of m keys required.
     /// It returns a json object with the address and redeemScript.
-    pub async fn create_multisig_with(&self, n_required: i64, keys: Vec<String>, opts: CreateMultisigOptions) -> Result<CreateMultisig> {
-        self.call_raw("createmultisig", &[json!(n_required), json!(keys), json!(opts.address_type)]).await
+    pub async fn create_multisig_with(
+        &self,
+        n_required: i64,
+        keys: Vec<String>,
+        opts: CreateMultisigOptions,
+    ) -> Result<CreateMultisig> {
+        self.call_raw("createmultisig", &[json!(n_required), json!(keys), json!(opts.address_type)])
+            .await
     }
 
     /// `deriveaddresses` with required arguments only.
@@ -99,7 +102,7 @@ impl Client {
     ///     sh(multi(\<n\>,\<pubkey\>,\<pubkey\>,...))              P2SH-multisig outputs for the given threshold and pubkeys
     ///     raw(\<hex script\>)                                 Outputs whose output script equals the specified hex-encoded bytes
     ///     tr(\<pubkey\>,multi_a(\<n\>,\<pubkey\>,\<pubkey\>,...))   P2TR-multisig outputs for the given threshold and pubkeys
-    /// 
+    ///
     /// In the above, \<pubkey\> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one
     /// or more path elements separated by "/", where "h" represents a hardened child key.
     /// For more information on output descriptors, see the documentation in the doc/descriptors.md file.
@@ -116,11 +119,15 @@ impl Client {
     ///     sh(multi(\<n\>,\<pubkey\>,\<pubkey\>,...))              P2SH-multisig outputs for the given threshold and pubkeys
     ///     raw(\<hex script\>)                                 Outputs whose output script equals the specified hex-encoded bytes
     ///     tr(\<pubkey\>,multi_a(\<n\>,\<pubkey\>,\<pubkey\>,...))   P2TR-multisig outputs for the given threshold and pubkeys
-    /// 
+    ///
     /// In the above, \<pubkey\> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one
     /// or more path elements separated by "/", where "h" represents a hardened child key.
     /// For more information on output descriptors, see the documentation in the doc/descriptors.md file.
-    pub async fn derive_addresses_with(&self, descriptor: String, opts: DeriveAddressesOptions) -> Result<DeriveAddresses> {
+    pub async fn derive_addresses_with(
+        &self,
+        descriptor: String,
+        opts: DeriveAddressesOptions,
+    ) -> Result<DeriveAddresses> {
         self.call_raw("deriveaddresses", &[json!(descriptor), json!(opts.range)]).await
     }
 
@@ -140,7 +147,11 @@ impl Client {
     /// confirmation within conf_target blocks if possible and return the number of blocks
     /// for which the estimate is valid. Uses virtual transaction size as defined
     /// in BIP 141 (witness data is discounted).
-    pub async fn estimate_smart_fee_with(&self, conf_target: i64, opts: EstimateSmartFeeOptions) -> Result<EstimateSmartFee> {
+    pub async fn estimate_smart_fee_with(
+        &self,
+        conf_target: i64,
+        opts: EstimateSmartFeeOptions,
+    ) -> Result<EstimateSmartFee> {
         self.call_raw("estimatesmartfee", &[json!(conf_target), json!(opts.estimate_mode)]).await
     }
 
@@ -168,7 +179,11 @@ impl Client {
     /// `signmessagewithprivkey` with required arguments only.
     ///
     /// Sign a message with the private key of an address
-    pub async fn sign_message_with_priv_key(&self, priv_key: String, message: String) -> Result<SignMessageWithPrivKey> {
+    pub async fn sign_message_with_priv_key(
+        &self,
+        priv_key: String,
+        message: String,
+    ) -> Result<SignMessageWithPrivKey> {
         self.call_raw("signmessagewithprivkey", &[json!(priv_key), json!(message)]).await
     }
 
@@ -182,8 +197,12 @@ impl Client {
     /// `verifymessage` with required arguments only.
     ///
     /// Verify a signed message.
-    pub async fn verify_message(&self, address: String, signature: String, message: String) -> Result<VerifyMessage> {
+    pub async fn verify_message(
+        &self,
+        address: String,
+        signature: String,
+        message: String,
+    ) -> Result<VerifyMessage> {
         self.call_raw("verifymessage", &[json!(address), json!(signature), json!(message)]).await
     }
-
 }

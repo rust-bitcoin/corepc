@@ -11,15 +11,8 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-
 use types::v30::generated::{
-    GetMemoryInfo,
-    GetOpenRpcInfo,
-    GetRpcInfo,
-    Help,
-    Logging,
-    Stop,
-    Uptime,
+    GetMemoryInfo, GetOpenRpcInfo, GetRpcInfo, Help, Logging, Stop, Uptime,
 };
 
 use crate::client_async::error::Result;
@@ -85,9 +78,7 @@ impl Client {
     /// `help` with required arguments only.
     ///
     /// List all commands, or get help for a specified command.
-    pub async fn help(&self) -> Result<Help> {
-        self.call_raw("help", &[(); 0] as &[()]).await
-    }
+    pub async fn help(&self) -> Result<Help> { self.call_raw("help", &[(); 0] as &[()]).await }
 
     /// `help` with all optional arguments via [`HelpOptions`].
     ///
@@ -127,9 +118,7 @@ impl Client {
     /// `stop` with required arguments only.
     ///
     /// Request a graceful shutdown of Bitcoin Core.
-    pub async fn stop(&self) -> Result<Stop> {
-        self.call_raw("stop", &[(); 0] as &[()]).await
-    }
+    pub async fn stop(&self) -> Result<Stop> { self.call_raw("stop", &[(); 0] as &[()]).await }
 
     /// `uptime` with required arguments only.
     ///
@@ -137,5 +126,4 @@ impl Client {
     pub async fn uptime(&self) -> Result<Uptime> {
         self.call_raw("uptime", &[(); 0] as &[()]).await
     }
-
 }
