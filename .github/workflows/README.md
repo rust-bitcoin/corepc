@@ -9,7 +9,7 @@ The minimal/recent lock files are handled by CI (`rust.yml`).
 
 ## Jobs
 
-Run from `rust.yml` unless stated otherwise. Total 11 jobs.
+Run from `rust.yml` unless stated otherwise. Total 12 jobs.
 
 0.  `Prepare`
 1.  `Stable - minimal`
@@ -23,7 +23,8 @@ Run from `rust.yml` unless stated otherwise. Total 11 jobs.
 9.  `Docsrs`
 10. `Format`
 11. `Verify`
+12. `Codegen`
 
 +16 jobs - 1 for each supported version of Core.
 
-
++1 job - integration tests run against the async client (v30 only).

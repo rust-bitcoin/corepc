@@ -122,6 +122,26 @@ jobs:
         # Verify all versions (known to the verify program)
         run: cd verify && cargo run all
 
+  Codegen:                      # 1 job, the generator lives in its own workspace.
+    name: Codegen - stable toolchain
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: "Checkout repo"
+        uses: actions/checkout@v4
+      - name: "Select toolchain"
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: "Test, lint and check formatting of the generator"
+        run: |
+          cd codegen
+          cargo test
+          cargo clippy --all-targets -- --deny warnings
+          cargo fmt --all -- --check
+
   Integration:                  # 1 job for each bitcoind version we support.
     name: Integration tests - stable toolchain
     runs-on: ubuntu-latest
@@ -161,6 +181,28 @@ jobs:
         env:
           BITCOIND_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/corepc/bitcoind
         run: cd integration_test && cargo test --features=${{ matrix.version }},download
+
+  IntegrationAsync:
+    name: Integration tests (async client) - stable toolchain
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["30_2"]
+    steps:
+      - name: "Checkout repo"
+        uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - uses: rust-bitcoin/rust-bitcoin-maintainer-tools/.github/actions/setup-rbmt@6560b728ae6a81af9d92713b630ba26772fbd970 # v0.1.0
+      - name: "Cache downloaded bitcoind"
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.cache/corepc/bitcoind
+          key: bitcoind-${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}
+      - name: "Run integration tests against the async client"
+        env:
+          BITCOIND_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/corepc/bitcoind
+        run: cd integration_test && cargo test --no-default-features --features=${{ matrix.version }},test-async,download
 
   # The jobs below copied from electrsd repo during import. Not too
   # much further thought given to it.
