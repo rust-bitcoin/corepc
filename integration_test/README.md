@@ -3,7 +3,7 @@
 This crate is used to run tests against all the supported versions of
 Core. It runs Core by using `bitcoind` with the `download` feature
 enabled. However `bitcoind` allows setting the environment variable
-`BITCOIND_EXE` to override downloading the Core executable. E.g. 
+`BITCOIND_EXE` to override downloading the Core executable. E.g.
 
 `BITCOIND_EXE=/opt/bitcoin-28.0/bin/bitcoind cargo test --features=28_0`
 
@@ -39,3 +39,32 @@ alias test31='BITCOIND_EXE=/opt/bitcoin-31.0/bin/bitcoind cargo test --features=
 
 Tests derived from Bitcoin Core's `test/functional/` folder live in
 `tests/` alongside the modelled tests, with a `_core` filename suffix.
+
+## Async Integration Tests
+
+The async client ships with a blocking facade so the same integration
+tests can be run against it without changes. Enable the `test-async`
+feature alongside a single version feature. It pulls in `bitcoind`'s
+`client-async` feature, which swaps the sync client for the async
+client's blocking wrapper.
+
+`test-async` is mutually exclusive with the same constraints as the
+version features: pick one version, and don't combine it with
+`--all-features`.
+
+Note that a workspace `--all-features` build (which runs over `bitcoind`,
+not this excluded crate) still resolves to the sync client. Enabling every
+version feature turns on `31_0`, which disables the `client-async` blocking
+re-export in `bitcoind`, so `--all-features` lands on the sync `v31` client
+rather than the async facade. See `bitcoind/src/client_versions.rs`.
+
+```bash
+cargo test -p integration-test --no-default-features --features 30_2,test-async,download
+```
+
+As with the sync tests, set `BITCOIND_EXE` to skip the download:
+
+```bash
+BITCOIND_EXE=/opt/bitcoin-30.2/bin/bitcoind \
+  cargo test -p integration-test --no-default-features --features 30_2,test-async
+```

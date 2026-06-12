@@ -15,6 +15,11 @@ download = ["bitcoind/download"]
 
 latest = ["31_0"]
 
+# Run the unchanged integration tests against the async production client (via its blocking facade)
+# instead of the sync client. Use alongside the `30_2` version feature, e.g.
+# `cargo test -p integration-test --no-default-features --features 30_2,test-async,download`.
+test-async = ["bitcoind/client-async"]
+
 # Enable the same feature in `bitcoind` and the version feature here.
 # All minor releases of the latest three versions.
 31_0 = ["v31_and_below", "bitcoind/31_0"]
