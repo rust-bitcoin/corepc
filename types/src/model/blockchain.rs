@@ -322,6 +322,7 @@ pub struct Bip9SoftforkInfo {
 
 /// BIP-9 softfork status. Part of `getblockchaininfo`.
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Bip9SoftforkStatus {
     /// BIP-9 softfork status "defined".
     Defined,

@@ -311,7 +311,7 @@ impl ListUnspentItem {
         Ok(model::ListUnspentItem {
             txid,
             vout,
-            address,
+            address: Some(address),
             label: self.label,
             script_pubkey,
             amount,

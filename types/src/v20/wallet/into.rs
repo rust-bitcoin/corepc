@@ -245,7 +245,7 @@ impl GetTransactionDetail {
         Ok(model::GetTransactionDetail {
             involves_watch_only: self.involves_watch_only,
             account: self.account,
-            address,
+            address: Some(address),
             category: self.category.into_model(),
             amount,
             label: self.label,

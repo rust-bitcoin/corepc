@@ -15,6 +15,7 @@ extern crate alloc;
 
 mod error;
 mod psbt;
+mod reconstruct;
 
 // JSON types, for each specific version of `bitcoind`.
 pub mod v17;
@@ -93,6 +94,27 @@ impl fmt::Display for NumericError {
 
 #[cfg(feature = "std")]
 impl std::error::Error for NumericError {}
+
+/// A field the model type requires was absent from Core's response.
+///
+/// Some `crate::model` fields are non-optional (and have no sensible default, e.g. an `Address`)
+/// while the raw response types it as optional because Core can legitimately omit it (for instance
+/// a `scriptPubKey` with no standard address). The generated `into_model` returns this rather than
+/// fabricating a value.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MissingField {
+    /// The model field that had no value to convert.
+    pub field: &'static str,
+}
+
+impl fmt::Display for MissingField {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "the required field `{}` was missing from the response", self.field)
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for MissingField {}
 
 /// Converts `fee_rate` in BTC/kB to `FeeRate`.
 fn btc_per_kb(btc_per_kb: f64) -> Result<Option<FeeRate>, ParseAmountError> {

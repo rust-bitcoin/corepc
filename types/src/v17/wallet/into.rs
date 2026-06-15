@@ -394,7 +394,7 @@ impl GetTransactionDetail {
         Ok(model::GetTransactionDetail {
             involves_watch_only: None, // v20 and later only.
             account: self.account,
-            address,
+            address: Some(address),
             category: self.category.into_model(),
             amount,
             label: self.label,
@@ -670,7 +670,7 @@ impl ListUnspentItem {
         Ok(model::ListUnspentItem {
             txid,
             vout,
-            address,
+            address: Some(address),
             label: self.label,
             script_pubkey,
             amount,

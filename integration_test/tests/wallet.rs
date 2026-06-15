@@ -263,14 +263,17 @@ fn wallet__get_address_info__modelled() {
 
     // Test a SegWit address with embedded information.
     let addr_p2sh = node.client.new_address_with_type(AddressType::P2shSegwit).unwrap();
+    println!("P2SH-SegWit address: {addr_p2sh}");
     let json: GetAddressInfo =
         node.client.get_address_info(&addr_p2sh).expect("getaddressinfo p2sh-segwit");
     let model: Result<mtype::GetAddressInfo, GetAddressInfoError> = json.into_model();
+    println!("Modelled GetAddressInfo: {:#?}", model);
     let address_info = model.unwrap();
     let embedded = address_info.embedded.unwrap();
     assert_eq!(address_info.address.assume_checked(), addr_p2sh);
     assert_eq!(address_info.script.unwrap(), mtype::ScriptType::WitnessV0KeyHash);
     assert!(embedded.address.is_valid_for_network(Network::Regtest));
+    // assert!(false);
 
     // Test a Bech32 address.
     let addr_bech32 = node.client.new_address_with_type(AddressType::Bech32).unwrap();
