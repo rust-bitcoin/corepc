@@ -101,33 +101,21 @@ impl Method {
         Method { name, ret: Some(Return::Type(ty)), requires_model: false, function }
     }
 
-    const fn new_nothing(name: &'static str, function: &'static str) -> Method {
-        Method { name, ret: Some(Return::Nothing), requires_model: false, function }
-    }
-
-    const fn new_numeric(name: &'static str, function: &'static str) -> Method {
-        Method { name, ret: Some(Return::Numeric), requires_model: false, function }
-    }
-
-    const fn new_bool(name: &'static str, function: &'static str) -> Method {
-        Method { name, ret: Some(Return::Bool), requires_model: false, function }
-    }
-
-    const fn new_string(name: &'static str, function: &'static str) -> Method {
-        Method { name, ret: Some(Return::String), requires_model: false, function }
+    /// Represents a method that does not have a version-specific return type.
+    ///
+    /// This includes primitive returns (boolean, numeric, string) and methods that return nothing.
+    /// The concrete primitive type is covered by integration tests.
+    const fn new_no_type(name: &'static str, function: &'static str) -> Method {
+        Method { name, ret: Some(Return::NoType), requires_model: false, function }
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Return {
-    /// Method returns a type (that should exist).
+    /// Method returns a type (that should exist as a re-export in `types`).
     Type(&'static str),
-    /// Method does not return anything.
-    Nothing,
-    /// Method returns a numeric type.
-    Numeric,
-    /// Method returns a boolean.
-    Bool,
-    /// Method returns a string.
-    String,
+    /// Method has no version-specific return type.
+    ///
+    /// No re-export from `types` is needed for these methods.
+    NoType,
 }
