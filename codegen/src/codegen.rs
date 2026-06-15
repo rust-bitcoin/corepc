@@ -2,6 +2,11 @@
 
 //! Translate a parsed OpenRPC [`Spec`] into Rust source for the four output files.
 
+// The model-layer emitters (`emit_model_*`, `convert`, fallibility analysis) are superseded by
+// `crate::into_model`, which generates `into_model` conversions into the shared `crate::model`
+// types. They are kept for reference until the migration is complete.
+#![allow(dead_code)]
+
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
@@ -217,33 +222,78 @@ impl Modules {
     pub fn option_count(&self) -> usize { self.methods.iter().filter(|m| m.has_optional()).count() }
 
     /// Write all generated files across both crates, split into per-category modules.
+    ///
+    /// Response types go to `types/.../generated/`. Categories with whitelisted `into_model`
+    /// conversions (see [`crate::into_model`]) become directory modules with a sibling `into.rs`;
+    /// the rest stay flat. The shared `compatibility.rs` (manual override shims) is always emitted.
     pub fn write(&self, types_dir: &Path, client_dir: &Path, version: &str) -> Result<(), String> {
         let categories = self.categories();
-        let fallible = self.fallible_types();
-        let model_dir = types_dir.join("model");
-        fs::create_dir_all(&model_dir)
-            .map_err(|e| format!("mkdir {}: {e}", model_dir.display()))?;
 
         write_file(&types_dir.join("mod.rs"), &emit_types_mod_rs(version, &categories))?;
-        write_file(&model_dir.join("mod.rs"), &emit_model_mod_rs(version, &categories))?;
         write_file(&client_dir.join("mod.rs"), &emit_client_mod_rs(version, &categories))?;
+        write_file(
+            &types_dir.join("compatibility.rs"),
+            &crate::into_model::emit_compatibility(version),
+        )?;
+
+        // The canonical model source the `into_model` generator reads its target shapes from.
+        let model_dir = types_dir
+            .parent()
+            .and_then(Path::parent)
+            .map(|src| src.join("model"))
+            .ok_or_else(|| format!("cannot locate model dir from {}", types_dir.display()))?;
 
         for cat in &categories {
             let module = category_module(cat);
-            write_file(
-                &types_dir.join(format!("{module}.rs")),
-                &self.emit_types_category(version, cat),
-            )?;
-            write_file(
-                &model_dir.join(format!("{module}.rs")),
-                &self.emit_model_category(version, cat, &fallible),
-            )?;
+            let raw = self.emit_types_category(version, cat);
+            let infos = self.all_response_infos(cat);
+            let generated = crate::into_model::generate_category(version, cat, &infos, &model_dir);
+            if generated.has_roots {
+                let dir = types_dir.join(&module);
+                fs::create_dir_all(&dir).map_err(|e| format!("mkdir {}: {e}", dir.display()))?;
+                write_file(&dir.join("mod.rs"), &inject_into_decl(&raw, &generated.error_names))?;
+                write_file(&dir.join("into.rs"), &generated.source)?;
+            } else {
+                write_file(&types_dir.join(format!("{module}.rs")), &raw)?;
+            }
             write_file(
                 &client_dir.join(format!("{module}.rs")),
                 &self.emit_client_category(version, cat),
             )?;
         }
         Ok(())
+    }
+
+    /// Every response type in `category` as the simplified `RawTypeInfo` the `into_model` generator
+    /// consumes (name + full Rust type per field). The generator picks roots by whitelist and walks
+    /// nested types from those, so it needs the whole set, not just the whitelisted ones.
+    fn all_response_infos(&self, category: &str) -> Vec<crate::into_model::RawTypeInfo> {
+        let mut out = Vec::new();
+        for (c, origin, gt) in &self.types {
+            if c != category || *origin != Origin::Response || gt.body.is_empty() {
+                continue;
+            }
+            let shape = match &gt.ir {
+                TypeIr::Struct(fields) => crate::into_model::RawShape::Struct(
+                    fields
+                        .iter()
+                        .map(|f| crate::into_model::RawField {
+                            name: f.rust_name.clone(),
+                            ty: if f.optional {
+                                format!("Option<{}>", f.rust_type)
+                            } else {
+                                f.rust_type.clone()
+                            },
+                        })
+                        .collect(),
+                ),
+                TypeIr::Newtype(inner) => crate::into_model::RawShape::Newtype(inner.clone()),
+                _ => continue,
+            };
+            out.push(crate::into_model::RawTypeInfo { raw_name: gt.name.clone(), shape });
+        }
+        out.sort_by(|a, b| a.raw_name.cmp(&b.raw_name));
+        out
     }
 
     /// Distinct help categories present across all methods, sorted.
@@ -2153,11 +2203,30 @@ fn emit_types_mod_rs(version: &str, categories: &[String]) -> String {
     for cat in categories {
         s.push_str(&format!("pub mod {};\n", category_module(cat)));
     }
-    s.push_str("\npub mod model;\n\n");
+    s.push_str(
+        "\n// Hand-maintained override shims for conversions the canonical `crate::model` types\n\
+         // get wrong; emitted by codegen from a fixed table. See `corepc_bugs_backlog.md`.\n\
+         pub mod compatibility;\n\n",
+    );
     for cat in categories {
         s.push_str(&format!("pub use self::{}::*;\n", category_module(cat)));
     }
     s
+}
+
+/// Insert `mod into;` and the category's error-type re-exports into a raw category file, just
+/// before its serde import, turning it into the `mod.rs` of a directory module with an `into.rs`.
+fn inject_into_decl(raw: &str, errs: &[String]) -> String {
+    let reexport = if errs.is_empty() {
+        String::new()
+    } else {
+        format!("pub use self::into::{{{}}};\n\n", errs.join(", "))
+    };
+    let anchor = "use serde::{Deserialize, Serialize};";
+    match raw.find(anchor) {
+        Some(idx) => format!("{}mod into;\n\n{}{}", &raw[..idx], reexport, &raw[idx..]),
+        None => format!("mod into;\n\n{}{}", reexport, raw),
+    }
 }
 
 /// Emit `mod.rs` for `corepc-types/generated/model/`.

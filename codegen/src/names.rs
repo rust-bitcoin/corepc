@@ -42,6 +42,7 @@ pub static WORDS: &[&str] = &[
     "bare",
     "best",
     "bip125",
+    "bitcoin",
     "block",
     "blockchain",
     "blocks",
@@ -52,7 +53,6 @@ pub static WORDS: &[&str] = &[
     "bytes",
     "carrier",
     "chain",
-    "chainwork",
     "challenge",
     "change",
     "clear",
@@ -130,6 +130,7 @@ pub static WORDS: &[&str] = &[
     "join",
     "json",
     "key",
+    "keypool",
     "label",
     "last",
     "limit",
@@ -147,16 +148,17 @@ pub static WORDS: &[&str] = &[
     "median",
     "memory",
     "mempool",
+    "merkle",
     "message",
     "migrate",
     "min",
     "mining",
     "mock",
     "modified",
+    "multipath",
     "multisig",
     "name",
     "names",
-    "nchaintx",
     "net",
     "network",
     "networks",
@@ -214,6 +216,7 @@ pub static WORDS: &[&str] = &[
     "rescan",
     "restore",
     "result",
+    "root",
     "rpc",
     "save",
     "scan",
@@ -243,6 +246,7 @@ pub static WORDS: &[&str] = &[
     "submit",
     "success",
     "sync",
+    "taproot",
     "target",
     "template",
     "test",
@@ -284,6 +288,7 @@ pub static WORDS: &[&str] = &[
     "witness",
     "work",
     "written",
+    "wtxid",
     "zmq",
 ];
 
@@ -326,20 +331,23 @@ pub fn method_to_snake(name: &str) -> String {
 }
 
 /// Convert name to snake_case using the [`WORDS`] list.
-/// - already-separated forms (`-`/`_`) are split, lowercased and rejoined;
-/// - camelCase has underscores inserted at lower-to-upper transitions;
-/// - all-lowercase compounds use the word list to find boundaries.
+/// - dashes become underscores and camelCase gains underscores at lower-to-upper transitions;
+/// - every underscore-separated segment is then word-split, so compounds are fully broken
+///   (`txoutset_hash` -> `tx_out_set_hash`, `chainwork` -> `chain_work`).
+///
+/// This keeps field identifiers consistent with the strongly typed `crate::model` names. The raw
+/// struct keeps a `#[serde(rename)]` back to the original wire key, so the wire format is unchanged.
 pub fn to_rust_field(name: &str) -> String {
     let cleaned = name.replace('-', "_");
-    if cleaned.contains('_') {
-        return rust_keyword_safe(&cleaned.to_ascii_lowercase());
-    }
     let de_camel = decamel(&cleaned);
-    if de_camel.contains('_') {
-        return rust_keyword_safe(&de_camel);
-    }
-    let parts = greedy_split(&cleaned.to_ascii_lowercase(), &sorted_words());
-    rust_keyword_safe(&parts.join("_"))
+    let words = sorted_words();
+    let split = de_camel
+        .split('_')
+        .filter(|s| !s.is_empty())
+        .flat_map(|seg| greedy_split(&seg.to_ascii_lowercase(), &words))
+        .collect::<Vec<_>>()
+        .join("_");
+    rust_keyword_safe(&split)
 }
 
 /// Convert name to PascalCase.

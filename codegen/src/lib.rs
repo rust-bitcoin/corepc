@@ -7,6 +7,7 @@
 //! (request structs + method wrappers) into `corepc-client`.
 
 mod codegen;
+mod into_model;
 mod names;
 mod spec;
 

@@ -118,6 +118,12 @@ fn collect_type_files_and_names(src_dir: &Path, versions: &[String]) -> Result<P
             if entry.path().extension().and_then(|ext| ext.to_str()) != Some("rs") {
                 continue;
             }
+            // The `generated/` trees are a parallel, machine-written namespace
+            // (`types::vXX::generated::*`); their helper types are not part of the hand-written
+            // re-export convention this check enforces.
+            if entry.path().components().any(|c| c.as_os_str() == "generated") {
+                continue;
+            }
             let content = fs::read_to_string(entry.path())
                 .with_context(|| format!("reading source file {}", entry.path().display()))?;
             let syntax = syn::parse_file(&content)
