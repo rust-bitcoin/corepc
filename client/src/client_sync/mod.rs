@@ -24,6 +24,7 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 pub use crate::client_sync::error::Error;
+pub(crate) use crate::{into_json, log_response};
 
 /// Crate-specific Result type.
 ///
@@ -155,37 +156,4 @@ macro_rules! impl_client_check_expected_server_version {
             }
         }
     };
-}
-
-/// Shorthand for converting a variable into a `serde_json::Value`.
-fn into_json<T>(val: T) -> Result<serde_json::Value>
-where
-    T: serde::ser::Serialize,
-{
-    Ok(serde_json::to_value(val)?)
-}
-
-/// Helper to log an RPC response.
-fn log_response(method: &str, resp: &Result<jsonrpc::Response>) {
-    use log::Level::{Debug, Trace, Warn};
-
-    if log::log_enabled!(Warn) || log::log_enabled!(Debug) || log::log_enabled!(Trace) {
-        match resp {
-            Err(ref e) =>
-                if log::log_enabled!(Debug) {
-                    log::debug!(target: "corepc", "error: {}: {:?}", method, e);
-                },
-            Ok(ref resp) =>
-                if let Some(ref e) = resp.error {
-                    if log::log_enabled!(Debug) {
-                        log::debug!(target: "corepc", "response error for {}: {:?}", method, e);
-                    }
-                } else if log::log_enabled!(Trace) {
-                    let def =
-                        serde_json::value::to_raw_value(&serde_json::value::Value::Null).unwrap();
-                    let result = resp.result.as_ref().unwrap_or(&def);
-                    log::trace!(target: "corepc", "response for {}: {}", method, result);
-                },
-        }
-    }
 }
