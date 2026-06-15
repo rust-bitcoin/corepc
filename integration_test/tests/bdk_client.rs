@@ -99,6 +99,19 @@ async fn async__get_block_header__modelled() {
 }
 
 #[tokio::test]
+async fn async__get_blockchain_info__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::None, &["-prune=10000"]);
+    let client = async_client_for(&node);
+
+    let model: Result<mtype::GetBlockchainInfo, AsyncClientError> =
+        client.get_blockchain_info().await;
+    let model = model.unwrap();
+
+    assert_eq!(model.blocks, 0);
+    assert!(model.pruned);
+}
+
+#[tokio::test]
 async fn async__get_raw_mempool__modelled() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let client = async_client_for(&node);
@@ -127,6 +140,24 @@ async fn async__get_raw_transaction__modelled() {
         client.get_raw_transaction(&txid).await;
     let model = model.unwrap();
     assert_eq!(model.compute_txid(), txid);
+}
+
+#[tokio::test]
+async fn async__get_tx_out__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let client = async_client_for(&node);
+    let (_address, tx) = node.create_mined_transaction();
+    let txid = tx.compute_txid();
+
+    let model: Result<Option<mtype::GetTxOut>, AsyncClientError> =
+        client.get_tx_out(&bitcoin::OutPoint { txid, vout: 1 }, true).await;
+    let model = model.unwrap().expect("unspent output");
+    assert!(!model.coinbase);
+
+    let missing: Result<Option<mtype::GetTxOut>, AsyncClientError> =
+        client.get_tx_out(&bitcoin::OutPoint { txid, vout: 2 }, true).await;
+    assert!(missing.unwrap().is_none());
 }
 
 fn auth_for(node: &BitcoinD) -> Auth { Auth::CookieFile(node.params.cookie_file.clone()) }

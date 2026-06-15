@@ -3,11 +3,13 @@
 //! RPC methods for the async Bitcoin Core client.
 //! All functions return the version nonspecific, strongly typed types.
 
-use bitcoin::{block, Block, BlockHash, Transaction, Txid};
+use bitcoin::{block, Block, BlockHash, OutPoint, Transaction, Txid};
 use serde_json::value::RawValue;
 
 use super::{into_json, Client, IntoModelError, Result};
-use crate::types::model::{GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne};
+use crate::types::model::{
+    GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne, GetBlockchainInfo, GetTxOut,
+};
 
 /// Bitcoin Core RPC methods (v25 to v30).
 ///
@@ -42,11 +44,21 @@ pub trait BitcoinRpcs {
     /// Gets the block filter for a blockhash.
     async fn get_block_filter(&self, hash: &BlockHash) -> Result<GetBlockFilter>;
 
+    /// Gets information about the current state of the blockchain.
+    async fn get_blockchain_info(&self) -> Result<GetBlockchainInfo>;
+
     /// Gets the transaction IDs currently in the mempool.
     async fn get_raw_mempool(&self) -> Result<Vec<Txid>>;
 
     /// Gets the raw transaction by txid.
     async fn get_raw_transaction(&self, txid: &Txid) -> Result<Transaction>;
+
+    /// Gets details about an unspent transaction output.
+    async fn get_tx_out(
+        &self,
+        outpoint: &OutPoint,
+        include_mempool: bool,
+    ) -> Result<Option<GetTxOut>>;
 
     /// Returns the version integer reported by the server (e.g. `250200` for v25.2.0).
     async fn server_version(&self) -> Result<usize>;
@@ -112,6 +124,21 @@ impl BitcoinRpcs for Client {
         Ok(json.into_model().map_err(|e| IntoModelError::new("`getblockfilter`", e))?)
     }
 
+    async fn get_blockchain_info(&self) -> Result<GetBlockchainInfo> {
+        let raw: Box<RawValue> = self.call("getblockchaininfo", &[]).await?;
+
+        if let Ok(json) = serde_json::from_str::<crate::types::v29::GetBlockchainInfo>(raw.get()) {
+            Ok(json.into_model().map_err(|e| IntoModelError::new("`getblockchaininfo`", e))?)
+        } else if let Ok(json) =
+            serde_json::from_str::<crate::types::v28::GetBlockchainInfo>(raw.get())
+        {
+            Ok(json.into_model().map_err(|e| IntoModelError::new("`getblockchaininfo`", e))?)
+        } else {
+            let json: crate::types::v25::GetBlockchainInfo = serde_json::from_str(raw.get())?;
+            Ok(json.into_model().map_err(|e| IntoModelError::new("`getblockchaininfo`", e))?)
+        }
+    }
+
     async fn get_raw_mempool(&self) -> Result<Vec<Txid>> {
         let json: crate::types::v25::GetRawMempool = self.call("getrawmempool", &[]).await?;
         Ok(json.into_model().map_err(|e| IntoModelError::new("`getrawmempool`", e))?.0)
@@ -121,6 +148,28 @@ impl BitcoinRpcs for Client {
         let json: crate::types::v25::GetRawTransaction =
             self.call("getrawtransaction", &[into_json(txid)?]).await?;
         Ok(json.into_model().map_err(|e| IntoModelError::new("`getrawtransaction`", e))?.0)
+    }
+
+    async fn get_tx_out(
+        &self,
+        outpoint: &OutPoint,
+        include_mempool: bool,
+    ) -> Result<Option<GetTxOut>> {
+        let json: Option<crate::types::v25::GetTxOut> = self
+            .call(
+                "gettxout",
+                &[
+                    into_json(outpoint.txid)?,
+                    into_json(outpoint.vout)?,
+                    into_json(include_mempool)?,
+                ],
+            )
+            .await?;
+        match json {
+            None => Ok(None),
+            Some(json) =>
+                Ok(Some(json.into_model().map_err(|e| IntoModelError::new("`gettxout`", e))?)),
+        }
     }
 
     async fn server_version(&self) -> Result<usize> {
