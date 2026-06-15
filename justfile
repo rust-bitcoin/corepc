@@ -17,6 +17,15 @@ alias lv := lint-verify
 default:
   @just --list
 
+# Generate Rust client bindings for a Bitcoin Core version (e.g. `just codegen 30`), or
+# `just codegen clean` to remove all generated code.
+#
+# Formats the emitted files afterwards so a regeneration leaves a tree that passes
+# `cargo fmt --check`; the generator itself does not produce rustfmt-exact output.
+codegen version:
+  just -f "$REPO_DIR/codegen/justfile" codegen {{version}}
+  if [ "{{version}}" != "clean" ]; then cargo +$(cat "$REPO_DIR/nightly-version") fmt --all; fi
+
 # Cargo build everything.
 build:
   for crate in {{ALL_FEATURE_CRATES}}; do cargo build --manifest-path "$REPO_DIR/$crate/Cargo.toml" --all-targets --all-features; done

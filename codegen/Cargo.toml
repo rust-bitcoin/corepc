@@ -1,0 +1,17 @@
+[package]
+name = "btc-codegen"
+version = "0.1.0"
+authors = ["Renato Britto <renatobritto@protonmail.com>"]
+edition = "2021"
+rust-version = "1.75.0"
+publish = false
+description = "Generate Rust bindings for the Bitcoin Core JSON-RPC API from an OpenRPC spec."
+license = "CC0-1.0"
+
+[[bin]]
+name = "btc-codegen"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
