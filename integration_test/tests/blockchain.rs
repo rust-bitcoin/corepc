@@ -765,7 +765,7 @@ fn blockchain__prune_blockchain() {
 }
 
 #[test]
-fn blockchain__savemempool() {
+fn blockchain__save_mempool() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_addr, _txid) = node.create_mempool_transaction();

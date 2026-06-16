@@ -719,7 +719,7 @@ fn wallet__import_multi() {
 
 #[test]
 #[cfg(feature = "v29_and_below")]
-fn wallet__import_privkey() {
+fn wallet__import_priv_key() {
     let node = match () {
         #[cfg(feature = "v22_and_below")]
         () => BitcoinD::with_wallet(Wallet::Default, &[]),
