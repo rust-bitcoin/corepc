@@ -52,7 +52,7 @@
 //! | gettxoutsetinfo                    | version + model |                                        |
 //! | gettxspendingprevout               | version + model |                                        |
 //! | importmempool                      | returns nothing |                                        |
-//! | loadtxoutset                       | version + model | UNTESTED                               |
+//! | loadtxoutset                       | version + model |                                        |
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
