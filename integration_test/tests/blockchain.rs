@@ -783,7 +783,7 @@ fn blockchain__savemempool() {
 
 #[test]
 #[cfg(not(feature = "v24_and_below"))]
-fn blockchain__scan_blocks_modelled() {
+fn blockchain__scan_blocks__modelled() {
     let node = BitcoinD::with_wallet(Wallet::None, &["-blockfilterindex=1"]);
 
     // Arbitrary scan descriptor
@@ -807,7 +807,7 @@ fn blockchain__scan_blocks_modelled() {
 }
 
 #[test]
-fn blockchain__scan_tx_out_set_modelled() {
+fn blockchain__scan_tx_out_set__modelled() {
     let node = match () {
         #[cfg(feature = "v21_and_below")]
         () => BitcoinD::with_wallet(Wallet::None, &[]),
