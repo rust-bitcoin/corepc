@@ -18,8 +18,6 @@ use verify::method::{Method, Return};
 use verify::versioned::{self, Status};
 use verify::{method, model, reexports, ssot, Version};
 
-// TODO: Enable running from any directory, currently errors if run from `src/`.
-
 const VERSIONS: [Version; 15] = [
     Version::V17,
     Version::V18,

@@ -4,15 +4,10 @@
 //!
 //! The "model files" are the files in `types/src/model/`.
 
-use std::path::PathBuf;
-
 use anyhow::Result;
 
 use crate::method::{self, Return};
-use crate::Version;
-
-/// Path to the model module file.
-fn path() -> PathBuf { PathBuf::from("../types/src/model/mod.rs") }
+use crate::{paths, Version};
 
 /// Returns `true` if this method requires a type to exist.
 pub fn requires_type(version: Version, method_name: &str) -> Result<bool> {
@@ -40,7 +35,7 @@ pub fn type_exists(version: Version, method_name: &str) -> Result<bool> {
     };
 
     if let Some(Return::Type(s)) = method.ret {
-        return crate::grep_for_re_export(&path(), s);
+        return crate::grep_for_re_export(&paths::model_mod(), s);
     }
     Ok(false)
 }
