@@ -291,22 +291,48 @@ fn verify_returns_method(version: Version) -> Result<()> {
         let Some(method) = Method::from_name(version, &name) else { continue };
 
         match entry {
-            ReturnsDoc::Version =>
+            ReturnsDoc::Version => {
                 if method.requires_model {
                     eprintln!(
-                        "'Returns' says 'version' but method is marked as requiring a model: {}",
+                        "'Returns' says 'version' but method is marked as requiring a model: \n{}\n",
                         output_method(method)
                     );
                     failures += 1;
-                },
-            ReturnsDoc::VersionPlusModel =>
+                }
+                if matches!(method.ret, Some(Return::NoType)) {
+                    eprintln!(
+                        "'Returns' says 'version' but method has no custom return type: \n{}\n",
+                        output_method(method)
+                    );
+                    failures += 1;
+                }
+            }
+            ReturnsDoc::VersionPlusModel => {
                 if !method.requires_model {
                     eprintln!(
-                        "'Returns' says 'version + model' but method is marked as not requiring a model: {}",
+                        "'Returns' says 'version + model' but method is marked as not requiring a model: \n{}\n",
                         output_method(method)
                     );
                     failures += 1;
-                },
+                }
+                if matches!(method.ret, Some(Return::NoType)) {
+                    eprintln!(
+                        "'Returns' says 'version + model' but method has no custom return type: \n{}\n",
+                        output_method(method)
+                    );
+                    failures += 1;
+                }
+            }
+            ReturnsDoc::Other(ref s) if s.starts_with("returns ") => {
+                if matches!(method.ret, Some(Return::Type(_))) {
+                    eprintln!(
+                        "'Returns' says '{}' but method has a custom return type requiring a re-export: \n{}\n",
+                        s,
+                        output_method(method)
+                    );
+                    failures += 1;
+                }
+            }
             ReturnsDoc::Other(_) => {}
         }
     }

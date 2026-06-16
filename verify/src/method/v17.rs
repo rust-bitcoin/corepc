@@ -27,41 +27,41 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getmempoolinfo", "GetMempoolInfo", "get_mempool_info"),
     Method::new_modelled("getrawmempool", "GetRawMempool", "get_raw_mempool"),
     Method::new_modelled("gettxout", "GetTxOut", "get_tx_out"),
-    Method::new_string("gettxoutproof", "get_tx_out_proof"),
+    Method::new_no_type("gettxoutproof", "get_tx_out_proof"),
     Method::new_modelled("gettxoutsetinfo", "GetTxOutSetInfo", "get_tx_out_set_info"),
-    Method::new_nothing("preciousblock", "precious_block"),
+    Method::new_no_type("preciousblock", "precious_block"),
     Method::new_no_model("pruneblockchain", "PruneBlockchain", "prune_blockchain"),
-    Method::new_nothing("savemempool", "save_mempool"),
+    Method::new_no_type("savemempool", "save_mempool"),
     Method::new_modelled("scantxoutset", "ScanTxOutSetStart", "scan_tx_out_set"),
     Method::new_no_model("verifychain", "VerifyChain", "verify_chain"),
     Method::new_modelled("verifytxoutproof", "VerifyTxOutProof", "verify_tx_out_proof"),
     // control
     Method::new_no_model("getmemoryinfo", "GetMemoryInfoStats", "get_memory_info"),
-    Method::new_string("help", "help"),
+    Method::new_no_type("help", "help"),
     Method::new_no_model("logging", "Logging", "logging"),
-    Method::new_string("stop", "stop"),
-    Method::new_numeric("uptime", "uptime"),
+    Method::new_no_type("stop", "stop"),
+    Method::new_no_type("uptime", "uptime"),
     // generating
     Method::new_modelled("generate", "Generate", "generate"),
     Method::new_modelled("generatetoaddress", "GenerateToAddress", "generate_to_address"),
     // mining
     Method::new_modelled("getblocktemplate", "GetBlockTemplate", "get_block_template"),
     Method::new_modelled("getmininginfo", "GetMiningInfo", "get_mining_info"),
-    Method::new_numeric("getnetworkhashps", "get_network_hash_ps"),
-    Method::new_bool("prioritisetransaction", "prioritise_transaction"),
-    Method::new_nothing("submitblock", "submit_block"),
+    Method::new_no_type("getnetworkhashps", "get_network_hash_ps"),
+    Method::new_no_type("prioritisetransaction", "prioritise_transaction"),
+    Method::new_no_type("submitblock", "submit_block"),
     // network
-    Method::new_nothing("addnode", "add_node"),
-    Method::new_nothing("clearbanned", "clear_banned"),
-    Method::new_nothing("disconnectnode", "disconnect_node"),
+    Method::new_no_type("addnode", "add_node"),
+    Method::new_no_type("clearbanned", "clear_banned"),
+    Method::new_no_type("disconnectnode", "disconnect_node"),
     Method::new_no_model("getaddednodeinfo", "GetAddedNodeInfo", "get_added_node_info"),
     Method::new_no_model("getconnectioncount", "GetConnectionCount", "get_connection_count"),
     Method::new_no_model("getnettotals", "GetNetTotals", "get_net_totals"),
     Method::new_modelled("getnetworkinfo", "GetNetworkInfo", "get_network_info"),
     Method::new_no_model("getpeerinfo", "GetPeerInfo", "get_peer_info"),
     Method::new_no_model("listbanned", "ListBanned", "list_banned"),
-    Method::new_nothing("ping", "ping"),
-    Method::new_nothing("setban", "set_ban"),
+    Method::new_no_type("ping", "ping"),
+    Method::new_no_type("setban", "set_ban"),
     Method::new_no_model("setnetworkactive", "SetNetworkActive", "set_network_active"),
     // raw transactions
     Method::new_modelled("combinepsbt", "CombinePsbt", "combine_psbt"),
@@ -98,24 +98,24 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("validateaddress", "ValidateAddress", "validate_address"),
     Method::new_no_model("verifymessage", "VerifyMessage", "verify_message"),
     // wallet
-    Method::new_nothing("abandontransaction", "abandon_transaction"),
+    Method::new_no_type("abandontransaction", "abandon_transaction"),
     Method::new_no_model("abortrescan", "AbortRescan", "abort_rescan"),
     Method::new_modelled("addmultisigaddress", "AddMultisigAddress", "add_multisig_address"),
-    Method::new_nothing("backupwallet", "backup_wallet"),
+    Method::new_no_type("backupwallet", "backup_wallet"),
     Method::new_modelled("bumpfee", "BumpFee", "bump_fee"),
     Method::new_modelled("createwallet", "CreateWallet", "create_wallet"),
     Method::new_modelled("dumpprivkey", "DumpPrivKey", "dump_priv_key"),
     Method::new_no_model("dumpwallet", "DumpWallet", "dump_wallet"),
     Method::new_no_model("encryptwallet", "EncryptWallet", "encrypt_wallet"),
-    Method::new_nothing("getaccount", "get_account"), // Deprecated
-    Method::new_nothing("getaccountaddress", "get_account_address"), // Deprecated
-    Method::new_nothing("getaddressbyaccount", "get_address_by_account"), // Deprecated
+    Method::new_no_type("getaccount", "get_account"), // Deprecated
+    Method::new_no_type("getaccountaddress", "get_account_address"), // Deprecated
+    Method::new_no_type("getaddressbyaccount", "get_address_by_account"), // Deprecated
     Method::new_modelled("getaddressesbylabel", "GetAddressesByLabel", "get_addresses_by_label"),
     Method::new_modelled("getaddressinfo", "GetAddressInfo", "get_address_info"),
     Method::new_modelled("getbalance", "GetBalance", "get_balance"),
     Method::new_modelled("getnewaddress", "GetNewAddress", "get_new_address"),
     Method::new_modelled("getrawchangeaddress", "GetRawChangeAddress", "get_raw_change_address"),
-    Method::new_nothing("getreceivedbyaccount", "get_received_by_account"), // Deprecated
+    Method::new_no_type("getreceivedbyaccount", "get_received_by_account"), // Deprecated
     Method::new_modelled("getreceivedbyaddress", "GetReceivedByAddress", "get_received_by_address"),
     Method::new_modelled("gettransaction", "GetTransaction", "get_transaction"),
     Method::new_modelled(
@@ -124,18 +124,18 @@ pub const METHODS: &[Method] = &[
         "get_unconfirmed_balance",
     ),
     Method::new_modelled("getwalletinfo", "GetWalletInfo", "get_wallet_info"),
-    Method::new_nothing("importaddress", "import_addressss"),
+    Method::new_no_type("importaddress", "import_addressss"),
     Method::new_no_model("importmulti", "ImportMulti", "import_multi"),
-    Method::new_nothing("importprivkey", "import_priv_key"),
-    Method::new_nothing("importprunedfunds", "import_pruned_funds"),
-    Method::new_nothing("importpubkey", "import_pubkey"),
-    Method::new_nothing("importwallet", "import_walet"),
-    Method::new_nothing("keypoolrefill", "keypool_refill"),
-    Method::new_nothing("listaccounts", "list_accounts"), // Deprecated
+    Method::new_no_type("importprivkey", "import_priv_key"),
+    Method::new_no_type("importprunedfunds", "import_pruned_funds"),
+    Method::new_no_type("importpubkey", "import_pubkey"),
+    Method::new_no_type("importwallet", "import_walet"),
+    Method::new_no_type("keypoolrefill", "keypool_refill"),
+    Method::new_no_type("listaccounts", "list_accounts"), // Deprecated
     Method::new_modelled("listaddressgroupings", "ListAddressGroupings", "list_address_groupings"),
     Method::new_no_model("listlabels", "ListLabels", "list_labels"),
     Method::new_modelled("listlockunspent", "ListLockUnspent", "list_lock_unspent"),
-    Method::new_nothing("listreceivedbyaccount", "list_received_by_account"), // Deprecated
+    Method::new_no_type("listreceivedbyaccount", "list_received_by_account"), // Deprecated
     Method::new_modelled(
         "listreceivedbyaddress",
         "ListReceivedByAddress",
@@ -147,14 +147,14 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("listwallets", "ListWallets", "list_wallets"),
     Method::new_modelled("loadwallet", "LoadWallet", "load_wallet"),
     Method::new_no_model("lockunspent", "LockUnspent", "lock_unspent"),
-    Method::new_bool("move", "move"),
-    Method::new_nothing("removeprunedfunds", "remove_pruned_funds"),
+    Method::new_no_type("move", "move"),
+    Method::new_no_type("removeprunedfunds", "remove_pruned_funds"),
     Method::new_modelled("rescanblockchain", "RescanBlockchain", "rescan_blockchain"),
-    Method::new_nothing("sendfrom", "send_from"), // Deprecated
+    Method::new_no_type("sendfrom", "send_from"), // Deprecated
     Method::new_modelled("sendmany", "SendMany", "send_many"),
     Method::new_modelled("sendtoaddress", "SendToAddress", "send_to_address"),
-    Method::new_nothing("setaccount", "set_account"), // Deprecated
-    Method::new_nothing("sethdseed", "set_hd_seed"),
+    Method::new_no_type("setaccount", "set_account"), // Deprecated
+    Method::new_no_type("sethdseed", "set_hd_seed"),
     Method::new_no_model("settxfee", "SetTxFee", "set_tx_fee"),
     Method::new_modelled("signmessage", "SignMessage", "sign_message"),
     Method::new_modelled(
@@ -162,15 +162,15 @@ pub const METHODS: &[Method] = &[
         "SignRawTransaction",
         "sign_raw_transaction_with_wallet",
     ),
-    Method::new_nothing("unloadwallet", "unload_wallet"),
+    Method::new_no_type("unloadwallet", "unload_wallet"),
     Method::new_modelled(
         "walletcreatefundedpsbt",
         "WalletCreateFundedPsbt",
         "wallet_create_funded_psbt",
     ),
-    Method::new_nothing("walletlock", "wallet_lock"),
-    Method::new_nothing("walletpassphrase", "wallet_passphrase"),
-    Method::new_nothing("walletpassphrasechange", "wallet_passphrase_change"),
+    Method::new_no_type("walletlock", "wallet_lock"),
+    Method::new_no_type("walletpassphrase", "wallet_passphrase"),
+    Method::new_no_type("walletpassphrasechange", "wallet_passphrase_change"),
     Method::new_modelled("walletprocesspsbt", "WalletProcessPsbt", "wallet_process_psbt"),
     // zmq
     Method::new_no_model("getzmqnotifications", "GetZmqNotifications", "get_zmq_notifications"),
