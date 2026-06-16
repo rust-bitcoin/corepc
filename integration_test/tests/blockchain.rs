@@ -4,7 +4,6 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-#[cfg(feature = "v30_and_below")]
 use bitcoin::consensus::encode;
 use bitcoin::hex;
 use bitcoind::vtype::*; // All the version specific types.
@@ -141,7 +140,6 @@ fn blockchain__get_best_block_hash__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_block__modelled() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
@@ -154,7 +152,10 @@ fn blockchain__get_block__modelled() {
     let json: GetBlockVerboseOne =
         node.client.get_block_verbose_one(block_hash).expect("getblock verbose=1");
     let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseOneError> = json.into_model();
-    model.unwrap();
+    let block_v1 = model.unwrap();
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(block_v1.coinbase_tx.is_some());
+    let _ = block_v1;
 
     #[cfg(not(feature = "v28_and_below"))]
     {
@@ -236,7 +237,6 @@ fn blockchain__get_block_filter__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_block_from_peer() {
     use bitcoin::hashes::Hash;
@@ -382,7 +382,6 @@ fn blockchain__get_chain_tx_stats__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 #[cfg(not(feature = "v22_and_below"))]
 fn blockchain__get_deployment_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
@@ -410,6 +409,8 @@ fn blockchain__get_deployment_info__modelled() {
     let deployment_info_tip = model_tip.unwrap();
 
     assert_eq!(deployment_info_tip.hash, tip_block_hash);
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(deployment_info_tip.script_flags.is_some());
 }
 
 #[test]
@@ -464,7 +465,6 @@ fn blockchain__get_mempool_ancestors__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_ancestors_verbose__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -477,6 +477,8 @@ fn blockchain__get_mempool_ancestors_verbose__modelled() {
     let ancestors = model.unwrap();
 
     assert!(ancestors.0.contains_key(&parent_txid));
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(ancestors.0[&parent_txid].chunk_weight.is_some());
 }
 
 #[test]
@@ -495,7 +497,6 @@ fn blockchain__get_mempool_descendants__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_descendants_verbose__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -511,10 +512,11 @@ fn blockchain__get_mempool_descendants_verbose__modelled() {
     let descendants = model.unwrap();
 
     assert!(descendants.0.contains_key(&child_txid));
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(descendants.0[&child_txid].chunk_weight.is_some());
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_entry__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -522,11 +524,16 @@ fn blockchain__get_mempool_entry__modelled() {
 
     let json: GetMempoolEntry = node.client.get_mempool_entry(txid).expect("getmempoolentry");
     let model: Result<mtype::GetMempoolEntry, MempoolEntryError> = json.into_model();
-    model.unwrap();
+    let entry = model.unwrap();
+    #[cfg(not(feature = "v30_and_below"))]
+    {
+        assert!(entry.0.chunk_weight.is_some());
+        assert!(entry.0.fees.chunk.is_some());
+    }
+    let _ = entry;
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_mempool_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -538,10 +545,15 @@ fn blockchain__get_mempool_info__modelled() {
 
     // Sanity check.
     assert_eq!(info.size, 1);
+    #[cfg(not(feature = "v30_and_below"))]
+    {
+        assert!(info.limit_cluster_count.is_some());
+        assert!(info.limit_cluster_size.is_some());
+        assert!(info.optimal.is_some());
+    }
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__get_raw_mempool__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
@@ -561,6 +573,8 @@ fn blockchain__get_raw_mempool__modelled() {
     let mempool = model.unwrap();
     // Sanity check.
     assert_eq!(mempool.0.len(), 1);
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(mempool.0.values().next().expect("one entry").chunk_weight.is_some());
 
     #[cfg(not(feature = "v20_and_below"))]
     {
@@ -571,6 +585,49 @@ fn blockchain__get_raw_mempool__modelled() {
         let mempool = model.unwrap();
         // Sanity check.
         assert_eq!(mempool.txids.len(), 1);
+    }
+}
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn blockchain__get_mempool_cluster__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, parent_txid) = node.create_mempool_transaction();
+    let child_txid = create_child_spending_parent(&node, parent_txid);
+
+    let json: GetMempoolCluster =
+        node.client.get_mempool_cluster(parent_txid).expect("getmempoolcluster");
+    let model: Result<mtype::GetMempoolCluster, GetMempoolClusterError> = json.into_model();
+    let cluster = model.unwrap();
+
+    // The parent and its child are linearised in the same cluster.
+    assert_eq!(cluster.tx_count, 2);
+    assert!(cluster.cluster_weight > 0);
+    let cluster_txids: Vec<bitcoin::Txid> =
+        cluster.chunks.iter().flat_map(|c| c.txs.iter().copied()).collect();
+    assert!(cluster_txids.contains(&parent_txid));
+    assert!(cluster_txids.contains(&child_txid));
+}
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn blockchain__get_mempool_feerate_diagram__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _txid) = node.create_mempool_transaction();
+
+    let json: GetMempoolFeerateDiagram =
+        node.client.get_mempool_feerate_diagram().expect("getmempoolfeeratediagram");
+    let model: Result<mtype::GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError> =
+        json.into_model();
+    let diagram = model.unwrap();
+
+    // The diagram is non-empty and cumulative (weight and fee are non-decreasing).
+    assert!(!diagram.0.is_empty());
+    for pair in diagram.0.windows(2) {
+        assert!(pair[1].weight >= pair[0].weight);
+        assert!(pair[1].fee >= pair[0].fee);
     }
 }
 
@@ -622,14 +679,45 @@ fn blockchain__get_tx_spending_prevout__modelled() {
         bitcoin::OutPoint { txid: txid_2, vout: 0 },
     ];
 
+    #[cfg(feature = "v30_and_below")]
     let json: GetTxSpendingPrevout =
         node.client.get_tx_spending_prevout(&inputs).expect("gettxspendingprevout");
+    #[cfg(not(feature = "v30_and_below"))]
+    let json: GetTxSpendingPrevout =
+        node.client.get_tx_spending_prevout(&inputs, true, false).expect("gettxspendingprevout");
     let model: Result<mtype::GetTxSpendingPrevout, GetTxSpendingPrevoutError> = json.into_model();
     let spending_prevout = model.unwrap();
 
     assert_eq!(spending_prevout.0.len(), 2);
     assert_eq!(spending_prevout.0[0].outpoint.txid, txid_1);
     assert_eq!(spending_prevout.0[0].outpoint.vout, 0);
+}
+
+#[test]
+#[cfg(not(feature = "v30_and_below"))]
+fn blockchain__get_tx_spending_prevout_spending_tx_and_block_hash__modelled() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-txindex=1", "-txospenderindex=1"]);
+    node.fund_wallet();
+
+    // Create and confirm a transaction, then look up the (now confirmed) output it spends.
+    let (_address, tx) = node.create_mined_transaction();
+    let outpoint = tx.input[0].previous_output;
+
+    let json: GetTxSpendingPrevout = node
+        .client
+        .get_tx_spending_prevout(&[outpoint], false, true)
+        .expect("gettxspendingprevout");
+    let item = &json.0[0];
+    assert!(item.spending_txid.is_some());
+    assert!(item.spending_tx.is_some());
+    assert!(item.block_hash.is_some());
+
+    let model: Result<mtype::GetTxSpendingPrevout, GetTxSpendingPrevoutError> = json.into_model();
+    let model = model.unwrap();
+    assert_eq!(model.0[0].outpoint, outpoint);
+    assert_eq!(model.0[0].spending_txid, Some(tx.compute_txid()));
+    assert!(model.0[0].spending_tx.is_some());
+    assert!(model.0[0].block_hash.is_some());
 }
 
 #[test]
@@ -797,7 +885,6 @@ fn blockchain__wait_for_block_height__modelled() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn blockchain__wait_for_new_block__modelled() {
     let (node1, node2, _node3) = integration_test::three_node_network();
     node1.fund_wallet();

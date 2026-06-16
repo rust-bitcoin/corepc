@@ -10,7 +10,6 @@ use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_peer_info_has_connection_type() {
     let (node1, _node2, _node3) = integration_test::three_node_network();
 
@@ -31,7 +30,6 @@ fn get_net_totals_time_millis_is_non_zero() {
 
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_peer_info_bytes_per_msg_non_empty() {
     let (node1, _node2, _node3) = integration_test::three_node_network();
 
@@ -44,14 +42,17 @@ fn get_peer_info_bytes_per_msg_non_empty() {
 
 #[test]
 #[cfg(not(feature = "v22_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_peer_info_synced_blocks_le_headers() {
     let (node1, _node2, _node3) = integration_test::three_node_network();
 
     let json: GetPeerInfo = node1.client.get_peer_info().unwrap();
     let peer = json.0.first().unwrap();
 
+    #[cfg(feature = "v30_and_below")]
     assert!(peer.starting_height.is_some());
+    #[cfg(not(feature = "v30_and_below"))]
+    assert!(peer.starting_height.is_none());
+
     let headers = peer.synced_headers.unwrap();
     let blocks = peer.synced_blocks.unwrap();
     assert!(blocks <= headers);
@@ -69,7 +70,6 @@ fn get_network_info_local_services_names_non_empty() {
 
 #[test]
 #[cfg(not(feature = "v20_and_below"))]
-#[cfg(feature = "v30_and_below")]
 fn get_network_info_connections_sum_matches_total() {
     let (node1, _node2, _node3) = integration_test::three_node_network();
 

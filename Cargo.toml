@@ -10,6 +10,7 @@ stable = "1.94.1"
 [workspace.metadata.rbmt.integration]
 package = "integration-test"
 versions = [
+    "31_0",
     "30_2",
     "30_0",
     "29_0",

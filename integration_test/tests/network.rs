@@ -4,10 +4,8 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
-#[cfg(feature = "v30_and_below")]
-use bitcoind::mtype;
 use bitcoind::vtype::*; // All the version specific types.
-use bitcoind::{AddNodeCommand, SetBanCommand};
+use bitcoind::{mtype, AddNodeCommand, SetBanCommand};
 use integration_test::{BitcoinD, BitcoinDExt as _, Wallet};
 
 #[test]
@@ -36,7 +34,6 @@ fn network__clear_banned() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn network__disconnect_node() {
     let (_node1, node2, _node3) = integration_test::three_node_network();
 
@@ -78,7 +75,6 @@ fn network__get_net_totals() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn network__get_network_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let json: GetNetworkInfo = node.client.get_network_info().expect("getnetworkinfo");
@@ -112,20 +108,17 @@ fn network__get_node_addresses() {
 }
 
 #[test]
-#[cfg(feature = "v30_and_below")]
 fn network__get_peer_info() {
     get_peer_info_one_node_network();
     get_peer_info_three_node_network();
 }
 
-#[cfg(feature = "v30_and_below")]
 fn get_peer_info_one_node_network() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
     let json: GetPeerInfo = node.client.get_peer_info().expect("getpeerinfo");
     assert_eq!(json.0.len(), 0);
 }
 
-#[cfg(feature = "v30_and_below")]
 fn get_peer_info_three_node_network() {
     let (node1, node2, node3) = integration_test::three_node_network();
 
@@ -137,6 +130,9 @@ fn get_peer_info_three_node_network() {
     let json: GetPeerInfo = node1.client.get_peer_info().expect("getpeerinfo");
     // This verifies that we re-exported the correct `PeerInfo` type at the module level.
     let _: PeerInfo = json.0[0];
+
+    #[cfg(not(feature = "v30_and_below"))]
+    let _ = (json.0[0].inv_to_send, json.0[0].last_inv_sequence);
 
     // FIXME: Fails if we use equal to 2 ???
     assert!(node1.peers_connected() >= 1);

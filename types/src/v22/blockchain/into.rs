@@ -28,6 +28,9 @@ impl GetMempoolInfo {
             full_rbf: None,
             permit_bare_multisig: None,
             max_data_carrier_size: None,
+            limit_cluster_count: None,
+            limit_cluster_size: None,
+            optimal: None,
         })
     }
 }

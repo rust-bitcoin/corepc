@@ -49,6 +49,7 @@ impl GetBlockVerboseOne {
             size: crate::to_u32(self.size, "size")?,
             stripped_size,
             weight,
+            coinbase_tx: None,
             height: crate::to_u32(self.height, "height")?,
             version,
             merkle_root,
@@ -108,6 +109,7 @@ impl GetBlockVerboseTwo {
             size: crate::to_u32(self.size, "size")?,
             stripped_size,
             weight,
+            coinbase_tx: None,
             height: crate::to_u32(self.height, "height")?,
             version,
             merkle_root,
@@ -127,7 +129,8 @@ impl GetBlockVerboseTwo {
 }
 
 impl GetRawTransactionVerboseWithPrevout {
-    fn into_model_with_prevouts(
+    /// Converts to the model transaction along with its parsed prevouts.
+    pub fn into_model_with_prevouts(
         self,
     ) -> Result<
         (model::GetRawTransactionVerbose, Vec<Option<model::GetBlockVerboseThreePrevout>>),
@@ -234,6 +237,7 @@ impl GetBlockVerboseThree {
             size: crate::to_u32(self.size, "size")?,
             stripped_size,
             weight,
+            coinbase_tx: None,
             height: crate::to_u32(self.height, "height")?,
             version,
             merkle_root,

@@ -11,7 +11,7 @@ use bitcoin::address::NetworkUnchecked;
 use bitcoin::hashes::sha256;
 use bitcoin::{
     block, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, ScriptBuf,
-    Target, TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
+    Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
 };
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +42,23 @@ pub struct GetBestBlockHash(pub BlockHash);
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetBlockVerboseZero(pub Block);
 
+/// The coinbase transaction of a block. Part of `getblock` at verbosity 1, 2 and 3.
+///
+/// Introduced in Bitcoin Core v31.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CoinbaseTransaction {
+    /// The coinbase transaction version.
+    pub version: i32,
+    /// The coinbase transaction's locktime.
+    pub locktime: u32,
+    /// The coinbase input's sequence number (nSequence).
+    pub sequence: u32,
+    /// The coinbase input's script.
+    pub coinbase: String,
+    /// The coinbase input's first (and only) witness stack element, if present.
+    pub witness: Option<String>,
+}
+
 /// Models the result of JSON-RPC method `getblock` with verbosity set to 1.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetBlockVerboseOne {
@@ -55,6 +72,8 @@ pub struct GetBlockVerboseOne {
     pub stripped_size: Option<u32>,
     /// The block weight as defined in BIP-141.
     pub weight: Weight,
+    /// Coinbase transaction metadata (v31 and later only).
+    pub coinbase_tx: Option<CoinbaseTransaction>,
     /// The block height or index.
     pub height: u32,
     /// The block version.
@@ -98,6 +117,8 @@ pub struct GetBlockVerboseTwo {
     pub stripped_size: Option<u32>,
     /// The block weight as defined in BIP-141.
     pub weight: Weight,
+    /// Coinbase transaction metadata (v31 and later only).
+    pub coinbase_tx: Option<CoinbaseTransaction>,
     /// The block height or index.
     pub height: u32,
     /// The block version.
@@ -150,6 +171,8 @@ pub struct GetBlockVerboseThree {
     pub stripped_size: Option<u32>,
     /// The block weight as defined in BIP-141.
     pub weight: Weight,
+    /// Coinbase transaction metadata (v31 and later only).
+    pub coinbase_tx: Option<CoinbaseTransaction>,
     /// The block height or index.
     pub height: u32,
     /// The block version.
@@ -549,6 +572,8 @@ pub struct GetDeploymentInfo {
     pub hash: BlockHash,
     /// Requested block height (or tip).
     pub height: u32,
+    /// Script verify flags for the block. v31 and later only.
+    pub script_flags: Option<Vec<String>>,
     /// Deployments info, keyed by deployment name.
     pub deployments: std::collections::BTreeMap<String, DeploymentInfo>,
 }
@@ -731,6 +756,10 @@ pub struct MempoolEntry {
     pub ancestor_count: u32,
     /// Virtual transaction size of in-mempool ancestors (including this one).
     pub ancestor_size: u32,
+    /// Sigops-adjusted weight of all transactions in this chunk.
+    ///
+    /// This was introduced with Bitcoin Core v31 and will hence be `None` for previous versions.
+    pub chunk_weight: Option<u32>,
     /// Hash of serialized transaction, including witness data.
     pub wtxid: Wtxid,
     /// (No docs in Core v0.17). Part of `getmempoolentry`.
@@ -757,6 +786,10 @@ pub struct MempoolEntryFees {
     pub ancestor: Amount,
     /// Modified fees (see above) of in-mempool descendants (including this one).
     pub descendant: Amount,
+    /// Transaction fees of chunk.
+    ///
+    /// This was introduced with Bitcoin Core v31 and will hence be `None` for previous versions.
+    pub chunk: Option<Amount>,
 }
 
 /// Models the result of JSON-RPC method `getmempoolinfo` with verbose set to true.
@@ -777,7 +810,7 @@ pub struct GetMempoolInfo {
     pub total_fee: Option<f64>,
     /// Maximum memory usage for the mempool.
     pub max_mempool: u32,
-    /// Minimum fee rate in BTC/kB for a transaction to be accepted.
+    /// Minimum fee rate for a transaction to be accepted.
     ///
     /// This is the maximum of `minrelaytxfee` and the minimum mempool fee.
     pub mempool_min_fee: Option<FeeRate>,
@@ -794,6 +827,12 @@ pub struct GetMempoolInfo {
     pub permit_bare_multisig: Option<bool>,
     /// Maximum number of bytes that can be used by OP_RETURN outputs in the mempool.
     pub max_data_carrier_size: Option<u64>,
+    /// Maximum number of transactions that can be in a cluster (configured by -limitclustercount). v31 and later only.
+    pub limit_cluster_count: Option<u32>,
+    /// Maximum size of a cluster in virtual bytes (configured by -limitclustersize). v31 and later only.
+    pub limit_cluster_size: Option<u32>,
+    /// True if the mempool is in a known-optimal transaction ordering.
+    pub optimal: Option<bool>,
 }
 
 /// Models the result of JSON-RPC method `getrawmempool` with verbose set to false.
@@ -811,6 +850,19 @@ pub struct GetRawMempoolSequence {
     pub txids: Vec<Txid>,
     /// The mempool sequence value.
     pub mempool_sequence: u64,
+}
+
+/// Models the result of JSON-RPC method `getmempoolfeeratediagram`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+pub struct GetMempoolFeerateDiagram(pub Vec<FeerateDiagramEntry>);
+
+/// A point on the mempool feerate diagram. Part of `getmempoolfeeratediagram`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct FeerateDiagramEntry {
+    /// Cumulative sigops-adjusted weight.
+    pub weight: u64,
+    /// Cumulative fee.
+    pub fee: Amount,
 }
 
 /// Models the result of JSON-RPC method `gettxout`.
@@ -901,6 +953,12 @@ pub struct GetTxSpendingPrevoutItem {
     pub outpoint: OutPoint,
     /// The transaction id of the mempool transaction spending this output (omitted if unspent).
     pub spending_txid: Option<Txid>,
+    /// The transaction spending this output (only if `return_spending_tx` is set, omitted if
+    /// unspent). v31 and later only.
+    pub spending_tx: Option<Transaction>,
+    /// The hash of the spending block (omitted if unspent or the spending tx is not confirmed).
+    /// v31 and later only.
+    pub block_hash: Option<BlockHash>,
 }
 
 /// Models the result of JSON-RPC method `loadtxoutset`.

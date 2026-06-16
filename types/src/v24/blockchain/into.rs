@@ -104,6 +104,7 @@ impl MempoolEntry {
             descendant_size,
             ancestor_count,
             ancestor_size,
+            chunk_weight: None,
             wtxid,
             fees,
             depends,
@@ -155,6 +156,9 @@ impl GetMempoolInfo {
             full_rbf: Some(self.full_rbf),
             permit_bare_multisig: None,
             max_data_carrier_size: None,
+            limit_cluster_count: None,
+            limit_cluster_size: None,
+            optimal: None,
         })
     }
 }
@@ -178,6 +182,11 @@ impl GetTxSpendingPrevoutItem {
         let spending_txid =
             self.spending_txid.map(|id| id.parse::<Txid>().map_err(E::SpendingTxid)).transpose()?;
 
-        Ok(model::GetTxSpendingPrevoutItem { outpoint, spending_txid })
+        Ok(model::GetTxSpendingPrevoutItem {
+            outpoint,
+            spending_txid,
+            spending_tx: None,
+            block_hash: None,
+        })
     }
 }

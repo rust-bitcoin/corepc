@@ -4,9 +4,22 @@
 //!
 //! Types for methods found under the `== Blockchain ==` section of the API docs.
 
+mod error;
 mod into;
 
+use alloc::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
+
+pub use self::error::{
+    GetMempoolClusterError, GetMempoolFeerateDiagramError, GetTxSpendingPrevoutError,
+    MapMempoolEntryError, MempoolEntryError, MempoolEntryFeesError,
+};
+use super::{DeploymentInfo, GetBlockVerboseThreeTransaction, GetBlockVerboseTwoTransaction};
+pub use super::{
+    GetBlockVerboseOneError, GetBlockVerboseThreeError, GetBlockVerboseTwoError,
+    GetDeploymentInfoError, GetMempoolInfoError,
+};
 
 /// Result of JSON-RPC method `getmempoolcluster`.
 ///
@@ -26,15 +39,409 @@ pub struct GetMempoolCluster {
     pub chunks: Vec<Chunk>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct Chunk {
     /// Fees of the transactions in this chunk.
     #[serde(rename = "chunkfee")]
-    // FIXME: This is probably a float. https://github.com/rust-bitcoin/corepc/pull/598#discussion_r3283795812
-    pub chunk_fee: u64,
+    pub chunk_fee: f64,
     /// Sigops-adjusted weight of all transactions in this chunk.
     #[serde(rename = "chunkweight")]
     pub chunk_weight: u64,
-    /// Transactions in this chunk in mining order (txids).
+    /// Transactions in this chunk in mining order.
     pub txs: Vec<String>,
+}
+
+/// Result of JSON-RPC method `getmempoolentry`.
+///
+/// > getmempoolentry "txid"
+/// >
+/// > Returns mempool data for given transaction
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetMempoolEntry(pub MempoolEntry);
+
+/// Result of JSON-RPC method `getrawmempool` with verbose set to `true`.
+///
+/// Map of txid to [`MempoolEntry`].
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetRawMempoolVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Result of JSON-RPC method `getmempoolancestors` with verbose set to `true`.
+///
+/// Map of txid to [`MempoolEntry`].
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetMempoolAncestorsVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Result of JSON-RPC method `getmempooldescendants` with verbose set to `true`.
+///
+/// Map of txid to [`MempoolEntry`].
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetMempoolDescendantsVerbose(pub BTreeMap<String, MempoolEntry>);
+
+/// Mempool data. Part of `getmempoolentry`, `getrawmempool`, `getmempoolancestors` and
+/// `getmempooldescendants`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct MempoolEntry {
+    /// Virtual transaction size as defined in BIP 141.
+    ///
+    /// This is different from actual serialized size for witness transactions as witness data is
+    /// discounted.
+    pub vsize: i64,
+    /// Transaction weight as defined in BIP 141.
+    pub weight: i64,
+    /// Local time transaction entered pool in seconds since 1 Jan 1970 GMT.
+    pub time: i64,
+    /// Block height when transaction entered pool.
+    pub height: i64,
+    /// Number of in-mempool descendant transactions (including this one).
+    #[serde(rename = "descendantcount")]
+    pub descendant_count: i64,
+    /// Virtual transaction size of in-mempool descendants (including this one).
+    #[serde(rename = "descendantsize")]
+    pub descendant_size: i64,
+    /// Number of in-mempool ancestor transactions (including this one).
+    #[serde(rename = "ancestorcount")]
+    pub ancestor_count: i64,
+    /// Virtual transaction size of in-mempool ancestors (including this one).
+    #[serde(rename = "ancestorsize")]
+    pub ancestor_size: i64,
+    /// Sigops-adjusted weight (as defined in BIP 141 and modified by `-bytespersigop`) of this
+    /// transaction's chunk.
+    #[serde(rename = "chunkweight")]
+    pub chunk_weight: i64,
+    /// Hash of serialized transaction, including witness data.
+    pub wtxid: String,
+    /// Fee object which contains the base fee, modified fee (with fee deltas), ancestor/descendant
+    /// fee totals and chunk fee, all in BTC.
+    pub fees: MempoolEntryFees,
+    /// Unconfirmed transactions used as inputs for this transaction (parent transaction id).
+    pub depends: Vec<String>,
+    /// Unconfirmed transactions spending outputs from this transaction (child transaction id).
+    #[serde(rename = "spentby")]
+    pub spent_by: Vec<String>,
+    /// Whether this transaction signals BIP125 replaceability or has an unconfirmed ancestor
+    /// signaling BIP125 replaceability (DEPRECATED).
+    #[serde(rename = "bip125-replaceable")]
+    pub bip125_replaceable: bool,
+    /// Whether this transaction is currently unbroadcast (initial broadcast not yet acknowledged by
+    /// any peers).
+    pub unbroadcast: bool,
+}
+
+/// Fee object. Part of `getmempoolentry`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct MempoolEntryFees {
+    /// Transaction fee, denominated in BTC.
+    pub base: f64,
+    /// Transaction fee with fee deltas used for mining priority, denominated in BTC.
+    pub modified: f64,
+    /// Transaction fees of in-mempool ancestors (including this one) with fee deltas used for
+    /// mining priority, denominated in BTC.
+    pub ancestor: f64,
+    /// Transaction fees of in-mempool descendants (including this one) with fee deltas used for
+    /// mining priority, denominated in BTC.
+    pub descendant: f64,
+    /// Transaction fees of chunk, denominated in BTC.
+    pub chunk: f64,
+}
+
+/// Result of JSON-RPC method `getmempoolinfo` with verbose set to `true`.
+///
+/// > getmempoolinfo
+/// >
+/// > Returns details on the active state of the TX memory pool.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetMempoolInfo {
+    /// True if the initial load attempt of the persisted mempool finished.
+    pub loaded: bool,
+    /// Current tx count.
+    pub size: i64,
+    /// Sum of all virtual transaction sizes as defined in BIP 141.
+    ///
+    /// Differs from actual serialized size because witness data is discounted.
+    pub bytes: i64,
+    /// Total memory usage for the mempool.
+    pub usage: i64,
+    /// Total fees for the mempool in BTC, ignoring modified fees through prioritisetransaction.
+    pub total_fee: f64,
+    /// Maximum memory usage for the mempool.
+    #[serde(rename = "maxmempool")]
+    pub max_mempool: i64,
+    /// Minimum fee rate in BTC/kvB for a transaction to be accepted.
+    ///
+    /// This is the maximum of `minrelaytxfee` and the minimum mempool fee.
+    #[serde(rename = "mempoolminfee")]
+    pub mempool_min_fee: f64,
+    /// Current minimum relay fee for transactions.
+    #[serde(rename = "minrelaytxfee")]
+    pub min_relay_tx_fee: f64,
+    /// Minimum fee rate increment for mempool limiting or replacement in BTC/kvB.
+    #[serde(rename = "incrementalrelayfee")]
+    pub incremental_relay_fee: f64,
+    /// Current number of transactions that haven't passed initial broadcast yet.
+    #[serde(rename = "unbroadcastcount")]
+    pub unbroadcast_count: i64,
+    /// True if the mempool accepts RBF without replaceability signaling inspection (DEPRECATED).
+    #[serde(rename = "fullrbf")]
+    pub full_rbf: bool,
+    /// True if the mempool accepts transactions with bare multisig outputs.
+    #[serde(rename = "permitbaremultisig")]
+    pub permit_bare_multisig: bool,
+    /// Maximum number of bytes that can be used by OP_RETURN outputs in the mempool.
+    #[serde(rename = "maxdatacarriersize")]
+    pub max_data_carrier_size: u64,
+    /// Maximum number of transactions that can be in a cluster (configured by `-limitclustercount`).
+    #[serde(rename = "limitclustercount")]
+    pub limit_cluster_count: i64,
+    /// Maximum size of a cluster in virtual bytes (configured by `-limitclustersize`).
+    #[serde(rename = "limitclustersize")]
+    pub limit_cluster_size: i64,
+    /// True if the mempool is in a known-optimal transaction ordering.
+    pub optimal: bool,
+}
+
+/// Result of JSON-RPC method `getmempoolfeeratediagram`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetMempoolFeerateDiagram(pub Vec<FeerateDiagramEntry>);
+
+/// A point on the mempool feerate diagram. Part of `getmempoolfeeratediagram`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct FeerateDiagramEntry {
+    /// Cumulative sigops-adjusted weight.
+    pub weight: i64,
+    /// Cumulative fee.
+    pub fee: f64,
+}
+
+/// The coinbase transaction object. Part of `getblock` at verbosity 1, 2 and 3.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct CoinbaseTransaction {
+    /// The coinbase transaction version.
+    pub version: i32,
+    /// The coinbase transaction's locktime (nLockTime).
+    pub locktime: u32,
+    /// The coinbase input's sequence number (nSequence).
+    pub sequence: u32,
+    /// The coinbase input's script.
+    pub coinbase: String,
+    /// The coinbase input's first (and only) witness stack element, if present.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub witness: Option<String>,
+}
+
+/// Result of JSON-RPC method `getdeploymentinfo`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetDeploymentInfo {
+    /// Requested block hash (or tip).
+    pub hash: String,
+    /// Requested block height (or tip).
+    pub height: u32,
+    /// Script verify flags for the block.
+    pub script_flags: Vec<String>,
+    /// Deployments info, keyed by deployment name.
+    pub deployments: BTreeMap<String, DeploymentInfo>,
+}
+
+/// Result of JSON-RPC method `gettxspendingprevout`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetTxSpendingPrevout(pub Vec<GetTxSpendingPrevoutItem>);
+
+/// A transaction item. Part of `gettxspendingprevout`.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetTxSpendingPrevoutItem {
+    /// The transaction id of the checked output.
+    pub txid: String,
+    /// The vout value of the checked output.
+    pub vout: u32,
+    /// The transaction id of the mempool transaction spending this output (omitted if unspent).
+    #[serde(rename = "spendingtxid", skip_serializing_if = "Option::is_none")]
+    pub spending_txid: Option<String>,
+    /// The transaction spending this output (only if `return_spending_tx` is set, omitted if
+    /// unspent).
+    #[serde(rename = "spendingtx", skip_serializing_if = "Option::is_none")]
+    pub spending_tx: Option<String>,
+    /// The hash of the spending block (omitted if unspent or the spending tx is not confirmed).
+    #[serde(rename = "blockhash", skip_serializing_if = "Option::is_none")]
+    pub block_hash: Option<String>,
+}
+
+/// Result of JSON-RPC method `getblock` with verbosity set to 1.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseOne {
+    /// The block hash (same as provided) in RPC call.
+    pub hash: String,
+    /// The number of confirmations, or -1 if the block is not on the main chain.
+    pub confirmations: i64,
+    /// The block size.
+    pub size: i64,
+    /// The block size excluding witness data.
+    #[serde(rename = "strippedsize")]
+    pub stripped_size: Option<i64>,
+    /// The block weight as defined in BIP-141.
+    pub weight: u64,
+    /// The coinbase transaction.
+    pub coinbase_tx: CoinbaseTransaction,
+    /// The block height or index.
+    pub height: i64,
+    /// The block version.
+    pub version: i32,
+    /// The block version formatted in hexadecimal.
+    #[serde(rename = "versionHex")]
+    pub version_hex: String,
+    /// The merkle root.
+    #[serde(rename = "merkleroot")]
+    pub merkle_root: String,
+    /// The transaction ids.
+    pub tx: Vec<String>,
+    /// The block time expressed in UNIX epoch time.
+    pub time: i64,
+    /// The median block time expressed in UNIX epoch time.
+    #[serde(rename = "mediantime")]
+    pub median_time: Option<i64>,
+    /// The nonce (this should be only 4 bytes).
+    pub nonce: i64,
+    /// nBits: compact representation of the block difficulty target.
+    pub bits: String,
+    /// The difficulty target.
+    pub target: String,
+    /// The difficulty.
+    pub difficulty: f64,
+    /// Expected number of hashes required to produce the chain up to this block (in hex).
+    #[serde(rename = "chainwork")]
+    pub chain_work: String,
+    /// The number of transactions in the block.
+    #[serde(rename = "nTx")]
+    pub n_tx: i64,
+    /// The hash of the previous block (if available).
+    #[serde(rename = "previousblockhash")]
+    pub previous_block_hash: Option<String>,
+    /// The hash of the next block (if available).
+    #[serde(rename = "nextblockhash")]
+    pub next_block_hash: Option<String>,
+}
+
+/// Result of JSON-RPC method `getblock` with verbosity set to 2.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseTwo {
+    /// The block hash (same as provided).
+    pub hash: String,
+    /// The number of confirmations, or -1 if the block is not on the main chain.
+    pub confirmations: i64,
+    /// The block size.
+    pub size: i64,
+    /// The block size excluding witness data.
+    #[serde(rename = "strippedsize")]
+    pub stripped_size: Option<i64>,
+    /// The block weight as defined in BIP 141.
+    pub weight: u64,
+    /// The coinbase transaction.
+    pub coinbase_tx: CoinbaseTransaction,
+    /// The block height or index.
+    pub height: i64,
+    /// The block version.
+    pub version: i32,
+    /// The block version formatted in hexadecimal.
+    #[serde(rename = "versionHex")]
+    pub version_hex: String,
+    /// The merkle root.
+    #[serde(rename = "merkleroot")]
+    pub merkle_root: String,
+    /// The transactions.
+    pub tx: Vec<GetBlockVerboseTwoTransaction>,
+    /// The block time expressed in UNIX epoch time.
+    pub time: i64,
+    /// The median block time expressed in UNIX epoch time.
+    #[serde(rename = "mediantime")]
+    pub median_time: Option<i64>,
+    /// The nonce.
+    pub nonce: i64,
+    /// nBits: compact representation of the block difficulty target.
+    pub bits: String,
+    /// The difficulty target.
+    pub target: String,
+    /// The difficulty.
+    pub difficulty: f64,
+    /// Expected number of hashes required to produce the chain up to this block (in hex).
+    #[serde(rename = "chainwork")]
+    pub chain_work: String,
+    /// The number of transactions in the block.
+    #[serde(rename = "nTx")]
+    pub n_tx: i64,
+    /// The hash of the previous block (if available).
+    #[serde(rename = "previousblockhash")]
+    pub previous_block_hash: Option<String>,
+    /// The hash of the next block (if available).
+    #[serde(rename = "nextblockhash")]
+    pub next_block_hash: Option<String>,
+}
+
+/// Result of JSON-RPC method `getblock` with verbosity set to 3.
+#[derive(Clone, PartialEq, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
+pub struct GetBlockVerboseThree {
+    /// The block hash (same as provided) in RPC call.
+    pub hash: String,
+    /// The number of confirmations, or -1 if the block is not on the main chain.
+    pub confirmations: i64,
+    /// The block size.
+    pub size: i64,
+    /// The block size excluding witness data.
+    #[serde(rename = "strippedsize")]
+    pub stripped_size: Option<i64>,
+    /// The block weight as defined in BIP-141.
+    pub weight: u64,
+    /// The coinbase transaction.
+    pub coinbase_tx: CoinbaseTransaction,
+    /// The block height or index.
+    pub height: i64,
+    /// The block version.
+    pub version: i32,
+    /// The block version formatted in hexadecimal.
+    #[serde(rename = "versionHex")]
+    pub version_hex: String,
+    /// The merkle root.
+    #[serde(rename = "merkleroot")]
+    pub merkle_root: String,
+    /// The transactions.
+    pub tx: Vec<GetBlockVerboseThreeTransaction>,
+    /// The block time expressed in UNIX epoch time.
+    pub time: i64,
+    /// The median block time expressed in UNIX epoch time.
+    #[serde(rename = "mediantime")]
+    pub median_time: Option<i64>,
+    /// The nonce (this should be only 4 bytes).
+    pub nonce: i64,
+    /// nBits: compact representation of the block difficulty target.
+    pub bits: String,
+    /// The difficulty target.
+    pub target: String,
+    /// The difficulty.
+    pub difficulty: f64,
+    /// Expected number of hashes required to produce the chain up to this block (in hex).
+    #[serde(rename = "chainwork")]
+    pub chain_work: String,
+    /// The number of transactions in the block.
+    #[serde(rename = "nTx")]
+    pub n_tx: i64,
+    /// The hash of the previous block (if available).
+    #[serde(rename = "previousblockhash")]
+    pub previous_block_hash: Option<String>,
+    /// The hash of the next block (if available).
+    #[serde(rename = "nextblockhash")]
+    pub next_block_hash: Option<String>,
 }

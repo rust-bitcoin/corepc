@@ -22,6 +22,7 @@ pub struct AbortPrivateBroadcast {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RemovedTransaction {
     /// The transaction hash in hex.
     pub txid: String,
@@ -44,6 +45,7 @@ pub struct GetPrivateBroadcastInfo {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PrivateBroadcastTransaction {
     /// The transaction hash in hex.
     pub txid: String,
@@ -56,14 +58,15 @@ pub struct PrivateBroadcastTransaction {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+#[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct PrivateBroadcastPeer {
     /// The address of the peer to which the transaction was sent.
     pub address: String,
     /// The time this transaction was picked for sending to this peer via private
     /// broadcast (seconds since epoch).
-    pub sent: u64,
+    pub sent: i64,
     /// The time this peer acknowledged reception of the transaction (seconds since
     /// epoch).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub received: Option<u64>,
+    pub received: Option<i64>,
 }
