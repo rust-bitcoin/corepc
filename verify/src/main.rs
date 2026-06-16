@@ -195,12 +195,21 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
                 }
 
                 if let Some(test_output) = test_output {
-                    if check_integration_test_crate::test_exists(version, &method.name, test_output)
-                        .is_err()
-                    {
-                        eprintln!("missing integration test: {}", method.name);
-                        failures += 1;
-                    }
+                    match check_integration_test_crate::test_exists(
+                        version,
+                        &method.name,
+                        test_output,
+                    ) {
+                        Ok(true) => {}
+                        Ok(false) => {
+                            eprintln!("missing integration test: {}", method.name);
+                            failures += 1;
+                        }
+                        Err(e) => {
+                            eprintln!("{}", e);
+                            failures += 1;
+                        }
+                    };
                 }
             }
             Status::Untested => {
@@ -210,9 +219,14 @@ fn verify_status(version: Version, test_output: Option<&String>) -> Result<()> {
 
                 // Make sure we didn't forget to mark as tested after implementing integration test.
                 if let Some(test_output) = test_output {
-                    if check_integration_test_crate::test_exists(version, &method.name, test_output)
-                        .is_ok()
-                    {
+                    if matches!(
+                        check_integration_test_crate::test_exists(
+                            version,
+                            &method.name,
+                            test_output
+                        ),
+                        Ok(true)
+                    ) {
                         eprintln!("found integration test for untested method: {}", method.name);
                         failures += 1;
                     }
@@ -365,7 +379,7 @@ mod check_integration_test_crate {
         let file = File::open(&path)
             .with_context(|| format!("Failed to open test output file {}", path.display()))?;
         let reader = io::BufReader::new(file);
-        let test_re = Regex::new(r"test ([a-z_]+) ... ok")?;
+        let test_re = Regex::new(r"test ([a-z_]+) \.\.\. (ok|FAILED)")?;
 
         for line in reader.lines() {
             let line = line?;
