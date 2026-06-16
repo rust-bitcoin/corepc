@@ -245,7 +245,7 @@ fn hidden__reconsider_block() {
         "height should decrease by 1 after invalidating the tip block"
     );
 
-    node.client.reconsider_block(tip_before).expect("reconsiderblock");
+    let _: () = node.client.reconsider_block(tip_before).expect("reconsiderblock");
 
     let tip_after_reconsider =
         node.client.best_block_hash().expect("bestblockhash after reconsider");

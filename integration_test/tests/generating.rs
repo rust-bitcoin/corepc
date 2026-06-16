@@ -110,7 +110,7 @@ fn generating__invalidate_block() {
         node.client.get_best_block_hash().expect("getbestblockhash").into_model().unwrap().0;
     assert_ne!(old_best_block, new_best_block);
 
-    node.client.invalidate_block(new_best_block).expect("invalidateblock");
+    let _: () = node.client.invalidate_block(new_best_block).expect("invalidateblock");
 
     let json: GetBestBlockHash = node.client.get_best_block_hash().expect("getbestblockhash");
     let model: Result<mtype::GetBestBlockHash, hex::HexToArrayError> = json.into_model();
