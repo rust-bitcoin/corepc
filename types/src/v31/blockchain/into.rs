@@ -4,18 +4,19 @@ use alloc::collections::BTreeMap;
 
 use bitcoin::consensus::encode;
 use bitcoin::{
-    block, Amount, BlockHash, CompactTarget, OutPoint, Target, Transaction, TxMerkleNode, Txid,
-    Weight, Work, Wtxid,
+    absolute, block, transaction, Amount, BlockHash, CompactTarget, OutPoint, ScriptBuf, Sequence,
+    Target, Transaction, TxMerkleNode, Txid, Weight, Work, Wtxid,
 };
 
 use super::{
-    CoinbaseTransaction, GetBlockVerboseOne, GetBlockVerboseOneError, GetBlockVerboseThree,
-    GetBlockVerboseThreeError, GetBlockVerboseTwo, GetBlockVerboseTwoError, GetDeploymentInfo,
-    GetDeploymentInfoError, GetMempoolAncestorsVerbose, GetMempoolCluster, GetMempoolClusterError,
-    GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolFeerateDiagram,
-    GetMempoolFeerateDiagramError, GetMempoolInfo, GetMempoolInfoError, GetRawMempoolVerbose,
-    GetTxSpendingPrevout, GetTxSpendingPrevoutError, GetTxSpendingPrevoutItem,
-    MapMempoolEntryError, MempoolEntry, MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError,
+    CoinbaseTransaction, CoinbaseTransactionError, GetBlockVerboseOne, GetBlockVerboseOneError,
+    GetBlockVerboseThree, GetBlockVerboseThreeError, GetBlockVerboseTwo, GetBlockVerboseTwoError,
+    GetDeploymentInfo, GetDeploymentInfoError, GetMempoolAncestorsVerbose, GetMempoolCluster,
+    GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
+    GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError, GetMempoolInfo, GetMempoolInfoError,
+    GetRawMempoolVerbose, GetTxSpendingPrevout, GetTxSpendingPrevoutError,
+    GetTxSpendingPrevoutItem, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
+    MempoolEntryFees, MempoolEntryFeesError,
 };
 use crate::model;
 
@@ -269,14 +270,20 @@ impl GetTxSpendingPrevoutItem {
 
 impl CoinbaseTransaction {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> model::CoinbaseTransaction {
-        model::CoinbaseTransaction {
-            version: self.version,
-            locktime: self.locktime,
-            sequence: self.sequence,
-            coinbase: self.coinbase,
-            witness: self.witness,
-        }
+    pub fn into_model(self) -> Result<model::CoinbaseTransaction, CoinbaseTransactionError> {
+        use CoinbaseTransactionError as E;
+
+        let coinbase = ScriptBuf::from_hex(&self.coinbase).map_err(E::Coinbase)?;
+        let witness = self
+            .witness
+            .map(|w| crate::witness_from_hex_slice(&[w]))
+            .transpose()
+            .map_err(E::Witness)?;
+        let version = transaction::Version::non_standard(self.version);
+        let locktime = absolute::LockTime::from_consensus(self.locktime);
+        let sequence = Sequence::from_consensus(self.sequence);
+
+        Ok(model::CoinbaseTransaction { version, locktime, sequence, coinbase, witness })
     }
 }
 
@@ -311,7 +318,7 @@ impl GetBlockVerboseOne {
             .transpose()
             .map_err(E::NextBlockHash)?;
         let size = crate::to_u32(self.size, "size")?;
-        let coinbase_tx = Some(self.coinbase_tx.into_model());
+        let coinbase_tx = Some(self.coinbase_tx.into_model().map_err(E::CoinbaseTx)?);
         let height = crate::to_u32(self.height, "height")?;
         let time = crate::to_u32(self.time, "time")?;
         let nonce = crate::to_u32(self.nonce, "nonce")?;
@@ -377,7 +384,7 @@ impl GetBlockVerboseTwo {
             .transpose()
             .map_err(E::NextBlockHash)?;
         let size = crate::to_u32(self.size, "size")?;
-        let coinbase_tx = Some(self.coinbase_tx.into_model());
+        let coinbase_tx = Some(self.coinbase_tx.into_model().map_err(E::CoinbaseTx)?);
         let height = crate::to_u32(self.height, "height")?;
         let time = crate::to_u32(self.time, "time")?;
         let nonce = crate::to_u32(self.nonce, "nonce")?;
@@ -423,7 +430,8 @@ impl GetBlockVerboseThree {
             .tx
             .into_iter()
             .map(|entry| {
-                let (transaction, prevouts) = entry.transaction.into_model_with_prevouts()?;
+                let (transaction, prevouts) =
+                    entry.transaction.into_model_with_prevouts().map_err(E::Transaction)?;
                 let fee = entry.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
                 Ok(model::GetBlockVerboseThreeTransaction { transaction, prevouts, fee })
             })
@@ -443,7 +451,7 @@ impl GetBlockVerboseThree {
             .transpose()
             .map_err(E::NextBlockHash)?;
         let size = crate::to_u32(self.size, "size")?;
-        let coinbase_tx = Some(self.coinbase_tx.into_model());
+        let coinbase_tx = Some(self.coinbase_tx.into_model().map_err(E::CoinbaseTx)?);
         let height = crate::to_u32(self.height, "height")?;
         let time = crate::to_u32(self.time, "time")?;
         let nonce = crate::to_u32(self.nonce, "nonce")?;

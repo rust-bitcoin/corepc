@@ -253,13 +253,14 @@ mod wallet;
 #[doc(inline)]
 pub use self::{
     blockchain::{
-        Chunk, CoinbaseTransaction, FeerateDiagramEntry, GetBlockVerboseOne, GetBlockVerboseThree,
-        GetBlockVerboseTwo, GetDeploymentInfo, GetMempoolAncestorsVerbose, GetMempoolCluster,
-        GetMempoolClusterError, GetMempoolDescendantsVerbose, GetMempoolEntry,
-        GetMempoolFeerateDiagram, GetMempoolFeerateDiagramError, GetMempoolInfo,
-        GetRawMempoolVerbose, GetTxSpendingPrevout, GetTxSpendingPrevoutError,
-        GetTxSpendingPrevoutItem, MapMempoolEntryError, MempoolEntry, MempoolEntryError,
-        MempoolEntryFees, MempoolEntryFeesError,
+        Chunk, CoinbaseTransaction, CoinbaseTransactionError, FeerateDiagramEntry,
+        GetBlockVerboseOne, GetBlockVerboseOneError, GetBlockVerboseThree,
+        GetBlockVerboseThreeError, GetBlockVerboseTwo, GetBlockVerboseTwoError, GetDeploymentInfo,
+        GetMempoolAncestorsVerbose, GetMempoolCluster, GetMempoolClusterError,
+        GetMempoolDescendantsVerbose, GetMempoolEntry, GetMempoolFeerateDiagram,
+        GetMempoolFeerateDiagramError, GetMempoolInfo, GetRawMempoolVerbose, GetTxSpendingPrevout,
+        GetTxSpendingPrevoutError, GetTxSpendingPrevoutItem, MapMempoolEntryError, MempoolEntry,
+        MempoolEntryError, MempoolEntryFees, MempoolEntryFeesError,
     },
     control::Logging,
     network::{ConnectionType, GetPeerInfo, PeerInfo, TransportProtocolType},
@@ -353,9 +354,8 @@ pub use crate::{
     },
     v29::{
         ActivityEntry, ChainState, DeriveAddressesMultipath, GetBlockHeader, GetBlockHeaderError,
-        GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockVerboseOneError,
-        GetBlockVerboseThreeError, GetBlockVerboseThreePrevout, GetBlockVerboseThreeTransaction,
-        GetBlockVerboseTwoError, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
+        GetBlockHeaderVerbose, GetBlockHeaderVerboseError, GetBlockVerboseThreePrevout,
+        GetBlockVerboseThreeTransaction, GetBlockVerboseTwoTransaction, GetBlockchainInfo,
         GetBlockchainInfoError, GetChainStates, GetChainStatesError, GetDescriptorActivity,
         GetDescriptorActivityError, GetDescriptorInfo, GetOrphanTxsError,
         GetOrphanTxsVerboseOneEntryError, GetOrphanTxsVerboseTwoEntryError,
