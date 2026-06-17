@@ -23,14 +23,20 @@
 //!   (backlog #1). The shim throws the value away, so the models cannot match.
 //! - `decodescript`: the canonical `model::DecodeScript` is stale vs Core v30 (backlog #2), so the
 //!   two sides legitimately disagree on the nested `segwit` data.
-//! - `decodepsbt`: the generated `into_model` still has a `todo!()` where it would reconstruct the
-//!   `Psbt` from its decoded parts (there is a `reconstruct` helper for `Transaction` but not yet
-//!   for `Psbt`). Left half-done on purpose, so the conversion panics rather than fabricating a
-//!   wrong value. (`decoderawtransaction` and `gettransaction.decoded` now reconstruct fine.)
 //! - `gettransaction`: the hand-written raw type models `mempool_conflicts` as `Option<Vec<_>>` (so
 //!   an omitted empty list is `None`), while the generated raw types it as a defaulting `Vec` (so it
 //!   is `Some([])`). Both are valid `Option<Vec<Txid>>` readings of "no mempool conflicts"; the
 //!   generated conversion is correct, it just disagrees with the hand-written representation here.
+//! - `getblockstats`: the `total_weight` / `segwit_total_weight` fields are diffed with the two
+//!   weight fields cleared. Core reports these as raw BIP141 weight units, so the generated code
+//!   uses `Weight::from_wu`; the hand-written conversion uses `Weight::from_vb` (which multiplies by
+//!   4), giving a 4x-too-large value (backlog #5). Every other field is compared directly.
+//! - `getrawmempool`: the hand-written client splits the three response shapes into separate typed
+//!   methods (each producing one of `model::GetRawMempool` / `GetRawMempoolVerbose` /
+//!   `GetRawMempoolSequence`), while the generated client returns a single untagged
+//!   `model::GetRawMempoolResult` enum (the `oneOf` is selected by two parameters, so the verbose
+//!   splitter cannot pick a variant at the type level). The two sides have different model types by
+//!   design, so they are not diffed here.
 
 #![cfg(all(feature = "v30_and_below", not(feature = "v29_and_below")))]
 #![allow(non_snake_case)]
@@ -562,6 +568,145 @@ fn diff__scan_tx_out_set() {
     assert_into_model_agrees!(
         node.client.scan_tx_out_set_start(&[&scan_desc]).expect("scantxoutset start"),
         types::v30::generated::ScanTxOutSetVariant0,
+    );
+}
+
+// == Util ==
+
+#[test]
+fn diff__validate_address() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    let address = node.client.new_address().expect("newaddress");
+    assert_into_model_agrees!(
+        node.client.validate_address(&address).expect("validateaddress"),
+        types::v30::generated::ValidateAddress,
+    );
+}
+
+// == Wallet: listsinceblock ==
+
+#[test]
+fn diff__list_since_block() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    node.client.send_to_address(&addr, Amount::from_sat(7_000)).expect("sendtoaddress");
+    node.mine_a_block();
+    assert_into_model_agrees!(
+        node.client.list_since_block().expect("listsinceblock"),
+        types::v30::generated::ListSinceBlock,
+    );
+}
+
+// == Blockchain: getblockstats ==
+//
+// Diffed field-by-field with the two weight fields cleared: the hand-written conversion uses
+// `Weight::from_vb` (4x too large) while the generated one correctly uses `Weight::from_wu`. See
+// the module docs and `corepc_bugs_backlog.md` #5.
+#[test]
+fn diff__get_block_stats() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _txid) = node.create_mined_transaction();
+    let hash = node.client.best_block_hash().expect("best_block_hash");
+
+    let sync_raw = node.client.get_block_stats_by_block_hash(&hash, None).expect("getblockstats");
+    let mut value =
+        bitcoind::serde_json::to_value(&sync_raw).expect("serialize the sync raw response");
+    strip_nulls(&mut value);
+    let gen_raw: types::v30::generated::GetBlockStats = bitcoind::serde_json::from_value(value)
+        .expect("generated raw type is wire-compatible with the sync raw type");
+
+    let mut sync_model = sync_raw.into_model().expect("hand-written into_model");
+    let mut gen_model = gen_raw.into_model().expect("generated into_model");
+    // The weight fields legitimately diverge (hand-written bug, backlog #5); compare the rest.
+    sync_model.total_weight = None;
+    gen_model.total_weight = None;
+    sync_model.segwit_total_weight = None;
+    gen_model.segwit_total_weight = None;
+    assert_eq!(sync_model, gen_model, "generated into_model disagrees with the hand-written one");
+}
+
+// == Wallet: listaddressgroupings ==
+
+#[test]
+fn diff__list_address_groupings() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    node.client.send_to_address(&addr, Amount::from_sat(20_000)).expect("sendtoaddress");
+    node.mine_a_block();
+    assert_into_model_agrees!(
+        node.client.list_address_groupings().expect("listaddressgroupings"),
+        types::v30::generated::ListAddressGroupings,
+    );
+}
+
+// == Blockchain: getblock verbosity 2 ==
+
+#[test]
+fn diff__get_block_verbose_two() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _txid) = node.create_mined_transaction();
+    let hash = node.client.best_block_hash().expect("best_block_hash");
+    assert_into_model_agrees!(
+        node.client.get_block_verbose_two(hash).expect("getblock verbose=2"),
+        types::v30::generated::GetBlockVerbose2,
+    );
+}
+
+// == Blockchain: getdescriptoractivity ==
+//
+// Only a `receive` activity is exercised: Core's wire field for a spend is `spend_vin`, but the
+// hand-written `SpendActivity` raw type names it `spend_vout` with no rename (backlog #6), so it
+// cannot deserialize a real spend entry. A freshly funded, unspent address yields receives only.
+#[test]
+fn diff__get_descriptor_activity() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &["-coinstatsindex=1", "-txindex=1"]);
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    node.client.send_to_address(&addr, Amount::from_sat(50_000)).expect("sendtoaddress");
+    node.mine_a_block();
+    let block_hash = node.client.best_block_hash().expect("best_block_hash");
+    let scan = format!("addr({})", addr);
+    assert_into_model_agrees!(
+        node.client
+            .get_descriptor_activity(&[block_hash], &[scan.as_str()])
+            .expect("getdescriptoractivity"),
+        types::v30::generated::GetDescriptorActivity,
+    );
+}
+
+// == Blockchain: getblock verbosity 3 ==
+
+#[test]
+fn diff__get_block_verbose_three() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let (_address, _txid) = node.create_mined_transaction();
+    let hash = node.client.best_block_hash().expect("best_block_hash");
+    assert_into_model_agrees!(
+        node.client.get_block_verbose_three(hash).expect("getblock verbose=3"),
+        types::v30::generated::GetBlockVerbose3,
+    );
+}
+
+// == Raw transactions: decodepsbt ==
+
+#[test]
+fn diff__decode_psbt() {
+    let node = BitcoinD::with_wallet(Wallet::Default, &[]);
+    node.fund_wallet();
+    let addr = node.client.new_address().expect("newaddress");
+    let outputs = std::collections::BTreeMap::from([(addr, Amount::from_sat(100_000))]);
+    let funded = node
+        .client
+        .wallet_create_funded_psbt(vec![], vec![outputs])
+        .expect("walletcreatefundedpsbt");
+    assert_into_model_agrees!(
+        node.client.decode_psbt(&funded.psbt).expect("decodepsbt"),
+        types::v30::generated::DecodePsbt,
     );
 }
 

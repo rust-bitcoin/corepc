@@ -1,0 +1,56 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug 'btc-codegen' (prompt for version)",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=btc-codegen",
+                    "--package=btc-codegen"
+                ],
+                "filter": {
+                    "name": "btc-codegen",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "${input:codegenVersion}"
+            ],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug 'btc-codegen' (all)",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=btc-codegen",
+                    "--package=btc-codegen"
+                ],
+                "filter": {
+                    "name": "btc-codegen",
+                    "kind": "bin"
+                }
+            },
+            "args": [
+                "all"
+            ],
+            "cwd": "${workspaceFolder}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "codegenVersion",
+            "type": "promptString",
+            "description": "Spec version to regenerate (e.g. 30) or 'all'",
+            "default": "30"
+        }
+    ]
+}

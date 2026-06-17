@@ -59,6 +59,87 @@ pub fn transaction<T: Serialize>(value: &T) -> Result<Transaction, ReconstructEr
     raw.to_transaction().map_err(ReconstructError::Transaction)
 }
 
+/// Error rebuilding a `bitcoin::Psbt` from a generated decoded `decodepsbt` response.
+#[derive(Debug)]
+pub enum ReconstructPsbtError {
+    /// Bridging the generated type through JSON into `RawPsbt` failed.
+    Bridge(serde_json::Error),
+    /// Assembling the `bitcoin::Psbt` from the decoded parts failed.
+    Psbt(crate::psbt::RawPsbtError),
+}
+
+impl fmt::Display for ReconstructPsbtError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Bridge(e) => write!(f, "bridging the decoded psbt through JSON failed: {e}"),
+            Self::Psbt(e) => write!(f, "assembling the psbt from decoded parts failed: {e}"),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl std::error::Error for ReconstructPsbtError {}
+
+/// Rebuilds a `bitcoin::Psbt` from a generated decoded `decodepsbt` response type.
+///
+/// Bridges `value` through JSON into the shared [`crate::psbt::RawPsbt`] (dropping `null` members),
+/// then assembles the PSBT with [`crate::psbt::RawPsbt::into_psbt`].
+pub fn psbt<T: Serialize>(value: &T) -> Result<bitcoin::Psbt, ReconstructPsbtError> {
+    let mut json = serde_json::to_value(value).map_err(ReconstructPsbtError::Bridge)?;
+    strip_nulls(&mut json);
+    let raw: crate::psbt::RawPsbt =
+        serde_json::from_value(json).map_err(ReconstructPsbtError::Bridge)?;
+    raw.into_psbt().map_err(ReconstructPsbtError::Psbt)
+}
+
+/// Re-types a flattened map of decoded fields (a `#[serde(flatten)]` "extra" bag) as a generated
+/// raw response type `T`.
+///
+/// `getblock` verbosity 2 nests each transaction as a flat `getrawtransaction`-verbose object that
+/// the generated raw type captures in an untyped `extra` map. This re-serialises that map and
+/// deserialises it into `T` (dropping `null` members the curated types emit, which the generated
+/// `deny_unknown_fields` types would otherwise reject), so the caller can run `T::into_model`.
+pub fn from_flat_fields<T: serde::de::DeserializeOwned>(
+    fields: &std::collections::BTreeMap<String, Value>,
+) -> Result<T, serde_json::Error> {
+    let mut json = serde_json::to_value(fields)?;
+    strip_nulls(&mut json);
+    serde_json::from_value(json)
+}
+
+/// Re-types a `getblock` verbosity-3 transaction as a generated verbose-tx type `T`.
+///
+/// Verbosity 3 pulls each input's `vin` entry out of the flattened tx body (to attach per-input
+/// `prevout` data), so the leftover `extra` map lacks `vin` and carries a block-only `fee` member.
+/// This rebuilds the `getrawtransaction`-verbose object: drop `fee`, re-insert `vin` (each input
+/// minus its `prevout`), then deserialise into `T` so the caller can run `T::into_model`.
+pub fn block_verbose3_tx<T, V>(
+    extra: &std::collections::BTreeMap<String, Value>,
+    vin: &[V],
+) -> Result<T, serde_json::Error>
+where
+    T: serde::de::DeserializeOwned,
+    V: Serialize,
+{
+    let vins = vin
+        .iter()
+        .map(|v| {
+            let mut vv = serde_json::to_value(v)?;
+            if let Value::Object(m) = &mut vv {
+                m.remove("prevout");
+            }
+            Ok(vv)
+        })
+        .collect::<Result<Vec<_>, serde_json::Error>>()?;
+    let mut obj = serde_json::to_value(extra)?;
+    if let Value::Object(m) = &mut obj {
+        m.remove("fee");
+        m.insert("vin".to_owned(), Value::Array(vins));
+    }
+    strip_nulls(&mut obj);
+    serde_json::from_value(obj)
+}
+
 /// Recursively drops object members whose value is JSON `null`.
 fn strip_nulls(value: &mut Value) {
     match value {

@@ -243,7 +243,7 @@
 //! </details>
 
 mod blockchain;
-pub mod generated;
+// pub mod generated;
 mod hidden;
 mod mining;
 mod raw_transactions;

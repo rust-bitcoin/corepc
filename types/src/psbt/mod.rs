@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
+mod decode;
 mod error;
 
 use std::collections::{BTreeMap, HashMap};
@@ -11,6 +12,7 @@ use bitcoin::{
 };
 use serde::{Deserialize, Serialize};
 
+pub use self::decode::{RawPsbt, RawPsbtError};
 pub use self::error::{
     Bip32DerivError, PartialSignatureError, RawTransactionError, RawTransactionInputError,
     RawTransactionOutputError, WitnessUtxoError,

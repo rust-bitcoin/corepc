@@ -866,6 +866,24 @@ pub struct FeerateDiagramEntry {
     pub fee: Amount,
 }
 
+/// Models the result of JSON-RPC method `getrawmempool` regardless of the arguments it was called
+/// with.
+///
+/// `getrawmempool` selects one of three response shapes from two arguments (`verbose` and
+/// `mempool_sequence`); the async client returns this enum because it cannot know which shape the
+/// node will pick at the type level. The hand-written (sync) client splits these into separate typed
+/// methods instead, so each variant here wraps the matching single-shape model type.
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum GetRawMempoolResult {
+    /// `verbose=false`: a plain list of transaction ids.
+    List(GetRawMempool),
+    /// `verbose=true`: a map of transaction id to mempool entry.
+    Verbose(GetRawMempoolVerbose),
+    /// `verbose=false, mempool_sequence=true`: the id list plus the mempool sequence value.
+    Sequence(GetRawMempoolSequence),
+}
+
 /// Models the result of JSON-RPC method `gettxout`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetTxOut {

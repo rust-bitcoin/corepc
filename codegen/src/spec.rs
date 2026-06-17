@@ -99,7 +99,7 @@ impl SchemaType {
 #[serde(untagged)]
 pub enum AdditionalProperties {
     Schema(Box<Schema>),
-    Bool(#[allow(dead_code)] bool),
+    Bool(bool),
 }
 
 /// JSON Schema `items`: a single schema or a tuple array.

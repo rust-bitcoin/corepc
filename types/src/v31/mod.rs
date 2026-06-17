@@ -246,6 +246,7 @@
 
 mod blockchain;
 mod control;
+pub mod generated;
 mod network;
 mod raw_transactions;
 mod wallet;

@@ -33,9 +33,11 @@ client-async = ["jsonrpc", "jsonrpc/bitreq_http_async", "30_0"]
 # async transport.
 blocking = ["client-sync", "client-async", "dep:tokio"]
 
-# Bitcoin Core version selection for the async client. v30 is the only generated
-# version today; more features are added here as their bindings are generated.
+# Bitcoin Core version selection for the async client. Exactly one is active; when several are
+# enabled (e.g. docs.rs `all-features`) the highest wins via the `cfg` precedence in
+# `client_async`. More features are added here as their bindings are generated.
 "30_0" = []
+"31_0" = []
 
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }

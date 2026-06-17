@@ -47,12 +47,13 @@ latest = ["31_0"]
 download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "bitreq", "zip"]
 
 # Back `node.client` with the async production client (via its blocking facade) instead of the sync
-# client. Only meaningful with the `30_2` version feature (the async client targets v30). Lets the
-# integration tests run unchanged against the async client.
+# client. Paired with a version feature (`30_2` or `31_0`); the facade targets that version's
+# generated async client. Lets the integration tests run unchanged against the async client.
 client-async = ["corepc-client/blocking"]
 
 # We support all minor releases of the latest three versions.
-31_0 = ["30_2"]
+# `31_0` also selects the v31 async bindings, so `31_0 + client-async` exercises the v31 async client.
+31_0 = ["30_2", "corepc-client/31_0"]
 30_2 = ["29_0"]
 # No `30_0` or `30_1` because of wallet migration bug.
 29_0 = ["28_2"]

@@ -7,19 +7,25 @@ is committed; the generator is not part of the consumers' build.
 It does not execute RPC calls. It emits response types, their model conversions, and the async call
 surface that the consumers compile.
 
-A small compiler: `src/spec.rs` (front end) deserializes the OpenRPC subset used; `codegen.rs::lower()`
-(middle) converts it to generator-owned data; `Modules::write()` (back end) emits the files.
-`src/names.rs` handles identifier splitting, `main.rs` is the CLI. `btc-codegen` is a private
-workspace member depending only on `serde` + `serde_json`. Specs live in `specs/` (one per release
-v17..v31, from a Core patch adding `getopenrpcinfo`).
+A small compiler: `src/spec.rs` (front end) deserializes the OpenRPC subset used; `codegen/lower.rs`
+(middle) converts it to generator-owned data (the `Modules` IR, in `codegen/mod.rs`); `codegen/emit.rs`
+(back end, `Modules::write()`) emits the files. `src/into_model/` generates the `into_model`
+conversions (tables, the conversion engine, emission). `src/names.rs` handles identifier splitting,
+`main.rs` is the CLI. `btc-codegen` is a private workspace member depending only on `serde` +
+`serde_json`. Specs live in `specs/` (one per release v17..v31, from a Core patch adding
+`getopenrpcinfo`).
 
 ## Flow
 
 `main.rs` resolves the version and `find_spec()` picks `specs/v{version}_*_openrpc.json`. `generate()`
 parses it, `lower()` builds `Modules`, `Modules::write()` emits per Core help category:
 
-- `types/src/v{N}/generated/{category}.rs`: response structs, tuple newtypes, nested helpers.
-- `types/src/v{N}/generated/model/{category}.rs`: model counterparts (`into_model()`, `*Error`).
+- `types/src/v{N}/generated/{category}/mod.rs`: response structs, tuple newtypes, nested helpers
+  (a flat `{category}.rs` when the category has no conversions).
+- `types/src/v{N}/generated/{category}/into.rs`: the `into_model()` conversions into the shared
+  `crate::model` types, plus each conversion's `*Error` enum.
+- `types/src/v{N}/generated/compatibility.rs`: hand-shaped shims for canonical types codegen knows
+  are wrong (see `corepc_bugs_backlog.md`).
 - `client/src/client_async/v{N}/{category}.rs`: `*Options` structs, param helpers, `impl Client`.
 - `mod.rs` for both trees.
 
@@ -81,12 +87,21 @@ entries, Rust keywords get an `_` suffix, and snake/camelCase is handled before 
 `RESERVED_TYPE_NAMES` rewrites prelude collisions (`Send`->`SendResult`, `Vec`->`VecResult`,
 `Result`->`ResultResponse`, and so on) for both the type def and the return type.
 
-## Model layer
+## Model conversions
 
-Each raw type gets a same-named model counterpart converted via `into_model()`; semantic strings
-(hashes, addresses, amounts) become `rust-bitcoin` types. Fallibility is a fixpoint over the types;
-fallible ones get a `{Type}Error` enum (one variant per failing field), pure passthroughs become
-`pub type` aliases.
+`src/into_model/` emits `RawType::into_model()` into the shared, hand-written `crate::model` types
+(it does not generate the model types themselves). It reads two shapes and bridges them: the raw
+type's fields and the canonical `crate::model` type's fields (parsed from the model source). Fields
+match by a normalized name key, and the target type comes from the canonical struct, so per-RPC
+quirks need no special casing. Per-pair conversion expressions (`String -> BlockHash`, `f64 ->
+Amount`, ...) come from generic rules, with `Option`/`Vec`/`BTreeMap` wrappers handled around them.
+Each conversion gets a `{Type}Error` enum (one variant per failing field, plus a shared `Numeric`).
+
+Escape hatches are small override tables: `TYPE_ALIAS`/`FIELD_ALIAS` (naming the normalizer can't
+bridge), `RECONSTRUCT`/`TYPE_RECONSTRUCT`/`ENUM_RECONSTRUCT` (values built from several raw fields, a
+whole `Psbt`, or the `getrawmempool` union), and `COMPAT` (a canonical type codegen knows is wrong,
+routed through a `compatibility.rs` shim so the crate still builds). Every response type with a
+`crate::model` counterpart is generated; one with no counterpart is skipped.
 
 ## Docs
 
@@ -96,7 +111,10 @@ the text close to upstream for review.
 
 ## Tests
 
-Inline in `codegen.rs` / `names.rs`: name splitting, keyword handling, doc escaping, number
-classification, verbose suffix detection, structural dedup, options emission, reserved-name rewrites,
-and an end-to-end `lower()` over v30. Real acceptance is external: regenerate (`just codegen 30`),
-build the workspace, run the consumer suites against a real `bitcoind`.
+Inline in `codegen.rs` / `names.rs` / `into_model.rs`: name splitting, keyword handling, doc
+escaping, number classification, verbose suffix detection, structural dedup, options emission,
+reserved-name rewrites, an end-to-end `lower()` over v30, and the `into_model` rule engine (type-pair
+rules, wrappers, error enums, and `generate_category` over a synthetic model dir). The generated
+conversions are also exercised node-free in `types/tests/into_model.rs`. Real acceptance is external:
+regenerate (`just codegen 30`), build the workspace, run the consumer suites against a real
+`bitcoind`.

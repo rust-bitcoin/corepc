@@ -6,22 +6,21 @@
 
 #![allow(unused_imports)] // Not all users need the json types.
 
-#[cfg(feature = "31_0")]
+// Under `client-async`, `Client` is the blocking facade over the async production client. The facade
+// is version-generic: it exposes the active version's method surface (same names, args, curated
+// return types), so the integration tests run unchanged but exercise the async transport. Without
+// `client-async`, `Client` is the sync client for the same version. The `blocking::*` glob also
+// re-exports the facade's `vtype` shim module.
+#[cfg(all(feature = "31_0", not(feature = "client-async")))]
 pub use corepc_client::{client_sync::v31::*, types::v31 as vtype};
+#[cfg(all(feature = "31_0", feature = "client-async"))]
+pub use corepc_client::client_async::blocking::*;
 
 #[cfg(all(feature = "30_2", not(feature = "31_0"), not(feature = "client-async")))]
 pub use corepc_client::{client_sync::v30::*, types::v30 as vtype};
 
-// With `client-async`, `Client` is the blocking facade over the async production client. It exposes
-// the identical `v30` method surface (same names, args, curated return types), so the integration
-// tests run unchanged but exercise the async transport.
-//
-// The `not(feature = "31_0")` guard is what makes `--all-features` resolve to the sync client: under
-// `--all-features` every version feature is on (including `31_0`), so this branch is disabled and the
-// `31_0` sync re-export above wins. `client-async` is meant to be paired with `30_2` alone; combining
-// it with a higher version silently falls back to that version's sync client rather than erroring.
 #[cfg(all(feature = "30_2", not(feature = "31_0"), feature = "client-async"))]
-pub use corepc_client::{client_async::blocking::*, types::v30 as vtype};
+pub use corepc_client::client_async::blocking::*;
 
 #[cfg(all(feature = "29_0", not(feature = "30_2")))]
 pub use corepc_client::{client_sync::v29::*, types::v29 as vtype};
@@ -67,16 +66,16 @@ pub use corepc_client::{client_sync::v17::*, types::v17 as vtype};
 #[cfg(not(feature = "0_17_2"))] // Remember: later version features enable earlier ones.
 pub use corepc_client::{client_sync::v28::*, types::v28 as vtype};
 
-// Guards the `--all-features` => sync-client contract above. This combination of features is only
-// active under `--all-features` (every version on, so `31_0` wins and disables the `client-async`
-// re-export). The body never runs; the assignment only has to type-check, which it does iff
-// `Client` is the sync `v31` client. Inert in every single-version build.
+// Guards the `31_0 + client-async` => async-facade wiring above (the combination `--all-features`
+// resolves to: every version on, so `31_0` wins, and `client-async` selects the blocking facade).
+// The body never runs; the assignment only has to type-check, which it does iff `Client` is the
+// async blocking facade. Inert in every build without both features.
 #[cfg(all(test, feature = "31_0", feature = "client-async"))]
 #[test]
-fn all_features_surfaces_the_sync_client() {
+fn async_features_surface_the_blocking_facade() {
     #[allow(unreachable_code, unused_variables)]
     fn _assert() {
-        let sync: corepc_client::client_sync::v31::Client = unimplemented!();
-        let surfaced: crate::Client = sync;
+        let facade: corepc_client::client_async::blocking::Client = unimplemented!();
+        let surfaced: crate::Client = facade;
     }
 }

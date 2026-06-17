@@ -211,7 +211,8 @@ macro_rules! impl_client_v17__get_new_address {
                     (Some(label), Some(ty)) =>
                         self.call("getnewaddress", &[into_json(label)?, into_json(ty)?]),
                     (Some(label), None) => self.call("getnewaddress", &[into_json(label)?]),
-                    (None, Some(ty)) => self.call("getnewaddress", &["".into(), into_json(AddressType::Legacy)?]),
+                    (None, Some(ty)) =>
+                        self.call("getnewaddress", &["".into(), into_json(AddressType::Legacy)?]),
                     (None, None) => self.call("getnewaddress", &[]),
                 }
             }

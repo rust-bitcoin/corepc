@@ -173,22 +173,31 @@ pub struct GetAddressInfo {
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum ScriptType {
     /// Non-standard output script type.
+    #[serde(rename = "nonstandard")]
     NonStandard,
     /// PubKey output script.
+    #[serde(rename = "pubkey")]
     PubKey,
     /// PubKey hash output script.
+    #[serde(rename = "pubkeyhash")]
     PubKeyHash,
     /// Script hash output script.
+    #[serde(rename = "scripthash")]
     ScriptHash,
     /// Multisig output script.
+    #[serde(rename = "multisig")]
     Multisig,
     /// Null data for output script.
+    #[serde(rename = "nulldata")]
     NullData,
     /// Witness version 0 key hash output script.
+    #[serde(rename = "witness_v0_keyhash")]
     WitnessV0KeyHash,
     /// Witness version 0 script hash output script.
+    #[serde(rename = "witness_v0_scripthash")]
     WitnessV0ScriptHash,
     /// Witness unknown for output script.
+    #[serde(rename = "witness_unknown")]
     WitnessUnknown,
 }
 
