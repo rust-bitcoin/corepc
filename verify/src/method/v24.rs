@@ -49,7 +49,7 @@ pub const METHODS: &[Method] = &[
     // mining
     Method::new_modelled("getblocktemplate", "GetBlockTemplate", "get_block_template"),
     Method::new_modelled("getmininginfo", "GetMiningInfo", "get_mining_info"),
-    Method::new_no_type("getnetworkhashps", "get_network_hashes_per_second"),
+    Method::new_no_type("getnetworkhashps", "get_network_hash_ps"),
     Method::new_no_type("prioritisetransaction", "prioritise_transaction"),
     Method::new_no_type("submitblock", "submit_block"),
     Method::new_no_type("submitheader", "submit_header"),
@@ -138,7 +138,7 @@ pub const METHODS: &[Method] = &[
     Method::new_no_type("importprivkey", "import_priv_key"),
     Method::new_no_type("importprunedfunds", "import_pruned_funds"),
     Method::new_no_type("importpubkey", "import_pubkey"),
-    Method::new_no_type("importwallet", "import_walet"),
+    Method::new_no_type("importwallet", "import_wallet"),
     Method::new_no_type("keypoolrefill", "keypool_refill"),
     Method::new_modelled("listaddressgroupings", "ListAddressGroupings", "list_address_groupings"),
     Method::new_no_model("listdescriptors", "ListDescriptors", "list_descriptors"),
