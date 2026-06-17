@@ -85,7 +85,7 @@
 //! | getmininginfo                      | version + model |                                        |
 //! | getnetworkhashps                   | returns numeric |                                        |
 //! | prioritisetransaction              | returns boolean |                                        |
-//! | submitblock                        | returns nothing |                                        |
+//! | submitblock                        | returns nothing | UNTESTED                               |
 //!
 //! </details>
 //!

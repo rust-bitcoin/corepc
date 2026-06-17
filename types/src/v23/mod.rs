@@ -79,7 +79,7 @@
 //! | getmininginfo                      | version + model |                                        |
 //! | getnetworkhashps                   | returns numeric |                                        |
 //! | prioritisetransaction              | returns boolean |                                        |
-//! | submitblock                        | returns nothing |                                        |
+//! | submitblock                        | returns nothing | UNTESTED                               |
 //! | submitheader                       | returns nothing |                                        |
 //!
 //! </details>
@@ -124,7 +124,7 @@
 //! | getrawtransaction                  | version + model | Includes additional 'verbose' type     |
 //! | joinpsbts                          | version + model |                                        |
 //! | sendrawtransaction                 | version + model |                                        |
-//! | signrawtransactionwithkey          | version + model |                                        |
+//! | signrawtransactionwithkey          | version + model | UNTESTED                               |
 //! | testmempoolaccept                  | version + model |                                        |
 //! | utxoupdatepsbt                     | version + model |                                        |
 //!
@@ -210,7 +210,7 @@
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |
-//! | setlabel                           | returns nothing |                                        |
+//! | setlabel                           | returns nothing | UNTESTED                               |
 //! | settxfee                           | version         |                                        |
 //! | setwalletflag                      | version         |                                        |
 //! | signmessage                        | version + model |                                        |
