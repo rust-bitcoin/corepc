@@ -242,8 +242,7 @@ fn get_tx_spending_prevout_for_unspent_output() {
     #[cfg(feature = "v30_and_below")]
     let json: GetTxSpendingPrevout = node.client.get_tx_spending_prevout(&outpoints).unwrap();
     #[cfg(not(feature = "v30_and_below"))]
-    let json: GetTxSpendingPrevout =
-        node.client.get_tx_spending_prevout(&outpoints, true, false).unwrap();
+    let json: GetTxSpendingPrevout = node.client.get_tx_spending_prevout(&outpoints).unwrap();
 
     assert_eq!(json.0.len(), 1);
     assert_eq!(json.0[0].txid, txid.to_string());

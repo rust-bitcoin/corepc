@@ -41,8 +41,6 @@ macro_rules! impl_client_v31__get_tx_spending_prevout {
             pub fn get_tx_spending_prevout(
                 &self,
                 outputs: &[bitcoin::OutPoint],
-                mempool_only: bool,
-                return_spending_tx: bool,
             ) -> Result<GetTxSpendingPrevout> {
                 let json_outputs: Vec<_> = outputs.iter().map(|out| {
                     serde_json::json!({
@@ -50,11 +48,7 @@ macro_rules! impl_client_v31__get_tx_spending_prevout {
                         "vout": out.vout,
                     })
                 }).collect();
-                let options = serde_json::json!({
-                    "mempool_only": mempool_only,
-                    "return_spending_tx": return_spending_tx,
-                });
-                self.call("gettxspendingprevout", &[json_outputs.into(), options])
+                self.call("gettxspendingprevout", &[json_outputs.into()])
             }
         }
     };
