@@ -383,10 +383,10 @@ macro_rules! impl_client_v17__import_wallet {
 
 /// Implements Bitcoin Core JSON-RPC API method `keypoolrefill`.
 #[macro_export]
-macro_rules! impl_client_v17__key_pool_refill {
+macro_rules! impl_client_v17__keypool_refill {
     () => {
         impl Client {
-            pub fn key_pool_refill(&self) -> Result<()> {
+            pub fn keypool_refill(&self) -> Result<()> {
                 match self.call("keypoolrefill", &[]) {
                     Ok(serde_json::Value::Null) => Ok(()),
                     Ok(res) => Err(Error::Returned(res.to_string())),

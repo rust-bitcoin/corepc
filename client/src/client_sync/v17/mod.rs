@@ -144,7 +144,7 @@ crate::impl_client_v17__import_privkey!();
 crate::impl_client_v17__import_pruned_funds!();
 crate::impl_client_v17__import_pubkey!();
 crate::impl_client_v17__import_wallet!();
-crate::impl_client_v17__key_pool_refill!();
+crate::impl_client_v17__keypool_refill!();
 crate::impl_client_v17__list_address_groupings!();
 crate::impl_client_v17__list_labels!();
 crate::impl_client_v17__list_lock_unspent!();

@@ -548,7 +548,7 @@ fn wallet__import_wallet() {
 fn wallet__keypool_refill() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
-    let _: () = node.client.key_pool_refill().expect("keypoolrefill");
+    let _: () = node.client.keypool_refill().expect("keypoolrefill");
 }
 
 #[test]

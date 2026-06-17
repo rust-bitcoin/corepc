@@ -162,7 +162,7 @@ pub const METHODS: &[Method] = &[
     Method::new_no_model("listlabels", "ListLabels", "list_labels"),
     Method::new_modelled("listlockunspent", "ListLockUnspent", "list_lock_unspent"),
     Method::new_no_model("migratewallet", "MigrateWallet", "migrate_wallet"),
-    Method::new_no_type("newkeypool", "new_key_pool"),
+    Method::new_no_type("newkeypool", "new_keypool"),
     Method::new_modelled("psbtbumpfee", "PsbtBumpFee", "psbt_bump_fee"),
     Method::new_modelled(
         "listreceivedbyaddress",
