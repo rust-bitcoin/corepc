@@ -298,7 +298,7 @@ fn wallet__get_balance__modelled() {
 
 #[test]
 #[cfg(not(feature = "v18_and_below"))]
-fn wallet__get_balances() {
+fn wallet__get_balances__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
@@ -1072,7 +1072,7 @@ fn wallet__sign_message__modelled() {
 
 #[test]
 #[cfg(not(feature = "v23_and_below"))]
-fn wallet__simulate_raw_transaction() {
+fn wallet__simulate_raw_transaction__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
