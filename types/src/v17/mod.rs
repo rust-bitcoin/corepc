@@ -159,15 +159,15 @@
 //! | dumpprivkey                        | version + model |                                        |
 //! | dumpwallet                         | version         |                                        |
 //! | encryptwallet                      | version         |                                        |
-//! | getaccount                         | returns nothing |                                        |
-//! | getaccountaddress                  | returns nothing |                                        |
-//! | getaddressbyaccount                | returns nothing |                                        |
+//! | getaccount                         | returns nothing | UNTESTED (deprecated)                  |
+//! | getaccountaddress                  | returns nothing | UNTESTED (deprecated)                  |
+//! | getaddressbyaccount                | returns nothing | UNTESTED (deprecated)                  |
 //! | getaddressesbylabel                | version + model |                                        |
 //! | getaddressinfo                     | version + model |                                        |
 //! | getbalance                         | version + model |                                        |
 //! | getnewaddress                      | version + model |                                        |
 //! | getrawchangeaddress                | version + model |                                        |
-//! | getreceivedbyaccount               | returns nothing |                                        |
+//! | getreceivedbyaccount               | returns nothing | UNTESTED (deprecated)                  |
 //! | getreceivedbyaddress               | version + model |                                        |
 //! | gettransaction                     | version + model |                                        |
 //! | getunconfirmedbalance              | version + model |                                        |
@@ -179,11 +179,11 @@
 //! | importpubkey                       | returns nothing |                                        |
 //! | importwallet                       | returns nothing |                                        |
 //! | keypoolrefill                      | returns nothing |                                        |
-//! | listaccounts                       | returns nothing |                                        |
+//! | listaccounts                       | returns nothing | UNTESTED (deprecated)                  |
 //! | listaddressgroupings               | version + model |                                        |
 //! | listlabels                         | version         |                                        |
 //! | listlockunspent                    | version + model |                                        |
-//! | listreceivedbyaccount              | returns nothing |                                        |
+//! | listreceivedbyaccount              | returns nothing | UNTESTED (deprecated)                  |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listsinceblock                     | version + model |                                        |
 //! | listtransactions                   | version + model |                                        |
@@ -191,13 +191,13 @@
 //! | listwallets                        | version + model |                                        |
 //! | loadwallet                         | version + model |                                        |
 //! | lockunspent                        | version         |                                        |
-//! | move                               | returns boolean |                                        |
+//! | move                               | returns boolean | UNTESTED (deprecated)                  |
 //! | removeprunedfunds                  | returns nothing |                                        |
 //! | rescanblockchain                   | version + model |                                        |
-//! | sendfrom                           | returns nothing |                                        |
+//! | sendfrom                           | returns nothing | UNTESTED (deprecated)                  |
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
-//! | setaccount                         | returns nothing |                                        |
+//! | setaccount                         | returns nothing | UNTESTED (deprecated)                  |
 //! | sethdseed                          | returns nothing |                                        |
 //! | settxfee                           | version         |                                        |
 //! | signmessage                        | version + model |                                        |
