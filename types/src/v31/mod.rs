@@ -267,7 +267,7 @@ pub use self::{
         AbortPrivateBroadcast, GetPrivateBroadcastInfo, PrivateBroadcastPeer,
         PrivateBroadcastTransaction, RemovedTransaction,
     },
-    wallet::GetWalletInfo,
+    wallet::{GetWalletInfo, GetWalletInfoError},
 };
 #[doc(inline)]
 pub use crate::{
@@ -366,11 +366,11 @@ pub use crate::{
     v30::{
         ControlBlocksError, DecodePsbt, DecodePsbtError, GetMiningInfo, GetMiningInfoError,
         GetOrphanTxs, GetOrphanTxsVerboseOne, GetOrphanTxsVerboseOneEntry, GetOrphanTxsVerboseTwo,
-        GetOrphanTxsVerboseTwoEntry, GetWalletInfoError, GetWalletInfoScanning, GlobalXpub,
-        GlobalXpubError, LastProcessedBlock, LastProcessedBlockError, ListWalletDir,
-        ListWalletDirWallet, Musig2PartialSig, Musig2ParticipantPubKeys, Musig2Pubnonce,
-        Proprietary, PsbtInput, PsbtInputError, PsbtOutput, PsbtOutputError, TaprootBip32Deriv,
-        TaprootBip32DerivsError, TaprootLeaf, TaprootLeafError, TaprootScript, TaprootScriptError,
-        TaprootScriptPathSig, TaprootScriptPathSigError,
+        GetOrphanTxsVerboseTwoEntry, GetWalletInfoScanning, GlobalXpub, GlobalXpubError,
+        LastProcessedBlock, LastProcessedBlockError, ListWalletDir, ListWalletDirWallet,
+        Musig2PartialSig, Musig2ParticipantPubKeys, Musig2Pubnonce, Proprietary, PsbtInput,
+        PsbtInputError, PsbtOutput, PsbtOutputError, TaprootBip32Deriv, TaprootBip32DerivsError,
+        TaprootLeaf, TaprootLeafError, TaprootScript, TaprootScriptError, TaprootScriptPathSig,
+        TaprootScriptPathSigError,
     },
 };

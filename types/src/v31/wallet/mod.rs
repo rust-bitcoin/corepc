@@ -4,11 +4,13 @@
 //!
 //! Types for methods found under the `== Wallet ==` section of the API docs.
 
+mod error;
 mod into;
 
 use serde::{Deserialize, Serialize};
 
-pub use super::{GetWalletInfoError, GetWalletInfoScanning, LastProcessedBlock};
+pub use self::error::GetWalletInfoError;
+pub use crate::v30::{GetWalletInfoScanning, LastProcessedBlock};
 
 /// Result of the JSON-RPC method `getwalletinfo`.
 ///
