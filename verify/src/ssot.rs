@@ -10,19 +10,15 @@
 
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use regex::Regex;
 
-use crate::Version;
-
-/// Path to the RPC SSOT file.
-pub fn path(version: Version) -> PathBuf { PathBuf::from(format!("./rpc-api-{}.txt", version)) }
+use crate::{paths, Version};
 
 /// Parses the Bitcoin Core docs (from SSOT file) and gets all the method names.
 pub fn all_methods(version: Version) -> Result<Vec<String>> {
-    let path = path(version);
+    let path = paths::ssot(version);
     let file = File::open(&path)
         .with_context(|| format!("Failed to grep for method names in {}", path.display()))?;
     let reader = io::BufReader::new(file);

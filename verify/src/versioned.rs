@@ -7,19 +7,13 @@
 use std::fmt;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::PathBuf;
 use std::str::FromStr;
 
 use anyhow::{Context, Result};
 use regex::Regex;
 
 use crate::method::{self, Return};
-use crate::Version;
-
-/// Path to the version specific module file.
-pub fn path(version: Version) -> PathBuf {
-    PathBuf::from(format!("../types/src/{}/mod.rs", version))
-}
+use crate::{paths, Version};
 
 /// Parses module rustdocs and gets all the method names.
 pub fn all_methods(version: Version) -> Result<Vec<String>> {
@@ -29,7 +23,7 @@ pub fn all_methods(version: Version) -> Result<Vec<String>> {
 
 /// Parses module rustdocs and grabs each method and its current status.
 pub fn methods_and_status(version: Version) -> Result<Vec<Method>> {
-    let path = path(version);
+    let path = paths::versioned_mod(version);
     let file = File::open(&path)
         .with_context(|| format!("Failed to grep rustdocs in {}", path.display()))?;
     let reader = io::BufReader::new(file);
@@ -80,7 +74,7 @@ pub fn requires_type(version: Version, method_name: &str) -> Result<bool> {
 
 /// Checks that a type exists in version specific module.
 pub fn type_exists(version: Version, method_name: &str) -> Result<bool> {
-    let path = path(version);
+    let path = paths::versioned_mod(version);
     let method = match method::Method::from_name(version, method_name) {
         Some(m) => m,
         None =>
@@ -111,7 +105,7 @@ pub enum ReturnsDoc {
 pub fn returns_map(version: Version) -> Result<std::collections::BTreeMap<String, ReturnsDoc>> {
     use std::collections::BTreeMap;
 
-    let path = path(version);
+    let path = paths::versioned_mod(version);
     let file = File::open(&path)
         .with_context(|| format!("Failed to grep rustdocs in {}", path.display()))?;
     let reader = io::BufReader::new(file);

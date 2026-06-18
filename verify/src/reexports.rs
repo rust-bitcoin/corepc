@@ -10,7 +10,7 @@ use anyhow::{anyhow, Context, Result};
 use syn::{Fields, GenericArgument, Item, PathArguments, Type, UseTree, Visibility};
 use walkdir::WalkDir;
 
-use crate::Version;
+use crate::{paths, Version};
 
 type VersionedDeps = HashMap<String, BTreeMap<String, BTreeSet<String>>>;
 type ParsedTypeFiles = (Vec<(String, PathBuf)>, HashSet<String>);
@@ -32,8 +32,7 @@ struct UseEntry {
 
 /// Checks that every type is re-exported for the requested version.
 pub fn check_type_reexports(version: Version) -> Result<()> {
-    let crate_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let src_dir = crate_dir.join("../types/src");
+    let src_dir = paths::types_src_dir();
     let all_versions = collect_version_dirs(&src_dir)?;
     let (files, known_names) = collect_type_files_and_names(&src_dir, &all_versions)?;
     let definitions = collect_type_definitions(&files, &known_names)?;

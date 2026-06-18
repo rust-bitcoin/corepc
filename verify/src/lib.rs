@@ -4,6 +4,7 @@
 
 pub mod method;
 pub mod model;
+pub mod paths;
 pub mod reexports;
 pub mod ssot;
 pub mod versioned;
