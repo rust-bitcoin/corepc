@@ -190,6 +190,10 @@ impl std::error::Error for Error {
 const LOCAL_IP: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1);
 
 const INVALID_ARGS: [&str; 2] = ["-rpcuser", "-rpcpassword"];
+const COOKIE_WAIT_TIMEOUT: Duration = Duration::from_secs(15);
+const CLIENT_WAIT_TIMEOUT: Duration = Duration::from_secs(15);
+const CLIENT_CREATE_RETRIES: usize = 50;
+const CLIENT_RETRY_DELAY: Duration = Duration::from_millis(200);
 
 /// The node configuration parameters, implements a convenient [Default] for most common use.
 ///
@@ -277,6 +281,12 @@ impl Default for Conf<'_> {
 }
 
 impl BitcoinD {
+    /// Terminate a child process and always attempt to reap it.
+    fn terminate_process(process: &mut Child) {
+        let _ = process.kill();
+        let _ = process.wait();
+    }
+
     /// Launch the bitcoind process from the given `exe` executable with default args.
     ///
     /// Waits for the node to be ready to accept connections before returning.
@@ -332,7 +342,7 @@ impl BitcoinD {
             match process.try_wait() {
                 Ok(Some(_)) | Err(_) => {
                     // Process has exited or an error occurred, kill and retry
-                    let _ = process.kill();
+                    Self::terminate_process(&mut process);
                     continue;
                 }
                 Ok(None) => {
@@ -340,35 +350,47 @@ impl BitcoinD {
                 }
             }
 
-            if Self::wait_for_cookie_file(cookie_file.as_path(), Duration::from_secs(5)).is_err() {
+            if Self::wait_for_cookie_file(cookie_file.as_path(), COOKIE_WAIT_TIMEOUT).is_err() {
                 // If the cookie file is not accessible a new work_dir is needed and therefore a new
                 // process. Kill the process and retry.
-                let _ = process.kill();
+                Self::terminate_process(&mut process);
                 continue;
             }
             let auth = Auth::CookieFile(cookie_file.clone());
 
-            let client_base = Self::create_client_base(&rpc_url, &auth)?;
+            let client_base = match Self::create_client_base(&rpc_url, &auth) {
+                Ok(client) => client,
+                Err(e) => {
+                    // If base RPC client creation fails, there might be an issue with
+                    // process startup timing. Terminate and retry unless this was the
+                    // final attempt.
+                    Self::terminate_process(&mut process);
+                    if attempt == conf.attempts - 1 {
+                        return Err(e);
+                    }
+                    continue;
+                }
+            };
             let client = match &conf.wallet {
                 Some(wallet) =>
                     match Self::create_client_wallet(&client_base, &rpc_url, &auth, wallet) {
                         Ok(client) => client,
-                        Err(e) =>
+                        Err(e) => {
+                            // If the wallet cannot be created or loaded, there might be an issue
+                            // with the work_dir or process. Kill the process and retry.
+                            Self::terminate_process(&mut process);
                             if attempt == conf.attempts - 1 {
                                 return Err(e);
-                            } else {
-                                // If the wallet cannot be created or loaded, there might be an issue
-                                // with the work_dir or process. Kill the process and retry.
-                                let _ = process.kill();
-                                continue;
-                            },
+                            }
+                            continue;
+                        }
                     },
                 None => client_base,
             };
-            if Self::wait_for_client(&client, Duration::from_secs(5)).is_err() {
+            if Self::wait_for_client(&client, CLIENT_WAIT_TIMEOUT).is_err() {
                 // If the client times out there might be an issue with the work_dir or process. Kill
                 // the process and retry.
-                let _ = process.kill();
+                Self::terminate_process(&mut process);
                 continue;
             }
 
@@ -491,11 +513,11 @@ impl BitcoinD {
     ///
     /// The client may not be immediately available, so retry up to 10 times.
     fn create_client_base(rpc_url: &str, auth: &Auth) -> anyhow::Result<Client> {
-        for _ in 0..10 {
+        for _ in 0..CLIENT_CREATE_RETRIES {
             if let Ok(client) = Client::new_with_auth(rpc_url, auth.clone()) {
                 return Ok(client);
             }
-            thread::sleep(Duration::from_millis(200));
+            thread::sleep(CLIENT_RETRY_DELAY);
         }
         Client::new_with_auth(rpc_url, auth.clone())
             .map_err(|e| Error::NoBitcoindInstance(e.to_string()).into())
@@ -513,7 +535,7 @@ impl BitcoinD {
         auth: &Auth,
         wallet: &str,
     ) -> anyhow::Result<Client> {
-        for _ in 0..10 {
+        for _ in 0..CLIENT_CREATE_RETRIES {
             // Try to create the wallet, or if that fails it might already exist so try to load it.
             if client_base.create_wallet(wallet).is_ok() || client_base.load_wallet(wallet).is_ok()
             {
@@ -521,7 +543,7 @@ impl BitcoinD {
                 return Client::new_with_auth(&url, auth.clone())
                     .map_err(|e| Error::NoBitcoindInstance(e.to_string()).into());
             }
-            thread::sleep(Duration::from_millis(200));
+            thread::sleep(CLIENT_RETRY_DELAY);
         }
         Err(Error::NoBitcoindInstance("Could not create or load wallet".to_string()).into())
     }
