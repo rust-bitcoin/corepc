@@ -10,8 +10,9 @@ use alloc::collections::BTreeMap;
 use bitcoin::address::NetworkUnchecked;
 use bitcoin::hashes::sha256;
 use bitcoin::{
-    block, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, ScriptBuf,
-    Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, Work, Wtxid,
+    absolute, block, transaction, Address, Amount, Block, BlockHash, CompactTarget, FeeRate,
+    Network, OutPoint, ScriptBuf, Sequence, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight,
+    Witness, Work, Wtxid,
 };
 use serde::{Deserialize, Serialize};
 
@@ -41,23 +42,6 @@ pub struct GetBestBlockHash(pub BlockHash);
 /// Models the result of JSON-RPC method `getblock` with verbosity set to 0.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetBlockVerboseZero(pub Block);
-
-/// The coinbase transaction of a block. Part of `getblock` at verbosity 1, 2 and 3.
-///
-/// Introduced in Bitcoin Core v31.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct CoinbaseTransaction {
-    /// The coinbase transaction version.
-    pub version: i32,
-    /// The coinbase transaction's locktime.
-    pub locktime: u32,
-    /// The coinbase input's sequence number (nSequence).
-    pub sequence: u32,
-    /// The coinbase input's script.
-    pub coinbase: String,
-    /// The coinbase input's first (and only) witness stack element, if present.
-    pub witness: Option<String>,
-}
 
 /// Models the result of JSON-RPC method `getblock` with verbosity set to 1.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -201,6 +185,21 @@ pub struct GetBlockVerboseThree {
     pub previous_block_hash: Option<BlockHash>,
     /// The hash of the next block (if available).
     pub next_block_hash: Option<BlockHash>,
+}
+
+/// Coinbase transaction metadata. Part of `getblock`.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
+pub struct CoinbaseTransaction {
+    /// The coinbase transaction version.
+    pub version: transaction::Version,
+    /// The coinbase transaction's locktime
+    pub locktime: absolute::LockTime,
+    /// The coinbase input's sequence number (nSequence).
+    pub sequence: Sequence,
+    /// The coinbase input's script.
+    pub coinbase: ScriptBuf,
+    /// The coinbase input's first (and only) witness stack element, if present.
+    pub witness: Option<Witness>,
 }
 
 /// A transaction entry for `getblock` verbosity 3.

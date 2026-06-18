@@ -684,7 +684,7 @@ fn blockchain__get_tx_spending_prevout__modelled() {
         node.client.get_tx_spending_prevout(&inputs).expect("gettxspendingprevout");
     #[cfg(not(feature = "v30_and_below"))]
     let json: GetTxSpendingPrevout =
-        node.client.get_tx_spending_prevout(&inputs, true, false).expect("gettxspendingprevout");
+        node.client.get_tx_spending_prevout(&inputs).expect("gettxspendingprevout");
     let model: Result<mtype::GetTxSpendingPrevout, GetTxSpendingPrevoutError> = json.into_model();
     let spending_prevout = model.unwrap();
 
@@ -703,9 +703,14 @@ fn blockchain__get_tx_spending_prevout_spending_tx_and_block_hash__modelled() {
     let (_address, tx) = node.create_mined_transaction();
     let outpoint = tx.input[0].previous_output;
 
+    let outputs = bitcoind::serde_json::json!([{
+        "txid": outpoint.txid.to_string(),
+        "vout": outpoint.vout,
+    }]);
+    let options = bitcoind::serde_json::json!({ "return_spending_tx": true });
     let json: GetTxSpendingPrevout = node
         .client
-        .get_tx_spending_prevout(&[outpoint], false, true)
+        .call("gettxspendingprevout", &[outputs, options])
         .expect("gettxspendingprevout");
     let item = &json.0[0];
     assert!(item.spending_txid.is_some());

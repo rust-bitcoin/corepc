@@ -12,14 +12,12 @@ use alloc::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 pub use self::error::{
-    GetMempoolClusterError, GetMempoolFeerateDiagramError, GetTxSpendingPrevoutError,
-    MapMempoolEntryError, MempoolEntryError, MempoolEntryFeesError,
+    CoinbaseTransactionError, GetBlockVerboseOneError, GetBlockVerboseThreeError,
+    GetBlockVerboseTwoError, GetMempoolClusterError, GetMempoolFeerateDiagramError,
+    GetTxSpendingPrevoutError, MapMempoolEntryError, MempoolEntryError, MempoolEntryFeesError,
 };
 use super::{DeploymentInfo, GetBlockVerboseThreeTransaction, GetBlockVerboseTwoTransaction};
-pub use super::{
-    GetBlockVerboseOneError, GetBlockVerboseThreeError, GetBlockVerboseTwoError,
-    GetDeploymentInfoError, GetMempoolInfoError,
-};
+pub use super::{GetDeploymentInfoError, GetMempoolInfoError};
 
 /// Result of JSON-RPC method `getmempoolcluster`.
 ///
