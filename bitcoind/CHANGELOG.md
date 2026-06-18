@@ -1,3 +1,9 @@
+# 0.41.0 - 2026-06-18
+
+- Improve bitcoind multithreading [#632](https://github.com/rust-bitcoin/corepc/pull/632)
+- Make `latest` feature enable Core 31 [#615](https://github.com/rust-bitcoin/corepc/pull/615)
+- Upgrade to latest version of `corepc-types` and `corepc-client`
+
 # 0.40.0 - 2026-05-26
 
 - Add initial support for Bitcoin Core v31 [#598](https://github.com/rust-bitcoin/corepc/pull/598)

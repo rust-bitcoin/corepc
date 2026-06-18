@@ -1,6 +1,6 @@
 [package]
 name = "bitcoind"
-version = "0.40.0"
+version = "0.41.0"
 authors = ["Riccardo Casatta <riccardo@casatta.it>", "Tobin C. Harding <me@tobin.cc>"]
 license = "MIT"
 repository = "https://github.com/rust-bitcoin/corepc"

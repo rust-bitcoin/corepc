@@ -1,6 +1,6 @@
 [package]
 name = "electrsd"
-version = "0.40.0"
+version = "0.41.0"
 authors = ["Riccardo Casatta <riccardo@casatta.it>"]
 description = "Utility to run a regtest electrs process, useful in integration testing environment"
 repository = "https://github.com/rust-bitcoin/corepc"
@@ -12,7 +12,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::testing"]
 exclude = ["tests", "contrib"]
 
 [dependencies]
-bitcoind = { version = "0.40.0", path = "../bitcoind" }
+bitcoind = { version = "0.41.0", path = "../bitcoind" }
 corepc-client = { version = "0.16.0", path = "../client" }
 electrum-client = { version = "0.25.0", default-features = false }
 log = { version = "0.4" }
