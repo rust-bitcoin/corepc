@@ -1,3 +1,8 @@
+# 0.15.0 - 2026-06-18
+
+- Finish off support for Bitcoin Core v31.0 [#615](https://github.com/rust-bitcoin/corepc/pull/615)
+- Follow-ups for Bitcoin Core v31.0 support [#635](https://github.com/rust-bitcoin/corepc/pull/635)
+
 # 0.14.0 - 2026-05-26
 
 - Add initial support for Bitcoin Core v31 [#598](https://github.com/rust-bitcoin/corepc/pull/598)
