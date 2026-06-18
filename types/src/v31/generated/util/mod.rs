@@ -10,11 +10,9 @@
 
 mod into;
 
-use serde::{Deserialize, Serialize};
+pub use self::into::{CreateMultisigError, EstimateSmartFeeError, SignMessageWithPrivKeyError, ValidateAddressError};
 
-pub use self::into::{
-    CreateMultisigError, EstimateSmartFeeError, SignMessageWithPrivKeyError, ValidateAddressError,
-};
+use serde::{Deserialize, Serialize};
 
 /// Creates a multi-signature address with n signatures of m keys required.
 /// It returns a json object with the address and redeemScript.
@@ -44,7 +42,7 @@ pub struct CreateMultisig {
 /// >     sh(multi(\<n\>,\<pubkey\>,\<pubkey\>,...))              P2SH-multisig outputs for the given threshold and pubkeys
 /// >     raw(\<hex script\>)                                 Outputs whose output script equals the specified hex-encoded bytes
 /// >     tr(\<pubkey\>,multi_a(\<n\>,\<pubkey\>,\<pubkey\>,...))   P2TR-multisig outputs for the given threshold and pubkeys
-/// >
+/// > 
 /// > In the above, \<pubkey\> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one
 /// > or more path elements separated by "/", where "h" represents a hardened child key.
 /// > For more information on output descriptors, see the documentation in the doc/descriptors.md file.
@@ -176,3 +174,4 @@ impl std::ops::Deref for VerifyMessage {
     type Target = bool;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
+

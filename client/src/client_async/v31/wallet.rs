@@ -11,22 +11,62 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+
 use types::v31::generated::{
-    AbortRescan, BumpFee, CreateWallet, CreateWalletDescriptor, EncryptWallet, GetAddressInfo,
-    GetAddressesByLabel, GetBalance, GetBalances, GetHdKeys, GetNewAddress, GetRawChangeAddress,
-    GetReceivedByAddress, GetReceivedByLabel, GetTransaction, GetWalletInfo, ImportDescriptors,
-    ListAddressGroupings, ListDescriptors, ListLabels, ListLockUnspent, ListReceivedByAddress,
-    ListReceivedByLabel, ListSinceBlock, ListTransactions, ListUnspent, ListWalletDir, ListWallets,
-    LoadWallet, LockUnspent, MigrateWallet, PsbtBumpFee, RescanBlockchain, RestoreWallet, SendAll,
-    SendManyVerbose0, SendManyVerbose1, SendResult, SendToAddressVerbose0, SendToAddressVerbose1,
-    SetWalletFlag, SignMessage, SignRawTransactionWithWallet, SimulateRawTransaction, UnloadWallet,
-    WalletCreateFundedPsbt, WalletDisplayAddress, WalletProcessPsbt,
+    AbortRescan,
+    BumpFee,
+    CreateWallet,
+    CreateWalletDescriptor,
+    EncryptWallet,
+    GetAddressInfo,
+    GetAddressesByLabel,
+    GetBalance,
+    GetBalances,
+    GetHdKeys,
+    GetNewAddress,
+    GetRawChangeAddress,
+    GetReceivedByAddress,
+    GetReceivedByLabel,
+    GetTransaction,
+    GetWalletInfo,
+    ImportDescriptors,
+    ListAddressGroupings,
+    ListDescriptors,
+    ListLabels,
+    ListLockUnspent,
+    ListReceivedByAddress,
+    ListReceivedByLabel,
+    ListSinceBlock,
+    ListTransactions,
+    ListUnspent,
+    ListWalletDir,
+    ListWallets,
+    LoadWallet,
+    LockUnspent,
+    MigrateWallet,
+    PsbtBumpFee,
+    RescanBlockchain,
+    RestoreWallet,
+    SendAll,
+    SendManyVerbose0,
+    SendManyVerbose1,
+    SendResult,
+    SendToAddressVerbose0,
+    SendToAddressVerbose1,
+    SetWalletFlag,
+    SignMessage,
+    SignRawTransactionWithWallet,
+    SimulateRawTransaction,
+    UnloadWallet,
+    WalletCreateFundedPsbt,
+    WalletDisplayAddress,
+    WalletProcessPsbt,
 };
 
 use crate::client_async::error::Result;
 use crate::client_async::Client;
 
-///
+/// 
 /// Specify a fee rate in sat/vB instead of relying on the built-in fee estimator.
 /// Must be at least 0.100 sat/vB higher than the current transaction fee rate.
 /// WARNING: before version 0.21, fee_rate was in BTC/kvB. As of 0.21, fee_rate is in sat/vB.
@@ -143,7 +183,7 @@ pub struct LockUnspentTransactions {
     pub vout: i64,
 }
 
-///
+/// 
 /// Specify a fee rate in sat/vB instead of relying on the built-in fee estimator.
 /// Must be at least 0.100 sat/vB higher than the current transaction fee rate.
 /// WARNING: before version 0.21, fee_rate was in BTC/kvB. As of 0.21, fee_rate is in sat/vB.
@@ -190,16 +230,16 @@ pub struct SendAllOptionsArg {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
     /// conservative estimates use a longer time horizon, making them
     /// less responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a higher fee rate estimate.
-    ///
+    /// 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimate_mode: Option<String>,
     /// Specify a fee rate in sat/vB.
@@ -314,7 +354,7 @@ pub enum SendResultFeeRate {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct SendResultOptionsArg {
     /// Automatically include coins from the wallet to cover the target amount.
-    ///
+    /// 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub add_inputs: Option<bool>,
     /// When false, returns a serialized transaction which will not be added to the wallet or broadcast
@@ -333,16 +373,16 @@ pub struct SendResultOptionsArg {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
     /// conservative estimates use a longer time horizon, making them
     /// less responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a higher fee rate estimate.
-    ///
+    /// 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimate_mode: Option<String>,
     /// Specify a fee rate in sat/vB.
@@ -517,7 +557,7 @@ pub struct WalletCreateFundedPsbtInputs {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct WalletCreateFundedPsbtOptionsArg {
     /// Automatically include coins from the wallet to cover the target amount.
-    ///
+    /// 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub add_inputs: Option<bool>,
     /// The bitcoin address to receive the change
@@ -533,16 +573,16 @@ pub struct WalletCreateFundedPsbtOptionsArg {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
     /// conservative estimates use a longer time horizon, making them
     /// less responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a higher fee rate estimate.
-    ///
+    /// 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimate_mode: Option<String>,
     /// Specify a fee rate in BTC/kvB.
@@ -638,9 +678,9 @@ pub struct BumpFeeOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -917,9 +957,9 @@ pub struct PsbtBumpFeeOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -978,9 +1018,9 @@ pub struct SendResultOptions {
     /// Confirmation target in blocks
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -1002,9 +1042,9 @@ pub struct SendAllOptions {
     /// Confirmation target in blocks
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -1037,9 +1077,9 @@ pub struct SendManyOptions {
     /// Confirmation target in blocks
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -1059,7 +1099,7 @@ pub struct SendToAddressOptions {
     /// This is not part of the transaction, just kept in your wallet.
     pub comment: Option<String>,
     /// A comment to store the name of the person or organization
-    /// to which you're sending the transaction. This is not part of the
+    /// to which you're sending the transaction. This is not part of the 
     /// transaction, just kept in your wallet.
     pub comment_to: Option<String>,
     /// The fee will be deducted from the amount being sent.
@@ -1070,9 +1110,9 @@ pub struct SendToAddressOptions {
     /// Confirmation target in blocks
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative
+    /// unset, economical, conservative 
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used).
+    /// otherwise, conservative mode is used). 
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
@@ -1240,25 +1280,8 @@ impl Client {
     /// `createwallet` with all optional arguments via [`CreateWalletOptions`].
     ///
     /// Creates and loads a new wallet.
-    pub async fn create_wallet_with(
-        &self,
-        wallet_name: String,
-        opts: CreateWalletOptions,
-    ) -> Result<CreateWallet> {
-        self.call_raw(
-            "createwallet",
-            &[
-                json!(wallet_name),
-                json!(opts.disable_private_keys),
-                json!(opts.blank),
-                json!(opts.passphrase),
-                json!(opts.avoid_reuse),
-                json!(opts.descriptors),
-                json!(opts.load_on_startup),
-                json!(opts.external_signer),
-            ],
-        )
-        .await
+    pub async fn create_wallet_with(&self, wallet_name: String, opts: CreateWalletOptions) -> Result<CreateWallet> {
+        self.call_raw("createwallet", &[json!(wallet_name), json!(opts.disable_private_keys), json!(opts.blank), json!(opts.passphrase), json!(opts.avoid_reuse), json!(opts.descriptors), json!(opts.load_on_startup), json!(opts.external_signer)]).await
     }
 
     /// `createwalletdescriptor` with required arguments only.
@@ -1273,18 +1296,14 @@ impl Client {
     ///
     /// Creates the wallet's descriptor for the given address type. The address type must be one that the wallet does not already have a descriptor for.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn create_wallet_descriptor_with(
-        &self,
-        type_: String,
-        opts: CreateWalletDescriptorOptions,
-    ) -> Result<CreateWalletDescriptor> {
+    pub async fn create_wallet_descriptor_with(&self, type_: String, opts: CreateWalletDescriptorOptions) -> Result<CreateWalletDescriptor> {
         self.call_raw("createwalletdescriptor", &[json!(type_), json!(opts)]).await
     }
 
     /// `encryptwallet` with required arguments only.
     ///
     /// Encrypts the wallet with 'passphrase'. This is for first time encryption.
-    /// After this, any calls that interact with private keys such as sending or signing
+    /// After this, any calls that interact with private keys such as sending or signing 
     /// will require the passphrase to be set prior to making these calls.
     /// Use the walletpassphrase call for this, and then walletlock call.
     /// If the wallet is already encrypted, use the walletpassphrasechange call.
@@ -1326,16 +1345,7 @@ impl Client {
     /// The available balance is what the wallet considers currently spendable, and is
     /// thus affected by options which limit spendability such as -spendzeroconfchange.
     pub async fn get_balance_with(&self, opts: GetBalanceOptions) -> Result<GetBalance> {
-        self.call_raw(
-            "getbalance",
-            &[
-                json!(opts.dummy),
-                json!(opts.min_conf),
-                json!(opts.include_watch_only),
-                json!(opts.avoid_reuse),
-            ],
-        )
-        .await
+        self.call_raw("getbalance", &[json!(opts.dummy), json!(opts.min_conf), json!(opts.include_watch_only), json!(opts.avoid_reuse)]).await
     }
 
     /// `getbalances` with required arguments only.
@@ -1362,7 +1372,7 @@ impl Client {
     /// `getnewaddress` with required arguments only.
     ///
     /// Returns a new Bitcoin address for receiving payments.
-    /// If 'label' is specified, it is added to the address book
+    /// If 'label' is specified, it is added to the address book 
     /// so payments received with the address will be associated with 'label'.
     pub async fn get_new_address(&self) -> Result<GetNewAddress> {
         self.call_raw("getnewaddress", &[(); 0] as &[()]).await
@@ -1371,7 +1381,7 @@ impl Client {
     /// `getnewaddress` with all optional arguments via [`GetNewAddressOptions`].
     ///
     /// Returns a new Bitcoin address for receiving payments.
-    /// If 'label' is specified, it is added to the address book
+    /// If 'label' is specified, it is added to the address book 
     /// so payments received with the address will be associated with 'label'.
     pub async fn get_new_address_with(&self, opts: GetNewAddressOptions) -> Result<GetNewAddress> {
         self.call_raw("getnewaddress", &[json!(opts.label), json!(opts.address_type)]).await
@@ -1389,10 +1399,7 @@ impl Client {
     ///
     /// Returns a new Bitcoin address, for receiving change.
     /// This is for use with raw transactions, NOT normal use.
-    pub async fn get_raw_change_address_with(
-        &self,
-        opts: GetRawChangeAddressOptions,
-    ) -> Result<GetRawChangeAddress> {
+    pub async fn get_raw_change_address_with(&self, opts: GetRawChangeAddressOptions) -> Result<GetRawChangeAddress> {
         self.call_raw("getrawchangeaddress", &[json!(opts.address_type)]).await
     }
 
@@ -1406,16 +1413,8 @@ impl Client {
     /// `getreceivedbyaddress` with all optional arguments via [`GetReceivedByAddressOptions`].
     ///
     /// Returns the total amount received by the given address in transactions with at least minconf confirmations.
-    pub async fn get_received_by_address_with(
-        &self,
-        address: String,
-        opts: GetReceivedByAddressOptions,
-    ) -> Result<GetReceivedByAddress> {
-        self.call_raw(
-            "getreceivedbyaddress",
-            &[json!(address), json!(opts.min_conf), json!(opts.include_immature_coinbase)],
-        )
-        .await
+    pub async fn get_received_by_address_with(&self, address: String, opts: GetReceivedByAddressOptions) -> Result<GetReceivedByAddress> {
+        self.call_raw("getreceivedbyaddress", &[json!(address), json!(opts.min_conf), json!(opts.include_immature_coinbase)]).await
     }
 
     /// `getreceivedbylabel` with required arguments only.
@@ -1428,16 +1427,8 @@ impl Client {
     /// `getreceivedbylabel` with all optional arguments via [`GetReceivedByLabelOptions`].
     ///
     /// Returns the total amount received by addresses with \<label\> in transactions with at least \[minconf\] confirmations.
-    pub async fn get_received_by_label_with(
-        &self,
-        label: String,
-        opts: GetReceivedByLabelOptions,
-    ) -> Result<GetReceivedByLabel> {
-        self.call_raw(
-            "getreceivedbylabel",
-            &[json!(label), json!(opts.min_conf), json!(opts.include_immature_coinbase)],
-        )
-        .await
+    pub async fn get_received_by_label_with(&self, label: String, opts: GetReceivedByLabelOptions) -> Result<GetReceivedByLabel> {
+        self.call_raw("getreceivedbylabel", &[json!(label), json!(opts.min_conf), json!(opts.include_immature_coinbase)]).await
     }
 
     /// `gettransaction` with required arguments only.
@@ -1450,16 +1441,8 @@ impl Client {
     /// `gettransaction` with all optional arguments via [`GetTransactionOptions`].
     ///
     /// Get detailed information about in-wallet transaction \<txid\>
-    pub async fn get_transaction_with(
-        &self,
-        txid: String,
-        opts: GetTransactionOptions,
-    ) -> Result<GetTransaction> {
-        self.call_raw(
-            "gettransaction",
-            &[json!(txid), json!(opts.include_watch_only), json!(opts.verbose)],
-        )
-        .await
+    pub async fn get_transaction_with(&self, txid: String, opts: GetTransactionOptions) -> Result<GetTransaction> {
+        self.call_raw("gettransaction", &[json!(txid), json!(opts.include_watch_only), json!(opts.verbose)]).await
     }
 
     /// `getwalletinfo` with required arguments only.
@@ -1473,25 +1456,18 @@ impl Client {
     ///
     /// Import descriptors. This will trigger a rescan of the blockchain based on the earliest timestamp of all descriptors being imported. Requires a new wallet backup.
     /// When importing descriptors with multipath key expressions, if the multipath specifier contains exactly two elements, the descriptor produced from the second element will be imported as an internal descriptor.
-    ///
+    /// 
     /// Note: This call can take over an hour to complete if using an early timestamp; during that time, other rpc calls
     /// may report that the imported keys, addresses or scripts exist but related transactions are still missing.
     /// The rescan is significantly faster if block filters are available (using startup option "-blockfilterindex=1").
-    pub async fn import_descriptors(
-        &self,
-        requests: Vec<ImportDescriptorsRequests>,
-    ) -> Result<ImportDescriptors> {
+    pub async fn import_descriptors(&self, requests: Vec<ImportDescriptorsRequests>) -> Result<ImportDescriptors> {
         self.call_raw("importdescriptors", &[json!(requests)]).await
     }
 
     /// `importprunedfunds` with required arguments only.
     ///
     /// Imports funds without rescan. Corresponding address or script must previously be included in wallet. Aimed towards pruned wallets. The end-user is responsible to import additional transactions that subsequently spend the imported outputs or rescan after the point in the blockchain the transaction is included.
-    pub async fn import_pruned_funds(
-        &self,
-        raw_transaction: String,
-        tx_out_proof: String,
-    ) -> Result<()> {
+    pub async fn import_pruned_funds(&self, raw_transaction: String, tx_out_proof: String) -> Result<()> {
         self.call_raw("importprunedfunds", &[json!(raw_transaction), json!(tx_out_proof)]).await
     }
 
@@ -1499,7 +1475,7 @@ impl Client {
     ///
     /// Refills each descriptor keypool in the wallet up to the specified number of new keys.
     /// By default, descriptor wallets have 4 active ranged descriptors ("legacy", "p2sh-segwit", "bech32", "bech32m"), each with 1000 entries.
-    ///
+    /// 
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
     pub async fn keypool_refill(&self) -> Result<()> {
         self.call_raw("keypoolrefill", &[(); 0] as &[()]).await
@@ -1509,7 +1485,7 @@ impl Client {
     ///
     /// Refills each descriptor keypool in the wallet up to the specified number of new keys.
     /// By default, descriptor wallets have 4 active ranged descriptors ("legacy", "p2sh-segwit", "bech32", "bech32m"), each with 1000 entries.
-    ///
+    /// 
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
     pub async fn keypool_refill_with(&self, opts: KeypoolRefillOptions) -> Result<()> {
         self.call_raw("keypoolrefill", &[json!(opts.new_size)]).await
@@ -1534,10 +1510,7 @@ impl Client {
     /// `listdescriptors` with all optional arguments via [`ListDescriptorsOptions`].
     ///
     /// List all descriptors present in a wallet.
-    pub async fn list_descriptors_with(
-        &self,
-        opts: ListDescriptorsOptions,
-    ) -> Result<ListDescriptors> {
+    pub async fn list_descriptors_with(&self, opts: ListDescriptorsOptions) -> Result<ListDescriptors> {
         self.call_raw("listdescriptors", &[json!(opts.private)]).await
     }
 
@@ -1573,21 +1546,8 @@ impl Client {
     /// `listreceivedbyaddress` with all optional arguments via [`ListReceivedByAddressOptions`].
     ///
     /// List balances by receiving address.
-    pub async fn list_received_by_address_with(
-        &self,
-        opts: ListReceivedByAddressOptions,
-    ) -> Result<ListReceivedByAddress> {
-        self.call_raw(
-            "listreceivedbyaddress",
-            &[
-                json!(opts.min_conf),
-                json!(opts.include_empty),
-                json!(opts.include_watch_only),
-                json!(opts.address_filter),
-                json!(opts.include_immature_coinbase),
-            ],
-        )
-        .await
+    pub async fn list_received_by_address_with(&self, opts: ListReceivedByAddressOptions) -> Result<ListReceivedByAddress> {
+        self.call_raw("listreceivedbyaddress", &[json!(opts.min_conf), json!(opts.include_empty), json!(opts.include_watch_only), json!(opts.address_filter), json!(opts.include_immature_coinbase)]).await
     }
 
     /// `listreceivedbylabel` with required arguments only.
@@ -1600,20 +1560,8 @@ impl Client {
     /// `listreceivedbylabel` with all optional arguments via [`ListReceivedByLabelOptions`].
     ///
     /// List received transactions by label.
-    pub async fn list_received_by_label_with(
-        &self,
-        opts: ListReceivedByLabelOptions,
-    ) -> Result<ListReceivedByLabel> {
-        self.call_raw(
-            "listreceivedbylabel",
-            &[
-                json!(opts.min_conf),
-                json!(opts.include_empty),
-                json!(opts.include_watch_only),
-                json!(opts.include_immature_coinbase),
-            ],
-        )
-        .await
+    pub async fn list_received_by_label_with(&self, opts: ListReceivedByLabelOptions) -> Result<ListReceivedByLabel> {
+        self.call_raw("listreceivedbylabel", &[json!(opts.min_conf), json!(opts.include_empty), json!(opts.include_watch_only), json!(opts.include_immature_coinbase)]).await
     }
 
     /// `listsinceblock` with required arguments only.
@@ -1630,31 +1578,17 @@ impl Client {
     /// Get all transactions in blocks since block \[blockhash\], or all transactions if omitted.
     /// If "blockhash" is no longer a part of the main chain, transactions from the fork point onward are included.
     /// Additionally, if include_removed is set, transactions affecting the wallet which were removed are returned in the "removed" array.
-    pub async fn list_since_block_with(
-        &self,
-        opts: ListSinceBlockOptions,
-    ) -> Result<ListSinceBlock> {
-        self.call_raw(
-            "listsinceblock",
-            &[
-                json!(opts.block_hash),
-                json!(opts.target_confirmations),
-                json!(opts.include_watch_only),
-                json!(opts.include_removed),
-                json!(opts.include_change),
-                json!(opts.label),
-            ],
-        )
-        .await
+    pub async fn list_since_block_with(&self, opts: ListSinceBlockOptions) -> Result<ListSinceBlock> {
+        self.call_raw("listsinceblock", &[json!(opts.block_hash), json!(opts.target_confirmations), json!(opts.include_watch_only), json!(opts.include_removed), json!(opts.include_change), json!(opts.label)]).await
     }
 
     /// `listtransactions` with required arguments only.
     ///
     /// If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.
-    /// Returns up to 'count' most recent transactions ordered from oldest to newest while skipping the first number of
-    /// transactions specified in the 'skip' argument. A transaction can have multiple entries in this RPC response.
-    /// For instance, a wallet transaction that pays three addresses — one wallet-owned and two external — will produce
-    /// four entries. The payment to the wallet-owned address appears both as a send entry and as a receive entry.
+    /// Returns up to 'count' most recent transactions ordered from oldest to newest while skipping the first number of 
+    /// transactions specified in the 'skip' argument. A transaction can have multiple entries in this RPC response. 
+    /// For instance, a wallet transaction that pays three addresses — one wallet-owned and two external — will produce 
+    /// four entries. The payment to the wallet-owned address appears both as a send entry and as a receive entry. 
     /// As a result, the RPC response will contain one entry in the receive category and three entries in the send category.
     pub async fn list_transactions(&self) -> Result<ListTransactions> {
         self.call_raw("listtransactions", &[(); 0] as &[()]).await
@@ -1663,25 +1597,13 @@ impl Client {
     /// `listtransactions` with all optional arguments via [`ListTransactionsOptions`].
     ///
     /// If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.
-    /// Returns up to 'count' most recent transactions ordered from oldest to newest while skipping the first number of
-    /// transactions specified in the 'skip' argument. A transaction can have multiple entries in this RPC response.
-    /// For instance, a wallet transaction that pays three addresses — one wallet-owned and two external — will produce
-    /// four entries. The payment to the wallet-owned address appears both as a send entry and as a receive entry.
+    /// Returns up to 'count' most recent transactions ordered from oldest to newest while skipping the first number of 
+    /// transactions specified in the 'skip' argument. A transaction can have multiple entries in this RPC response. 
+    /// For instance, a wallet transaction that pays three addresses — one wallet-owned and two external — will produce 
+    /// four entries. The payment to the wallet-owned address appears both as a send entry and as a receive entry. 
     /// As a result, the RPC response will contain one entry in the receive category and three entries in the send category.
-    pub async fn list_transactions_with(
-        &self,
-        opts: ListTransactionsOptions,
-    ) -> Result<ListTransactions> {
-        self.call_raw(
-            "listtransactions",
-            &[
-                json!(opts.label),
-                json!(opts.count),
-                json!(opts.skip),
-                json!(opts.include_watch_only),
-            ],
-        )
-        .await
+    pub async fn list_transactions_with(&self, opts: ListTransactionsOptions) -> Result<ListTransactions> {
+        self.call_raw("listtransactions", &[json!(opts.label), json!(opts.count), json!(opts.skip), json!(opts.include_watch_only)]).await
     }
 
     /// `listunspent` with required arguments only.
@@ -1699,17 +1621,7 @@ impl Client {
     /// with between minconf and maxconf (inclusive) confirmations.
     /// Optionally filter to only include txouts paid to specified addresses.
     pub async fn list_unspent_with(&self, opts: ListUnspentOptions) -> Result<ListUnspent> {
-        self.call_raw(
-            "listunspent",
-            &[
-                json!(opts.min_conf),
-                json!(opts.max_conf),
-                json!(opts.addresses),
-                json!(opts.include_unsafe),
-                json!(opts.query_options),
-            ],
-        )
-        .await
+        self.call_raw("listunspent", &[json!(opts.min_conf), json!(opts.max_conf), json!(opts.addresses), json!(opts.include_unsafe), json!(opts.query_options)]).await
     }
 
     /// `listwalletdir` with required arguments only.
@@ -1741,11 +1653,7 @@ impl Client {
     /// Loads a wallet from a wallet file or directory.
     /// Note that all wallet command-line options used when starting bitcoind will be
     /// applied to the new wallet.
-    pub async fn load_wallet_with(
-        &self,
-        file_name: String,
-        opts: LoadWalletOptions,
-    ) -> Result<LoadWallet> {
+    pub async fn load_wallet_with(&self, file_name: String, opts: LoadWalletOptions) -> Result<LoadWallet> {
         self.call_raw("loadwallet", &[json!(file_name), json!(opts.load_on_startup)]).await
     }
 
@@ -1775,28 +1683,20 @@ impl Client {
     /// wallet database and loaded on node start. Unwritten (persistent=false) locks are always cleared
     /// (by virtue of process exit) when a node stops or fails. Unlocking will clear both persistent and not.
     /// Also see the listunspent call
-    pub async fn lock_unspent_with(
-        &self,
-        unlock: bool,
-        opts: LockUnspentOptions,
-    ) -> Result<LockUnspent> {
-        self.call_raw(
-            "lockunspent",
-            &[json!(unlock), json!(opts.transactions), json!(opts.persistent)],
-        )
-        .await
+    pub async fn lock_unspent_with(&self, unlock: bool, opts: LockUnspentOptions) -> Result<LockUnspent> {
+        self.call_raw("lockunspent", &[json!(unlock), json!(opts.transactions), json!(opts.persistent)]).await
     }
 
     /// `migratewallet` with required arguments only.
     ///
     /// Migrate the wallet to a descriptor wallet.
     /// A new wallet backup will need to be made.
-    ///
+    /// 
     /// The migration process will create a backup of the wallet before migrating. This backup
     /// file will be named \<wallet name\>-\<timestamp\>.legacy.bak and can be found in the directory
     /// for this wallet. In the event of an incorrect migration, the backup can be restored using restorewallet.
     /// Encrypted wallets must have the passphrase provided as an argument to this call.
-    ///
+    /// 
     /// This RPC may take a long time to complete. Increasing the RPC client timeout is recommended.
     pub async fn migrate_wallet(&self) -> Result<MigrateWallet> {
         self.call_raw("migratewallet", &[(); 0] as &[()]).await
@@ -1806,12 +1706,12 @@ impl Client {
     ///
     /// Migrate the wallet to a descriptor wallet.
     /// A new wallet backup will need to be made.
-    ///
+    /// 
     /// The migration process will create a backup of the wallet before migrating. This backup
     /// file will be named \<wallet name\>-\<timestamp\>.legacy.bak and can be found in the directory
     /// for this wallet. In the event of an incorrect migration, the backup can be restored using restorewallet.
     /// Encrypted wallets must have the passphrase provided as an argument to this call.
-    ///
+    /// 
     /// This RPC may take a long time to complete. Increasing the RPC client timeout is recommended.
     pub async fn migrate_wallet_with(&self, opts: MigrateWalletOptions) -> Result<MigrateWallet> {
         self.call_raw("migratewallet", &[json!(opts.wallet_name), json!(opts.passphrase)]).await
@@ -1851,11 +1751,7 @@ impl Client {
     /// At a minimum, the new fee rate must be high enough to pay an additional new relay fee (incrementalfee
     /// returned by getnetworkinfo) to enter the node's mempool.
     /// * WARNING: before version 0.21, fee_rate was in BTC/kvB. As of 0.21, fee_rate is in sat/vB. *
-    pub async fn psbt_bump_fee_with(
-        &self,
-        txid: String,
-        opts: PsbtBumpFeeOptions,
-    ) -> Result<PsbtBumpFee> {
+    pub async fn psbt_bump_fee_with(&self, txid: String, opts: PsbtBumpFeeOptions) -> Result<PsbtBumpFee> {
         self.call_raw("psbtbumpfee", &[json!(txid), json!(opts)]).await
     }
 
@@ -1882,51 +1778,34 @@ impl Client {
     /// Note: Use "getwalletinfo" to query the scanning progress.
     /// The rescan is significantly faster if block filters are available
     /// (using startup option "-blockfilterindex=1").
-    pub async fn rescan_blockchain_with(
-        &self,
-        opts: RescanBlockchainOptions,
-    ) -> Result<RescanBlockchain> {
-        self.call_raw("rescanblockchain", &[json!(opts.start_height), json!(opts.stop_height)])
-            .await
+    pub async fn rescan_blockchain_with(&self, opts: RescanBlockchainOptions) -> Result<RescanBlockchain> {
+        self.call_raw("rescanblockchain", &[json!(opts.start_height), json!(opts.stop_height)]).await
     }
 
     /// `restorewallet` with required arguments only.
     ///
     /// Restores and loads a wallet from backup.
-    ///
+    /// 
     /// The rescan is significantly faster if block filters are available
     /// (using startup option "-blockfilterindex=1").
-    pub async fn restore_wallet(
-        &self,
-        wallet_name: String,
-        backup_file: String,
-    ) -> Result<RestoreWallet> {
+    pub async fn restore_wallet(&self, wallet_name: String, backup_file: String) -> Result<RestoreWallet> {
         self.call_raw("restorewallet", &[json!(wallet_name), json!(backup_file)]).await
     }
 
     /// `restorewallet` with all optional arguments via [`RestoreWalletOptions`].
     ///
     /// Restores and loads a wallet from backup.
-    ///
+    /// 
     /// The rescan is significantly faster if block filters are available
     /// (using startup option "-blockfilterindex=1").
-    pub async fn restore_wallet_with(
-        &self,
-        wallet_name: String,
-        backup_file: String,
-        opts: RestoreWalletOptions,
-    ) -> Result<RestoreWallet> {
-        self.call_raw(
-            "restorewallet",
-            &[json!(wallet_name), json!(backup_file), json!(opts.load_on_startup)],
-        )
-        .await
+    pub async fn restore_wallet_with(&self, wallet_name: String, backup_file: String, opts: RestoreWalletOptions) -> Result<RestoreWallet> {
+        self.call_raw("restorewallet", &[json!(wallet_name), json!(backup_file), json!(opts.load_on_startup)]).await
     }
 
     /// `send` with required arguments only.
     ///
     /// EXPERIMENTAL warning: this call may be changed in future releases.
-    ///
+    /// 
     /// Send a transaction.
     pub async fn send(&self, outputs: Vec<SendResultOutputs>) -> Result<SendResult> {
         self.call_raw("send", &[json!(outputs)]).await
@@ -1935,31 +1814,16 @@ impl Client {
     /// `send` with all optional arguments via [`SendResultOptions`].
     ///
     /// EXPERIMENTAL warning: this call may be changed in future releases.
-    ///
+    /// 
     /// Send a transaction.
-    pub async fn send_with(
-        &self,
-        outputs: Vec<SendResultOutputs>,
-        opts: SendResultOptions,
-    ) -> Result<SendResult> {
-        self.call_raw(
-            "send",
-            &[
-                json!(outputs),
-                json!(opts.conf_target),
-                json!(opts.estimate_mode),
-                json!(opts.fee_rate),
-                json!(opts.options),
-                json!(opts.version),
-            ],
-        )
-        .await
+    pub async fn send_with(&self, outputs: Vec<SendResultOutputs>, opts: SendResultOptions) -> Result<SendResult> {
+        self.call_raw("send", &[json!(outputs), json!(opts.conf_target), json!(opts.estimate_mode), json!(opts.fee_rate), json!(opts.options), json!(opts.version)]).await
     }
 
     /// `sendall` with required arguments only.
     ///
     /// EXPERIMENTAL warning: this call may be changed in future releases.
-    ///
+    /// 
     /// Spend the value of all (or specific) confirmed UTXOs and unconfirmed change in the wallet to one or more recipients.
     /// Unconfirmed inbound UTXOs and locked UTXOs will not be spent. Sendall will respect the avoid_reuse wallet flag.
     /// If your wallet contains many small inputs, either because it received tiny payments or as a result of accumulating change, consider using `send_max` to exclude inputs that are worth less than the fees needed to spend them.
@@ -1970,247 +1834,79 @@ impl Client {
     /// `sendall` with all optional arguments via [`SendAllOptions`].
     ///
     /// EXPERIMENTAL warning: this call may be changed in future releases.
-    ///
+    /// 
     /// Spend the value of all (or specific) confirmed UTXOs and unconfirmed change in the wallet to one or more recipients.
     /// Unconfirmed inbound UTXOs and locked UTXOs will not be spent. Sendall will respect the avoid_reuse wallet flag.
     /// If your wallet contains many small inputs, either because it received tiny payments or as a result of accumulating change, consider using `send_max` to exclude inputs that are worth less than the fees needed to spend them.
-    pub async fn send_all_with(
-        &self,
-        recipients: Vec<SendAllRecipients>,
-        opts: SendAllOptions,
-    ) -> Result<SendAll> {
-        self.call_raw(
-            "sendall",
-            &[
-                json!(recipients),
-                json!(opts.conf_target),
-                json!(opts.estimate_mode),
-                json!(opts.fee_rate),
-                json!(opts.options),
-            ],
-        )
-        .await
+    pub async fn send_all_with(&self, recipients: Vec<SendAllRecipients>, opts: SendAllOptions) -> Result<SendAll> {
+        self.call_raw("sendall", &[json!(recipients), json!(opts.conf_target), json!(opts.estimate_mode), json!(opts.fee_rate), json!(opts.options)]).await
     }
 
     /// `sendmany` with the result selected for verbosity `false`.
     ///
     /// Send multiple times. Amounts are double-precision floating point numbers.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_many_verbose_0(
-        &self,
-        amounts: std::collections::BTreeMap<String, SendManyAmounts>,
-    ) -> Result<SendManyVerbose0> {
-        self.call_raw(
-            "sendmany",
-            &[
-                json!(null),
-                json!(amounts),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(false),
-            ],
-        )
-        .await
+    pub async fn send_many_verbose_0(&self, amounts: std::collections::BTreeMap<String, SendManyAmounts>) -> Result<SendManyVerbose0> {
+        self.call_raw("sendmany", &[json!(null), json!(amounts), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(false)]).await
     }
 
     /// `sendmany` with the result selected for verbosity `false`. With all optional arguments via [`SendManyOptions`].
     ///
     /// Send multiple times. Amounts are double-precision floating point numbers.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_many_verbose_0_with(
-        &self,
-        amounts: std::collections::BTreeMap<String, SendManyAmounts>,
-        opts: SendManyOptions,
-    ) -> Result<SendManyVerbose0> {
-        self.call_raw(
-            "sendmany",
-            &[
-                json!(opts.dummy),
-                json!(amounts),
-                json!(opts.min_conf),
-                json!(opts.comment),
-                json!(opts.subtract_fee_from),
-                json!(opts.replaceable),
-                json!(opts.conf_target),
-                json!(opts.estimate_mode),
-                json!(opts.fee_rate),
-                json!(false),
-            ],
-        )
-        .await
+    pub async fn send_many_verbose_0_with(&self, amounts: std::collections::BTreeMap<String, SendManyAmounts>, opts: SendManyOptions) -> Result<SendManyVerbose0> {
+        self.call_raw("sendmany", &[json!(opts.dummy), json!(amounts), json!(opts.min_conf), json!(opts.comment), json!(opts.subtract_fee_from), json!(opts.replaceable), json!(opts.conf_target), json!(opts.estimate_mode), json!(opts.fee_rate), json!(false)]).await
     }
 
     /// `sendmany` with the result selected for verbosity `true`.
     ///
     /// Send multiple times. Amounts are double-precision floating point numbers.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_many_verbose_1(
-        &self,
-        amounts: std::collections::BTreeMap<String, SendManyAmounts>,
-    ) -> Result<SendManyVerbose1> {
-        self.call_raw(
-            "sendmany",
-            &[
-                json!(null),
-                json!(amounts),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(true),
-            ],
-        )
-        .await
+    pub async fn send_many_verbose_1(&self, amounts: std::collections::BTreeMap<String, SendManyAmounts>) -> Result<SendManyVerbose1> {
+        self.call_raw("sendmany", &[json!(null), json!(amounts), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(true)]).await
     }
 
     /// `sendmany` with the result selected for verbosity `true`. With all optional arguments via [`SendManyOptions`].
     ///
     /// Send multiple times. Amounts are double-precision floating point numbers.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_many_verbose_1_with(
-        &self,
-        amounts: std::collections::BTreeMap<String, SendManyAmounts>,
-        opts: SendManyOptions,
-    ) -> Result<SendManyVerbose1> {
-        self.call_raw(
-            "sendmany",
-            &[
-                json!(opts.dummy),
-                json!(amounts),
-                json!(opts.min_conf),
-                json!(opts.comment),
-                json!(opts.subtract_fee_from),
-                json!(opts.replaceable),
-                json!(opts.conf_target),
-                json!(opts.estimate_mode),
-                json!(opts.fee_rate),
-                json!(true),
-            ],
-        )
-        .await
+    pub async fn send_many_verbose_1_with(&self, amounts: std::collections::BTreeMap<String, SendManyAmounts>, opts: SendManyOptions) -> Result<SendManyVerbose1> {
+        self.call_raw("sendmany", &[json!(opts.dummy), json!(amounts), json!(opts.min_conf), json!(opts.comment), json!(opts.subtract_fee_from), json!(opts.replaceable), json!(opts.conf_target), json!(opts.estimate_mode), json!(opts.fee_rate), json!(true)]).await
     }
+
 
     /// `sendtoaddress` with the result selected for verbosity `false`.
     ///
     /// Send an amount to a given address.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_to_address_verbose_0(
-        &self,
-        address: String,
-        amount: SendToAddressAmount,
-    ) -> Result<SendToAddressVerbose0> {
-        self.call_raw(
-            "sendtoaddress",
-            &[
-                json!(address),
-                json!(amount),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(false),
-            ],
-        )
-        .await
+    pub async fn send_to_address_verbose_0(&self, address: String, amount: SendToAddressAmount) -> Result<SendToAddressVerbose0> {
+        self.call_raw("sendtoaddress", &[json!(address), json!(amount), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(false)]).await
     }
 
     /// `sendtoaddress` with the result selected for verbosity `false`. With all optional arguments via [`SendToAddressOptions`].
     ///
     /// Send an amount to a given address.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_to_address_verbose_0_with(
-        &self,
-        address: String,
-        amount: SendToAddressAmount,
-        opts: SendToAddressOptions,
-    ) -> Result<SendToAddressVerbose0> {
-        self.call_raw(
-            "sendtoaddress",
-            &[
-                json!(address),
-                json!(amount),
-                json!(opts.comment),
-                json!(opts.comment_to),
-                json!(opts.subtract_fee_from_amount),
-                json!(opts.replaceable),
-                json!(opts.conf_target),
-                json!(opts.estimate_mode),
-                json!(opts.avoid_reuse),
-                json!(opts.fee_rate),
-                json!(false),
-            ],
-        )
-        .await
+    pub async fn send_to_address_verbose_0_with(&self, address: String, amount: SendToAddressAmount, opts: SendToAddressOptions) -> Result<SendToAddressVerbose0> {
+        self.call_raw("sendtoaddress", &[json!(address), json!(amount), json!(opts.comment), json!(opts.comment_to), json!(opts.subtract_fee_from_amount), json!(opts.replaceable), json!(opts.conf_target), json!(opts.estimate_mode), json!(opts.avoid_reuse), json!(opts.fee_rate), json!(false)]).await
     }
 
     /// `sendtoaddress` with the result selected for verbosity `true`.
     ///
     /// Send an amount to a given address.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_to_address_verbose_1(
-        &self,
-        address: String,
-        amount: SendToAddressAmount,
-    ) -> Result<SendToAddressVerbose1> {
-        self.call_raw(
-            "sendtoaddress",
-            &[
-                json!(address),
-                json!(amount),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(null),
-                json!(true),
-            ],
-        )
-        .await
+    pub async fn send_to_address_verbose_1(&self, address: String, amount: SendToAddressAmount) -> Result<SendToAddressVerbose1> {
+        self.call_raw("sendtoaddress", &[json!(address), json!(amount), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(null), json!(true)]).await
     }
 
     /// `sendtoaddress` with the result selected for verbosity `true`. With all optional arguments via [`SendToAddressOptions`].
     ///
     /// Send an amount to a given address.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn send_to_address_verbose_1_with(
-        &self,
-        address: String,
-        amount: SendToAddressAmount,
-        opts: SendToAddressOptions,
-    ) -> Result<SendToAddressVerbose1> {
-        self.call_raw(
-            "sendtoaddress",
-            &[
-                json!(address),
-                json!(amount),
-                json!(opts.comment),
-                json!(opts.comment_to),
-                json!(opts.subtract_fee_from_amount),
-                json!(opts.replaceable),
-                json!(opts.conf_target),
-                json!(opts.estimate_mode),
-                json!(opts.avoid_reuse),
-                json!(opts.fee_rate),
-                json!(true),
-            ],
-        )
-        .await
+    pub async fn send_to_address_verbose_1_with(&self, address: String, amount: SendToAddressAmount, opts: SendToAddressOptions) -> Result<SendToAddressVerbose1> {
+        self.call_raw("sendtoaddress", &[json!(address), json!(amount), json!(opts.comment), json!(opts.comment_to), json!(opts.subtract_fee_from_amount), json!(opts.replaceable), json!(opts.conf_target), json!(opts.estimate_mode), json!(opts.avoid_reuse), json!(opts.fee_rate), json!(true)]).await
     }
+
 
     /// `setlabel` with required arguments only.
     ///
@@ -2229,11 +1925,7 @@ impl Client {
     /// `setwalletflag` with all optional arguments via [`SetWalletFlagOptions`].
     ///
     /// Change the state of the given wallet flag for a wallet.
-    pub async fn set_wallet_flag_with(
-        &self,
-        flag: String,
-        opts: SetWalletFlagOptions,
-    ) -> Result<SetWalletFlag> {
+    pub async fn set_wallet_flag_with(&self, flag: String, opts: SetWalletFlagOptions) -> Result<SetWalletFlag> {
         self.call_raw("setwalletflag", &[json!(flag), json!(opts.value)]).await
     }
 
@@ -2251,10 +1943,7 @@ impl Client {
     /// The second optional argument (may be null) is an array of previous transaction outputs that
     /// this transaction depends on but may not yet be in the block chain.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn sign_raw_transaction_with_wallet(
-        &self,
-        hexstring: String,
-    ) -> Result<SignRawTransactionWithWallet> {
+    pub async fn sign_raw_transaction_with_wallet(&self, hexstring: String) -> Result<SignRawTransactionWithWallet> {
         self.call_raw("signrawtransactionwithwallet", &[json!(hexstring)]).await
     }
 
@@ -2264,16 +1953,8 @@ impl Client {
     /// The second optional argument (may be null) is an array of previous transaction outputs that
     /// this transaction depends on but may not yet be in the block chain.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn sign_raw_transaction_with_wallet_with(
-        &self,
-        hexstring: String,
-        opts: SignRawTransactionWithWalletOptions,
-    ) -> Result<SignRawTransactionWithWallet> {
-        self.call_raw(
-            "signrawtransactionwithwallet",
-            &[json!(hexstring), json!(opts.prev_txs), json!(opts.sig_hash_type)],
-        )
-        .await
+    pub async fn sign_raw_transaction_with_wallet_with(&self, hexstring: String, opts: SignRawTransactionWithWalletOptions) -> Result<SignRawTransactionWithWallet> {
+        self.call_raw("signrawtransactionwithwallet", &[json!(hexstring), json!(opts.prev_txs), json!(opts.sig_hash_type)]).await
     }
 
     /// `simulaterawtransaction` with required arguments only.
@@ -2286,10 +1967,7 @@ impl Client {
     /// `simulaterawtransaction` with all optional arguments via [`SimulateRawTransactionOptions`].
     ///
     /// Calculate the balance change resulting in the signing and broadcasting of the given transaction(s).
-    pub async fn simulate_raw_transaction_with(
-        &self,
-        opts: SimulateRawTransactionOptions,
-    ) -> Result<SimulateRawTransaction> {
+    pub async fn simulate_raw_transaction_with(&self, opts: SimulateRawTransactionOptions) -> Result<SimulateRawTransaction> {
         self.call_raw("simulaterawtransaction", &[json!(opts.raw_txs), json!(opts.options)]).await
     }
 
@@ -2315,10 +1993,7 @@ impl Client {
     /// Implements the Creator and Updater roles.
     /// All existing inputs must either have their previous output transaction be in the wallet
     /// or be in the UTXO set. Solving data must be provided for non-wallet inputs.
-    pub async fn wallet_create_funded_psbt(
-        &self,
-        outputs: Vec<WalletCreateFundedPsbtOutputs>,
-    ) -> Result<WalletCreateFundedPsbt> {
+    pub async fn wallet_create_funded_psbt(&self, outputs: Vec<WalletCreateFundedPsbtOutputs>) -> Result<WalletCreateFundedPsbt> {
         self.call_raw("walletcreatefundedpsbt", &[json!(null), json!(outputs)]).await
     }
 
@@ -2328,23 +2003,8 @@ impl Client {
     /// Implements the Creator and Updater roles.
     /// All existing inputs must either have their previous output transaction be in the wallet
     /// or be in the UTXO set. Solving data must be provided for non-wallet inputs.
-    pub async fn wallet_create_funded_psbt_with(
-        &self,
-        outputs: Vec<WalletCreateFundedPsbtOutputs>,
-        opts: WalletCreateFundedPsbtOptions,
-    ) -> Result<WalletCreateFundedPsbt> {
-        self.call_raw(
-            "walletcreatefundedpsbt",
-            &[
-                json!(opts.inputs),
-                json!(outputs),
-                json!(opts.locktime),
-                json!(opts.options),
-                json!(opts.bip32derivs),
-                json!(opts.version),
-            ],
-        )
-        .await
+    pub async fn wallet_create_funded_psbt_with(&self, outputs: Vec<WalletCreateFundedPsbtOutputs>, opts: WalletCreateFundedPsbtOptions) -> Result<WalletCreateFundedPsbt> {
+        self.call_raw("walletcreatefundedpsbt", &[json!(opts.inputs), json!(outputs), json!(opts.locktime), json!(opts.options), json!(opts.bip32derivs), json!(opts.version)]).await
     }
 
     /// `walletdisplayaddress` with required arguments only.
@@ -2367,7 +2027,7 @@ impl Client {
     ///
     /// Stores the wallet decryption key in memory for 'timeout' seconds.
     /// This is needed prior to performing transactions related to private keys such as sending bitcoins
-    ///
+    /// 
     /// Note:
     /// Issuing the walletpassphrase command while the wallet is already unlocked will set a new unlock
     /// time that overrides the old one.
@@ -2378,13 +2038,8 @@ impl Client {
     /// `walletpassphrasechange` with required arguments only.
     ///
     /// Changes the wallet passphrase from 'oldpassphrase' to 'newpassphrase'.
-    pub async fn wallet_passphrase_change(
-        &self,
-        old_passphrase: String,
-        new_passphrase: String,
-    ) -> Result<()> {
-        self.call_raw("walletpassphrasechange", &[json!(old_passphrase), json!(new_passphrase)])
-            .await
+    pub async fn wallet_passphrase_change(&self, old_passphrase: String, new_passphrase: String) -> Result<()> {
+        self.call_raw("walletpassphrasechange", &[json!(old_passphrase), json!(new_passphrase)]).await
     }
 
     /// `walletprocesspsbt` with required arguments only.
@@ -2401,21 +2056,8 @@ impl Client {
     /// Update a PSBT with input information from our wallet and then sign inputs
     /// that we can sign for.
     /// Requires wallet passphrase to be set with walletpassphrase call if wallet is encrypted.
-    pub async fn wallet_process_psbt_with(
-        &self,
-        psbt: String,
-        opts: WalletProcessPsbtOptions,
-    ) -> Result<WalletProcessPsbt> {
-        self.call_raw(
-            "walletprocesspsbt",
-            &[
-                json!(psbt),
-                json!(opts.sign),
-                json!(opts.sig_hash_type),
-                json!(opts.bip32derivs),
-                json!(opts.finalize),
-            ],
-        )
-        .await
+    pub async fn wallet_process_psbt_with(&self, psbt: String, opts: WalletProcessPsbtOptions) -> Result<WalletProcessPsbt> {
+        self.call_raw("walletprocesspsbt", &[json!(psbt), json!(opts.sign), json!(opts.sig_hash_type), json!(opts.bip32derivs), json!(opts.finalize)]).await
     }
+
 }

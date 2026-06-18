@@ -21,12 +21,8 @@ use bitcoin::error::UnprefixedHexError;
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::hex::FromHex as _;
 use bitcoin::key::{self, PrivateKey, PublicKey};
-use bitcoin::{
-    amount, block, hex, network, psbt, sign_message, witness_program, witness_version, Address,
-    Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence,
-    SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram,
-    WitnessVersion, Work, Wtxid,
-};
+use bitcoin::sign_message;
+use bitcoin::{amount, block, hex, network, psbt, witness_program, witness_version, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence, SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram, WitnessVersion, Work, Wtxid};
 
 use super::*;
 use crate::error::write_err;
@@ -60,8 +56,7 @@ impl fmt::Display for CreateMultisigError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
-            Self::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `RedeemScript` field failed"; e),
+            Self::RedeemScript(ref e) => write_err!(f, "conversion of the `RedeemScript` field failed"; e),
         }
     }
 }
@@ -82,11 +77,7 @@ impl EstimateSmartFee {
         use EstimateSmartFeeError as E;
 
         Ok(model::EstimateSmartFee {
-            fee_rate: self
-                .fee_rate
-                .map(|f| crate::btc_per_kb(f).map_err(E::FeeRate))
-                .transpose()?
-                .flatten(),
+            fee_rate: self.fee_rate.map(|f| crate::btc_per_kb(f).map_err(E::FeeRate)).transpose()?.flatten(),
             errors: self.errors,
             blocks: crate::to_u32(self.blocks, "blocks")?,
         })
@@ -130,9 +121,7 @@ impl SignMessageWithPrivKey {
     pub fn into_model(self) -> Result<model::SignMessageWithPrivKey, SignMessageWithPrivKeyError> {
         use SignMessageWithPrivKeyError as E;
 
-        Ok(model::SignMessageWithPrivKey(
-            self.0.parse::<sign_message::MessageSignature>().map_err(E::Inner)?,
-        ))
+        Ok(model::SignMessageWithPrivKey(self.0.parse::<sign_message::MessageSignature>().map_err(E::Inner)?))
     }
 }
 
@@ -167,46 +156,12 @@ impl ValidateAddress {
 
         Ok(model::ValidateAddress {
             is_valid: self.isvalid,
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?
-                .ok_or(E::AddressMissing(crate::MissingField { field: "address" }))?,
-            script_pubkey: self
-                .script_pub_key
-                .map(|x| ScriptBuf::from_hex(&x))
-                .transpose()
-                .map_err(E::ScriptPubkey)?
-                .ok_or(E::ScriptPubkeyMissing(crate::MissingField { field: "script_pubkey" }))?,
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?.ok_or(E::AddressMissing(crate::MissingField { field: "address" }))?,
+            script_pubkey: self.script_pub_key.map(|x| ScriptBuf::from_hex(&x)).transpose().map_err(E::ScriptPubkey)?.ok_or(E::ScriptPubkeyMissing(crate::MissingField { field: "script_pubkey" }))?,
             is_script: self.is_script.unwrap_or_default(),
             is_witness: self.is_witness.unwrap_or_default(),
-            witness_version: match (self.witness_version, self.witness_program.as_ref()) {
-                (Some(v), Some(_)) => Some(
-                    WitnessVersion::try_from(u8::try_from(v).map_err(|_| {
-                        crate::NumericError::Overflow {
-                            value: v,
-                            field: "witness_version".to_owned(),
-                        }
-                    })?)
-                    .map_err(E::WitnessVersion)?,
-                ),
-                _ => None,
-            },
-            witness_program: match (self.witness_version, self.witness_program.as_ref()) {
-                (Some(v), Some(p)) => Some({
-                    let wv = WitnessVersion::try_from(u8::try_from(v).map_err(|_| {
-                        crate::NumericError::Overflow {
-                            value: v,
-                            field: "witness_program".to_owned(),
-                        }
-                    })?)
-                    .map_err(E::WitnessVersion)?;
-                    let bytes = Vec::<u8>::from_hex(p).map_err(E::WitnessProgramBytes)?;
-                    WitnessProgram::new(wv, &bytes).map_err(E::WitnessProgram)?
-                }),
-                _ => None,
-            },
+            witness_version: match (self.witness_version, self.witness_program.as_ref()) { (Some(v), Some(_)) => Some(WitnessVersion::try_from(u8::try_from(v).map_err(|_| crate::NumericError::Overflow { value: v, field: "witness_version".to_owned() })?).map_err(E::WitnessVersion)?), _ => None },
+            witness_program: match (self.witness_version, self.witness_program.as_ref()) { (Some(v), Some(p)) => Some({ let wv = WitnessVersion::try_from(u8::try_from(v).map_err(|_| crate::NumericError::Overflow { value: v, field: "witness_program".to_owned() })?).map_err(E::WitnessVersion)?; let bytes = Vec::<u8>::from_hex(p).map_err(E::WitnessProgramBytes)?; WitnessProgram::new(wv, &bytes).map_err(E::WitnessProgram)? }), _ => None },
         })
     }
 }
@@ -235,19 +190,13 @@ pub enum ValidateAddressError {
 impl fmt::Display for ValidateAddressError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::AddressMissing(ref e) =>
-                write_err!(f, "conversion of the `AddressMissing` field failed"; e),
+            Self::AddressMissing(ref e) => write_err!(f, "conversion of the `AddressMissing` field failed"; e),
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
-            Self::ScriptPubkeyMissing(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkeyMissing` field failed"; e),
-            Self::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
-            Self::WitnessVersion(ref e) =>
-                write_err!(f, "conversion of the `WitnessVersion` field failed"; e),
-            Self::WitnessProgramBytes(ref e) =>
-                write_err!(f, "conversion of the `WitnessProgramBytes` field failed"; e),
-            Self::WitnessProgram(ref e) =>
-                write_err!(f, "conversion of the `WitnessProgram` field failed"; e),
+            Self::ScriptPubkeyMissing(ref e) => write_err!(f, "conversion of the `ScriptPubkeyMissing` field failed"; e),
+            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::WitnessVersion(ref e) => write_err!(f, "conversion of the `WitnessVersion` field failed"; e),
+            Self::WitnessProgramBytes(ref e) => write_err!(f, "conversion of the `WitnessProgramBytes` field failed"; e),
+            Self::WitnessProgram(ref e) => write_err!(f, "conversion of the `WitnessProgram` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -272,3 +221,4 @@ impl std::error::Error for ValidateAddressError {
 impl From<crate::NumericError> for ValidateAddressError {
     fn from(e: crate::NumericError) -> Self { Self::Numeric(e) }
 }
+

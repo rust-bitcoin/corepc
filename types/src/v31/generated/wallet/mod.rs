@@ -10,23 +10,9 @@
 
 mod into;
 
-use serde::{Deserialize, Serialize};
+pub use self::into::{AddressInformationError, BumpFeeError, CreateWalletError, GetAddressInfoEmbeddedError, GetAddressInfoError, GetAddressesByLabelError, GetBalanceError, GetBalancesError, GetBalancesMineError, GetHdKeysError, GetNewAddressError, GetRawChangeAddressError, GetReceivedByAddressError, GetReceivedByLabelError, GetTransactionDetailError, GetTransactionError, GetWalletInfoError, HdKeyDescriptorError, HdKeyError, LastProcessedBlockError, ListAddressGroupingsError, ListLockUnspentError, ListLockUnspentItemError, ListReceivedByAddressError, ListReceivedByAddressItemError, ListReceivedByLabelError, ListReceivedByLabelItemError, ListSinceBlockError, ListTransactionsError, ListUnspentError, ListUnspentItemError, ListWalletsError, LoadWalletError, PsbtBumpFeeError, RescanBlockchainError, SendAllError, SendError, SendManyError, SendManyVerboseError, SendToAddressError, SignMessageError, SimulateRawTransactionError, TransactionItemError, UnloadWalletError, WalletCreateFundedPsbtError, WalletDisplayAddressError, WalletProcessPsbtError};
 
-pub use self::into::{
-    AddressInformationError, BumpFeeError, CreateWalletError, GetAddressInfoEmbeddedError,
-    GetAddressInfoError, GetAddressesByLabelError, GetBalanceError, GetBalancesError,
-    GetBalancesMineError, GetHdKeysError, GetNewAddressError, GetRawChangeAddressError,
-    GetReceivedByAddressError, GetReceivedByLabelError, GetTransactionDetailError,
-    GetTransactionError, GetWalletInfoError, HdKeyDescriptorError, HdKeyError,
-    LastProcessedBlockError, ListAddressGroupingsError, ListLockUnspentError,
-    ListLockUnspentItemError, ListReceivedByAddressError, ListReceivedByAddressItemError,
-    ListReceivedByLabelError, ListReceivedByLabelItemError, ListSinceBlockError,
-    ListTransactionsError, ListUnspentError, ListUnspentItemError, ListWalletsError,
-    LoadWalletError, PsbtBumpFeeError, RescanBlockchainError, SendAllError, SendError,
-    SendManyError, SendManyVerboseError, SendToAddressError, SignMessageError,
-    SimulateRawTransactionError, TransactionItemError, UnloadWalletError,
-    WalletCreateFundedPsbtError, WalletDisplayAddressError, WalletProcessPsbtError,
-};
+use serde::{Deserialize, Serialize};
 
 /// Result of the JSON-RPC method `abortrescan`.
 ///
@@ -94,7 +80,7 @@ pub struct CreateWalletDescriptor {
 /// > encryptwallet
 /// >
 /// > Encrypts the wallet with 'passphrase'. This is for first time encryption.
-/// > After this, any calls that interact with private keys such as sending or signing
+/// > After this, any calls that interact with private keys such as sending or signing 
 /// > will require the passphrase to be set prior to making these calls.
 /// > Use the walletpassphrase call for this, and then walletlock call.
 /// > If the wallet is already encrypted, use the walletpassphrasechange call.
@@ -352,7 +338,7 @@ pub struct GetHdKeysItemDescriptorsItem {
 /// > getnewaddress
 /// >
 /// > Returns a new Bitcoin address for receiving payments.
-/// > If 'label' is specified, it is added to the address book
+/// > If 'label' is specified, it is added to the address book 
 /// > so payments received with the address will be associated with 'label'.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -584,7 +570,7 @@ pub struct GetTransactionDetailsItem {
     /// "immature"              Coinbase transactions received with 100 or fewer confirmations.
     /// "orphan"                Orphaned coinbase transactions received.
     pub category: String,
-    /// The amount of the fee in BTC. This is negative and only available for the
+    /// The amount of the fee in BTC. This is negative and only available for the 
     /// 'send' category of transactions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fee: Option<f64>,
@@ -670,7 +656,7 @@ pub struct GetWalletInfoLastProcessedBlock {
 /// >
 /// > Import descriptors. This will trigger a rescan of the blockchain based on the earliest timestamp of all descriptors being imported. Requires a new wallet backup.
 /// > When importing descriptors with multipath key expressions, if the multipath specifier contains exactly two elements, the descriptor produced from the second element will be imported as an internal descriptor.
-/// >
+/// > 
 /// > Note: This call can take over an hour to complete if using an early timestamp; during that time, other rpc calls
 /// > may report that the imported keys, addresses or scripts exist but related transactions are still missing.
 /// > The rescan is significantly faster if block filters are available (using startup option "-blockfilterindex=1").
@@ -1003,10 +989,10 @@ pub struct ListSinceBlockTransactionsItem {
 /// > listtransactions
 /// >
 /// > If a label name is provided, this will return only incoming transactions paying to addresses with the specified label.
-/// > Returns up to 'count' most recent transactions ordered from oldest to newest while skipping the first number of
-/// > transactions specified in the 'skip' argument. A transaction can have multiple entries in this RPC response.
-/// > For instance, a wallet transaction that pays three addresses — one wallet-owned and two external — will produce
-/// > four entries. The payment to the wallet-owned address appears both as a send entry and as a receive entry.
+/// > Returns up to 'count' most recent transactions ordered from oldest to newest while skipping the first number of 
+/// > transactions specified in the 'skip' argument. A transaction can have multiple entries in this RPC response. 
+/// > For instance, a wallet transaction that pays three addresses — one wallet-owned and two external — will produce 
+/// > four entries. The payment to the wallet-owned address appears both as a send entry and as a receive entry. 
 /// > As a result, the RPC response will contain one entry in the receive category and three entries in the send category.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1225,12 +1211,12 @@ impl std::ops::Deref for LockUnspent {
 
 /// Migrate the wallet to a descriptor wallet.
 /// A new wallet backup will need to be made.
-///
+/// 
 /// The migration process will create a backup of the wallet before migrating. This backup
 /// file will be named \<wallet name\>-\<timestamp\>.legacy.bak and can be found in the directory
 /// for this wallet. In the event of an incorrect migration, the backup can be restored using restorewallet.
 /// Encrypted wallets must have the passphrase provided as an argument to this call.
-///
+/// 
 /// This RPC may take a long time to complete. Increasing the RPC client timeout is recommended.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1288,7 +1274,7 @@ pub struct RescanBlockchain {
 }
 
 /// Restores and loads a wallet from backup.
-///
+/// 
 /// The rescan is significantly faster if block filters are available
 /// (using startup option "-blockfilterindex=1").
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -1302,7 +1288,7 @@ pub struct RestoreWallet {
 }
 
 /// EXPERIMENTAL warning: this call may be changed in future releases.
-///
+/// 
 /// Spend the value of all (or specific) confirmed UTXOs and unconfirmed change in the wallet to one or more recipients.
 /// Unconfirmed inbound UTXOs and locked UTXOs will not be spent. Sendall will respect the avoid_reuse wallet flag.
 /// If your wallet contains many small inputs, either because it received tiny payments or as a result of accumulating change, consider using `send_max` to exclude inputs that are worth less than the fees needed to spend them.
@@ -1346,7 +1332,7 @@ pub struct SendManyVerbose1 {
 }
 
 /// EXPERIMENTAL warning: this call may be changed in future releases.
-///
+/// 
 /// Send a transaction.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1502,3 +1488,4 @@ pub struct WalletProcessPsbt {
     /// The base64-encoded partially signed transaction
     pub psbt: String,
 }
+

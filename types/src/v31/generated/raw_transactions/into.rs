@@ -21,12 +21,8 @@ use bitcoin::error::UnprefixedHexError;
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::hex::FromHex as _;
 use bitcoin::key::{self, PrivateKey, PublicKey};
-use bitcoin::{
-    amount, block, hex, network, psbt, sign_message, witness_program, witness_version, Address,
-    Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence,
-    SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram,
-    WitnessVersion, Work, Wtxid,
-};
+use bitcoin::sign_message;
+use bitcoin::{amount, block, hex, network, psbt, witness_program, witness_version, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence, SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram, WitnessVersion, Work, Wtxid};
 
 use super::*;
 use crate::error::write_err;
@@ -39,11 +35,7 @@ impl AbortPrivateBroadcast {
         use AbortPrivateBroadcastError as E;
 
         Ok(model::AbortPrivateBroadcast {
-            removed_transactions: self
-                .removed_transactions
-                .into_iter()
-                .map(|x| crate::reconstruct::transaction(&x).map_err(E::RemovedTransactions))
-                .collect::<Result<Vec<_>, _>>()?,
+            removed_transactions: self.removed_transactions.into_iter().map(|x| crate::reconstruct::transaction(&x).map_err(E::RemovedTransactions)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -58,8 +50,7 @@ pub enum AbortPrivateBroadcastError {
 impl fmt::Display for AbortPrivateBroadcastError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::RemovedTransactions(ref e) =>
-                write_err!(f, "conversion of the `RemovedTransactions` field failed"; e),
+            Self::RemovedTransactions(ref e) => write_err!(f, "conversion of the `RemovedTransactions` field failed"; e),
         }
     }
 }
@@ -79,26 +70,9 @@ impl AnalyzePsbt {
         use AnalyzePsbtError as E;
 
         Ok(model::AnalyzePsbt {
-            inputs: self
-                .inputs
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inputs))
-                .collect::<Result<Vec<_>, _>>()?,
-            estimated_vsize: self
-                .estimated_vsize
-                .map(|x| {
-                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
-                        value: x as i64,
-                        field: "estimated_vsize".to_owned(),
-                    })
-                })
-                .transpose()?,
-            estimated_fee_rate: self
-                .estimated_fee_rate
-                .map(|f| crate::btc_per_kb(f).map_err(E::EstimatedFeeRate))
-                .transpose()?
-                .flatten(),
+            inputs: self.inputs.unwrap_or_default().into_iter().map(|x| x.into_model().map_err(E::Inputs)).collect::<Result<Vec<_>, _>>()?,
+            estimated_vsize: self.estimated_vsize.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "estimated_vsize".to_owned() })).transpose()?,
+            estimated_fee_rate: self.estimated_fee_rate.map(|f| crate::btc_per_kb(f).map_err(E::EstimatedFeeRate)).transpose()?.flatten(),
             fee: self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?,
             next: self.next,
         })
@@ -122,8 +96,7 @@ impl fmt::Display for AnalyzePsbtError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Inputs(ref e) => write_err!(f, "conversion of the `Inputs` field failed"; e),
-            Self::EstimatedFeeRate(ref e) =>
-                write_err!(f, "conversion of the `EstimatedFeeRate` field failed"; e),
+            Self::EstimatedFeeRate(ref e) => write_err!(f, "conversion of the `EstimatedFeeRate` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
@@ -186,34 +159,14 @@ impl std::error::Error for AnalyzePsbtInputError {
 
 impl AnalyzePsbtInputsItemMissing {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::AnalyzePsbtInputMissing, AnalyzePsbtInputMissingError> {
+    pub fn into_model(self) -> Result<model::AnalyzePsbtInputMissing, AnalyzePsbtInputMissingError> {
         use AnalyzePsbtInputMissingError as E;
 
         Ok(model::AnalyzePsbtInputMissing {
-            pubkeys: self
-                .pubkeys
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.parse::<hash160::Hash>().map_err(E::Pubkeys))
-                .collect::<Result<Vec<_>, _>>()?,
-            signatures: self
-                .signatures
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.parse::<hash160::Hash>().map_err(E::Signatures))
-                .collect::<Result<Vec<_>, _>>()?,
-            redeem_script: self
-                .redeem_script
-                .map(|x| x.parse::<hash160::Hash>())
-                .transpose()
-                .map_err(E::RedeemScript)?,
-            witness_script: self
-                .witness_script
-                .map(|x| x.parse::<sha256::Hash>())
-                .transpose()
-                .map_err(E::WitnessScript)?,
+            pubkeys: self.pubkeys.unwrap_or_default().into_iter().map(|x| x.parse::<hash160::Hash>().map_err(E::Pubkeys)).collect::<Result<Vec<_>, _>>()?,
+            signatures: self.signatures.unwrap_or_default().into_iter().map(|x| x.parse::<hash160::Hash>().map_err(E::Signatures)).collect::<Result<Vec<_>, _>>()?,
+            redeem_script: self.redeem_script.map(|x| x.parse::<hash160::Hash>()).transpose().map_err(E::RedeemScript)?,
+            witness_script: self.witness_script.map(|x| x.parse::<sha256::Hash>()).transpose().map_err(E::WitnessScript)?,
         })
     }
 }
@@ -235,12 +188,9 @@ impl fmt::Display for AnalyzePsbtInputMissingError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Pubkeys(ref e) => write_err!(f, "conversion of the `Pubkeys` field failed"; e),
-            Self::Signatures(ref e) =>
-                write_err!(f, "conversion of the `Signatures` field failed"; e),
-            Self::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `RedeemScript` field failed"; e),
-            Self::WitnessScript(ref e) =>
-                write_err!(f, "conversion of the `WitnessScript` field failed"; e),
+            Self::Signatures(ref e) => write_err!(f, "conversion of the `Signatures` field failed"; e),
+            Self::RedeemScript(ref e) => write_err!(f, "conversion of the `RedeemScript` field failed"; e),
+            Self::WitnessScript(ref e) => write_err!(f, "conversion of the `WitnessScript` field failed"; e),
         }
     }
 }
@@ -295,9 +245,7 @@ impl CombineRawTransaction {
     pub fn into_model(self) -> Result<model::CombineRawTransaction, CombineRawTransactionError> {
         use CombineRawTransactionError as E;
 
-        Ok(model::CombineRawTransaction(
-            encode::deserialize_hex::<Transaction>(&self.0).map_err(E::Inner)?,
-        ))
+        Ok(model::CombineRawTransaction(encode::deserialize_hex::<Transaction>(&self.0).map_err(E::Inner)?))
     }
 }
 
@@ -396,9 +344,7 @@ impl CreateRawTransaction {
     pub fn into_model(self) -> Result<model::CreateRawTransaction, CreateRawTransactionError> {
         use CreateRawTransactionError as E;
 
-        Ok(model::CreateRawTransaction(
-            encode::deserialize_hex::<Transaction>(&self.0).map_err(E::Inner)?,
-        ))
+        Ok(model::CreateRawTransaction(encode::deserialize_hex::<Transaction>(&self.0).map_err(E::Inner)?))
     }
 }
 
@@ -471,9 +417,7 @@ impl DecodeRawTransaction {
     pub fn into_model(self) -> Result<model::DecodeRawTransaction, DecodeRawTransactionError> {
         use DecodeRawTransactionError as E;
 
-        Ok(model::DecodeRawTransaction(
-            crate::reconstruct::transaction(&self).map_err(E::Reconstruct)?,
-        ))
+        Ok(model::DecodeRawTransaction(crate::reconstruct::transaction(&self).map_err(E::Reconstruct)?))
     }
 }
 
@@ -487,8 +431,7 @@ pub enum DecodeRawTransactionError {
 impl fmt::Display for DecodeRawTransactionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Reconstruct(ref e) =>
-                write_err!(f, "conversion of the `Reconstruct` field failed"; e),
+            Self::Reconstruct(ref e) => write_err!(f, "conversion of the `Reconstruct` field failed"; e),
         }
     }
 }
@@ -511,18 +454,10 @@ impl DecodeScript {
             script_pubkey: None, // no raw field; canonical is optional
             descriptor: Some(self.desc),
             type_: self.type_,
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?,
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
             required_signatures: None, // no raw field; canonical is optional
-            addresses: vec![],         // no raw field; canonical is a list
-            p2sh: self
-                .p2sh
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::P2sh)?,
+            addresses: vec![], // no raw field; canonical is a list
+            p2sh: self.p2sh.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::P2sh)?,
             p2sh_segwit: None, // no raw field; canonical is optional
         })
     }
@@ -564,11 +499,7 @@ impl DescriptorProcessPsbt {
         Ok(model::DescriptorProcessPsbt {
             psbt: self.psbt.parse::<Psbt>().map_err(E::Psbt)?,
             complete: self.complete,
-            tx: self
-                .hex
-                .map(|x| encode::deserialize_hex::<Transaction>(&x))
-                .transpose()
-                .map_err(E::Tx)?,
+            tx: self.hex.map(|x| encode::deserialize_hex::<Transaction>(&x)).transpose().map_err(E::Tx)?,
         })
     }
 }
@@ -608,11 +539,7 @@ impl FinalizePsbt {
 
         Ok(model::FinalizePsbt {
             psbt: self.psbt.map(|x| x.parse::<Psbt>()).transpose().map_err(E::Psbt)?,
-            tx: self
-                .hex
-                .map(|x| encode::deserialize_hex::<Transaction>(&x))
-                .transpose()
-                .map_err(E::Tx)?,
+            tx: self.hex.map(|x| encode::deserialize_hex::<Transaction>(&x)).transpose().map_err(E::Tx)?,
             complete: self.complete,
         })
     }
@@ -689,17 +616,11 @@ impl std::error::Error for FundRawTransactionError {
 
 impl GetPrivateBroadcastInfo {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::GetPrivateBroadcastInfo, GetPrivateBroadcastInfoError> {
+    pub fn into_model(self) -> Result<model::GetPrivateBroadcastInfo, GetPrivateBroadcastInfoError> {
         use GetPrivateBroadcastInfoError as E;
 
         Ok(model::GetPrivateBroadcastInfo {
-            transactions: self
-                .transactions
-                .into_iter()
-                .map(|x| crate::reconstruct::transaction(&x).map_err(E::Transactions))
-                .collect::<Result<Vec<_>, _>>()?,
+            transactions: self.transactions.into_iter().map(|x| crate::reconstruct::transaction(&x).map_err(E::Transactions)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -714,8 +635,7 @@ pub enum GetPrivateBroadcastInfoError {
 impl fmt::Display for GetPrivateBroadcastInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Transactions(ref e) =>
-                write_err!(f, "conversion of the `Transactions` field failed"; e),
+            Self::Transactions(ref e) => write_err!(f, "conversion of the `Transactions` field failed"; e),
         }
     }
 }
@@ -734,9 +654,7 @@ impl GetRawTransactionVerbose0 {
     pub fn into_model(self) -> Result<model::GetRawTransaction, GetRawTransactionError> {
         use GetRawTransactionError as E;
 
-        Ok(model::GetRawTransaction(
-            encode::deserialize_hex::<Transaction>(&self.0).map_err(E::Inner)?,
-        ))
+        Ok(model::GetRawTransaction(encode::deserialize_hex::<Transaction>(&self.0).map_err(E::Inner)?))
     }
 }
 
@@ -766,28 +684,15 @@ impl std::error::Error for GetRawTransactionError {
 
 impl GetRawTransactionVerbose1 {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::GetRawTransactionVerbose, GetRawTransactionVerboseError> {
+    pub fn into_model(self) -> Result<model::GetRawTransactionVerbose, GetRawTransactionVerboseError> {
         use GetRawTransactionVerboseError as E;
 
         Ok(model::GetRawTransactionVerbose {
             in_active_chain: self.in_active_chain,
-            transaction: encode::deserialize_hex::<Transaction>(&self.hex)
-                .map_err(E::Transaction)?,
-            block_hash: self
-                .block_hash
-                .map(|x| x.parse::<BlockHash>())
-                .transpose()
-                .map_err(E::BlockHash)?,
-            confirmations: self
-                .confirmations
-                .map(|x| crate::to_u64(x, "confirmations"))
-                .transpose()?,
-            transaction_time: self
-                .time
-                .map(|x| crate::to_u64(x, "transaction_time"))
-                .transpose()?,
+            transaction: encode::deserialize_hex::<Transaction>(&self.hex).map_err(E::Transaction)?,
+            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            confirmations: self.confirmations.map(|x| crate::to_u64(x, "confirmations")).transpose()?,
+            transaction_time: self.time.map(|x| crate::to_u64(x, "transaction_time")).transpose()?,
             block_time: self.block_time.map(|x| crate::to_u64(x, "block_time")).transpose()?,
         })
     }
@@ -807,10 +712,8 @@ pub enum GetRawTransactionVerboseError {
 impl fmt::Display for GetRawTransactionVerboseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Transaction(ref e) =>
-                write_err!(f, "conversion of the `Transaction` field failed"; e),
-            Self::BlockHash(ref e) =>
-                write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::Transaction(ref e) => write_err!(f, "conversion of the `Transaction` field failed"; e),
+            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -905,12 +808,7 @@ impl SignRawTransactionWithKey {
         Ok(model::SignRawTransaction {
             tx: encode::deserialize_hex::<Transaction>(&self.hex).map_err(E::Tx)?,
             complete: self.complete,
-            errors: self
-                .errors
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Errors))
-                .collect::<Result<Vec<_>, _>>()?,
+            errors: self.errors.unwrap_or_default().into_iter().map(|x| x.into_model().map_err(E::Errors)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -973,8 +871,7 @@ impl fmt::Display for SignFailError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
-            Self::ScriptSig(ref e) =>
-                write_err!(f, "conversion of the `ScriptSig` field failed"; e),
+            Self::ScriptSig(ref e) => write_err!(f, "conversion of the `ScriptSig` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1002,22 +899,8 @@ impl SubmitPackage {
 
         Ok(model::SubmitPackage {
             package_msg: self.package_msg,
-            tx_results: self
-                .tx_results
-                .into_iter()
-                .map(|(k, v)| {
-                    Ok::<_, E>((
-                        k.parse::<Wtxid>().map_err(E::TxResultsKey)?,
-                        v.into_model().map_err(E::TxResultsValue)?,
-                    ))
-                })
-                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
-            replaced_transactions: self
-                .replaced_transactions
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.parse::<Txid>().map_err(E::ReplacedTransactions))
-                .collect::<Result<Vec<_>, _>>()?,
+            tx_results: self.tx_results.into_iter().map(|(k, v)| Ok::<_, E>((k.parse::<Wtxid>().map_err(E::TxResultsKey)?, v.into_model().map_err(E::TxResultsValue)?))).collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
+            replaced_transactions: self.replaced_transactions.unwrap_or_default().into_iter().map(|x| x.parse::<Txid>().map_err(E::ReplacedTransactions)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1036,12 +919,9 @@ pub enum SubmitPackageError {
 impl fmt::Display for SubmitPackageError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::TxResultsKey(ref e) =>
-                write_err!(f, "conversion of the `TxResultsKey` field failed"; e),
-            Self::TxResultsValue(ref e) =>
-                write_err!(f, "conversion of the `TxResultsValue` field failed"; e),
-            Self::ReplacedTransactions(ref e) =>
-                write_err!(f, "conversion of the `ReplacedTransactions` field failed"; e),
+            Self::TxResultsKey(ref e) => write_err!(f, "conversion of the `TxResultsKey` field failed"; e),
+            Self::TxResultsValue(ref e) => write_err!(f, "conversion of the `TxResultsValue` field failed"; e),
+            Self::ReplacedTransactions(ref e) => write_err!(f, "conversion of the `ReplacedTransactions` field failed"; e),
         }
     }
 }
@@ -1064,11 +944,7 @@ impl SubmitPackageTxResults {
 
         Ok(model::SubmitPackageTxResult {
             txid: self.txid.parse::<Txid>().map_err(E::Txid)?,
-            other_wtxid: self
-                .other_wtxid
-                .map(|x| x.parse::<Wtxid>())
-                .transpose()
-                .map_err(E::OtherWtxid)?,
+            other_wtxid: self.other_wtxid.map(|x| x.parse::<Wtxid>()).transpose().map_err(E::OtherWtxid)?,
             vsize: self.vsize.map(|x| crate::to_u32(x, "vsize")).transpose()?,
             fees: self.fees.map(|x| x.into_model()).transpose().map_err(E::Fees)?,
             error: self.error,
@@ -1093,8 +969,7 @@ impl fmt::Display for SubmitPackageTxResultError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
-            Self::OtherWtxid(ref e) =>
-                write_err!(f, "conversion of the `OtherWtxid` field failed"; e),
+            Self::OtherWtxid(ref e) => write_err!(f, "conversion of the `OtherWtxid` field failed"; e),
             Self::Fees(ref e) => write_err!(f, "conversion of the `Fees` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
@@ -1119,24 +994,13 @@ impl From<crate::NumericError> for SubmitPackageTxResultError {
 
 impl SubmitPackageTxResultsFees {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::SubmitPackageTxResultFees, SubmitPackageTxResultFeesError> {
+    pub fn into_model(self) -> Result<model::SubmitPackageTxResultFees, SubmitPackageTxResultFeesError> {
         use SubmitPackageTxResultFeesError as E;
 
         Ok(model::SubmitPackageTxResultFees {
             base_fee: Amount::from_btc(self.base).map_err(E::BaseFee)?,
-            effective_fee_rate: self
-                .effective_fee_rate
-                .map(|f| crate::btc_per_kb(f).map_err(E::EffectiveFeeRate))
-                .transpose()?
-                .flatten(),
-            effective_includes: self
-                .effective_includes
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.parse::<Wtxid>().map_err(E::EffectiveIncludes))
-                .collect::<Result<Vec<_>, _>>()?,
+            effective_fee_rate: self.effective_fee_rate.map(|f| crate::btc_per_kb(f).map_err(E::EffectiveFeeRate)).transpose()?.flatten(),
+            effective_includes: self.effective_includes.unwrap_or_default().into_iter().map(|x| x.parse::<Wtxid>().map_err(E::EffectiveIncludes)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1156,10 +1020,8 @@ impl fmt::Display for SubmitPackageTxResultFeesError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::BaseFee(ref e) => write_err!(f, "conversion of the `BaseFee` field failed"; e),
-            Self::EffectiveFeeRate(ref e) =>
-                write_err!(f, "conversion of the `EffectiveFeeRate` field failed"; e),
-            Self::EffectiveIncludes(ref e) =>
-                write_err!(f, "conversion of the `EffectiveIncludes` field failed"; e),
+            Self::EffectiveFeeRate(ref e) => write_err!(f, "conversion of the `EffectiveFeeRate` field failed"; e),
+            Self::EffectiveIncludes(ref e) => write_err!(f, "conversion of the `EffectiveIncludes` field failed"; e),
         }
     }
 }
@@ -1181,11 +1043,7 @@ impl TestMempoolAccept {
         use TestMempoolAcceptError as E;
 
         Ok(model::TestMempoolAccept {
-            results: self
-                .0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Results))
-                .collect::<Result<Vec<_>, _>>()?,
+            results: self.0.into_iter().map(|x| x.into_model().map_err(E::Results)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1278,14 +1136,8 @@ impl TestMempoolAcceptItemFees {
 
         Ok(model::MempoolAcceptanceFees {
             base: Amount::from_btc(self.base).map_err(E::Base)?,
-            effective_fee_rate: crate::btc_per_kb(self.effective_fee_rate)
-                .map_err(E::EffectiveFeeRate)?,
-            effective_includes: Some(
-                self.effective_includes
-                    .into_iter()
-                    .map(|x| x.parse::<Wtxid>().map_err(E::EffectiveIncludes))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
+            effective_fee_rate: crate::btc_per_kb(self.effective_fee_rate).map_err(E::EffectiveFeeRate)?,
+            effective_includes: Some(self.effective_includes.into_iter().map(|x| x.parse::<Wtxid>().map_err(E::EffectiveIncludes)).collect::<Result<Vec<_>, _>>()?),
         })
     }
 }
@@ -1305,10 +1157,8 @@ impl fmt::Display for MempoolAcceptanceFeesError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Base(ref e) => write_err!(f, "conversion of the `Base` field failed"; e),
-            Self::EffectiveFeeRate(ref e) =>
-                write_err!(f, "conversion of the `EffectiveFeeRate` field failed"; e),
-            Self::EffectiveIncludes(ref e) =>
-                write_err!(f, "conversion of the `EffectiveIncludes` field failed"; e),
+            Self::EffectiveFeeRate(ref e) => write_err!(f, "conversion of the `EffectiveFeeRate` field failed"; e),
+            Self::EffectiveIncludes(ref e) => write_err!(f, "conversion of the `EffectiveIncludes` field failed"; e),
         }
     }
 }
@@ -1356,3 +1206,4 @@ impl std::error::Error for UtxoUpdatePsbtError {
         }
     }
 }
+

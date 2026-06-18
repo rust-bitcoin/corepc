@@ -11,9 +11,17 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+
 use types::v31::generated::{
-    GetAddedNodeInfo, GetAddrManInfo, GetConnectionCount, GetNetTotals, GetNetworkInfo,
-    GetNodeAddresses, GetPeerInfo, ListBanned, SetNetworkActive,
+    GetAddedNodeInfo,
+    GetAddrManInfo,
+    GetConnectionCount,
+    GetNetTotals,
+    GetNetworkInfo,
+    GetNodeAddresses,
+    GetPeerInfo,
+    ListBanned,
+    SetNetworkActive,
 };
 
 use crate::client_async::error::Result;
@@ -84,12 +92,7 @@ impl Client {
     /// Nodes added using addnode (or -connect) are protected from DoS disconnection and are not required to be
     /// full nodes/support SegWit as other outbound peers are (though such peers will not be synced from).
     /// Addnode connections are limited to 8 at a time and are counted separately from the -maxconnections limit.
-    pub async fn add_node_with(
-        &self,
-        node: String,
-        command: String,
-        opts: AddNodeOptions,
-    ) -> Result<()> {
+    pub async fn add_node_with(&self, node: String, command: String, opts: AddNodeOptions) -> Result<()> {
         self.call_raw("addnode", &[json!(node), json!(command), json!(opts.v2transport)]).await
     }
 
@@ -103,9 +106,9 @@ impl Client {
     /// `disconnectnode` with required arguments only.
     ///
     /// Immediately disconnects from the specified peer node.
-    ///
+    /// 
     /// Strictly one out of 'address' and 'nodeid' can be provided to identify the node.
-    ///
+    /// 
     /// To disconnect by nodeid, either set 'address' to the empty string, or call using the named 'nodeid' argument only.
     pub async fn disconnect_node(&self) -> Result<()> {
         self.call_raw("disconnectnode", &[(); 0] as &[()]).await
@@ -114,9 +117,9 @@ impl Client {
     /// `disconnectnode` with all optional arguments via [`DisconnectNodeOptions`].
     ///
     /// Immediately disconnects from the specified peer node.
-    ///
+    /// 
     /// Strictly one out of 'address' and 'nodeid' can be provided to identify the node.
-    ///
+    /// 
     /// To disconnect by nodeid, either set 'address' to the empty string, or call using the named 'nodeid' argument only.
     pub async fn disconnect_node_with(&self, opts: DisconnectNodeOptions) -> Result<()> {
         self.call_raw("disconnectnode", &[json!(opts.address), json!(opts.nodeid)]).await
@@ -134,10 +137,7 @@ impl Client {
     ///
     /// Returns information about the given added node, or all added nodes
     /// (note that onetry addnodes are not listed here)
-    pub async fn get_added_node_info_with(
-        &self,
-        opts: GetAddedNodeInfoOptions,
-    ) -> Result<GetAddedNodeInfo> {
+    pub async fn get_added_node_info_with(&self, opts: GetAddedNodeInfoOptions) -> Result<GetAddedNodeInfo> {
         self.call_raw("getaddednodeinfo", &[json!(opts.node)]).await
     }
 
@@ -184,10 +184,7 @@ impl Client {
     /// Return known addresses, after filtering for quality and recency.
     /// These can potentially be used to find new peers in the network.
     /// The total number of addresses known to the node may be higher.
-    pub async fn get_node_addresses_with(
-        &self,
-        opts: GetNodeAddressesOptions,
-    ) -> Result<GetNodeAddresses> {
+    pub async fn get_node_addresses_with(&self, opts: GetNodeAddressesOptions) -> Result<GetNodeAddresses> {
         self.call_raw("getnodeaddresses", &[json!(opts.count), json!(opts.network)]).await
     }
 
@@ -210,7 +207,9 @@ impl Client {
     /// Requests that a ping be sent to all other nodes, to measure ping time.
     /// Results are provided in getpeerinfo.
     /// Ping command is handled in queue with all other commands, so it measures processing backlog, not just network ping.
-    pub async fn ping(&self) -> Result<()> { self.call_raw("ping", &[(); 0] as &[()]).await }
+    pub async fn ping(&self) -> Result<()> {
+        self.call_raw("ping", &[(); 0] as &[()]).await
+    }
 
     /// `setban` with required arguments only.
     ///
@@ -222,17 +221,8 @@ impl Client {
     /// `setban` with all optional arguments via [`SetBanOptions`].
     ///
     /// Attempts to add or remove an IP/Subnet from the banned list.
-    pub async fn set_ban_with(
-        &self,
-        sub_net: String,
-        command: String,
-        opts: SetBanOptions,
-    ) -> Result<()> {
-        self.call_raw(
-            "setban",
-            &[json!(sub_net), json!(command), json!(opts.ban_time), json!(opts.absolute)],
-        )
-        .await
+    pub async fn set_ban_with(&self, sub_net: String, command: String, opts: SetBanOptions) -> Result<()> {
+        self.call_raw("setban", &[json!(sub_net), json!(command), json!(opts.ban_time), json!(opts.absolute)]).await
     }
 
     /// `setnetworkactive` with required arguments only.
@@ -241,4 +231,5 @@ impl Client {
     pub async fn set_network_active(&self, state: bool) -> Result<SetNetworkActive> {
         self.call_raw("setnetworkactive", &[json!(state)]).await
     }
+
 }

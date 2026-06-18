@@ -11,9 +11,14 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+
 use types::v31::generated::{
-    GetBlockTemplate, GetMiningInfo, GetNetworkHashPs, GetPrioritisedTransactions,
-    PrioritiseTransaction, SubmitBlock,
+    GetBlockTemplate,
+    GetMiningInfo,
+    GetNetworkHashPs,
+    GetPrioritisedTransactions,
+    PrioritiseTransaction,
+    SubmitBlock,
 };
 
 use crate::client_async::error::Result;
@@ -74,10 +79,7 @@ impl Client {
     ///     <https://github.com/bitcoin/bips/blob/master/bip-0023.mediawiki>
     ///     <https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki#getblocktemplate_changes>
     ///     <https://github.com/bitcoin/bips/blob/master/bip-0145.mediawiki>
-    pub async fn get_block_template(
-        &self,
-        template_request: GetBlockTemplateTemplateRequest,
-    ) -> Result<GetBlockTemplate> {
+    pub async fn get_block_template(&self, template_request: GetBlockTemplateTemplateRequest) -> Result<GetBlockTemplate> {
         self.call_raw("getblocktemplate", &[json!(template_request)]).await
     }
 
@@ -102,10 +104,7 @@ impl Client {
     /// Returns the estimated network hashes per second based on the last n blocks.
     /// Pass in \[blocks\] to override # of blocks, -1 specifies since last difficulty change.
     /// Pass in \[height\] to estimate the network speed at the time when a certain block was found.
-    pub async fn get_network_hash_ps_with(
-        &self,
-        opts: GetNetworkHashPsOptions,
-    ) -> Result<GetNetworkHashPs> {
+    pub async fn get_network_hash_ps_with(&self, opts: GetNetworkHashPsOptions) -> Result<GetNetworkHashPs> {
         self.call_raw("getnetworkhashps", &[json!(opts.n_blocks), json!(opts.height)]).await
     }
 
@@ -119,25 +118,15 @@ impl Client {
     /// `prioritisetransaction` with required arguments only.
     ///
     /// Accepts the transaction into mined blocks at a higher (or lower) priority
-    pub async fn prioritise_transaction(
-        &self,
-        txid: String,
-        fee_delta: i64,
-    ) -> Result<PrioritiseTransaction> {
+    pub async fn prioritise_transaction(&self, txid: String, fee_delta: i64) -> Result<PrioritiseTransaction> {
         self.call_raw("prioritisetransaction", &[json!(txid), json!(null), json!(fee_delta)]).await
     }
 
     /// `prioritisetransaction` with all optional arguments via [`PrioritiseTransactionOptions`].
     ///
     /// Accepts the transaction into mined blocks at a higher (or lower) priority
-    pub async fn prioritise_transaction_with(
-        &self,
-        txid: String,
-        fee_delta: i64,
-        opts: PrioritiseTransactionOptions,
-    ) -> Result<PrioritiseTransaction> {
-        self.call_raw("prioritisetransaction", &[json!(txid), json!(opts.dummy), json!(fee_delta)])
-            .await
+    pub async fn prioritise_transaction_with(&self, txid: String, fee_delta: i64, opts: PrioritiseTransactionOptions) -> Result<PrioritiseTransaction> {
+        self.call_raw("prioritisetransaction", &[json!(txid), json!(opts.dummy), json!(fee_delta)]).await
     }
 
     /// `submitblock` with required arguments only.
@@ -152,11 +141,7 @@ impl Client {
     ///
     /// Attempts to submit new block to network.
     /// See <https://en.bitcoin.it/wiki/BIP_0022> for full specification.
-    pub async fn submit_block_with(
-        &self,
-        hex_data: String,
-        opts: SubmitBlockOptions,
-    ) -> Result<SubmitBlock> {
+    pub async fn submit_block_with(&self, hex_data: String, opts: SubmitBlockOptions) -> Result<SubmitBlock> {
         self.call_raw("submitblock", &[json!(hex_data), json!(opts.dummy)]).await
     }
 
@@ -167,4 +152,5 @@ impl Client {
     pub async fn submit_header(&self, hex_data: String) -> Result<()> {
         self.call_raw("submitheader", &[json!(hex_data)]).await
     }
+
 }

@@ -25,3 +25,4 @@ pub struct EnumerateSignersSignersItem {
     /// Device name
     pub name: String,
 }
+

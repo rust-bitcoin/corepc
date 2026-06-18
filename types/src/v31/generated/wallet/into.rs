@@ -21,12 +21,8 @@ use bitcoin::error::UnprefixedHexError;
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::hex::FromHex as _;
 use bitcoin::key::{self, PrivateKey, PublicKey};
-use bitcoin::{
-    amount, block, hex, network, psbt, sign_message, witness_program, witness_version, Address,
-    Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence,
-    SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram,
-    WitnessVersion, Work, Wtxid,
-};
+use bitcoin::sign_message;
+use bitcoin::{amount, block, hex, network, psbt, witness_program, witness_version, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence, SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram, WitnessVersion, Work, Wtxid};
 
 use super::*;
 use crate::error::write_err;
@@ -62,8 +58,7 @@ impl fmt::Display for BumpFeeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
-            Self::OriginalFee(ref e) =>
-                write_err!(f, "conversion of the `OriginalFee` field failed"; e),
+            Self::OriginalFee(ref e) => write_err!(f, "conversion of the `OriginalFee` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
         }
     }
@@ -85,21 +80,31 @@ impl CreateWallet {
     pub fn into_model(self) -> Result<model::CreateWallet, CreateWalletError> {
         use CreateWalletError as E;
 
-        Ok(model::CreateWallet { name: self.name, warnings: self.warnings.unwrap_or_default() })
+        Ok(model::CreateWallet {
+            name: self.name,
+            warnings: self.warnings.unwrap_or_default(),
+        })
     }
 }
 
 /// Error when converting a `CreateWallet` type into the model type.
 #[derive(Debug)]
-pub enum CreateWalletError {}
+pub enum CreateWalletError {
+}
 
 impl fmt::Display for CreateWalletError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+        }
+    }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for CreateWalletError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+        }
+    }
 }
 
 impl GetAddressInfo {
@@ -118,70 +123,20 @@ impl GetAddressInfo {
             is_script: self.is_script,
             is_change: Some(self.is_change),
             is_witness: self.is_witness,
-            witness_version: match (self.witness_version, self.witness_program.as_ref()) {
-                (Some(v), Some(_)) => Some(
-                    WitnessVersion::try_from(u8::try_from(v).map_err(|_| {
-                        crate::NumericError::Overflow {
-                            value: v,
-                            field: "witness_version".to_owned(),
-                        }
-                    })?)
-                    .map_err(E::WitnessVersion)?,
-                ),
-                _ => None,
-            },
-            witness_program: match (self.witness_version, self.witness_program.as_ref()) {
-                (Some(v), Some(p)) => Some({
-                    let wv = WitnessVersion::try_from(u8::try_from(v).map_err(|_| {
-                        crate::NumericError::Overflow {
-                            value: v,
-                            field: "witness_program".to_owned(),
-                        }
-                    })?)
-                    .map_err(E::WitnessVersion)?;
-                    let bytes = Vec::<u8>::from_hex(p).map_err(E::WitnessProgramBytes)?;
-                    WitnessProgram::new(wv, &bytes).map_err(E::WitnessProgram)?
-                }),
-                _ => None,
-            },
-            script: self
-                .script
-                .map(|x| serde_json::from_value::<model::ScriptType>(serde_json::Value::String(x)))
-                .transpose()
-                .map_err(E::Script)?,
+            witness_version: match (self.witness_version, self.witness_program.as_ref()) { (Some(v), Some(_)) => Some(WitnessVersion::try_from(u8::try_from(v).map_err(|_| crate::NumericError::Overflow { value: v, field: "witness_version".to_owned() })?).map_err(E::WitnessVersion)?), _ => None },
+            witness_program: match (self.witness_version, self.witness_program.as_ref()) { (Some(v), Some(p)) => Some({ let wv = WitnessVersion::try_from(u8::try_from(v).map_err(|_| crate::NumericError::Overflow { value: v, field: "witness_program".to_owned() })?).map_err(E::WitnessVersion)?; let bytes = Vec::<u8>::from_hex(p).map_err(E::WitnessProgramBytes)?; WitnessProgram::new(wv, &bytes).map_err(E::WitnessProgram)? }), _ => None },
+            script: self.script.map(|x| serde_json::from_value::<model::ScriptType>(serde_json::Value::String(x))).transpose().map_err(E::Script)?,
             hex: self.hex.map(|x| ScriptBuf::from_hex(&x)).transpose().map_err(E::Hex)?,
-            pubkeys: self
-                .pubkeys
-                .map(|x| {
-                    x.into_iter()
-                        .map(|y| y.parse::<PublicKey>().map_err(E::Pubkeys))
-                        .collect::<Result<Vec<_>, _>>()
-                })
-                .transpose()?,
-            sigs_required: self
-                .sigs_required
-                .map(|x| crate::to_u32(x, "sigs_required"))
-                .transpose()?,
+            pubkeys: self.pubkeys.map(|x| x.into_iter().map(|y| y.parse::<PublicKey>().map_err(E::Pubkeys)).collect::<Result<Vec<_>, _>>()).transpose()?,
+            sigs_required: self.sigs_required.map(|x| crate::to_u32(x, "sigs_required")).transpose()?,
             pubkey: self.pubkey.map(|x| x.parse::<PublicKey>()).transpose().map_err(E::Pubkey)?,
             embedded: self.embedded.map(|x| x.into_model()).transpose().map_err(E::Embedded)?,
             is_compressed: self.iscompressed,
             label: None, // no raw field; canonical is optional
             timestamp: self.timestamp.map(|x| crate::to_u32(x, "timestamp")).transpose()?,
-            hd_key_path: self
-                .hd_key_path
-                .map(|x| x.parse::<bip32::DerivationPath>())
-                .transpose()
-                .map_err(E::HdKeyPath)?,
-            hd_seed_id: self
-                .hdseedid
-                .map(|x| x.parse::<hash160::Hash>())
-                .transpose()
-                .map_err(E::HdSeedId)?,
-            hd_master_fingerprint: self
-                .hdmasterfingerprint
-                .map(|x| x.parse::<bip32::Fingerprint>())
-                .transpose()
-                .map_err(E::HdMasterFingerprint)?,
+            hd_key_path: self.hd_key_path.map(|x| x.parse::<bip32::DerivationPath>()).transpose().map_err(E::HdKeyPath)?,
+            hd_seed_id: self.hdseedid.map(|x| x.parse::<hash160::Hash>()).transpose().map_err(E::HdSeedId)?,
+            hd_master_fingerprint: self.hdmasterfingerprint.map(|x| x.parse::<bip32::Fingerprint>()).transpose().map_err(E::HdMasterFingerprint)?,
             labels: self.labels,
         })
     }
@@ -224,24 +179,18 @@ impl fmt::Display for GetAddressInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
-            Self::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
-            Self::WitnessVersion(ref e) =>
-                write_err!(f, "conversion of the `WitnessVersion` field failed"; e),
-            Self::WitnessProgramBytes(ref e) =>
-                write_err!(f, "conversion of the `WitnessProgramBytes` field failed"; e),
-            Self::WitnessProgram(ref e) =>
-                write_err!(f, "conversion of the `WitnessProgram` field failed"; e),
+            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::WitnessVersion(ref e) => write_err!(f, "conversion of the `WitnessVersion` field failed"; e),
+            Self::WitnessProgramBytes(ref e) => write_err!(f, "conversion of the `WitnessProgramBytes` field failed"; e),
+            Self::WitnessProgram(ref e) => write_err!(f, "conversion of the `WitnessProgram` field failed"; e),
             Self::Script(ref e) => write_err!(f, "conversion of the `Script` field failed"; e),
             Self::Hex(ref e) => write_err!(f, "conversion of the `Hex` field failed"; e),
             Self::Pubkeys(ref e) => write_err!(f, "conversion of the `Pubkeys` field failed"; e),
             Self::Pubkey(ref e) => write_err!(f, "conversion of the `Pubkey` field failed"; e),
             Self::Embedded(ref e) => write_err!(f, "conversion of the `Embedded` field failed"; e),
-            Self::HdKeyPath(ref e) =>
-                write_err!(f, "conversion of the `HdKeyPath` field failed"; e),
+            Self::HdKeyPath(ref e) => write_err!(f, "conversion of the `HdKeyPath` field failed"; e),
             Self::HdSeedId(ref e) => write_err!(f, "conversion of the `HdSeedId` field failed"; e),
-            Self::HdMasterFingerprint(ref e) =>
-                write_err!(f, "conversion of the `HdMasterFingerprint` field failed"; e),
+            Self::HdMasterFingerprint(ref e) => write_err!(f, "conversion of the `HdMasterFingerprint` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -287,50 +236,12 @@ impl GetAddressInfoEmbedded {
             is_script: self.is_script,
             is_change: self.is_change,
             is_witness: self.is_witness,
-            witness_version: match (self.witness_version, self.witness_program.as_ref()) {
-                (Some(v), Some(_)) => Some(
-                    WitnessVersion::try_from(u8::try_from(v).map_err(|_| {
-                        crate::NumericError::Overflow {
-                            value: v,
-                            field: "witness_version".to_owned(),
-                        }
-                    })?)
-                    .map_err(E::WitnessVersion)?,
-                ),
-                _ => None,
-            },
-            witness_program: match (self.witness_version, self.witness_program.as_ref()) {
-                (Some(v), Some(p)) => Some({
-                    let wv = WitnessVersion::try_from(u8::try_from(v).map_err(|_| {
-                        crate::NumericError::Overflow {
-                            value: v,
-                            field: "witness_program".to_owned(),
-                        }
-                    })?)
-                    .map_err(E::WitnessVersion)?;
-                    let bytes = Vec::<u8>::from_hex(p).map_err(E::WitnessProgramBytes)?;
-                    WitnessProgram::new(wv, &bytes).map_err(E::WitnessProgram)?
-                }),
-                _ => None,
-            },
-            script: self
-                .script
-                .map(|x| serde_json::from_value::<model::ScriptType>(serde_json::Value::String(x)))
-                .transpose()
-                .map_err(E::Script)?,
+            witness_version: match (self.witness_version, self.witness_program.as_ref()) { (Some(v), Some(_)) => Some(WitnessVersion::try_from(u8::try_from(v).map_err(|_| crate::NumericError::Overflow { value: v, field: "witness_version".to_owned() })?).map_err(E::WitnessVersion)?), _ => None },
+            witness_program: match (self.witness_version, self.witness_program.as_ref()) { (Some(v), Some(p)) => Some({ let wv = WitnessVersion::try_from(u8::try_from(v).map_err(|_| crate::NumericError::Overflow { value: v, field: "witness_program".to_owned() })?).map_err(E::WitnessVersion)?; let bytes = Vec::<u8>::from_hex(p).map_err(E::WitnessProgramBytes)?; WitnessProgram::new(wv, &bytes).map_err(E::WitnessProgram)? }), _ => None },
+            script: self.script.map(|x| serde_json::from_value::<model::ScriptType>(serde_json::Value::String(x))).transpose().map_err(E::Script)?,
             hex: self.hex.map(|x| ScriptBuf::from_hex(&x)).transpose().map_err(E::Hex)?,
-            pubkeys: self
-                .pubkeys
-                .map(|x| {
-                    x.into_iter()
-                        .map(|y| y.parse::<PublicKey>().map_err(E::Pubkeys))
-                        .collect::<Result<Vec<_>, _>>()
-                })
-                .transpose()?,
-            sigs_required: self
-                .sigs_required
-                .map(|x| crate::to_u32(x, "sigs_required"))
-                .transpose()?,
+            pubkeys: self.pubkeys.map(|x| x.into_iter().map(|y| y.parse::<PublicKey>().map_err(E::Pubkeys)).collect::<Result<Vec<_>, _>>()).transpose()?,
+            sigs_required: self.sigs_required.map(|x| crate::to_u32(x, "sigs_required")).transpose()?,
             pubkey: self.pubkey.map(|x| x.parse::<PublicKey>()).transpose().map_err(E::Pubkey)?,
             is_compressed: self.is_compressed,
             label: None, // no raw field; canonical is optional
@@ -368,14 +279,10 @@ impl fmt::Display for GetAddressInfoEmbeddedError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
-            Self::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
-            Self::WitnessVersion(ref e) =>
-                write_err!(f, "conversion of the `WitnessVersion` field failed"; e),
-            Self::WitnessProgramBytes(ref e) =>
-                write_err!(f, "conversion of the `WitnessProgramBytes` field failed"; e),
-            Self::WitnessProgram(ref e) =>
-                write_err!(f, "conversion of the `WitnessProgram` field failed"; e),
+            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::WitnessVersion(ref e) => write_err!(f, "conversion of the `WitnessVersion` field failed"; e),
+            Self::WitnessProgramBytes(ref e) => write_err!(f, "conversion of the `WitnessProgramBytes` field failed"; e),
+            Self::WitnessProgram(ref e) => write_err!(f, "conversion of the `WitnessProgram` field failed"; e),
             Self::Script(ref e) => write_err!(f, "conversion of the `Script` field failed"; e),
             Self::Hex(ref e) => write_err!(f, "conversion of the `Hex` field failed"; e),
             Self::Pubkeys(ref e) => write_err!(f, "conversion of the `Pubkeys` field failed"; e),
@@ -412,17 +319,7 @@ impl GetAddressesByLabel {
     pub fn into_model(self) -> Result<model::GetAddressesByLabel, GetAddressesByLabelError> {
         use GetAddressesByLabelError as E;
 
-        Ok(model::GetAddressesByLabel(
-            self.0
-                .into_iter()
-                .map(|(k, v)| {
-                    Ok::<_, E>((
-                        k.parse::<Address<NetworkUnchecked>>().map_err(E::InnerKey)?,
-                        v.into_model().map_err(E::InnerValue)?,
-                    ))
-                })
-                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
-        ))
+        Ok(model::GetAddressesByLabel(self.0.into_iter().map(|(k, v)| Ok::<_, E>((k.parse::<Address<NetworkUnchecked>>().map_err(E::InnerKey)?, v.into_model().map_err(E::InnerValue)?))).collect::<Result<std::collections::BTreeMap<_, _>, _>>()?))
     }
 }
 
@@ -439,8 +336,7 @@ impl fmt::Display for GetAddressesByLabelError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::InnerKey(ref e) => write_err!(f, "conversion of the `InnerKey` field failed"; e),
-            Self::InnerValue(ref e) =>
-                write_err!(f, "conversion of the `InnerValue` field failed"; e),
+            Self::InnerValue(ref e) => write_err!(f, "conversion of the `InnerValue` field failed"; e),
         }
     }
 }
@@ -461,10 +357,7 @@ impl GetAddressesByLabelEntry {
         use AddressInformationError as E;
 
         Ok(model::AddressInformation {
-            purpose: serde_json::from_value::<model::AddressPurpose>(serde_json::Value::String(
-                self.purpose,
-            ))
-            .map_err(E::Purpose)?,
+            purpose: serde_json::from_value::<model::AddressPurpose>(serde_json::Value::String(self.purpose)).map_err(E::Purpose)?,
         })
     }
 }
@@ -534,9 +427,7 @@ impl GetBalances {
         Ok(model::GetBalances {
             mine: self.mine.into_model().map_err(E::Mine)?,
             watch_only: None, // no raw field; canonical is optional
-            last_processed_block: Some(
-                self.last_processed_block.into_model().map_err(E::LastProcessedBlock)?,
-            ),
+            last_processed_block: Some(self.last_processed_block.into_model().map_err(E::LastProcessedBlock)?),
         })
     }
 }
@@ -554,8 +445,7 @@ impl fmt::Display for GetBalancesError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Mine(ref e) => write_err!(f, "conversion of the `Mine` field failed"; e),
-            Self::LastProcessedBlock(ref e) =>
-                write_err!(f, "conversion of the `LastProcessedBlock` field failed"; e),
+            Self::LastProcessedBlock(ref e) => write_err!(f, "conversion of the `LastProcessedBlock` field failed"; e),
         }
     }
 }
@@ -621,8 +511,7 @@ impl GetBalancesMine {
 
         Ok(model::GetBalancesMine {
             trusted: Amount::from_btc(self.trusted).map_err(E::Trusted)?,
-            untrusted_pending: Amount::from_btc(self.untrusted_pending)
-                .map_err(E::UntrustedPending)?,
+            untrusted_pending: Amount::from_btc(self.untrusted_pending).map_err(E::UntrustedPending)?,
             immature: Amount::from_btc(self.immature).map_err(E::Immature)?,
             used: self.used.map(Amount::from_btc).transpose().map_err(E::Used)?,
         })
@@ -646,8 +535,7 @@ impl fmt::Display for GetBalancesMineError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Trusted(ref e) => write_err!(f, "conversion of the `Trusted` field failed"; e),
-            Self::UntrustedPending(ref e) =>
-                write_err!(f, "conversion of the `UntrustedPending` field failed"; e),
+            Self::UntrustedPending(ref e) => write_err!(f, "conversion of the `UntrustedPending` field failed"; e),
             Self::Immature(ref e) => write_err!(f, "conversion of the `Immature` field failed"; e),
             Self::Used(ref e) => write_err!(f, "conversion of the `Used` field failed"; e),
         }
@@ -671,12 +559,7 @@ impl GetHdKeys {
     pub fn into_model(self) -> Result<model::GetHdKeys, GetHdKeysError> {
         use GetHdKeysError as E;
 
-        Ok(model::GetHdKeys(
-            self.0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inner))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::GetHdKeys(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -713,11 +596,7 @@ impl GetHdKeysItem {
             xpub: self.xpub.parse::<Xpub>().map_err(E::Xpub)?,
             has_private: self.has_private,
             xpriv: None, // no raw field; canonical is optional
-            descriptors: self
-                .descriptors
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Descriptors))
-                .collect::<Result<Vec<_>, _>>()?,
+            descriptors: self.descriptors.into_iter().map(|x| x.into_model().map_err(E::Descriptors)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -735,8 +614,7 @@ impl fmt::Display for HdKeyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Xpub(ref e) => write_err!(f, "conversion of the `Xpub` field failed"; e),
-            Self::Descriptors(ref e) =>
-                write_err!(f, "conversion of the `Descriptors` field failed"; e),
+            Self::Descriptors(ref e) => write_err!(f, "conversion of the `Descriptors` field failed"; e),
         }
     }
 }
@@ -756,21 +634,31 @@ impl GetHdKeysItemDescriptorsItem {
     pub fn into_model(self) -> Result<model::HdKeyDescriptor, HdKeyDescriptorError> {
         use HdKeyDescriptorError as E;
 
-        Ok(model::HdKeyDescriptor { descriptor: self.desc, active: self.active })
+        Ok(model::HdKeyDescriptor {
+            descriptor: self.desc,
+            active: self.active,
+        })
     }
 }
 
 /// Error when converting a `HdKeyDescriptor` type into the model type.
 #[derive(Debug)]
-pub enum HdKeyDescriptorError {}
+pub enum HdKeyDescriptorError {
+}
 
 impl fmt::Display for HdKeyDescriptorError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+        }
+    }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for HdKeyDescriptorError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+        }
+    }
 }
 
 impl GetNewAddress {
@@ -811,9 +699,7 @@ impl GetRawChangeAddress {
     pub fn into_model(self) -> Result<model::GetRawChangeAddress, GetRawChangeAddressError> {
         use GetRawChangeAddressError as E;
 
-        Ok(model::GetRawChangeAddress(
-            self.0.parse::<Address<NetworkUnchecked>>().map_err(E::Inner)?,
-        ))
+        Ok(model::GetRawChangeAddress(self.0.parse::<Address<NetworkUnchecked>>().map_err(E::Inner)?))
     }
 }
 
@@ -918,62 +804,25 @@ impl GetTransaction {
             confirmations: self.confirmations,
             generated: self.generated,
             trusted: self.trusted,
-            block_hash: self
-                .block_hash
-                .map(|x| x.parse::<BlockHash>())
-                .transpose()
-                .map_err(E::BlockHash)?,
-            block_height: self
-                .block_height
-                .map(|x| crate::to_u32(x, "block_height"))
-                .transpose()?,
+            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            block_height: self.block_height.map(|x| crate::to_u32(x, "block_height")).transpose()?,
             block_index: self.block_index.map(|x| crate::to_u32(x, "block_index")).transpose()?,
             block_time: self.block_time.map(|x| crate::to_u32(x, "block_time")).transpose()?,
             txid: self.txid.parse::<Txid>().map_err(E::Txid)?,
             wtxid: Some(self.wtxid.parse::<Txid>().map_err(E::Wtxid)?),
-            wallet_conflicts: self
-                .wallet_conflicts
-                .into_iter()
-                .map(|x| x.parse::<Txid>().map_err(E::WalletConflicts))
-                .collect::<Result<Vec<_>, _>>()?,
-            replaced_by_txid: self
-                .replaced_by_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacedByTxid)?,
-            replaces_txid: self
-                .replaces_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacesTxid)?,
-            mempool_conflicts: Some(
-                self.mempool_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
+            wallet_conflicts: self.wallet_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::WalletConflicts)).collect::<Result<Vec<_>, _>>()?,
+            replaced_by_txid: self.replaced_by_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacedByTxid)?,
+            replaces_txid: self.replaces_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacesTxid)?,
+            mempool_conflicts: Some(self.mempool_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts)).collect::<Result<Vec<_>, _>>()?),
             to: self.to,
             time: crate::to_u32(self.time, "time")?,
             time_received: crate::to_u32(self.time_received, "time_received")?,
             comment: self.comment,
-            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(
-                serde_json::Value::String(self.bip125_replaceable),
-            )
-            .map_err(E::Bip125Replaceable)?,
+            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(serde_json::Value::String(self.bip125_replaceable)).map_err(E::Bip125Replaceable)?,
             parent_descriptors: self.parent_descs,
-            details: self
-                .details
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Details))
-                .collect::<Result<Vec<_>, _>>()?,
-            decoded: self
-                .decoded
-                .map(|x| crate::reconstruct::transaction(&x))
-                .transpose()
-                .map_err(E::Decoded)?,
-            last_processed_block: Some(
-                self.last_processed_block.into_model().map_err(E::LastProcessedBlock)?,
-            ),
+            details: self.details.into_iter().map(|x| x.into_model().map_err(E::Details)).collect::<Result<Vec<_>, _>>()?,
+            decoded: self.decoded.map(|x| crate::reconstruct::transaction(&x)).transpose().map_err(E::Decoded)?,
+            last_processed_block: Some(self.last_processed_block.into_model().map_err(E::LastProcessedBlock)?),
             tx: encode::deserialize_hex::<Transaction>(&self.hex).map_err(E::Tx)?,
         })
     }
@@ -1019,24 +868,17 @@ impl fmt::Display for GetTransactionError {
         match *self {
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
-            Self::BlockHash(ref e) =>
-                write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
             Self::Wtxid(ref e) => write_err!(f, "conversion of the `Wtxid` field failed"; e),
-            Self::WalletConflicts(ref e) =>
-                write_err!(f, "conversion of the `WalletConflicts` field failed"; e),
-            Self::ReplacedByTxid(ref e) =>
-                write_err!(f, "conversion of the `ReplacedByTxid` field failed"; e),
-            Self::ReplacesTxid(ref e) =>
-                write_err!(f, "conversion of the `ReplacesTxid` field failed"; e),
-            Self::MempoolConflicts(ref e) =>
-                write_err!(f, "conversion of the `MempoolConflicts` field failed"; e),
-            Self::Bip125Replaceable(ref e) =>
-                write_err!(f, "conversion of the `Bip125Replaceable` field failed"; e),
+            Self::WalletConflicts(ref e) => write_err!(f, "conversion of the `WalletConflicts` field failed"; e),
+            Self::ReplacedByTxid(ref e) => write_err!(f, "conversion of the `ReplacedByTxid` field failed"; e),
+            Self::ReplacesTxid(ref e) => write_err!(f, "conversion of the `ReplacesTxid` field failed"; e),
+            Self::MempoolConflicts(ref e) => write_err!(f, "conversion of the `MempoolConflicts` field failed"; e),
+            Self::Bip125Replaceable(ref e) => write_err!(f, "conversion of the `Bip125Replaceable` field failed"; e),
             Self::Details(ref e) => write_err!(f, "conversion of the `Details` field failed"; e),
             Self::Decoded(ref e) => write_err!(f, "conversion of the `Decoded` field failed"; e),
-            Self::LastProcessedBlock(ref e) =>
-                write_err!(f, "conversion of the `LastProcessedBlock` field failed"; e),
+            Self::LastProcessedBlock(ref e) => write_err!(f, "conversion of the `LastProcessedBlock` field failed"; e),
             Self::Tx(ref e) => write_err!(f, "conversion of the `Tx` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
@@ -1077,16 +919,9 @@ impl GetTransactionDetailsItem {
 
         Ok(model::GetTransactionDetail {
             involves_watch_only: None, // no raw field; canonical is optional
-            account: None,             // no raw field; canonical is optional
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?,
-            category: serde_json::from_value::<model::TransactionCategory>(
-                serde_json::Value::String(self.category),
-            )
-            .map_err(E::Category)?,
+            account: None, // no raw field; canonical is optional
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            category: serde_json::from_value::<model::TransactionCategory>(serde_json::Value::String(self.category)).map_err(E::Category)?,
             amount: SignedAmount::from_btc(self.amount).map_err(E::Amount)?,
             label: self.label,
             vout: crate::to_u32(self.vout, "vout")?,
@@ -1162,50 +997,25 @@ impl GetWalletInfo {
             wallet_name: self.wallet_name,
             wallet_version: crate::to_u32(self.wallet_version, "wallet_version")?,
             format: Some(self.format),
-            balance: None,             // no raw field; canonical is optional
+            balance: None, // no raw field; canonical is optional
             unconfirmed_balance: None, // no raw field; canonical is optional
-            immature_balance: None,    // no raw field; canonical is optional
-            tx_count: u32::try_from(self.tx_count).map_err(|_| crate::NumericError::Overflow {
-                value: self.tx_count as i64,
-                field: "tx_count".to_owned(),
-            })?,
+            immature_balance: None, // no raw field; canonical is optional
+            tx_count: u32::try_from(self.tx_count).map_err(|_| crate::NumericError::Overflow { value: self.tx_count as i64, field: "tx_count".to_owned() })?,
             keypool_oldest: None, // no raw field; canonical is optional
-            keypool_size: u32::try_from(self.keypool_size).map_err(|_| {
-                crate::NumericError::Overflow {
-                    value: self.keypool_size as i64,
-                    field: "keypool_size".to_owned(),
-                }
-            })?,
-            keypool_size_hd_internal: self
-                .keypool_size_hd_internal
-                .map(|x| {
-                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
-                        value: x as i64,
-                        field: "keypool_size_hd_internal".to_owned(),
-                    })
-                })
-                .transpose()?
-                .unwrap_or_default(),
-            unlocked_until: self
-                .unlocked_until
-                .map(|x| crate::to_u32(x, "unlocked_until"))
-                .transpose()?,
+            keypool_size: u32::try_from(self.keypool_size).map_err(|_| crate::NumericError::Overflow { value: self.keypool_size as i64, field: "keypool_size".to_owned() })?,
+            keypool_size_hd_internal: self.keypool_size_hd_internal.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "keypool_size_hd_internal".to_owned() })).transpose()?.unwrap_or_default(),
+            unlocked_until: self.unlocked_until.map(|x| crate::to_u32(x, "unlocked_until")).transpose()?,
             pay_tx_fee: None, // no raw field; canonical is optional
             hd_seed_id: None, // no raw field; canonical is optional
             private_keys_enabled: self.private_keys_enabled,
             avoid_reuse: Some(self.avoid_reuse),
-            scanning: Some(
-                serde_json::from_value::<model::GetWalletInfoScanning>(self.scanning)
-                    .map_err(E::Scanning)?,
-            ),
+            scanning: Some(serde_json::from_value::<model::GetWalletInfoScanning>(self.scanning).map_err(E::Scanning)?),
             descriptors: Some(self.descriptors),
             external_signer: Some(self.external_signer),
             blank: Some(self.blank),
             birthtime: self.birth_time.map(|x| crate::to_u32(x, "birthtime")).transpose()?,
             flags: Some(self.flags),
-            last_processed_block: Some(
-                self.last_processed_block.into_model().map_err(E::LastProcessedBlock)?,
-            ),
+            last_processed_block: Some(self.last_processed_block.into_model().map_err(E::LastProcessedBlock)?),
         })
     }
 }
@@ -1225,8 +1035,7 @@ impl fmt::Display for GetWalletInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Scanning(ref e) => write_err!(f, "conversion of the `Scanning` field failed"; e),
-            Self::LastProcessedBlock(ref e) =>
-                write_err!(f, "conversion of the `LastProcessedBlock` field failed"; e),
+            Self::LastProcessedBlock(ref e) => write_err!(f, "conversion of the `LastProcessedBlock` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1264,31 +1073,7 @@ impl ListAddressGroupings {
     pub fn into_model(self) -> Result<model::ListAddressGroupings, ListAddressGroupingsError> {
         use ListAddressGroupingsError as E;
 
-        Ok(model::ListAddressGroupings(
-            self.0
-                .into_iter()
-                .map(|group| {
-                    group
-                        .into_iter()
-                        .map(|item| {
-                            let address = item
-                                .first()
-                                .and_then(|v| v.as_str())
-                                .ok_or(E::MissingAddress(crate::MissingField { field: "address" }))?
-                                .parse::<Address<NetworkUnchecked>>()
-                                .map_err(E::Address)?;
-                            let amount =
-                                Amount::from_btc(item.get(1).and_then(|v| v.as_f64()).ok_or(
-                                    E::MissingAmount(crate::MissingField { field: "amount" }),
-                                )?)
-                                .map_err(E::Amount)?;
-                            let label = item.get(2).and_then(|v| v.as_str()).map(|s| s.to_owned());
-                            Ok::<_, E>(model::ListAddressGroupingsItem { address, amount, label })
-                        })
-                        .collect::<Result<Vec<_>, _>>()
-                })
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::ListAddressGroupings(self.0.into_iter().map(|group| group.into_iter().map(|item| { let address = item.first().and_then(|v| v.as_str()).ok_or(E::MissingAddress(crate::MissingField { field: "address" }))?.parse::<Address<NetworkUnchecked>>().map_err(E::Address)?; let amount = Amount::from_btc(item.get(1).and_then(|v| v.as_f64()).ok_or(E::MissingAmount(crate::MissingField { field: "amount" }))?).map_err(E::Amount)?; let label = item.get(2).and_then(|v| v.as_str()).map(|s| s.to_owned()); Ok::<_, E>(model::ListAddressGroupingsItem { address, amount, label }) }).collect::<Result<Vec<_>, _>>()).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -1310,10 +1095,8 @@ impl fmt::Display for ListAddressGroupingsError {
         match *self {
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
-            Self::MissingAddress(ref e) =>
-                write_err!(f, "conversion of the `MissingAddress` field failed"; e),
-            Self::MissingAmount(ref e) =>
-                write_err!(f, "conversion of the `MissingAmount` field failed"; e),
+            Self::MissingAddress(ref e) => write_err!(f, "conversion of the `MissingAddress` field failed"; e),
+            Self::MissingAmount(ref e) => write_err!(f, "conversion of the `MissingAmount` field failed"; e),
         }
     }
 }
@@ -1335,12 +1118,7 @@ impl ListLockUnspent {
     pub fn into_model(self) -> Result<model::ListLockUnspent, ListLockUnspentError> {
         use ListLockUnspentError as E;
 
-        Ok(model::ListLockUnspent(
-            self.0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inner))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::ListLockUnspent(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -1417,12 +1195,7 @@ impl ListReceivedByAddress {
     pub fn into_model(self) -> Result<model::ListReceivedByAddress, ListReceivedByAddressError> {
         use ListReceivedByAddressError as E;
 
-        Ok(model::ListReceivedByAddress(
-            self.0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inner))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::ListReceivedByAddress(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -1452,9 +1225,7 @@ impl std::error::Error for ListReceivedByAddressError {
 
 impl ListReceivedByAddressItem {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::ListReceivedByAddressItem, ListReceivedByAddressItemError> {
+    pub fn into_model(self) -> Result<model::ListReceivedByAddressItem, ListReceivedByAddressItemError> {
         use ListReceivedByAddressItemError as E;
 
         Ok(model::ListReceivedByAddressItem {
@@ -1463,11 +1234,7 @@ impl ListReceivedByAddressItem {
             amount: Amount::from_btc(self.amount).map_err(E::Amount)?,
             confirmations: self.confirmations,
             label: self.label,
-            txids: self
-                .txids
-                .into_iter()
-                .map(|x| x.parse::<Txid>().map_err(E::Txids))
-                .collect::<Result<Vec<_>, _>>()?,
+            txids: self.txids.into_iter().map(|x| x.parse::<Txid>().map_err(E::Txids)).collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1509,12 +1276,7 @@ impl ListReceivedByLabel {
     pub fn into_model(self) -> Result<model::ListReceivedByLabel, ListReceivedByLabelError> {
         use ListReceivedByLabelError as E;
 
-        Ok(model::ListReceivedByLabel(
-            self.0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inner))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::ListReceivedByLabel(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -1544,9 +1306,7 @@ impl std::error::Error for ListReceivedByLabelError {
 
 impl ListReceivedByLabelItem {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(
-        self,
-    ) -> Result<model::ListReceivedByLabelItem, ListReceivedByLabelItemError> {
+    pub fn into_model(self) -> Result<model::ListReceivedByLabelItem, ListReceivedByLabelItemError> {
         use ListReceivedByLabelItemError as E;
 
         Ok(model::ListReceivedByLabelItem {
@@ -1596,17 +1356,8 @@ impl ListSinceBlock {
         use ListSinceBlockError as E;
 
         Ok(model::ListSinceBlock {
-            transactions: self
-                .transactions
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Transactions))
-                .collect::<Result<Vec<_>, _>>()?,
-            removed: self
-                .removed
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Removed))
-                .collect::<Result<Vec<_>, _>>()?,
+            transactions: self.transactions.into_iter().map(|x| x.into_model().map_err(E::Transactions)).collect::<Result<Vec<_>, _>>()?,
+            removed: self.removed.unwrap_or_default().into_iter().map(|x| x.into_model().map_err(E::Removed)).collect::<Result<Vec<_>, _>>()?,
             last_block: self.last_block.parse::<BlockHash>().map_err(E::LastBlock)?,
         })
     }
@@ -1626,11 +1377,9 @@ pub enum ListSinceBlockError {
 impl fmt::Display for ListSinceBlockError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Transactions(ref e) =>
-                write_err!(f, "conversion of the `Transactions` field failed"; e),
+            Self::Transactions(ref e) => write_err!(f, "conversion of the `Transactions` field failed"; e),
             Self::Removed(ref e) => write_err!(f, "conversion of the `Removed` field failed"; e),
-            Self::LastBlock(ref e) =>
-                write_err!(f, "conversion of the `LastBlock` field failed"; e),
+            Self::LastBlock(ref e) => write_err!(f, "conversion of the `LastBlock` field failed"; e),
         }
     }
 }
@@ -1653,69 +1402,29 @@ impl ListSinceBlockRemovedItem {
 
         Ok(model::TransactionItem {
             involves_watch_only: None, // no raw field; canonical is optional
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?,
-            category: serde_json::from_value::<model::TransactionCategory>(
-                serde_json::Value::String(self.category),
-            )
-            .map_err(E::Category)?,
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            category: serde_json::from_value::<model::TransactionCategory>(serde_json::Value::String(self.category)).map_err(E::Category)?,
             amount: SignedAmount::from_btc(self.amount).map_err(E::Amount)?,
             vout: crate::to_u32(self.vout, "vout")?,
-            fee: self
-                .fee
-                .map(SignedAmount::from_btc)
-                .transpose()
-                .map_err(E::Fee)?
-                .unwrap_or_default(),
+            fee: self.fee.map(SignedAmount::from_btc).transpose().map_err(E::Fee)?.unwrap_or_default(),
             confirmations: self.confirmations,
             generated: self.generated,
             trusted: self.trusted,
-            block_hash: self
-                .block_hash
-                .map(|x| x.parse::<BlockHash>())
-                .transpose()
-                .map_err(E::BlockHash)?,
-            block_height: self
-                .block_height
-                .map(|x| crate::to_u32(x, "block_height"))
-                .transpose()?,
+            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            block_height: self.block_height.map(|x| crate::to_u32(x, "block_height")).transpose()?,
             block_index: self.block_index.map(|x| crate::to_u32(x, "block_index")).transpose()?,
             block_time: self.block_time.map(|x| crate::to_u32(x, "block_time")).transpose()?,
             txid: Some(self.txid.parse::<Txid>().map_err(E::Txid)?),
             wtxid: Some(self.wtxid.parse::<Txid>().map_err(E::Wtxid)?),
-            wallet_conflicts: Some(
-                self.wallet_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::WalletConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
-            replaced_by_txid: self
-                .replaced_by_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacedByTxid)?,
-            replaces_txid: self
-                .replaces_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacesTxid)?,
-            mempool_conflicts: Some(
-                self.mempool_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
+            wallet_conflicts: Some(self.wallet_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::WalletConflicts)).collect::<Result<Vec<_>, _>>()?),
+            replaced_by_txid: self.replaced_by_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacedByTxid)?,
+            replaces_txid: self.replaces_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacesTxid)?,
+            mempool_conflicts: Some(self.mempool_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts)).collect::<Result<Vec<_>, _>>()?),
             to: self.to,
             time: crate::to_u32(self.time, "time")?,
             time_received: crate::to_u32(self.time_received, "time_received")?,
             comment: self.comment,
-            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(
-                serde_json::Value::String(self.bip125_replaceable),
-            )
-            .map_err(E::Bip125Replaceable)?,
+            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(serde_json::Value::String(self.bip125_replaceable)).map_err(E::Bip125Replaceable)?,
             parent_descriptors: self.parent_descs,
             abandoned: Some(self.abandoned),
             label: self.label,
@@ -1730,69 +1439,29 @@ impl ListSinceBlockTransactionsItem {
 
         Ok(model::TransactionItem {
             involves_watch_only: None, // no raw field; canonical is optional
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?,
-            category: serde_json::from_value::<model::TransactionCategory>(
-                serde_json::Value::String(self.category),
-            )
-            .map_err(E::Category)?,
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            category: serde_json::from_value::<model::TransactionCategory>(serde_json::Value::String(self.category)).map_err(E::Category)?,
             amount: SignedAmount::from_btc(self.amount).map_err(E::Amount)?,
             vout: crate::to_u32(self.vout, "vout")?,
-            fee: self
-                .fee
-                .map(SignedAmount::from_btc)
-                .transpose()
-                .map_err(E::Fee)?
-                .unwrap_or_default(),
+            fee: self.fee.map(SignedAmount::from_btc).transpose().map_err(E::Fee)?.unwrap_or_default(),
             confirmations: self.confirmations,
             generated: self.generated,
             trusted: self.trusted,
-            block_hash: self
-                .block_hash
-                .map(|x| x.parse::<BlockHash>())
-                .transpose()
-                .map_err(E::BlockHash)?,
-            block_height: self
-                .block_height
-                .map(|x| crate::to_u32(x, "block_height"))
-                .transpose()?,
+            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            block_height: self.block_height.map(|x| crate::to_u32(x, "block_height")).transpose()?,
             block_index: self.block_index.map(|x| crate::to_u32(x, "block_index")).transpose()?,
             block_time: self.block_time.map(|x| crate::to_u32(x, "block_time")).transpose()?,
             txid: Some(self.txid.parse::<Txid>().map_err(E::Txid)?),
             wtxid: Some(self.wtxid.parse::<Txid>().map_err(E::Wtxid)?),
-            wallet_conflicts: Some(
-                self.wallet_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::WalletConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
-            replaced_by_txid: self
-                .replaced_by_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacedByTxid)?,
-            replaces_txid: self
-                .replaces_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacesTxid)?,
-            mempool_conflicts: Some(
-                self.mempool_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
+            wallet_conflicts: Some(self.wallet_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::WalletConflicts)).collect::<Result<Vec<_>, _>>()?),
+            replaced_by_txid: self.replaced_by_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacedByTxid)?,
+            replaces_txid: self.replaces_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacesTxid)?,
+            mempool_conflicts: Some(self.mempool_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts)).collect::<Result<Vec<_>, _>>()?),
             to: self.to,
             time: crate::to_u32(self.time, "time")?,
             time_received: crate::to_u32(self.time_received, "time_received")?,
             comment: self.comment,
-            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(
-                serde_json::Value::String(self.bip125_replaceable),
-            )
-            .map_err(E::Bip125Replaceable)?,
+            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(serde_json::Value::String(self.bip125_replaceable)).map_err(E::Bip125Replaceable)?,
             parent_descriptors: self.parent_descs,
             abandoned: Some(self.abandoned),
             label: self.label,
@@ -1838,20 +1507,14 @@ impl fmt::Display for TransactionItemError {
             Self::Category(ref e) => write_err!(f, "conversion of the `Category` field failed"; e),
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
-            Self::BlockHash(ref e) =>
-                write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
             Self::Wtxid(ref e) => write_err!(f, "conversion of the `Wtxid` field failed"; e),
-            Self::WalletConflicts(ref e) =>
-                write_err!(f, "conversion of the `WalletConflicts` field failed"; e),
-            Self::ReplacedByTxid(ref e) =>
-                write_err!(f, "conversion of the `ReplacedByTxid` field failed"; e),
-            Self::ReplacesTxid(ref e) =>
-                write_err!(f, "conversion of the `ReplacesTxid` field failed"; e),
-            Self::MempoolConflicts(ref e) =>
-                write_err!(f, "conversion of the `MempoolConflicts` field failed"; e),
-            Self::Bip125Replaceable(ref e) =>
-                write_err!(f, "conversion of the `Bip125Replaceable` field failed"; e),
+            Self::WalletConflicts(ref e) => write_err!(f, "conversion of the `WalletConflicts` field failed"; e),
+            Self::ReplacedByTxid(ref e) => write_err!(f, "conversion of the `ReplacedByTxid` field failed"; e),
+            Self::ReplacesTxid(ref e) => write_err!(f, "conversion of the `ReplacesTxid` field failed"; e),
+            Self::MempoolConflicts(ref e) => write_err!(f, "conversion of the `MempoolConflicts` field failed"; e),
+            Self::Bip125Replaceable(ref e) => write_err!(f, "conversion of the `Bip125Replaceable` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1887,12 +1550,7 @@ impl ListTransactions {
     pub fn into_model(self) -> Result<model::ListTransactions, ListTransactionsError> {
         use ListTransactionsError as E;
 
-        Ok(model::ListTransactions(
-            self.0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inner))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::ListTransactions(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -1927,69 +1585,29 @@ impl ListTransactionsItem {
 
         Ok(model::TransactionItem {
             involves_watch_only: None, // no raw field; canonical is optional
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?,
-            category: serde_json::from_value::<model::TransactionCategory>(
-                serde_json::Value::String(self.category),
-            )
-            .map_err(E::Category)?,
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            category: serde_json::from_value::<model::TransactionCategory>(serde_json::Value::String(self.category)).map_err(E::Category)?,
             amount: SignedAmount::from_btc(self.amount).map_err(E::Amount)?,
             vout: crate::to_u32(self.vout, "vout")?,
-            fee: self
-                .fee
-                .map(SignedAmount::from_btc)
-                .transpose()
-                .map_err(E::Fee)?
-                .unwrap_or_default(),
+            fee: self.fee.map(SignedAmount::from_btc).transpose().map_err(E::Fee)?.unwrap_or_default(),
             confirmations: self.confirmations,
             generated: self.generated,
             trusted: self.trusted,
-            block_hash: self
-                .block_hash
-                .map(|x| x.parse::<BlockHash>())
-                .transpose()
-                .map_err(E::BlockHash)?,
-            block_height: self
-                .block_height
-                .map(|x| crate::to_u32(x, "block_height"))
-                .transpose()?,
+            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            block_height: self.block_height.map(|x| crate::to_u32(x, "block_height")).transpose()?,
             block_index: self.block_index.map(|x| crate::to_u32(x, "block_index")).transpose()?,
             block_time: self.block_time.map(|x| crate::to_u32(x, "block_time")).transpose()?,
             txid: Some(self.txid.parse::<Txid>().map_err(E::Txid)?),
             wtxid: Some(self.wtxid.parse::<Txid>().map_err(E::Wtxid)?),
-            wallet_conflicts: Some(
-                self.wallet_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::WalletConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
-            replaced_by_txid: self
-                .replaced_by_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacedByTxid)?,
-            replaces_txid: self
-                .replaces_txid
-                .map(|x| x.parse::<Txid>())
-                .transpose()
-                .map_err(E::ReplacesTxid)?,
-            mempool_conflicts: Some(
-                self.mempool_conflicts
-                    .into_iter()
-                    .map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts))
-                    .collect::<Result<Vec<_>, _>>()?,
-            ),
+            wallet_conflicts: Some(self.wallet_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::WalletConflicts)).collect::<Result<Vec<_>, _>>()?),
+            replaced_by_txid: self.replaced_by_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacedByTxid)?,
+            replaces_txid: self.replaces_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::ReplacesTxid)?,
+            mempool_conflicts: Some(self.mempool_conflicts.into_iter().map(|x| x.parse::<Txid>().map_err(E::MempoolConflicts)).collect::<Result<Vec<_>, _>>()?),
             to: self.to,
             time: crate::to_u32(self.time, "time")?,
             time_received: crate::to_u32(self.time_received, "time_received")?,
             comment: self.comment,
-            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(
-                serde_json::Value::String(self.bip125_replaceable),
-            )
-            .map_err(E::Bip125Replaceable)?,
+            bip125_replaceable: serde_json::from_value::<model::Bip125Replaceable>(serde_json::Value::String(self.bip125_replaceable)).map_err(E::Bip125Replaceable)?,
             parent_descriptors: self.parent_descs,
             abandoned: Some(self.abandoned),
             label: self.label,
@@ -2002,12 +1620,7 @@ impl ListUnspent {
     pub fn into_model(self) -> Result<model::ListUnspent, ListUnspentError> {
         use ListUnspentError as E;
 
-        Ok(model::ListUnspent(
-            self.0
-                .into_iter()
-                .map(|x| x.into_model().map_err(E::Inner))
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
+        Ok(model::ListUnspent(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
     }
 }
 
@@ -2043,20 +1656,12 @@ impl ListUnspentItem {
         Ok(model::ListUnspentItem {
             txid: self.txid.parse::<Txid>().map_err(E::Txid)?,
             vout: crate::to_u32(self.vout, "vout")?,
-            address: self
-                .address
-                .map(|x| x.parse::<Address<NetworkUnchecked>>())
-                .transpose()
-                .map_err(E::Address)?,
+            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
             label: self.label.unwrap_or_default(),
             script_pubkey: ScriptBuf::from_hex(&self.script_pub_key).map_err(E::ScriptPubkey)?,
             amount: Amount::from_btc(self.amount).map_err(E::Amount)?,
             confirmations: crate::to_u32(self.confirmations, "confirmations")?,
-            redeem_script: self
-                .redeem_script
-                .map(|x| ScriptBuf::from_hex(&x))
-                .transpose()
-                .map_err(E::RedeemScript)?,
+            redeem_script: self.redeem_script.map(|x| ScriptBuf::from_hex(&x)).transpose().map_err(E::RedeemScript)?,
             spendable: self.spendable,
             solvable: self.solvable,
             descriptor: self.desc,
@@ -2088,11 +1693,9 @@ impl fmt::Display for ListUnspentItemError {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
-            Self::ScriptPubkey(ref e) =>
-                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
-            Self::RedeemScript(ref e) =>
-                write_err!(f, "conversion of the `RedeemScript` field failed"; e),
+            Self::RedeemScript(ref e) => write_err!(f, "conversion of the `RedeemScript` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -2127,15 +1730,22 @@ impl ListWallets {
 
 /// Error when converting a `ListWallets` type into the model type.
 #[derive(Debug)]
-pub enum ListWalletsError {}
+pub enum ListWalletsError {
+}
 
 impl fmt::Display for ListWalletsError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+        }
+    }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for ListWalletsError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+        }
+    }
 }
 
 impl LoadWallet {
@@ -2143,21 +1753,31 @@ impl LoadWallet {
     pub fn into_model(self) -> Result<model::LoadWallet, LoadWalletError> {
         use LoadWalletError as E;
 
-        Ok(model::LoadWallet { name: self.name, warnings: self.warnings.unwrap_or_default() })
+        Ok(model::LoadWallet {
+            name: self.name,
+            warnings: self.warnings.unwrap_or_default(),
+        })
     }
 }
 
 /// Error when converting a `LoadWallet` type into the model type.
 #[derive(Debug)]
-pub enum LoadWalletError {}
+pub enum LoadWalletError {
+}
 
 impl fmt::Display for LoadWalletError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+        }
+    }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for LoadWalletError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+        }
+    }
 }
 
 impl PsbtBumpFee {
@@ -2189,8 +1809,7 @@ impl fmt::Display for PsbtBumpFeeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Psbt(ref e) => write_err!(f, "conversion of the `Psbt` field failed"; e),
-            Self::OriginalFee(ref e) =>
-                write_err!(f, "conversion of the `OriginalFee` field failed"; e),
+            Self::OriginalFee(ref e) => write_err!(f, "conversion of the `OriginalFee` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
         }
     }
@@ -2255,11 +1874,7 @@ impl SendAll {
         Ok(model::SendAll {
             complete: self.complete,
             txid: self.txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::Txid)?,
-            hex: self
-                .hex
-                .map(|x| encode::deserialize_hex::<Transaction>(&x))
-                .transpose()
-                .map_err(E::Hex)?,
+            hex: self.hex.map(|x| encode::deserialize_hex::<Transaction>(&x)).transpose().map_err(E::Hex)?,
             psbt: self.psbt.map(|x| x.parse::<Psbt>()).transpose().map_err(E::Psbt)?,
         })
     }
@@ -2374,11 +1989,7 @@ impl SendResult {
         Ok(model::Send {
             complete: self.complete,
             txid: self.txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::Txid)?,
-            hex: self
-                .hex
-                .map(|x| encode::deserialize_hex::<Transaction>(&x))
-                .transpose()
-                .map_err(E::Hex)?,
+            hex: self.hex.map(|x| encode::deserialize_hex::<Transaction>(&x)).transpose().map_err(E::Hex)?,
             psbt: self.psbt.map(|x| x.parse::<Psbt>()).transpose().map_err(E::Psbt)?,
         })
     }
@@ -2421,7 +2032,9 @@ impl SendToAddressVerbose0 {
     pub fn into_model(self) -> Result<model::SendToAddress, SendToAddressError> {
         use SendToAddressError as E;
 
-        Ok(model::SendToAddress { txid: self.0.parse::<Txid>().map_err(E::Txid)? })
+        Ok(model::SendToAddress {
+            txid: self.0.parse::<Txid>().map_err(E::Txid)?,
+        })
     }
 }
 
@@ -2488,8 +2101,7 @@ impl SimulateRawTransaction {
         use SimulateRawTransactionError as E;
 
         Ok(model::SimulateRawTransaction {
-            balance_change: SignedAmount::from_btc(self.balance_change)
-                .map_err(E::BalanceChange)?,
+            balance_change: SignedAmount::from_btc(self.balance_change).map_err(E::BalanceChange)?,
         })
     }
 }
@@ -2504,8 +2116,7 @@ pub enum SimulateRawTransactionError {
 impl fmt::Display for SimulateRawTransactionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::BalanceChange(ref e) =>
-                write_err!(f, "conversion of the `BalanceChange` field failed"; e),
+            Self::BalanceChange(ref e) => write_err!(f, "conversion of the `BalanceChange` field failed"; e),
         }
     }
 }
@@ -2524,21 +2135,30 @@ impl UnloadWallet {
     pub fn into_model(self) -> Result<model::UnloadWallet, UnloadWalletError> {
         use UnloadWalletError as E;
 
-        Ok(model::UnloadWallet { warnings: self.warnings.unwrap_or_default() })
+        Ok(model::UnloadWallet {
+            warnings: self.warnings.unwrap_or_default(),
+        })
     }
 }
 
 /// Error when converting a `UnloadWallet` type into the model type.
 #[derive(Debug)]
-pub enum UnloadWalletError {}
+pub enum UnloadWalletError {
+}
 
 impl fmt::Display for UnloadWalletError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+        }
+    }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for UnloadWalletError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+        }
+    }
 }
 
 impl WalletCreateFundedPsbt {
@@ -2633,11 +2253,7 @@ impl WalletProcessPsbt {
         Ok(model::WalletProcessPsbt {
             psbt: self.psbt.parse::<Psbt>().map_err(E::Psbt)?,
             complete: self.complete,
-            hex: self
-                .hex
-                .map(|x| encode::deserialize_hex::<Transaction>(&x))
-                .transpose()
-                .map_err(E::Hex)?,
+            hex: self.hex.map(|x| encode::deserialize_hex::<Transaction>(&x)).transpose().map_err(E::Hex)?,
         })
     }
 }
@@ -2669,3 +2285,4 @@ impl std::error::Error for WalletProcessPsbtError {
         }
     }
 }
+

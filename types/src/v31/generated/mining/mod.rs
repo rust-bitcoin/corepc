@@ -10,12 +10,9 @@
 
 mod into;
 
-use serde::{Deserialize, Serialize};
+pub use self::into::{GetMiningInfoError, GetPrioritisedTransactionsError, NextBlockInfoError, PrioritisedTransactionError};
 
-pub use self::into::{
-    GetMiningInfoError, GetPrioritisedTransactionsError, NextBlockInfoError,
-    PrioritisedTransactionError,
-};
+use serde::{Deserialize, Serialize};
 
 /// Result of the JSON-RPC method `getblocktemplate`.
 ///
@@ -232,3 +229,4 @@ pub enum SubmitBlock {
     Null(()),
     Text(String),
 }
+
