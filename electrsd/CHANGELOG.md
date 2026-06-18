@@ -1,3 +1,8 @@
+# 0.41.0 - 2026-06-18
+
+- Fix timeout for old versions [#617](https://github.com/rust-bitcoin/corepc/pull/617)
+- Upgrade to latest version of `corepc-types`, `corepc-client`, and `bitcoind`
+
 # 0.40.0 - 2026-05-26
 
 With this release we now set the default feature to `electrs_0_10_6`.

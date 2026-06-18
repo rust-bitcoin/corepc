@@ -150,7 +150,7 @@ dependencies = [
 
 [[package]]
 name = "bitcoind"
-version = "0.40.0"
+version = "0.41.0"
 dependencies = [
  "anyhow",
  "bitcoin_hashes",
@@ -281,7 +281,7 @@ checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
 name = "corepc-client"
-version = "0.15.0"
+version = "0.16.0"
 dependencies = [
  "bitcoin",
  "corepc-types",
@@ -293,7 +293,7 @@ dependencies = [
 
 [[package]]
 name = "corepc-types"
-version = "0.14.0"
+version = "0.15.0"
 dependencies = [
  "bitcoin",
  "serde",
@@ -317,7 +317,7 @@ checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
 name = "electrsd"
-version = "0.40.0"
+version = "0.41.0"
 dependencies = [
  "anyhow",
  "bitcoin_hashes",
