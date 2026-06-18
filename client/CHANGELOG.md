@@ -1,3 +1,8 @@
+# 0.16.0 - 2026-06-18
+
+- Upgrade to latest `corepc-types 0.15.0`
+- Fix all the issues with `verify --tests` [#634](https://github.com/rust-bitcoin/corepc/pull/634)
+
 # 0.15.0 - 2026-05-26
 
 - Add initial support for Bitcoin Core v31 [#598](https://github.com/rust-bitcoin/corepc/pull/598)

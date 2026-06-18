@@ -13,7 +13,7 @@ exclude = ["tests", "contrib"]
 
 [dependencies]
 bitcoind = { version = "0.40.0", path = "../bitcoind" }
-corepc-client = { version = "0.15.0", path = "../client" }
+corepc-client = { version = "0.16.0", path = "../client" }
 electrum-client = { version = "0.25.0", default-features = false }
 log = { version = "0.4" }
 
