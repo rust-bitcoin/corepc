@@ -21,8 +21,12 @@ use bitcoin::error::UnprefixedHexError;
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::hex::FromHex as _;
 use bitcoin::key::{self, PrivateKey, PublicKey};
-use bitcoin::sign_message;
-use bitcoin::{amount, block, hex, network, psbt, witness_program, witness_version, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence, SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram, WitnessVersion, Work, Wtxid};
+use bitcoin::{
+    amount, block, hex, network, psbt, sign_message, witness_program, witness_version, Address,
+    Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence,
+    SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram,
+    WitnessVersion, Work, Wtxid,
+};
 
 use super::*;
 use crate::error::write_err;
@@ -41,8 +45,16 @@ impl DumpTxOutSet {
             base_hash: self.base_hash.parse::<BlockHash>().map_err(E::BaseHash)?,
             base_height: crate::to_u32(self.base_height, "base_height")?,
             path: self.path,
-            tx_out_set_hash: self.tx_out_set_hash.parse::<sha256::Hash>().map_err(E::TxOutSetHash)?,
-            n_chain_tx: u32::try_from(self.n_chain_tx).map_err(|_| crate::NumericError::Overflow { value: self.n_chain_tx as i64, field: "n_chain_tx".to_owned() })?,
+            tx_out_set_hash: self
+                .tx_out_set_hash
+                .parse::<sha256::Hash>()
+                .map_err(E::TxOutSetHash)?,
+            n_chain_tx: u32::try_from(self.n_chain_tx).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.n_chain_tx as i64,
+                    field: "n_chain_tx".to_owned(),
+                }
+            })?,
         })
     }
 }
@@ -62,7 +74,8 @@ impl fmt::Display for DumpTxOutSetError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::BaseHash(ref e) => write_err!(f, "conversion of the `BaseHash` field failed"; e),
-            Self::TxOutSetHash(ref e) => write_err!(f, "conversion of the `TxOutSetHash` field failed"; e),
+            Self::TxOutSetHash(ref e) =>
+                write_err!(f, "conversion of the `TxOutSetHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -231,7 +244,9 @@ impl GetBlockHeaderVerbose0 {
     pub fn into_model(self) -> Result<model::GetBlockHeader, GetBlockHeaderError> {
         use GetBlockHeaderError as E;
 
-        Ok(model::GetBlockHeader(encode::deserialize_hex::<block::Header>(&self.0).map_err(E::Inner)?))
+        Ok(model::GetBlockHeader(
+            encode::deserialize_hex::<block::Header>(&self.0).map_err(E::Inner)?,
+        ))
     }
 }
 
@@ -278,8 +293,16 @@ impl GetBlockHeaderVerbose1 {
             difficulty: self.difficulty,
             chain_work: Work::from_unprefixed_hex(&self.chain_work).map_err(E::ChainWork)?,
             n_tx: crate::to_u32(self.n_tx, "n_tx")?,
-            previous_block_hash: self.previous_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::PreviousBlockHash)?,
-            next_block_hash: self.next_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::NextBlockHash)?,
+            previous_block_hash: self
+                .previous_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::PreviousBlockHash)?,
+            next_block_hash: self
+                .next_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::NextBlockHash)?,
         })
     }
 }
@@ -309,12 +332,16 @@ impl fmt::Display for GetBlockHeaderVerboseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hash(ref e) => write_err!(f, "conversion of the `Hash` field failed"; e),
-            Self::MerkleRoot(ref e) => write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
+            Self::MerkleRoot(ref e) =>
+                write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::ChainWork(ref e) => write_err!(f, "conversion of the `ChainWork` field failed"; e),
-            Self::PreviousBlockHash(ref e) => write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
-            Self::NextBlockHash(ref e) => write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `ChainWork` field failed"; e),
+            Self::PreviousBlockHash(ref e) =>
+                write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
+            Self::NextBlockHash(ref e) =>
+                write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -348,9 +375,20 @@ impl GetBlockStats {
         Ok(model::GetBlockStats {
             average_fee: self.avg_fee.map(|x| Amount::from_sat(x as u64)),
             average_fee_rate: self.avg_fee_rate.and_then(|f| FeeRate::from_sat_per_vb(f as u64)),
-            average_tx_size: self.avg_tx_size.map(|x| crate::to_u32(x, "average_tx_size")).transpose()?,
-            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
-            fee_rate_percentiles: self.fee_rate_percentiles.map(|x| x.into_iter().map(|y| y.as_i64().and_then(|n| FeeRate::from_sat_per_vb(n as u64))).collect()),
+            average_tx_size: self
+                .avg_tx_size
+                .map(|x| crate::to_u32(x, "average_tx_size"))
+                .transpose()?,
+            block_hash: self
+                .block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::BlockHash)?,
+            fee_rate_percentiles: self.fee_rate_percentiles.map(|x| {
+                x.into_iter()
+                    .map(|y| y.as_i64().and_then(|n| FeeRate::from_sat_per_vb(n as u64)))
+                    .collect()
+            }),
             height: self.height.map(|x| crate::to_u32(x, "height")).transpose()?,
             inputs: self.ins.map(|x| crate::to_u32(x, "inputs")).transpose()?,
             max_fee: self.max_fee.map(|x| Amount::from_sat(x as u64)),
@@ -358,13 +396,22 @@ impl GetBlockStats {
             max_tx_size: self.max_tx_size.map(|x| crate::to_u32(x, "max_tx_size")).transpose()?,
             median_fee: self.median_fee.map(|x| Amount::from_sat(x as u64)),
             median_time: self.median_time.map(|x| crate::to_u32(x, "median_time")).transpose()?,
-            median_tx_size: self.median_tx_size.map(|x| crate::to_u32(x, "median_tx_size")).transpose()?,
+            median_tx_size: self
+                .median_tx_size
+                .map(|x| crate::to_u32(x, "median_tx_size"))
+                .transpose()?,
             minimum_fee: self.min_fee.map(|x| Amount::from_sat(x as u64)),
             minimum_fee_rate: self.min_fee_rate.and_then(|f| FeeRate::from_sat_per_vb(f as u64)),
-            minimum_tx_size: self.min_tx_size.map(|x| crate::to_u32(x, "minimum_tx_size")).transpose()?,
+            minimum_tx_size: self
+                .min_tx_size
+                .map(|x| crate::to_u32(x, "minimum_tx_size"))
+                .transpose()?,
             outputs: self.outs.map(|x| crate::to_u32(x, "outputs")).transpose()?,
             subsidy: self.subsidy.map(|x| Amount::from_sat(x as u64)),
-            segwit_total_size: self.sw_total_size.map(|x| crate::to_u32(x, "segwit_total_size")).transpose()?,
+            segwit_total_size: self
+                .sw_total_size
+                .map(|x| crate::to_u32(x, "segwit_total_size"))
+                .transpose()?,
             segwit_total_weight: self.sw_total_weight.map(|x| Weight::from_wu(x as u64)),
             segwit_txs: self.swtxs.map(|x| crate::to_u32(x, "segwit_txs")).transpose()?,
             time: self.time.map(|x| crate::to_u32(x, "time")).transpose()?,
@@ -372,11 +419,51 @@ impl GetBlockStats {
             total_size: self.total_size.map(|x| crate::to_u32(x, "total_size")).transpose()?,
             total_weight: self.total_weight.map(|x| Weight::from_wu(x as u64)),
             total_fee: self.total_fee.map(|x| Amount::from_sat(x as u64)),
-            txs: self.txs.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "txs".to_owned() })).transpose()?,
-            utxo_increase: self.utxo_increase.map(|x| i32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x, field: "utxo_increase".to_owned() })).transpose()?,
-            utxo_size_increase: self.utxo_size_inc.map(|x| i32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x, field: "utxo_size_increase".to_owned() })).transpose()?,
-            utxo_increase_actual: self.utxo_increase_actual.map(|x| i32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x, field: "utxo_increase_actual".to_owned() })).transpose()?,
-            utxo_size_increase_actual: self.utxo_size_inc_actual.map(|x| i32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x, field: "utxo_size_increase_actual".to_owned() })).transpose()?,
+            txs: self
+                .txs
+                .map(|x| {
+                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x as i64,
+                        field: "txs".to_owned(),
+                    })
+                })
+                .transpose()?,
+            utxo_increase: self
+                .utxo_increase
+                .map(|x| {
+                    i32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x,
+                        field: "utxo_increase".to_owned(),
+                    })
+                })
+                .transpose()?,
+            utxo_size_increase: self
+                .utxo_size_inc
+                .map(|x| {
+                    i32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x,
+                        field: "utxo_size_increase".to_owned(),
+                    })
+                })
+                .transpose()?,
+            utxo_increase_actual: self
+                .utxo_increase_actual
+                .map(|x| {
+                    i32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x,
+                        field: "utxo_increase_actual".to_owned(),
+                    })
+                })
+                .transpose()?,
+            utxo_size_increase_actual: self
+                .utxo_size_inc_actual
+                .map(|x| {
+                    i32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x,
+                        field: "utxo_size_increase_actual".to_owned(),
+                    })
+                })
+                .transpose()?,
         })
     }
 }
@@ -393,7 +480,8 @@ pub enum GetBlockStatsError {
 impl fmt::Display for GetBlockStatsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -454,14 +542,26 @@ impl GetBlockVerbose1 {
         Ok(model::GetBlockVerboseOne {
             hash: self.hash.parse::<BlockHash>().map_err(E::Hash)?,
             confirmations: self.confirmations,
-            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow { value: self.size as i64, field: "size".to_owned() })?,
-            stripped_size: Some(u32::try_from(self.stripped_size).map_err(|_| crate::NumericError::Overflow { value: self.stripped_size as i64, field: "stripped_size".to_owned() })?),
+            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow {
+                value: self.size as i64,
+                field: "size".to_owned(),
+            })?,
+            stripped_size: Some(u32::try_from(self.stripped_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.stripped_size as i64,
+                    field: "stripped_size".to_owned(),
+                }
+            })?),
             weight: Weight::from_wu(self.weight as u64),
             coinbase_tx: Some(self.coinbase_tx.into_model().map_err(E::CoinbaseTx)?),
             height: crate::to_u32(self.height, "height")?,
             version: block::Version::from_consensus(self.version as i32),
             merkle_root: self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?,
-            tx: self.tx.into_iter().map(|x| x.parse::<Txid>().map_err(E::Tx)).collect::<Result<Vec<_>, _>>()?,
+            tx: self
+                .tx
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Tx))
+                .collect::<Result<Vec<_>, _>>()?,
             time: crate::to_u32(self.time, "time")?,
             median_time: Some(crate::to_u32(self.median_time, "median_time")?),
             nonce: crate::to_u32(self.nonce, "nonce")?,
@@ -470,8 +570,16 @@ impl GetBlockVerbose1 {
             difficulty: self.difficulty,
             chain_work: Work::from_unprefixed_hex(&self.chain_work).map_err(E::ChainWork)?,
             n_tx: crate::to_u32(self.n_tx, "n_tx")?,
-            previous_block_hash: self.previous_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::PreviousBlockHash)?,
-            next_block_hash: self.next_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::NextBlockHash)?,
+            previous_block_hash: self
+                .previous_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::PreviousBlockHash)?,
+            next_block_hash: self
+                .next_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::NextBlockHash)?,
         })
     }
 }
@@ -505,14 +613,19 @@ impl fmt::Display for GetBlockVerboseOneError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hash(ref e) => write_err!(f, "conversion of the `Hash` field failed"; e),
-            Self::CoinbaseTx(ref e) => write_err!(f, "conversion of the `CoinbaseTx` field failed"; e),
-            Self::MerkleRoot(ref e) => write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
+            Self::CoinbaseTx(ref e) =>
+                write_err!(f, "conversion of the `CoinbaseTx` field failed"; e),
+            Self::MerkleRoot(ref e) =>
+                write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
             Self::Tx(ref e) => write_err!(f, "conversion of the `Tx` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::ChainWork(ref e) => write_err!(f, "conversion of the `ChainWork` field failed"; e),
-            Self::PreviousBlockHash(ref e) => write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
-            Self::NextBlockHash(ref e) => write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `ChainWork` field failed"; e),
+            Self::PreviousBlockHash(ref e) =>
+                write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
+            Self::NextBlockHash(ref e) =>
+                write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -546,7 +659,10 @@ impl GetBlockVerbose1CoinbaseTx {
         use CoinbaseTransactionError as E;
 
         Ok(model::CoinbaseTransaction {
-            version: i32::try_from(self.version).map_err(|_| crate::NumericError::Overflow { value: self.version, field: "version".to_owned() })?,
+            version: i32::try_from(self.version).map_err(|_| crate::NumericError::Overflow {
+                value: self.version,
+                field: "version".to_owned(),
+            })?,
             locktime: crate::to_u32(self.locktime, "locktime")?,
             sequence: crate::to_u32(self.sequence, "sequence")?,
             coinbase: self.coinbase,
@@ -591,14 +707,26 @@ impl GetBlockVerbose2 {
         Ok(model::GetBlockVerboseTwo {
             hash: self.hash.parse::<BlockHash>().map_err(E::Hash)?,
             confirmations: self.confirmations,
-            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow { value: self.size as i64, field: "size".to_owned() })?,
-            stripped_size: Some(u32::try_from(self.stripped_size).map_err(|_| crate::NumericError::Overflow { value: self.stripped_size as i64, field: "stripped_size".to_owned() })?),
+            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow {
+                value: self.size as i64,
+                field: "size".to_owned(),
+            })?,
+            stripped_size: Some(u32::try_from(self.stripped_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.stripped_size as i64,
+                    field: "stripped_size".to_owned(),
+                }
+            })?),
             weight: Weight::from_wu(self.weight as u64),
             coinbase_tx: Some(self.coinbase_tx.into_model().map_err(E::CoinbaseTx)?),
             height: crate::to_u32(self.height, "height")?,
             version: block::Version::from_consensus(self.version as i32),
             merkle_root: self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?,
-            tx: self.tx.into_iter().map(|x| x.into_model().map_err(E::Tx)).collect::<Result<Vec<_>, _>>()?,
+            tx: self
+                .tx
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Tx))
+                .collect::<Result<Vec<_>, _>>()?,
             time: crate::to_u32(self.time, "time")?,
             median_time: Some(crate::to_u32(self.median_time, "median_time")?),
             nonce: crate::to_u32(self.nonce, "nonce")?,
@@ -607,8 +735,16 @@ impl GetBlockVerbose2 {
             difficulty: self.difficulty,
             chain_work: Work::from_unprefixed_hex(&self.chain_work).map_err(E::ChainWork)?,
             n_tx: crate::to_u32(self.n_tx, "n_tx")?,
-            previous_block_hash: self.previous_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::PreviousBlockHash)?,
-            next_block_hash: self.next_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::NextBlockHash)?,
+            previous_block_hash: self
+                .previous_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::PreviousBlockHash)?,
+            next_block_hash: self
+                .next_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::NextBlockHash)?,
         })
     }
 }
@@ -642,14 +778,19 @@ impl fmt::Display for GetBlockVerboseTwoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hash(ref e) => write_err!(f, "conversion of the `Hash` field failed"; e),
-            Self::CoinbaseTx(ref e) => write_err!(f, "conversion of the `CoinbaseTx` field failed"; e),
-            Self::MerkleRoot(ref e) => write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
+            Self::CoinbaseTx(ref e) =>
+                write_err!(f, "conversion of the `CoinbaseTx` field failed"; e),
+            Self::MerkleRoot(ref e) =>
+                write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
             Self::Tx(ref e) => write_err!(f, "conversion of the `Tx` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::ChainWork(ref e) => write_err!(f, "conversion of the `ChainWork` field failed"; e),
-            Self::PreviousBlockHash(ref e) => write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
-            Self::NextBlockHash(ref e) => write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `ChainWork` field failed"; e),
+            Self::PreviousBlockHash(ref e) =>
+                write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
+            Self::NextBlockHash(ref e) =>
+                write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -683,7 +824,10 @@ impl GetBlockVerbose2CoinbaseTx {
         use CoinbaseTransactionError as E;
 
         Ok(model::CoinbaseTransaction {
-            version: i32::try_from(self.version).map_err(|_| crate::NumericError::Overflow { value: self.version, field: "version".to_owned() })?,
+            version: i32::try_from(self.version).map_err(|_| crate::NumericError::Overflow {
+                value: self.version,
+                field: "version".to_owned(),
+            })?,
             locktime: crate::to_u32(self.locktime, "locktime")?,
             sequence: crate::to_u32(self.sequence, "sequence")?,
             coinbase: self.coinbase,
@@ -694,11 +838,18 @@ impl GetBlockVerbose2CoinbaseTx {
 
 impl GetBlockVerbose2TxItem {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetBlockVerboseTwoTransaction, GetBlockVerboseTwoTransactionError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetBlockVerboseTwoTransaction, GetBlockVerboseTwoTransactionError> {
         use GetBlockVerboseTwoTransactionError as E;
 
         Ok(model::GetBlockVerboseTwoTransaction {
-            transaction: crate::reconstruct::from_flat_fields::<super::super::GetRawTransactionVerbose1>(&self.extra).map_err(E::Transaction)?.into_model().map_err(E::TransactionModel)?,
+            transaction: crate::reconstruct::from_flat_fields::<
+                super::super::GetRawTransactionVerbose1,
+            >(&self.extra)
+            .map_err(E::Transaction)?
+            .into_model()
+            .map_err(E::TransactionModel)?,
             fee: self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?,
         })
     }
@@ -718,8 +869,10 @@ pub enum GetBlockVerboseTwoTransactionError {
 impl fmt::Display for GetBlockVerboseTwoTransactionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Transaction(ref e) => write_err!(f, "conversion of the `Transaction` field failed"; e),
-            Self::TransactionModel(ref e) => write_err!(f, "conversion of the `TransactionModel` field failed"; e),
+            Self::Transaction(ref e) =>
+                write_err!(f, "conversion of the `Transaction` field failed"; e),
+            Self::TransactionModel(ref e) =>
+                write_err!(f, "conversion of the `TransactionModel` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
         }
     }
@@ -744,14 +897,26 @@ impl GetBlockVerbose3 {
         Ok(model::GetBlockVerboseThree {
             hash: self.hash.parse::<BlockHash>().map_err(E::Hash)?,
             confirmations: self.confirmations,
-            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow { value: self.size as i64, field: "size".to_owned() })?,
-            stripped_size: Some(u32::try_from(self.stripped_size).map_err(|_| crate::NumericError::Overflow { value: self.stripped_size as i64, field: "stripped_size".to_owned() })?),
+            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow {
+                value: self.size as i64,
+                field: "size".to_owned(),
+            })?,
+            stripped_size: Some(u32::try_from(self.stripped_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.stripped_size as i64,
+                    field: "stripped_size".to_owned(),
+                }
+            })?),
             weight: Weight::from_wu(self.weight as u64),
             coinbase_tx: Some(self.coinbase_tx.into_model().map_err(E::CoinbaseTx)?),
             height: crate::to_u32(self.height, "height")?,
             version: block::Version::from_consensus(self.version as i32),
             merkle_root: self.merkle_root.parse::<TxMerkleNode>().map_err(E::MerkleRoot)?,
-            tx: self.tx.into_iter().map(|x| x.into_model().map_err(E::Tx)).collect::<Result<Vec<_>, _>>()?,
+            tx: self
+                .tx
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Tx))
+                .collect::<Result<Vec<_>, _>>()?,
             time: crate::to_u32(self.time, "time")?,
             median_time: Some(crate::to_u32(self.median_time, "median_time")?),
             nonce: crate::to_u32(self.nonce, "nonce")?,
@@ -760,8 +925,16 @@ impl GetBlockVerbose3 {
             difficulty: self.difficulty,
             chain_work: Work::from_unprefixed_hex(&self.chain_work).map_err(E::ChainWork)?,
             n_tx: crate::to_u32(self.n_tx, "n_tx")?,
-            previous_block_hash: self.previous_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::PreviousBlockHash)?,
-            next_block_hash: self.next_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::NextBlockHash)?,
+            previous_block_hash: self
+                .previous_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::PreviousBlockHash)?,
+            next_block_hash: self
+                .next_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::NextBlockHash)?,
         })
     }
 }
@@ -795,14 +968,19 @@ impl fmt::Display for GetBlockVerboseThreeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hash(ref e) => write_err!(f, "conversion of the `Hash` field failed"; e),
-            Self::CoinbaseTx(ref e) => write_err!(f, "conversion of the `CoinbaseTx` field failed"; e),
-            Self::MerkleRoot(ref e) => write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
+            Self::CoinbaseTx(ref e) =>
+                write_err!(f, "conversion of the `CoinbaseTx` field failed"; e),
+            Self::MerkleRoot(ref e) =>
+                write_err!(f, "conversion of the `MerkleRoot` field failed"; e),
             Self::Tx(ref e) => write_err!(f, "conversion of the `Tx` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::ChainWork(ref e) => write_err!(f, "conversion of the `ChainWork` field failed"; e),
-            Self::PreviousBlockHash(ref e) => write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
-            Self::NextBlockHash(ref e) => write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `ChainWork` field failed"; e),
+            Self::PreviousBlockHash(ref e) =>
+                write_err!(f, "conversion of the `PreviousBlockHash` field failed"; e),
+            Self::NextBlockHash(ref e) =>
+                write_err!(f, "conversion of the `NextBlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -836,7 +1014,10 @@ impl GetBlockVerbose3CoinbaseTx {
         use CoinbaseTransactionError as E;
 
         Ok(model::CoinbaseTransaction {
-            version: i32::try_from(self.version).map_err(|_| crate::NumericError::Overflow { value: self.version, field: "version".to_owned() })?,
+            version: i32::try_from(self.version).map_err(|_| crate::NumericError::Overflow {
+                value: self.version,
+                field: "version".to_owned(),
+            })?,
             locktime: crate::to_u32(self.locktime, "locktime")?,
             sequence: crate::to_u32(self.sequence, "sequence")?,
             coinbase: self.coinbase,
@@ -847,13 +1028,32 @@ impl GetBlockVerbose3CoinbaseTx {
 
 impl GetBlockVerbose3TxItem {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetBlockVerboseThreeTransaction, GetBlockVerboseThreeTransactionError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetBlockVerboseThreeTransaction, GetBlockVerboseThreeTransactionError> {
         use GetBlockVerboseThreeTransactionError as E;
 
         Ok(model::GetBlockVerboseThreeTransaction {
-            transaction: crate::reconstruct::block_verbose3_tx::<super::super::GetRawTransactionVerbose1, _>(&self.extra, &self.vin).map_err(E::Transaction)?.into_model().map_err(E::TransactionModel)?,
-            prevouts: self.vin.iter().map(|vi| vi.prevout.clone().map(|p| p.into_model()).transpose()).collect::<Result<Vec<_>, _>>().map_err(E::Prevouts)?,
-            fee: self.extra.get("fee").and_then(|v| v.as_f64()).map(Amount::from_btc).transpose().map_err(E::Fee)?,
+            transaction: crate::reconstruct::block_verbose3_tx::<
+                super::super::GetRawTransactionVerbose1,
+                _,
+            >(&self.extra, &self.vin)
+            .map_err(E::Transaction)?
+            .into_model()
+            .map_err(E::TransactionModel)?,
+            prevouts: self
+                .vin
+                .iter()
+                .map(|vi| vi.prevout.clone().map(|p| p.into_model()).transpose())
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(E::Prevouts)?,
+            fee: self
+                .extra
+                .get("fee")
+                .and_then(|v| v.as_f64())
+                .map(Amount::from_btc)
+                .transpose()
+                .map_err(E::Fee)?,
         })
     }
 }
@@ -874,8 +1074,10 @@ pub enum GetBlockVerboseThreeTransactionError {
 impl fmt::Display for GetBlockVerboseThreeTransactionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Transaction(ref e) => write_err!(f, "conversion of the `Transaction` field failed"; e),
-            Self::TransactionModel(ref e) => write_err!(f, "conversion of the `TransactionModel` field failed"; e),
+            Self::Transaction(ref e) =>
+                write_err!(f, "conversion of the `Transaction` field failed"; e),
+            Self::TransactionModel(ref e) =>
+                write_err!(f, "conversion of the `TransactionModel` field failed"; e),
             Self::Prevouts(ref e) => write_err!(f, "conversion of the `Prevouts` field failed"; e),
             Self::Fee(ref e) => write_err!(f, "conversion of the `Fee` field failed"; e),
         }
@@ -896,7 +1098,9 @@ impl std::error::Error for GetBlockVerboseThreeTransactionError {
 
 impl GetBlockVerbose3TxItemVinItemPrevout {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetBlockVerboseThreePrevout, GetBlockVerboseThreePrevoutError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetBlockVerboseThreePrevout, GetBlockVerboseThreePrevoutError> {
         use GetBlockVerboseThreePrevoutError as E;
 
         Ok(model::GetBlockVerboseThreePrevout {
@@ -923,7 +1127,8 @@ impl fmt::Display for GetBlockVerboseThreePrevoutError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Value(ref e) => write_err!(f, "conversion of the `Value` field failed"; e),
-            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::ScriptPubkey(ref e) =>
+                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -952,7 +1157,11 @@ impl GetBlockVerbose3TxItemVinItemPrevoutScriptPubKey {
         Ok(model::ScriptPubKey {
             script_pubkey: ScriptBuf::from_hex(&self.hex).map_err(E::ScriptPubkey)?,
             required_signatures: None, // no raw field; canonical is optional
-            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            address: self
+                .address
+                .map(|x| x.parse::<Address<NetworkUnchecked>>())
+                .transpose()
+                .map_err(E::Address)?,
             addresses: None, // no raw field; canonical is optional
         })
     }
@@ -970,7 +1179,8 @@ pub enum ScriptPubKeyError {
 impl fmt::Display for ScriptPubKeyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::ScriptPubkey(ref e) =>
+                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
         }
     }
@@ -1006,11 +1216,18 @@ impl GetBlockchainInfo {
             chain_work: Work::from_unprefixed_hex(&self.chain_work).map_err(E::ChainWork)?,
             size_on_disk: self.size_on_disk,
             pruned: self.pruned,
-            prune_height: self.prune_height.map(|x| crate::to_u32(x, "prune_height")).transpose()?,
+            prune_height: self
+                .prune_height
+                .map(|x| crate::to_u32(x, "prune_height"))
+                .transpose()?,
             automatic_pruning: self.automatic_pruning,
             prune_target_size: self.prune_target_size,
             softforks: Default::default(), // no raw field; canonical is a map
-            signet_challenge: self.signet_challenge.map(|x| ScriptBuf::from_hex(&x)).transpose().map_err(E::SignetChallenge)?,
+            signet_challenge: self
+                .signet_challenge
+                .map(|x| ScriptBuf::from_hex(&x))
+                .transpose()
+                .map_err(E::SignetChallenge)?,
             warnings: self.warnings,
         })
     }
@@ -1039,11 +1256,14 @@ impl fmt::Display for GetBlockchainInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Chain(ref e) => write_err!(f, "conversion of the `Chain` field failed"; e),
-            Self::BestBlockHash(ref e) => write_err!(f, "conversion of the `BestBlockHash` field failed"; e),
+            Self::BestBlockHash(ref e) =>
+                write_err!(f, "conversion of the `BestBlockHash` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::ChainWork(ref e) => write_err!(f, "conversion of the `ChainWork` field failed"; e),
-            Self::SignetChallenge(ref e) => write_err!(f, "conversion of the `SignetChallenge` field failed"; e),
+            Self::ChainWork(ref e) =>
+                write_err!(f, "conversion of the `ChainWork` field failed"; e),
+            Self::SignetChallenge(ref e) =>
+                write_err!(f, "conversion of the `SignetChallenge` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1075,7 +1295,11 @@ impl GetChainStates {
 
         Ok(model::GetChainStates {
             headers: crate::to_u32(self.headers, "headers")?,
-            chain_states: self.chain_states.into_iter().map(|x| x.into_model().map_err(E::ChainStates)).collect::<Result<Vec<_>, _>>()?,
+            chain_states: self
+                .chain_states
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::ChainStates))
+                .collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1092,7 +1316,8 @@ pub enum GetChainStatesError {
 impl fmt::Display for GetChainStatesError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::ChainStates(ref e) => write_err!(f, "conversion of the `ChainStates` field failed"; e),
+            Self::ChainStates(ref e) =>
+                write_err!(f, "conversion of the `ChainStates` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1124,7 +1349,11 @@ impl GetChainStatesChainStatesItem {
             target: Some(Target::from_unprefixed_hex(&self.target).map_err(E::Target)?),
             difficulty: self.difficulty,
             verification_progress: self.verification_progress,
-            snapshot_block_hash: self.snapshot_block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::SnapshotBlockHash)?,
+            snapshot_block_hash: self
+                .snapshot_block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::SnapshotBlockHash)?,
             coins_db_cache_bytes: self.coins_db_cache_bytes,
             coins_tip_cache_bytes: self.coins_tip_cache_bytes,
             validated: self.validated,
@@ -1150,10 +1379,12 @@ pub enum ChainStateError {
 impl fmt::Display for ChainStateError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::BestBlockHash(ref e) => write_err!(f, "conversion of the `BestBlockHash` field failed"; e),
+            Self::BestBlockHash(ref e) =>
+                write_err!(f, "conversion of the `BestBlockHash` field failed"; e),
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::SnapshotBlockHash(ref e) => write_err!(f, "conversion of the `SnapshotBlockHash` field failed"; e),
+            Self::SnapshotBlockHash(ref e) =>
+                write_err!(f, "conversion of the `SnapshotBlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1181,7 +1412,12 @@ impl GetChainTips {
     pub fn into_model(self) -> Result<model::GetChainTips, GetChainTipsError> {
         use GetChainTipsError as E;
 
-        Ok(model::GetChainTips(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
+        Ok(model::GetChainTips(
+            self.0
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Inner))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 
@@ -1218,7 +1454,10 @@ impl GetChainTipsItem {
             height: crate::to_u32(self.height, "height")?,
             hash: self.hash.parse::<BlockHash>().map_err(E::Hash)?,
             branch_length: crate::to_u32(self.branchlen, "branch_length")?,
-            status: serde_json::from_value::<model::ChainTipsStatus>(serde_json::Value::String(self.status)).map_err(E::Status)?,
+            status: serde_json::from_value::<model::ChainTipsStatus>(serde_json::Value::String(
+                self.status,
+            ))
+            .map_err(E::Status)?,
         })
     }
 }
@@ -1266,12 +1505,38 @@ impl GetChainTxStats {
 
         Ok(model::GetChainTxStats {
             time: crate::to_u32(self.time, "time")?,
-            tx_count: self.tx_count.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "tx_count".to_owned() })).transpose()?.unwrap_or_default(),
-            window_final_block_hash: self.window_final_block_hash.parse::<BlockHash>().map_err(E::WindowFinalBlockHash)?,
-            window_final_block_height: Some(crate::to_u32(self.window_final_block_height, "window_final_block_height")?),
+            tx_count: self
+                .tx_count
+                .map(|x| {
+                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x as i64,
+                        field: "tx_count".to_owned(),
+                    })
+                })
+                .transpose()?
+                .unwrap_or_default(),
+            window_final_block_hash: self
+                .window_final_block_hash
+                .parse::<BlockHash>()
+                .map_err(E::WindowFinalBlockHash)?,
+            window_final_block_height: Some(crate::to_u32(
+                self.window_final_block_height,
+                "window_final_block_height",
+            )?),
             window_block_count: crate::to_u32(self.window_block_count, "window_block_count")?,
-            window_tx_count: self.window_tx_count.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "window_tx_count".to_owned() })).transpose()?,
-            window_interval: self.window_interval.map(|x| crate::to_u32(x, "window_interval")).transpose()?,
+            window_tx_count: self
+                .window_tx_count
+                .map(|x| {
+                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x as i64,
+                        field: "window_tx_count".to_owned(),
+                    })
+                })
+                .transpose()?,
+            window_interval: self
+                .window_interval
+                .map(|x| crate::to_u32(x, "window_interval"))
+                .transpose()?,
             tx_rate: self.tx_rate,
         })
     }
@@ -1289,7 +1554,8 @@ pub enum GetChainTxStatsError {
 impl fmt::Display for GetChainTxStatsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::WindowFinalBlockHash(ref e) => write_err!(f, "conversion of the `WindowFinalBlockHash` field failed"; e),
+            Self::WindowFinalBlockHash(ref e) =>
+                write_err!(f, "conversion of the `WindowFinalBlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1318,7 +1584,11 @@ impl GetDeploymentInfo {
             hash: self.hash.parse::<BlockHash>().map_err(E::Hash)?,
             height: crate::to_u32(self.height, "height")?,
             script_flags: Some(self.script_flags),
-            deployments: self.deployments.into_iter().map(|(k, v)| Ok::<_, E>((k, v.into_model().map_err(E::DeploymentsValue)?))).collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
+            deployments: self
+                .deployments
+                .into_iter()
+                .map(|(k, v)| Ok::<_, E>((k, v.into_model().map_err(E::DeploymentsValue)?)))
+                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
         })
     }
 }
@@ -1338,7 +1608,8 @@ impl fmt::Display for GetDeploymentInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Hash(ref e) => write_err!(f, "conversion of the `Hash` field failed"; e),
-            Self::DeploymentsValue(ref e) => write_err!(f, "conversion of the `DeploymentsValue` field failed"; e),
+            Self::DeploymentsValue(ref e) =>
+                write_err!(f, "conversion of the `DeploymentsValue` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1411,14 +1682,29 @@ impl GetDeploymentInfoDeploymentsBip9 {
         use Bip9InfoError as E;
 
         Ok(model::Bip9Info {
-            bit: self.bit.map(|x| u8::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x, field: "bit".to_owned() })).transpose()?,
+            bit: self
+                .bit
+                .map(|x| {
+                    u8::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x,
+                        field: "bit".to_owned(),
+                    })
+                })
+                .transpose()?,
             start_time: self.start_time,
             timeout: self.time_out,
-            min_activation_height: crate::to_u32(self.min_activation_height, "min_activation_height")?,
+            min_activation_height: crate::to_u32(
+                self.min_activation_height,
+                "min_activation_height",
+            )?,
             status: self.status,
             since: crate::to_u32(self.since, "since")?,
             status_next: self.status_next,
-            statistics: self.statistics.map(|x| x.into_model()).transpose().map_err(E::Statistics)?,
+            statistics: self
+                .statistics
+                .map(|x| x.into_model())
+                .transpose()
+                .map_err(E::Statistics)?,
             signalling: self.signalling,
         })
     }
@@ -1436,7 +1722,8 @@ pub enum Bip9InfoError {
 impl fmt::Display for Bip9InfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::Statistics(ref e) => write_err!(f, "conversion of the `Statistics` field failed"; e),
+            Self::Statistics(ref e) =>
+                write_err!(f, "conversion of the `Statistics` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1505,7 +1792,11 @@ impl GetDescriptorActivity {
         use GetDescriptorActivityError as E;
 
         Ok(model::GetDescriptorActivity {
-            activity: self.activity.into_iter().map(|x| x.into_model().map_err(E::Activity)).collect::<Result<Vec<_>, _>>()?,
+            activity: self
+                .activity
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Activity))
+                .collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1540,8 +1831,10 @@ impl GetDescriptorActivityActivity {
         use ActivityEntryError as E;
 
         Ok(match self {
-            GetDescriptorActivityActivity::Object(x) => model::ActivityEntry::Spend(x.into_model().map_err(E::Spend)?),
-            GetDescriptorActivityActivity::Object2(x) => model::ActivityEntry::Receive(x.into_model().map_err(E::Receive)?),
+            GetDescriptorActivityActivity::Object(x) =>
+                model::ActivityEntry::Spend(x.into_model().map_err(E::Spend)?),
+            GetDescriptorActivityActivity::Object2(x) =>
+                model::ActivityEntry::Receive(x.into_model().map_err(E::Receive)?),
         })
     }
 }
@@ -1581,7 +1874,11 @@ impl GetDescriptorActivityActivityVariant0 {
 
         Ok(model::SpendActivity {
             amount: Amount::from_btc(self.amount).map_err(E::Amount)?,
-            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            block_hash: self
+                .block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::BlockHash)?,
             height: self.height.map(|x| crate::to_u32(x, "height")).transpose()?,
             spend_txid: self.spend_txid.parse::<Txid>().map_err(E::SpendTxid)?,
             spend_vout: crate::to_u32(self.spend_vin, "spend_vout")?,
@@ -1613,10 +1910,14 @@ impl fmt::Display for SpendActivityError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
-            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
-            Self::SpendTxid(ref e) => write_err!(f, "conversion of the `SpendTxid` field failed"; e),
-            Self::PrevoutTxid(ref e) => write_err!(f, "conversion of the `PrevoutTxid` field failed"; e),
-            Self::PrevoutSpk(ref e) => write_err!(f, "conversion of the `PrevoutSpk` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::SpendTxid(ref e) =>
+                write_err!(f, "conversion of the `SpendTxid` field failed"; e),
+            Self::PrevoutTxid(ref e) =>
+                write_err!(f, "conversion of the `PrevoutTxid` field failed"; e),
+            Self::PrevoutSpk(ref e) =>
+                write_err!(f, "conversion of the `PrevoutSpk` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1648,7 +1949,11 @@ impl GetDescriptorActivityActivityVariant0PrevoutSpk {
         Ok(model::ScriptPubKey {
             script_pubkey: ScriptBuf::from_hex(&self.hex).map_err(E::ScriptPubkey)?,
             required_signatures: None, // no raw field; canonical is optional
-            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            address: self
+                .address
+                .map(|x| x.parse::<Address<NetworkUnchecked>>())
+                .transpose()
+                .map_err(E::Address)?,
             addresses: None, // no raw field; canonical is optional
         })
     }
@@ -1661,7 +1966,11 @@ impl GetDescriptorActivityActivityVariant1 {
 
         Ok(model::ReceiveActivity {
             amount: Amount::from_btc(self.amount).map_err(E::Amount)?,
-            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            block_hash: self
+                .block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::BlockHash)?,
             height: self.height.map(|x| crate::to_u32(x, "height")).transpose()?,
             txid: self.txid.parse::<Txid>().map_err(E::Txid)?,
             vout: crate::to_u32(self.vout, "vout")?,
@@ -1689,9 +1998,11 @@ impl fmt::Display for ReceiveActivityError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
-            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
-            Self::OutputSpk(ref e) => write_err!(f, "conversion of the `OutputSpk` field failed"; e),
+            Self::OutputSpk(ref e) =>
+                write_err!(f, "conversion of the `OutputSpk` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -1722,7 +2033,11 @@ impl GetDescriptorActivityActivityVariant1OutputSpk {
         Ok(model::ScriptPubKey {
             script_pubkey: ScriptBuf::from_hex(&self.hex).map_err(E::ScriptPubkey)?,
             required_signatures: None, // no raw field; canonical is optional
-            address: self.address.map(|x| x.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            address: self
+                .address
+                .map(|x| x.parse::<Address<NetworkUnchecked>>())
+                .transpose()
+                .map_err(E::Address)?,
             addresses: None, // no raw field; canonical is optional
         })
     }
@@ -1739,22 +2054,15 @@ impl GetDifficulty {
 
 /// Error when converting a `GetDifficulty` type into the model type.
 #[derive(Debug)]
-pub enum GetDifficultyError {
-}
+pub enum GetDifficultyError {}
 
 impl fmt::Display for GetDifficultyError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-        }
-    }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for GetDifficultyError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match *self {
-        }
-    }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
 }
 
 impl GetMempoolAncestorsVerbose0 {
@@ -1762,7 +2070,12 @@ impl GetMempoolAncestorsVerbose0 {
     pub fn into_model(self) -> Result<model::GetMempoolAncestors, GetMempoolAncestorsError> {
         use GetMempoolAncestorsError as E;
 
-        Ok(model::GetMempoolAncestors(self.0.into_iter().map(|x| x.parse::<Txid>().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
+        Ok(model::GetMempoolAncestors(
+            self.0
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Inner))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 
@@ -1792,10 +2105,22 @@ impl std::error::Error for GetMempoolAncestorsError {
 
 impl GetMempoolAncestorsVerbose1 {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetMempoolAncestorsVerbose, GetMempoolAncestorsVerboseError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolAncestorsVerbose, GetMempoolAncestorsVerboseError> {
         use GetMempoolAncestorsVerboseError as E;
 
-        Ok(model::GetMempoolAncestorsVerbose(self.0.into_iter().map(|(k, v)| Ok::<_, E>((k.parse::<Txid>().map_err(E::InnerKey)?, v.into_model().map_err(E::InnerValue)?))).collect::<Result<std::collections::BTreeMap<_, _>, _>>()?))
+        Ok(model::GetMempoolAncestorsVerbose(
+            self.0
+                .into_iter()
+                .map(|(k, v)| {
+                    Ok::<_, E>((
+                        k.parse::<Txid>().map_err(E::InnerKey)?,
+                        v.into_model().map_err(E::InnerValue)?,
+                    ))
+                })
+                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
+        ))
     }
 }
 
@@ -1812,7 +2137,8 @@ impl fmt::Display for GetMempoolAncestorsVerboseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::InnerKey(ref e) => write_err!(f, "conversion of the `InnerKey` field failed"; e),
-            Self::InnerValue(ref e) => write_err!(f, "conversion of the `InnerValue` field failed"; e),
+            Self::InnerValue(ref e) =>
+                write_err!(f, "conversion of the `InnerValue` field failed"; e),
         }
     }
 }
@@ -1838,15 +2164,43 @@ impl GetMempoolAncestorsVerbose1Entry {
             weight: Some(crate::to_u32(self.weight, "weight")?),
             time: crate::to_u32(self.time, "time")?,
             height: crate::to_u32(self.height, "height")?,
-            descendant_count: u32::try_from(self.descendant_count).map_err(|_| crate::NumericError::Overflow { value: self.descendant_count as i64, field: "descendant_count".to_owned() })?,
-            descendant_size: u32::try_from(self.descendant_size).map_err(|_| crate::NumericError::Overflow { value: self.descendant_size as i64, field: "descendant_size".to_owned() })?,
-            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_count as i64, field: "ancestor_count".to_owned() })?,
-            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_size as i64, field: "ancestor_size".to_owned() })?,
+            descendant_count: u32::try_from(self.descendant_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_count as i64,
+                    field: "descendant_count".to_owned(),
+                }
+            })?,
+            descendant_size: u32::try_from(self.descendant_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_size as i64,
+                    field: "descendant_size".to_owned(),
+                }
+            })?,
+            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_count as i64,
+                    field: "ancestor_count".to_owned(),
+                }
+            })?,
+            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_size as i64,
+                    field: "ancestor_size".to_owned(),
+                }
+            })?,
             chunk_weight: Some(crate::to_u32(self.chunk_weight, "chunk_weight")?),
             wtxid: self.wtxid.parse::<Wtxid>().map_err(E::Wtxid)?,
             fees: self.fees.into_model().map_err(E::Fees)?,
-            depends: self.depends.into_iter().map(|x| x.parse::<Txid>().map_err(E::Depends)).collect::<Result<Vec<_>, _>>()?,
-            spent_by: self.spent_by.into_iter().map(|x| x.parse::<Txid>().map_err(E::SpentBy)).collect::<Result<Vec<_>, _>>()?,
+            depends: self
+                .depends
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Depends))
+                .collect::<Result<Vec<_>, _>>()?,
+            spent_by: self
+                .spent_by
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::SpentBy))
+                .collect::<Result<Vec<_>, _>>()?,
             bip125_replaceable: Some(self.bip125_replaceable),
             unbroadcast: Some(self.unbroadcast),
         })
@@ -1920,7 +2274,11 @@ impl GetMempoolCluster {
         Ok(model::GetMempoolCluster {
             cluster_weight: crate::to_u64(self.cluster_weight, "cluster_weight")?,
             tx_count: self.tx_count,
-            chunks: self.chunks.into_iter().map(|x| x.into_model().map_err(E::Chunks)).collect::<Result<Vec<_>, _>>()?,
+            chunks: self
+                .chunks
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Chunks))
+                .collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -1965,7 +2323,11 @@ impl GetMempoolClusterChunksItem {
         Ok(model::Chunk {
             chunk_fee: Amount::from_btc(self.chunk_fee).map_err(E::ChunkFee)?,
             chunk_weight: crate::to_u64(self.chunk_weight, "chunk_weight")?,
-            txs: self.txs.into_iter().map(|x| x.parse::<Txid>().map_err(E::Txs)).collect::<Result<Vec<_>, _>>()?,
+            txs: self
+                .txs
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Txs))
+                .collect::<Result<Vec<_>, _>>()?,
         })
     }
 }
@@ -2011,7 +2373,12 @@ impl GetMempoolDescendantsVerbose0 {
     pub fn into_model(self) -> Result<model::GetMempoolDescendants, GetMempoolDescendantsError> {
         use GetMempoolDescendantsError as E;
 
-        Ok(model::GetMempoolDescendants(self.0.into_iter().map(|x| x.parse::<Txid>().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
+        Ok(model::GetMempoolDescendants(
+            self.0
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Inner))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 
@@ -2041,10 +2408,22 @@ impl std::error::Error for GetMempoolDescendantsError {
 
 impl GetMempoolDescendantsVerbose1 {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetMempoolDescendantsVerbose, GetMempoolDescendantsVerboseError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetMempoolDescendantsVerbose, GetMempoolDescendantsVerboseError> {
         use GetMempoolDescendantsVerboseError as E;
 
-        Ok(model::GetMempoolDescendantsVerbose(self.0.into_iter().map(|(k, v)| Ok::<_, E>((k.parse::<Txid>().map_err(E::InnerKey)?, v.into_model().map_err(E::InnerValue)?))).collect::<Result<std::collections::BTreeMap<_, _>, _>>()?))
+        Ok(model::GetMempoolDescendantsVerbose(
+            self.0
+                .into_iter()
+                .map(|(k, v)| {
+                    Ok::<_, E>((
+                        k.parse::<Txid>().map_err(E::InnerKey)?,
+                        v.into_model().map_err(E::InnerValue)?,
+                    ))
+                })
+                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
+        ))
     }
 }
 
@@ -2061,7 +2440,8 @@ impl fmt::Display for GetMempoolDescendantsVerboseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::InnerKey(ref e) => write_err!(f, "conversion of the `InnerKey` field failed"; e),
-            Self::InnerValue(ref e) => write_err!(f, "conversion of the `InnerValue` field failed"; e),
+            Self::InnerValue(ref e) =>
+                write_err!(f, "conversion of the `InnerValue` field failed"; e),
         }
     }
 }
@@ -2087,15 +2467,43 @@ impl GetMempoolDescendantsVerbose1Entry {
             weight: Some(crate::to_u32(self.weight, "weight")?),
             time: crate::to_u32(self.time, "time")?,
             height: crate::to_u32(self.height, "height")?,
-            descendant_count: u32::try_from(self.descendant_count).map_err(|_| crate::NumericError::Overflow { value: self.descendant_count as i64, field: "descendant_count".to_owned() })?,
-            descendant_size: u32::try_from(self.descendant_size).map_err(|_| crate::NumericError::Overflow { value: self.descendant_size as i64, field: "descendant_size".to_owned() })?,
-            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_count as i64, field: "ancestor_count".to_owned() })?,
-            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_size as i64, field: "ancestor_size".to_owned() })?,
+            descendant_count: u32::try_from(self.descendant_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_count as i64,
+                    field: "descendant_count".to_owned(),
+                }
+            })?,
+            descendant_size: u32::try_from(self.descendant_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_size as i64,
+                    field: "descendant_size".to_owned(),
+                }
+            })?,
+            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_count as i64,
+                    field: "ancestor_count".to_owned(),
+                }
+            })?,
+            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_size as i64,
+                    field: "ancestor_size".to_owned(),
+                }
+            })?,
             chunk_weight: Some(crate::to_u32(self.chunk_weight, "chunk_weight")?),
             wtxid: self.wtxid.parse::<Wtxid>().map_err(E::Wtxid)?,
             fees: self.fees.into_model().map_err(E::Fees)?,
-            depends: self.depends.into_iter().map(|x| x.parse::<Txid>().map_err(E::Depends)).collect::<Result<Vec<_>, _>>()?,
-            spent_by: self.spent_by.into_iter().map(|x| x.parse::<Txid>().map_err(E::SpentBy)).collect::<Result<Vec<_>, _>>()?,
+            depends: self
+                .depends
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Depends))
+                .collect::<Result<Vec<_>, _>>()?,
+            spent_by: self
+                .spent_by
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::SpentBy))
+                .collect::<Result<Vec<_>, _>>()?,
             bip125_replaceable: Some(self.bip125_replaceable),
             unbroadcast: Some(self.unbroadcast),
         })
@@ -2128,15 +2536,43 @@ impl GetMempoolEntry {
             weight: Some(crate::to_u32(self.weight, "weight")?),
             time: crate::to_u32(self.time, "time")?,
             height: crate::to_u32(self.height, "height")?,
-            descendant_count: u32::try_from(self.descendant_count).map_err(|_| crate::NumericError::Overflow { value: self.descendant_count as i64, field: "descendant_count".to_owned() })?,
-            descendant_size: u32::try_from(self.descendant_size).map_err(|_| crate::NumericError::Overflow { value: self.descendant_size as i64, field: "descendant_size".to_owned() })?,
-            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_count as i64, field: "ancestor_count".to_owned() })?,
-            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_size as i64, field: "ancestor_size".to_owned() })?,
+            descendant_count: u32::try_from(self.descendant_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_count as i64,
+                    field: "descendant_count".to_owned(),
+                }
+            })?,
+            descendant_size: u32::try_from(self.descendant_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_size as i64,
+                    field: "descendant_size".to_owned(),
+                }
+            })?,
+            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_count as i64,
+                    field: "ancestor_count".to_owned(),
+                }
+            })?,
+            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_size as i64,
+                    field: "ancestor_size".to_owned(),
+                }
+            })?,
             chunk_weight: Some(crate::to_u32(self.chunk_weight, "chunk_weight")?),
             wtxid: self.wtxid.parse::<Wtxid>().map_err(E::Wtxid)?,
             fees: self.fees.into_model().map_err(E::Fees)?,
-            depends: self.depends.into_iter().map(|x| x.parse::<Txid>().map_err(E::Depends)).collect::<Result<Vec<_>, _>>()?,
-            spent_by: self.spent_by.into_iter().map(|x| x.parse::<Txid>().map_err(E::SpentBy)).collect::<Result<Vec<_>, _>>()?,
+            depends: self
+                .depends
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Depends))
+                .collect::<Result<Vec<_>, _>>()?,
+            spent_by: self
+                .spent_by
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::SpentBy))
+                .collect::<Result<Vec<_>, _>>()?,
             bip125_replaceable: Some(self.bip125_replaceable),
             unbroadcast: Some(self.unbroadcast),
         }))
@@ -2223,7 +2659,8 @@ impl fmt::Display for MempoolEntryFeesError {
             Self::Base(ref e) => write_err!(f, "conversion of the `Base` field failed"; e),
             Self::Modified(ref e) => write_err!(f, "conversion of the `Modified` field failed"; e),
             Self::Ancestor(ref e) => write_err!(f, "conversion of the `Ancestor` field failed"; e),
-            Self::Descendant(ref e) => write_err!(f, "conversion of the `Descendant` field failed"; e),
+            Self::Descendant(ref e) =>
+                write_err!(f, "conversion of the `Descendant` field failed"; e),
             Self::Chunk(ref e) => write_err!(f, "conversion of the `Chunk` field failed"; e),
         }
     }
@@ -2249,19 +2686,40 @@ impl GetMempoolInfo {
 
         Ok(model::GetMempoolInfo {
             loaded: Some(self.loaded),
-            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow { value: self.size as i64, field: "size".to_owned() })?,
-            bytes: u32::try_from(self.bytes).map_err(|_| crate::NumericError::Overflow { value: self.bytes as i64, field: "bytes".to_owned() })?,
-            usage: u32::try_from(self.usage).map_err(|_| crate::NumericError::Overflow { value: self.usage as i64, field: "usage".to_owned() })?,
+            size: u32::try_from(self.size).map_err(|_| crate::NumericError::Overflow {
+                value: self.size as i64,
+                field: "size".to_owned(),
+            })?,
+            bytes: u32::try_from(self.bytes).map_err(|_| crate::NumericError::Overflow {
+                value: self.bytes as i64,
+                field: "bytes".to_owned(),
+            })?,
+            usage: u32::try_from(self.usage).map_err(|_| crate::NumericError::Overflow {
+                value: self.usage as i64,
+                field: "usage".to_owned(),
+            })?,
             total_fee: Some(self.total_fee),
             max_mempool: crate::to_u32(self.max_mempool, "max_mempool")?,
             mempool_min_fee: crate::btc_per_kb(self.mempool_min_fee).map_err(E::MempoolMinFee)?,
             min_relay_tx_fee: crate::btc_per_kb(self.min_relay_tx_fee).map_err(E::MinRelayTxFee)?,
-            incremental_relay_fee: crate::btc_per_kb(self.incremental_relay_fee).map_err(E::IncrementalRelayFee)?,
-            unbroadcast_count: Some(u32::try_from(self.unbroadcast_count).map_err(|_| crate::NumericError::Overflow { value: self.unbroadcast_count as i64, field: "unbroadcast_count".to_owned() })?),
+            incremental_relay_fee: crate::btc_per_kb(self.incremental_relay_fee)
+                .map_err(E::IncrementalRelayFee)?,
+            unbroadcast_count: Some(u32::try_from(self.unbroadcast_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.unbroadcast_count as i64,
+                    field: "unbroadcast_count".to_owned(),
+                }
+            })?),
             full_rbf: Some(self.full_rbf),
             permit_bare_multisig: Some(self.permit_bare_multisig),
-            max_data_carrier_size: Some(crate::to_u64(self.max_data_carrier_size, "max_data_carrier_size")?),
-            limit_cluster_count: Some(crate::to_u32(self.limit_cluster_count, "limit_cluster_count")?),
+            max_data_carrier_size: Some(crate::to_u64(
+                self.max_data_carrier_size,
+                "max_data_carrier_size",
+            )?),
+            limit_cluster_count: Some(crate::to_u32(
+                self.limit_cluster_count,
+                "limit_cluster_count",
+            )?),
             limit_cluster_size: Some(crate::to_u32(self.limit_cluster_size, "limit_cluster_size")?),
             optimal: Some(self.optimal),
         })
@@ -2284,9 +2742,12 @@ pub enum GetMempoolInfoError {
 impl fmt::Display for GetMempoolInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::MempoolMinFee(ref e) => write_err!(f, "conversion of the `MempoolMinFee` field failed"; e),
-            Self::MinRelayTxFee(ref e) => write_err!(f, "conversion of the `MinRelayTxFee` field failed"; e),
-            Self::IncrementalRelayFee(ref e) => write_err!(f, "conversion of the `IncrementalRelayFee` field failed"; e),
+            Self::MempoolMinFee(ref e) =>
+                write_err!(f, "conversion of the `MempoolMinFee` field failed"; e),
+            Self::MinRelayTxFee(ref e) =>
+                write_err!(f, "conversion of the `MinRelayTxFee` field failed"; e),
+            Self::IncrementalRelayFee(ref e) =>
+                write_err!(f, "conversion of the `IncrementalRelayFee` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -2314,9 +2775,26 @@ impl GetRawMempool {
         use GetRawMempoolResultError as E;
 
         Ok(match self {
-            GetRawMempool::List(txids) => model::GetRawMempoolResult::List(model::GetRawMempool(txids.into_iter().map(|t| t.parse::<Txid>()).collect::<Result<_, _>>().map_err(E::Txid)?)),
-            GetRawMempool::Object(map) => model::GetRawMempoolResult::Verbose(model::GetRawMempoolVerbose(map.into_iter().map(|(k, v)| Ok::<_, E>((k.parse::<Txid>().map_err(E::Txid)?, v.into_model().map_err(E::Verbose)?))).collect::<Result<_, _>>()?)),
-            GetRawMempool::Object2(seq) => model::GetRawMempoolResult::Sequence(seq.into_model().map_err(E::Sequence)?),
+            GetRawMempool::List(txids) => model::GetRawMempoolResult::List(model::GetRawMempool(
+                txids
+                    .into_iter()
+                    .map(|t| t.parse::<Txid>())
+                    .collect::<Result<_, _>>()
+                    .map_err(E::Txid)?,
+            )),
+            GetRawMempool::Object(map) =>
+                model::GetRawMempoolResult::Verbose(model::GetRawMempoolVerbose(
+                    map.into_iter()
+                        .map(|(k, v)| {
+                            Ok::<_, E>((
+                                k.parse::<Txid>().map_err(E::Txid)?,
+                                v.into_model().map_err(E::Verbose)?,
+                            ))
+                        })
+                        .collect::<Result<_, _>>()?,
+                )),
+            GetRawMempool::Object2(seq) =>
+                model::GetRawMempoolResult::Sequence(seq.into_model().map_err(E::Sequence)?),
         })
     }
 }
@@ -2364,15 +2842,43 @@ impl GetRawMempoolVariant1 {
             weight: Some(crate::to_u32(self.weight, "weight")?),
             time: crate::to_u32(self.time, "time")?,
             height: crate::to_u32(self.height, "height")?,
-            descendant_count: u32::try_from(self.descendant_count).map_err(|_| crate::NumericError::Overflow { value: self.descendant_count as i64, field: "descendant_count".to_owned() })?,
-            descendant_size: u32::try_from(self.descendant_size).map_err(|_| crate::NumericError::Overflow { value: self.descendant_size as i64, field: "descendant_size".to_owned() })?,
-            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_count as i64, field: "ancestor_count".to_owned() })?,
-            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| crate::NumericError::Overflow { value: self.ancestor_size as i64, field: "ancestor_size".to_owned() })?,
+            descendant_count: u32::try_from(self.descendant_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_count as i64,
+                    field: "descendant_count".to_owned(),
+                }
+            })?,
+            descendant_size: u32::try_from(self.descendant_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.descendant_size as i64,
+                    field: "descendant_size".to_owned(),
+                }
+            })?,
+            ancestor_count: u32::try_from(self.ancestor_count).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_count as i64,
+                    field: "ancestor_count".to_owned(),
+                }
+            })?,
+            ancestor_size: u32::try_from(self.ancestor_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.ancestor_size as i64,
+                    field: "ancestor_size".to_owned(),
+                }
+            })?,
             chunk_weight: Some(crate::to_u32(self.chunk_weight, "chunk_weight")?),
             wtxid: self.wtxid.parse::<Wtxid>().map_err(E::Wtxid)?,
             fees: self.fees.into_model().map_err(E::Fees)?,
-            depends: self.depends.into_iter().map(|x| x.parse::<Txid>().map_err(E::Depends)).collect::<Result<Vec<_>, _>>()?,
-            spent_by: self.spent_by.into_iter().map(|x| x.parse::<Txid>().map_err(E::SpentBy)).collect::<Result<Vec<_>, _>>()?,
+            depends: self
+                .depends
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Depends))
+                .collect::<Result<Vec<_>, _>>()?,
+            spent_by: self
+                .spent_by
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::SpentBy))
+                .collect::<Result<Vec<_>, _>>()?,
             bip125_replaceable: Some(self.bip125_replaceable),
             unbroadcast: Some(self.unbroadcast),
         })
@@ -2400,7 +2906,11 @@ impl GetRawMempoolVariant2 {
         use GetRawMempoolSequenceError as E;
 
         Ok(model::GetRawMempoolSequence {
-            txids: self.txids.into_iter().map(|x| x.parse::<Txid>().map_err(E::Txids)).collect::<Result<Vec<_>, _>>()?,
+            txids: self
+                .txids
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Txids))
+                .collect::<Result<Vec<_>, _>>()?,
             mempool_sequence: self.mempool_sequence,
         })
     }
@@ -2438,16 +2948,48 @@ impl GetTxOutSetInfo {
         Ok(model::GetTxOutSetInfo {
             height: crate::to_u32(self.height, "height")?,
             best_block: self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?,
-            transactions: self.transactions.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "transactions".to_owned() })).transpose()?,
-            tx_outs: u32::try_from(self.tx_outs).map_err(|_| crate::NumericError::Overflow { value: self.tx_outs as i64, field: "tx_outs".to_owned() })?,
-            bogo_size: u32::try_from(self.bogo_size).map_err(|_| crate::NumericError::Overflow { value: self.bogo_size as i64, field: "bogo_size".to_owned() })?,
+            transactions: self
+                .transactions
+                .map(|x| {
+                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x as i64,
+                        field: "transactions".to_owned(),
+                    })
+                })
+                .transpose()?,
+            tx_outs: u32::try_from(self.tx_outs).map_err(|_| crate::NumericError::Overflow {
+                value: self.tx_outs as i64,
+                field: "tx_outs".to_owned(),
+            })?,
+            bogo_size: u32::try_from(self.bogo_size).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.bogo_size as i64,
+                    field: "bogo_size".to_owned(),
+                }
+            })?,
             hash_serialized_2: None, // no raw field; canonical is optional
             hash_serialized_3: self.hash_serialized_3,
-            disk_size: self.disk_size.map(|x| u32::try_from(x).map_err(|_| crate::NumericError::Overflow { value: x as i64, field: "disk_size".to_owned() })).transpose()?,
+            disk_size: self
+                .disk_size
+                .map(|x| {
+                    u32::try_from(x).map_err(|_| crate::NumericError::Overflow {
+                        value: x as i64,
+                        field: "disk_size".to_owned(),
+                    })
+                })
+                .transpose()?,
             total_amount: Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?,
             muhash: self.mu_hash,
-            total_unspendable_amount: self.total_unspendable_amount.map(Amount::from_btc).transpose().map_err(E::TotalUnspendableAmount)?,
-            block_info: self.block_info.map(|x| x.into_model()).transpose().map_err(E::BlockInfo)?,
+            total_unspendable_amount: self
+                .total_unspendable_amount
+                .map(Amount::from_btc)
+                .transpose()
+                .map_err(E::TotalUnspendableAmount)?,
+            block_info: self
+                .block_info
+                .map(|x| x.into_model())
+                .transpose()
+                .map_err(E::BlockInfo)?,
         })
     }
 }
@@ -2470,10 +3012,14 @@ pub enum GetTxOutSetInfoError {
 impl fmt::Display for GetTxOutSetInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::BestBlock(ref e) => write_err!(f, "conversion of the `BestBlock` field failed"; e),
-            Self::TotalAmount(ref e) => write_err!(f, "conversion of the `TotalAmount` field failed"; e),
-            Self::TotalUnspendableAmount(ref e) => write_err!(f, "conversion of the `TotalUnspendableAmount` field failed"; e),
-            Self::BlockInfo(ref e) => write_err!(f, "conversion of the `BlockInfo` field failed"; e),
+            Self::BestBlock(ref e) =>
+                write_err!(f, "conversion of the `BestBlock` field failed"; e),
+            Self::TotalAmount(ref e) =>
+                write_err!(f, "conversion of the `TotalAmount` field failed"; e),
+            Self::TotalUnspendableAmount(ref e) =>
+                write_err!(f, "conversion of the `TotalUnspendableAmount` field failed"; e),
+            Self::BlockInfo(ref e) =>
+                write_err!(f, "conversion of the `BlockInfo` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -2498,13 +3044,16 @@ impl From<crate::NumericError> for GetTxOutSetInfoError {
 
 impl GetTxOutSetInfoBlockInfo {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetTxOutSetInfoBlockInfo, GetTxOutSetInfoBlockInfoError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetTxOutSetInfoBlockInfo, GetTxOutSetInfoBlockInfoError> {
         use GetTxOutSetInfoBlockInfoError as E;
 
         Ok(model::GetTxOutSetInfoBlockInfo {
             prevout_spent: Amount::from_btc(self.prevout_spent).map_err(E::PrevoutSpent)?,
             coinbase: Amount::from_btc(self.coinbase).map_err(E::Coinbase)?,
-            new_outputs_ex_coinbase: Amount::from_btc(self.new_outputs_ex_coinbase).map_err(E::NewOutputsExCoinbase)?,
+            new_outputs_ex_coinbase: Amount::from_btc(self.new_outputs_ex_coinbase)
+                .map_err(E::NewOutputsExCoinbase)?,
             unspendable: Amount::from_btc(self.unspendable).map_err(E::Unspendable)?,
             unspendables: self.unspendables.into_model().map_err(E::Unspendables)?,
         })
@@ -2529,11 +3078,15 @@ pub enum GetTxOutSetInfoBlockInfoError {
 impl fmt::Display for GetTxOutSetInfoBlockInfoError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::PrevoutSpent(ref e) => write_err!(f, "conversion of the `PrevoutSpent` field failed"; e),
+            Self::PrevoutSpent(ref e) =>
+                write_err!(f, "conversion of the `PrevoutSpent` field failed"; e),
             Self::Coinbase(ref e) => write_err!(f, "conversion of the `Coinbase` field failed"; e),
-            Self::NewOutputsExCoinbase(ref e) => write_err!(f, "conversion of the `NewOutputsExCoinbase` field failed"; e),
-            Self::Unspendable(ref e) => write_err!(f, "conversion of the `Unspendable` field failed"; e),
-            Self::Unspendables(ref e) => write_err!(f, "conversion of the `Unspendables` field failed"; e),
+            Self::NewOutputsExCoinbase(ref e) =>
+                write_err!(f, "conversion of the `NewOutputsExCoinbase` field failed"; e),
+            Self::Unspendable(ref e) =>
+                write_err!(f, "conversion of the `Unspendable` field failed"; e),
+            Self::Unspendables(ref e) =>
+                write_err!(f, "conversion of the `Unspendables` field failed"; e),
         }
     }
 }
@@ -2553,14 +3106,17 @@ impl std::error::Error for GetTxOutSetInfoBlockInfoError {
 
 impl GetTxOutSetInfoBlockInfoUnspendables {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetTxOutSetInfoUnspendables, GetTxOutSetInfoUnspendablesError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetTxOutSetInfoUnspendables, GetTxOutSetInfoUnspendablesError> {
         use GetTxOutSetInfoUnspendablesError as E;
 
         Ok(model::GetTxOutSetInfoUnspendables {
             genesis_block: Amount::from_btc(self.genesis_block).map_err(E::GenesisBlock)?,
             bip30: Amount::from_btc(self.bip30).map_err(E::Bip30)?,
             scripts: Amount::from_btc(self.scripts).map_err(E::Scripts)?,
-            unclaimed_rewards: Amount::from_btc(self.unclaimed_rewards).map_err(E::UnclaimedRewards)?,
+            unclaimed_rewards: Amount::from_btc(self.unclaimed_rewards)
+                .map_err(E::UnclaimedRewards)?,
         })
     }
 }
@@ -2581,10 +3137,12 @@ pub enum GetTxOutSetInfoUnspendablesError {
 impl fmt::Display for GetTxOutSetInfoUnspendablesError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::GenesisBlock(ref e) => write_err!(f, "conversion of the `GenesisBlock` field failed"; e),
+            Self::GenesisBlock(ref e) =>
+                write_err!(f, "conversion of the `GenesisBlock` field failed"; e),
             Self::Bip30(ref e) => write_err!(f, "conversion of the `Bip30` field failed"; e),
             Self::Scripts(ref e) => write_err!(f, "conversion of the `Scripts` field failed"; e),
-            Self::UnclaimedRewards(ref e) => write_err!(f, "conversion of the `UnclaimedRewards` field failed"; e),
+            Self::UnclaimedRewards(ref e) =>
+                write_err!(f, "conversion of the `UnclaimedRewards` field failed"; e),
         }
     }
 }
@@ -2609,8 +3167,17 @@ impl GetTxOutVariant1 {
         Ok(model::GetTxOut {
             best_block: self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?,
             confirmations: crate::to_u32(self.confirmations, "confirmations")?,
-            tx_out: TxOut { value: Amount::from_btc(self.value).map_err(E::TxOutValue)?, script_pubkey: ScriptBuf::from_hex(&self.script_pub_key.hex).map_err(E::TxOutScript)? },
-            address: self.script_pub_key.address.map(|a| a.parse::<Address<NetworkUnchecked>>()).transpose().map_err(E::Address)?,
+            tx_out: TxOut {
+                value: Amount::from_btc(self.value).map_err(E::TxOutValue)?,
+                script_pubkey: ScriptBuf::from_hex(&self.script_pub_key.hex)
+                    .map_err(E::TxOutScript)?,
+            },
+            address: self
+                .script_pub_key
+                .address
+                .map(|a| a.parse::<Address<NetworkUnchecked>>())
+                .transpose()
+                .map_err(E::Address)?,
             coinbase: self.coinbase,
         })
     }
@@ -2634,9 +3201,12 @@ pub enum GetTxOutError {
 impl fmt::Display for GetTxOutError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::BestBlock(ref e) => write_err!(f, "conversion of the `BestBlock` field failed"; e),
-            Self::TxOutValue(ref e) => write_err!(f, "conversion of the `TxOutValue` field failed"; e),
-            Self::TxOutScript(ref e) => write_err!(f, "conversion of the `TxOutScript` field failed"; e),
+            Self::BestBlock(ref e) =>
+                write_err!(f, "conversion of the `BestBlock` field failed"; e),
+            Self::TxOutValue(ref e) =>
+                write_err!(f, "conversion of the `TxOutValue` field failed"; e),
+            Self::TxOutScript(ref e) =>
+                write_err!(f, "conversion of the `TxOutScript` field failed"; e),
             Self::Address(ref e) => write_err!(f, "conversion of the `Address` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
@@ -2665,7 +3235,12 @@ impl GetTxSpendingPrevout {
     pub fn into_model(self) -> Result<model::GetTxSpendingPrevout, GetTxSpendingPrevoutError> {
         use GetTxSpendingPrevoutError as E;
 
-        Ok(model::GetTxSpendingPrevout(self.0.into_iter().map(|x| x.into_model().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
+        Ok(model::GetTxSpendingPrevout(
+            self.0
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Inner))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 
@@ -2695,14 +3270,31 @@ impl std::error::Error for GetTxSpendingPrevoutError {
 
 impl GetTxSpendingPrevoutItem {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetTxSpendingPrevoutItem, GetTxSpendingPrevoutItemError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetTxSpendingPrevoutItem, GetTxSpendingPrevoutItemError> {
         use GetTxSpendingPrevoutItemError as E;
 
         Ok(model::GetTxSpendingPrevoutItem {
-            outpoint: OutPoint { txid: self.txid.parse::<Txid>().map_err(E::OutpointTxid)?, vout: crate::to_u32(self.vout, "vout")? },
-            spending_txid: self.spending_txid.map(|x| x.parse::<Txid>()).transpose().map_err(E::SpendingTxid)?,
-            spending_tx: self.spending_tx.map(|x| encode::deserialize_hex::<Transaction>(&x)).transpose().map_err(E::SpendingTx)?,
-            block_hash: self.block_hash.map(|x| x.parse::<BlockHash>()).transpose().map_err(E::BlockHash)?,
+            outpoint: OutPoint {
+                txid: self.txid.parse::<Txid>().map_err(E::OutpointTxid)?,
+                vout: crate::to_u32(self.vout, "vout")?,
+            },
+            spending_txid: self
+                .spending_txid
+                .map(|x| x.parse::<Txid>())
+                .transpose()
+                .map_err(E::SpendingTxid)?,
+            spending_tx: self
+                .spending_tx
+                .map(|x| encode::deserialize_hex::<Transaction>(&x))
+                .transpose()
+                .map_err(E::SpendingTx)?,
+            block_hash: self
+                .block_hash
+                .map(|x| x.parse::<BlockHash>())
+                .transpose()
+                .map_err(E::BlockHash)?,
         })
     }
 }
@@ -2725,10 +3317,14 @@ pub enum GetTxSpendingPrevoutItemError {
 impl fmt::Display for GetTxSpendingPrevoutItemError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::OutpointTxid(ref e) => write_err!(f, "conversion of the `OutpointTxid` field failed"; e),
-            Self::SpendingTxid(ref e) => write_err!(f, "conversion of the `SpendingTxid` field failed"; e),
-            Self::SpendingTx(ref e) => write_err!(f, "conversion of the `SpendingTx` field failed"; e),
-            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::OutpointTxid(ref e) =>
+                write_err!(f, "conversion of the `OutpointTxid` field failed"; e),
+            Self::SpendingTxid(ref e) =>
+                write_err!(f, "conversion of the `SpendingTxid` field failed"; e),
+            Self::SpendingTx(ref e) =>
+                write_err!(f, "conversion of the `SpendingTx` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -2809,7 +3405,11 @@ impl ScanTxOutSetVariant0 {
             tx_outs: Some(crate::to_u64(self.tx_outs, "tx_outs")?),
             height: Some(crate::to_u64(self.height, "height")?),
             best_block: Some(self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?),
-            unspents: self.unspents.into_iter().map(|x| x.into_model().map_err(E::Unspents)).collect::<Result<Vec<_>, _>>()?,
+            unspents: self
+                .unspents
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Unspents))
+                .collect::<Result<Vec<_>, _>>()?,
             total_amount: Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?,
         })
     }
@@ -2831,9 +3431,11 @@ pub enum ScanTxOutSetStartError {
 impl fmt::Display for ScanTxOutSetStartError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Self::BestBlock(ref e) => write_err!(f, "conversion of the `BestBlock` field failed"; e),
+            Self::BestBlock(ref e) =>
+                write_err!(f, "conversion of the `BestBlock` field failed"; e),
             Self::Unspents(ref e) => write_err!(f, "conversion of the `Unspents` field failed"; e),
-            Self::TotalAmount(ref e) => write_err!(f, "conversion of the `TotalAmount` field failed"; e),
+            Self::TotalAmount(ref e) =>
+                write_err!(f, "conversion of the `TotalAmount` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -2893,9 +3495,11 @@ impl fmt::Display for ScanTxOutSetUnspentError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::Txid(ref e) => write_err!(f, "conversion of the `Txid` field failed"; e),
-            Self::ScriptPubkey(ref e) => write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
+            Self::ScriptPubkey(ref e) =>
+                write_err!(f, "conversion of the `ScriptPubkey` field failed"; e),
             Self::Amount(ref e) => write_err!(f, "conversion of the `Amount` field failed"; e),
-            Self::BlockHash(ref e) => write_err!(f, "conversion of the `BlockHash` field failed"; e),
+            Self::BlockHash(ref e) =>
+                write_err!(f, "conversion of the `BlockHash` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -2923,7 +3527,12 @@ impl VerifyTxOutProof {
     pub fn into_model(self) -> Result<model::VerifyTxOutProof, VerifyTxOutProofError> {
         use VerifyTxOutProofError as E;
 
-        Ok(model::VerifyTxOutProof(self.0.into_iter().map(|x| x.parse::<Txid>().map_err(E::Inner)).collect::<Result<Vec<_>, _>>()?))
+        Ok(model::VerifyTxOutProof(
+            self.0
+                .into_iter()
+                .map(|x| x.parse::<Txid>().map_err(E::Inner))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }
 
@@ -3082,4 +3691,3 @@ impl std::error::Error for WaitForNewBlockError {
 impl From<crate::NumericError> for WaitForNewBlockError {
     fn from(e: crate::NumericError) -> Self { Self::Numeric(e) }
 }
-

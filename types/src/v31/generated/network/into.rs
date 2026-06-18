@@ -21,8 +21,12 @@ use bitcoin::error::UnprefixedHexError;
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::hex::FromHex as _;
 use bitcoin::key::{self, PrivateKey, PublicKey};
-use bitcoin::sign_message;
-use bitcoin::{amount, block, hex, network, psbt, witness_program, witness_version, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence, SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram, WitnessVersion, Work, Wtxid};
+use bitcoin::{
+    amount, block, hex, network, psbt, sign_message, witness_program, witness_version, Address,
+    Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence,
+    SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram,
+    WitnessVersion, Work, Wtxid,
+};
 
 use super::*;
 use crate::error::write_err;
@@ -35,21 +39,57 @@ impl GetNetworkInfo {
         use GetNetworkInfoError as E;
 
         Ok(model::GetNetworkInfo {
-            version: usize::try_from(self.version).map_err(|_| crate::NumericError::Overflow { value: self.version, field: "version".to_owned() })?,
+            version: usize::try_from(self.version).map_err(|_| crate::NumericError::Overflow {
+                value: self.version,
+                field: "version".to_owned(),
+            })?,
             subversion: self.sub_version,
-            protocol_version: usize::try_from(self.protocol_version).map_err(|_| crate::NumericError::Overflow { value: self.protocol_version, field: "protocol_version".to_owned() })?,
+            protocol_version: usize::try_from(self.protocol_version).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.protocol_version,
+                    field: "protocol_version".to_owned(),
+                }
+            })?,
             local_services: self.localservices,
             local_services_names: Some(self.localservices_names),
             local_relay: self.local_relay,
-            time_offset: isize::try_from(self.time_offset).map_err(|_| crate::NumericError::Overflow { value: self.time_offset, field: "time_offset".to_owned() })?,
-            connections: usize::try_from(self.connections).map_err(|_| crate::NumericError::Overflow { value: self.connections as i64, field: "connections".to_owned() })?,
-            connections_in: Some(usize::try_from(self.connections_in).map_err(|_| crate::NumericError::Overflow { value: self.connections_in as i64, field: "connections_in".to_owned() })?),
-            connections_out: Some(usize::try_from(self.connections_out).map_err(|_| crate::NumericError::Overflow { value: self.connections_out as i64, field: "connections_out".to_owned() })?),
+            time_offset: isize::try_from(self.time_offset).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.time_offset,
+                    field: "time_offset".to_owned(),
+                }
+            })?,
+            connections: usize::try_from(self.connections).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.connections as i64,
+                    field: "connections".to_owned(),
+                }
+            })?,
+            connections_in: Some(usize::try_from(self.connections_in).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.connections_in as i64,
+                    field: "connections_in".to_owned(),
+                }
+            })?),
+            connections_out: Some(usize::try_from(self.connections_out).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.connections_out as i64,
+                    field: "connections_out".to_owned(),
+                }
+            })?),
             network_active: self.network_active,
-            networks: self.networks.into_iter().map(|x| x.into_model().map_err(E::Networks)).collect::<Result<Vec<_>, _>>()?,
+            networks: self
+                .networks
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::Networks))
+                .collect::<Result<Vec<_>, _>>()?,
             relay_fee: crate::btc_per_kb(self.relay_fee).map_err(E::RelayFee)?,
             incremental_fee: crate::btc_per_kb(self.incremental_fee).map_err(E::IncrementalFee)?,
-            local_addresses: self.local_addresses.into_iter().map(|x| x.into_model().map_err(E::LocalAddresses)).collect::<Result<Vec<_>, _>>()?,
+            local_addresses: self
+                .local_addresses
+                .into_iter()
+                .map(|x| x.into_model().map_err(E::LocalAddresses))
+                .collect::<Result<Vec<_>, _>>()?,
             warnings: self.warnings,
         })
     }
@@ -75,8 +115,10 @@ impl fmt::Display for GetNetworkInfoError {
         match *self {
             Self::Networks(ref e) => write_err!(f, "conversion of the `Networks` field failed"; e),
             Self::RelayFee(ref e) => write_err!(f, "conversion of the `RelayFee` field failed"; e),
-            Self::IncrementalFee(ref e) => write_err!(f, "conversion of the `IncrementalFee` field failed"; e),
-            Self::LocalAddresses(ref e) => write_err!(f, "conversion of the `LocalAddresses` field failed"; e),
+            Self::IncrementalFee(ref e) =>
+                write_err!(f, "conversion of the `IncrementalFee` field failed"; e),
+            Self::LocalAddresses(ref e) =>
+                write_err!(f, "conversion of the `LocalAddresses` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
     }
@@ -106,7 +148,10 @@ impl GetNetworkInfoLocalAddressesItem {
 
         Ok(model::GetNetworkInfoAddress {
             address: self.address,
-            port: u16::try_from(self.port).map_err(|_| crate::NumericError::Overflow { value: self.port, field: "port".to_owned() })?,
+            port: u16::try_from(self.port).map_err(|_| crate::NumericError::Overflow {
+                value: self.port,
+                field: "port".to_owned(),
+            })?,
             score: crate::to_u32(self.score, "score")?,
         })
     }
@@ -157,21 +202,13 @@ impl GetNetworkInfoNetworksItem {
 
 /// Error when converting a `GetNetworkInfoNetwork` type into the model type.
 #[derive(Debug)]
-pub enum GetNetworkInfoNetworkError {
-}
+pub enum GetNetworkInfoNetworkError {}
 
 impl fmt::Display for GetNetworkInfoNetworkError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-        }
-    }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for GetNetworkInfoNetworkError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match *self {
-        }
-    }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
 }
-

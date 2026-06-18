@@ -10,9 +10,9 @@
 
 mod into;
 
-pub use self::into::{GetNetworkInfoAddressError, GetNetworkInfoError, GetNetworkInfoNetworkError};
-
 use serde::{Deserialize, Serialize};
+
+pub use self::into::{GetNetworkInfoAddressError, GetNetworkInfoError, GetNetworkInfoNetworkError};
 
 /// Result of the JSON-RPC method `getaddednodeinfo`.
 ///
@@ -252,7 +252,7 @@ pub struct GetPeerInfoItem {
     /// The total bytes sent
     pub bytessent: u64,
     pub bytessent_per_msg: std::collections::BTreeMap<String, u64>,
-    /// Type of connection: 
+    /// Type of connection:
     /// outbound-full-relay (default automatic connections),
     /// block-relay-only (does not relay transactions or addresses),
     /// inbound (initiated by the peer),
@@ -315,7 +315,7 @@ pub struct GetPeerInfoItem {
     #[serde(rename = "servicesnames")]
     pub services_names: Vec<String>,
     /// The session ID for this connection, or "" if there is none ("v2" transport protocol only).
-    /// 
+    ///
     pub session_id: String,
     /// The string version
     pub subver: String,
@@ -326,11 +326,11 @@ pub struct GetPeerInfoItem {
     /// The time offset in seconds
     #[serde(rename = "timeoffset")]
     pub time_offset: i64,
-    /// Type of transport protocol: 
+    /// Type of transport protocol:
     /// detecting (peer could be v1 or v2),
     /// v1 (plaintext transport protocol),
     /// v2 (BIP324 encrypted transport protocol).
-    /// 
+    ///
     pub transport_protocol_type: String,
     /// The peer version, such as 70001
     pub version: i64,
@@ -373,4 +373,3 @@ impl std::ops::Deref for SetNetworkActive {
     type Target = bool;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-

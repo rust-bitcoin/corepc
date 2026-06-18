@@ -26,4 +26,3 @@ pub fn dump_tx_out_set_coins_written(_v: u64) -> Amount { Amount::from_sat(0) }
 /// Codegen produces `self.coins_loaded` (u64); the canonical field wrongly wants `Amount`, so this
 /// discards the real value to compile. TODO: fix the canonical type, then delete this shim.
 pub fn load_tx_out_set_coins_loaded(_v: u64) -> Amount { Amount::from_sat(0) }
-

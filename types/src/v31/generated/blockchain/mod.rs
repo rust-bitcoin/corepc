@@ -10,14 +10,32 @@
 
 mod into;
 
-pub use self::into::{ActivityEntryError, Bip9InfoError, Bip9StatisticsError, ChainStateError, ChainTipsError, ChunkError, CoinbaseTransactionError, DeploymentInfoError, DumpTxOutSetError, GetBestBlockHashError, GetBlockCountError, GetBlockFilterError, GetBlockHashError, GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockStatsError, GetBlockVerboseOneError, GetBlockVerboseThreeError, GetBlockVerboseThreePrevoutError, GetBlockVerboseThreeTransactionError, GetBlockVerboseTwoError, GetBlockVerboseTwoTransactionError, GetBlockVerboseZeroError, GetBlockchainInfoError, GetChainStatesError, GetChainTipsError, GetChainTxStatsError, GetDeploymentInfoError, GetDescriptorActivityError, GetDifficultyError, GetMempoolAncestorsError, GetMempoolAncestorsVerboseError, GetMempoolClusterError, GetMempoolDescendantsError, GetMempoolDescendantsVerboseError, GetMempoolEntryError, GetMempoolInfoError, GetRawMempoolResultError, GetRawMempoolSequenceError, GetTxOutError, GetTxOutSetInfoBlockInfoError, GetTxOutSetInfoError, GetTxOutSetInfoUnspendablesError, GetTxSpendingPrevoutError, GetTxSpendingPrevoutItemError, LoadTxOutSetError, MempoolEntryError, MempoolEntryFeesError, ReceiveActivityError, ScanTxOutSetStartError, ScanTxOutSetUnspentError, ScriptPubKeyError, SpendActivityError, VerifyTxOutProofError, WaitForBlockError, WaitForBlockHeightError, WaitForNewBlockError};
-
 use serde::{Deserialize, Serialize};
 
+pub use self::into::{
+    ActivityEntryError, Bip9InfoError, Bip9StatisticsError, ChainStateError, ChainTipsError,
+    ChunkError, CoinbaseTransactionError, DeploymentInfoError, DumpTxOutSetError,
+    GetBestBlockHashError, GetBlockCountError, GetBlockFilterError, GetBlockHashError,
+    GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockStatsError, GetBlockVerboseOneError,
+    GetBlockVerboseThreeError, GetBlockVerboseThreePrevoutError,
+    GetBlockVerboseThreeTransactionError, GetBlockVerboseTwoError,
+    GetBlockVerboseTwoTransactionError, GetBlockVerboseZeroError, GetBlockchainInfoError,
+    GetChainStatesError, GetChainTipsError, GetChainTxStatsError, GetDeploymentInfoError,
+    GetDescriptorActivityError, GetDifficultyError, GetMempoolAncestorsError,
+    GetMempoolAncestorsVerboseError, GetMempoolClusterError, GetMempoolDescendantsError,
+    GetMempoolDescendantsVerboseError, GetMempoolEntryError, GetMempoolInfoError,
+    GetRawMempoolResultError, GetRawMempoolSequenceError, GetTxOutError,
+    GetTxOutSetInfoBlockInfoError, GetTxOutSetInfoError, GetTxOutSetInfoUnspendablesError,
+    GetTxSpendingPrevoutError, GetTxSpendingPrevoutItemError, LoadTxOutSetError, MempoolEntryError,
+    MempoolEntryFeesError, ReceiveActivityError, ScanTxOutSetStartError, ScanTxOutSetUnspentError,
+    ScriptPubKeyError, SpendActivityError, VerifyTxOutProofError, WaitForBlockError,
+    WaitForBlockHeightError, WaitForNewBlockError,
+};
+
 /// Write the serialized UTXO set to a file. This can be used in loadtxoutset afterwards if this snapshot height is supported in the chainparams as well.
-/// 
+///
 /// Unless the "latest" type is requested, the node will roll back to the requested height and network activity will be suspended during this process. Because of this it is discouraged to interact with the node in any other way during the execution of this call to avoid inconsistent results and race conditions, particularly RPCs that interact with blockstorage.
-/// 
+///
 /// This call may take several minutes. Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -78,14 +96,14 @@ pub struct GetBlockFilter {
 }
 
 /// Attempt to fetch block from a given peer.
-/// 
+///
 /// We must have the header for this block, e.g. using submitheader.
 /// The block will not have any undo data which can limit the usage of the block data in a context where the undo data is needed.
 /// Subsequent calls for the same block may cause the response from the previous peer to be ignored.
 /// Peers generally ignore requests for a stale block that they never fully verified, or one that is more than a month old.
 /// When a peer does not respond with a block, we will disconnect.
 /// Note: The block could be re-pruned as soon as it is received.
-/// 
+///
 /// Returns an empty JSON object if the request was successfully scheduled.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1062,7 +1080,7 @@ pub struct GetMempoolAncestorsVerbose1Entry {
     #[serde(rename = "ancestorsize")]
     pub ancestor_size: u64,
     /// Whether this transaction signals BIP125 replaceability or has an unconfirmed ancestor signaling BIP125 replaceability. (DEPRECATED)
-    /// 
+    ///
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: bool,
     /// sigops-adjusted weight (as defined in BIP 141 and modified by '-bytespersigop') of this transaction's chunk
@@ -1159,7 +1177,7 @@ pub struct GetMempoolDescendantsVerbose1Entry {
     #[serde(rename = "ancestorsize")]
     pub ancestor_size: u64,
     /// Whether this transaction signals BIP125 replaceability or has an unconfirmed ancestor signaling BIP125 replaceability. (DEPRECATED)
-    /// 
+    ///
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: bool,
     /// sigops-adjusted weight (as defined in BIP 141 and modified by '-bytespersigop') of this transaction's chunk
@@ -1217,7 +1235,7 @@ pub struct GetMempoolEntry {
     #[serde(rename = "ancestorsize")]
     pub ancestor_size: u64,
     /// Whether this transaction signals BIP125 replaceability or has an unconfirmed ancestor signaling BIP125 replaceability. (DEPRECATED)
-    /// 
+    ///
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: bool,
     /// sigops-adjusted weight (as defined in BIP 141 and modified by '-bytespersigop') of this transaction's chunk
@@ -1317,7 +1335,7 @@ pub struct GetMempoolInfo {
 /// > getrawmempool
 /// >
 /// > Returns all transaction ids in memory pool as a json array of string transaction ids.
-/// > 
+/// >
 /// > Hint: use getmempoolentry to fetch a specific transaction from the mempool.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(untagged)]
@@ -1337,7 +1355,7 @@ pub struct GetRawMempoolVariant1 {
     #[serde(rename = "ancestorsize")]
     pub ancestor_size: u64,
     /// Whether this transaction signals BIP125 replaceability or has an unconfirmed ancestor signaling BIP125 replaceability. (DEPRECATED)
-    /// 
+    ///
     #[serde(rename = "bip125-replaceable")]
     pub bip125_replaceable: bool,
     /// sigops-adjusted weight (as defined in BIP 141 and modified by '-bytespersigop') of this transaction's chunk
@@ -1410,7 +1428,7 @@ pub enum GetTxOut {
 /// > gettxoutproof
 /// >
 /// > Returns a hex-encoded proof that "txid" was included in a block.
-/// > 
+/// >
 /// > NOTE: By default this function only works sometimes. This is when there is an
 /// > unspent output in the utxo for this transaction. To make it always work,
 /// > you need to maintain a transaction index, using the -txindex command line option or
@@ -1561,9 +1579,9 @@ pub struct ImportMempool {}
 
 /// Load the serialized UTXO set from a file.
 /// Once this snapshot is loaded, its contents will be deserialized into a second chainstate data structure, which is then used to sync to the network's tip. Meanwhile, the original chainstate will complete the initial block download process in the background, eventually validating up to the block that the snapshot is based upon.
-/// 
+///
 /// The result is a usable bitcoind instance that is current with the network tip in a matter of minutes rather than hours. UTXO snapshot are typically obtained from third-party sources (HTTP, torrent, etc.) which is reasonable since their contents are always checked by hash.
-/// 
+///
 /// You can find more information on this process in the `assumeutxo` design document (<https://github.com/bitcoin/bitcoin/blob/master/doc/design/assumeutxo.md>).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1656,7 +1674,7 @@ pub struct ScanBlocksVariant2 {
 /// >     tr(\<pubkey\>,{pk(\<pubkey\>)})          P2TR with single fallback pubkey in tapscript
 /// >     rawtr(\<pubkey\>)                      P2TR with the specified key as output key rather than inner
 /// >     wsh(and_v(v:pk(\<pubkey\>),after(2)))  P2WSH miniscript with mandatory pubkey and a timelock
-/// > 
+/// >
 /// > In the above, \<pubkey\> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one
 /// > or more path elements separated by "/", and optionally ending in "/*" (unhardened), or "/*'" or "/*h" (hardened) to specify all
 /// > unhardened or hardened child keys.
@@ -1748,9 +1766,9 @@ impl std::ops::Deref for VerifyChain {
 pub struct VerifyTxOutProof(pub Vec<String>);
 
 /// Waits for a specific new block and returns useful info about it.
-/// 
+///
 /// Returns the current block on timeout or exit.
-/// 
+///
 /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1763,9 +1781,9 @@ pub struct WaitForBlock {
 
 /// Waits for (at least) block height and returns the height and hash
 /// of the current tip.
-/// 
+///
 /// Returns the current block on timeout or exit.
-/// 
+///
 /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1777,9 +1795,9 @@ pub struct WaitForBlockHeight {
 }
 
 /// Waits for any new block and returns useful info about it.
-/// 
+///
 /// Returns the current block on timeout or exit.
-/// 
+///
 /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1789,4 +1807,3 @@ pub struct WaitForNewBlock {
     /// Block height
     pub height: i64,
 }
-

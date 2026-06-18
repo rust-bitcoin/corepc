@@ -11,7 +11,6 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-
 use types::v31::generated::EnumerateSigners;
 
 use crate::client_async::error::Result;
@@ -24,5 +23,4 @@ impl Client {
     pub async fn enumerate_signers(&self) -> Result<EnumerateSigners> {
         self.call_raw("enumeratesigners", &[(); 0] as &[()]).await
     }
-
 }

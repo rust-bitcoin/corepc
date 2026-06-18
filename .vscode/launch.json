@@ -5,6 +5,66 @@
     "version": "0.2.0",
     "configurations": [
         {
+            // F5 runs the SELECTED config. This one is first so a fresh F5 picks it.
+            // Set a breakpoint in integration_test/tests/wallet.rs and press F5.
+            "name": "ITEST async v31: wallet__get_address_info",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--manifest-path=${workspaceFolder}/integration_test/Cargo.toml",
+                    "--no-default-features",
+                    "--features=31_0,test-async,download",
+                    "--test=wallet"
+                ],
+                "filter": {
+                    "name": "wallet",
+                    "kind": "test"
+                }
+            },
+            "args": [
+                "wallet__get_address_info__modelled",
+                "--exact",
+                "--nocapture",
+                "--test-threads=1"
+            ],
+            "cwd": "${workspaceFolder}/integration_test",
+            "env": {
+                "RUST_LOG": "corepc=debug,corepc::async=debug"
+            }
+        },
+        {
+            "name": "ITEST sync v31: wallet__get_address_info",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--manifest-path=${workspaceFolder}/integration_test/Cargo.toml",
+                    "--no-default-features",
+                    "--features=31_0,download",
+                    "--test=wallet"
+                ],
+                "filter": {
+                    "name": "wallet",
+                    "kind": "test"
+                }
+            },
+            "args": [
+                "wallet__get_address_info__modelled",
+                "--exact",
+                "--nocapture",
+                "--test-threads=1"
+            ],
+            "cwd": "${workspaceFolder}/integration_test",
+            "env": {
+                "RUST_LOG": "corepc=debug"
+            }
+        },
+        {
             "name": "Debug 'btc-codegen' (prompt for version)",
             "type": "lldb",
             "request": "launch",

@@ -16,6 +16,13 @@ pub use corepc_client::{client_sync::v31::*, types::v31 as vtype};
 #[cfg(all(feature = "31_0", feature = "client-async"))]
 pub use corepc_client::client_async::blocking::*;
 
+// Also expose the raw async client (not the blocking facade) so tests can be written natively
+// async against it: build a `client_async::Client` pointed at the node and `.await` its generated
+// method wrappers directly. This is the no-facade, no-bridge path - the async client is exercised
+// through its own generated arg-encoding and return types, fully isolated from the sync client.
+#[cfg(feature = "client-async")]
+pub use corepc_client::client_async;
+
 #[cfg(all(feature = "30_2", not(feature = "31_0"), not(feature = "client-async")))]
 pub use corepc_client::{client_sync::v30::*, types::v30 as vtype};
 

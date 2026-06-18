@@ -11,30 +11,12 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-
 use types::v31::generated::{
-    AbortPrivateBroadcast,
-    AnalyzePsbt,
-    CombinePsbt,
-    CombineRawTransaction,
-    ConvertToPsbt,
-    CreatePsbt,
-    CreateRawTransaction,
-    DecodePsbt,
-    DecodeRawTransaction,
-    DecodeScript,
-    DescriptorProcessPsbt,
-    FinalizePsbt,
-    FundRawTransaction,
-    GetPrivateBroadcastInfo,
-    GetRawTransactionVerbose0,
-    GetRawTransactionVerbose1,
-    GetRawTransactionVerbose2,
-    JoinPsbts,
-    SendRawTransaction,
-    SignRawTransactionWithKey,
-    SubmitPackage,
-    TestMempoolAccept,
+    AbortPrivateBroadcast, AnalyzePsbt, CombinePsbt, CombineRawTransaction, ConvertToPsbt,
+    CreatePsbt, CreateRawTransaction, DecodePsbt, DecodeRawTransaction, DecodeScript,
+    DescriptorProcessPsbt, FinalizePsbt, FundRawTransaction, GetPrivateBroadcastInfo,
+    GetRawTransactionVerbose0, GetRawTransactionVerbose1, GetRawTransactionVerbose2, JoinPsbts,
+    SendRawTransaction, SignRawTransactionWithKey, SubmitPackage, TestMempoolAccept,
     UtxoUpdatePsbt,
 };
 
@@ -145,16 +127,16 @@ pub struct FundRawTransactionOptionsArg {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conf_target: Option<i64>,
     /// The fee estimate mode, must be one of (case insensitive):
-    /// unset, economical, conservative 
+    /// unset, economical, conservative
     /// unset means no mode set (economical mode is used if the transaction is replaceable;
-    /// otherwise, conservative mode is used). 
+    /// otherwise, conservative mode is used).
     /// economical estimates use a shorter time horizon, making them more
     /// responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a lower fee rate estimate.
     /// conservative estimates use a longer time horizon, making them
     /// less responsive to short-term drops in the prevailing fee market. This mode
     /// potentially returns a higher fee rate estimate.
-    /// 
+    ///
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimate_mode: Option<String>,
     /// Specify a fee rate in BTC/kvB.
@@ -518,7 +500,7 @@ impl Client {
     /// `combinerawtransaction` with required arguments only.
     ///
     /// Combine multiple partially signed transactions into one transaction.
-    /// The combined transaction may be another partially signed transaction or a 
+    /// The combined transaction may be another partially signed transaction or a
     /// fully signed transaction.
     pub async fn combine_raw_transaction(&self, txs: Vec<String>) -> Result<CombineRawTransaction> {
         self.call_raw("combinerawtransaction", &[json!(txs)]).await
@@ -536,8 +518,16 @@ impl Client {
     ///
     /// Converts a network serialized transaction to a PSBT. This should be used only with createrawtransaction and fundrawtransaction
     /// createpsbt and walletcreatefundedpsbt should be used for new applications.
-    pub async fn convert_to_psbt_with(&self, hexstring: String, opts: ConvertToPsbtOptions) -> Result<ConvertToPsbt> {
-        self.call_raw("converttopsbt", &[json!(hexstring), json!(opts.permitsig_data), json!(opts.is_witness)]).await
+    pub async fn convert_to_psbt_with(
+        &self,
+        hexstring: String,
+        opts: ConvertToPsbtOptions,
+    ) -> Result<ConvertToPsbt> {
+        self.call_raw(
+            "converttopsbt",
+            &[json!(hexstring), json!(opts.permitsig_data), json!(opts.is_witness)],
+        )
+        .await
     }
 
     /// `createpsbt` with required arguments only.
@@ -546,7 +536,11 @@ impl Client {
     /// Implements the Creator role.
     /// Note that the transaction's inputs are not signed, and
     /// it is not stored in the wallet or transmitted to the network.
-    pub async fn create_psbt(&self, inputs: Vec<CreatePsbtInputs>, outputs: Vec<CreatePsbtOutputs>) -> Result<CreatePsbt> {
+    pub async fn create_psbt(
+        &self,
+        inputs: Vec<CreatePsbtInputs>,
+        outputs: Vec<CreatePsbtOutputs>,
+    ) -> Result<CreatePsbt> {
         self.call_raw("createpsbt", &[json!(inputs), json!(outputs)]).await
     }
 
@@ -556,8 +550,23 @@ impl Client {
     /// Implements the Creator role.
     /// Note that the transaction's inputs are not signed, and
     /// it is not stored in the wallet or transmitted to the network.
-    pub async fn create_psbt_with(&self, inputs: Vec<CreatePsbtInputs>, outputs: Vec<CreatePsbtOutputs>, opts: CreatePsbtOptions) -> Result<CreatePsbt> {
-        self.call_raw("createpsbt", &[json!(inputs), json!(outputs), json!(opts.locktime), json!(opts.replaceable), json!(opts.version)]).await
+    pub async fn create_psbt_with(
+        &self,
+        inputs: Vec<CreatePsbtInputs>,
+        outputs: Vec<CreatePsbtOutputs>,
+        opts: CreatePsbtOptions,
+    ) -> Result<CreatePsbt> {
+        self.call_raw(
+            "createpsbt",
+            &[
+                json!(inputs),
+                json!(outputs),
+                json!(opts.locktime),
+                json!(opts.replaceable),
+                json!(opts.version),
+            ],
+        )
+        .await
     }
 
     /// `createrawtransaction` with required arguments only.
@@ -567,7 +576,11 @@ impl Client {
     /// Returns hex-encoded raw transaction.
     /// Note that the transaction's inputs are not signed, and
     /// it is not stored in the wallet or transmitted to the network.
-    pub async fn create_raw_transaction(&self, inputs: Vec<CreateRawTransactionInputs>, outputs: Vec<CreateRawTransactionOutputs>) -> Result<CreateRawTransaction> {
+    pub async fn create_raw_transaction(
+        &self,
+        inputs: Vec<CreateRawTransactionInputs>,
+        outputs: Vec<CreateRawTransactionOutputs>,
+    ) -> Result<CreateRawTransaction> {
         self.call_raw("createrawtransaction", &[json!(inputs), json!(outputs)]).await
     }
 
@@ -578,8 +591,23 @@ impl Client {
     /// Returns hex-encoded raw transaction.
     /// Note that the transaction's inputs are not signed, and
     /// it is not stored in the wallet or transmitted to the network.
-    pub async fn create_raw_transaction_with(&self, inputs: Vec<CreateRawTransactionInputs>, outputs: Vec<CreateRawTransactionOutputs>, opts: CreateRawTransactionOptions) -> Result<CreateRawTransaction> {
-        self.call_raw("createrawtransaction", &[json!(inputs), json!(outputs), json!(opts.locktime), json!(opts.replaceable), json!(opts.version)]).await
+    pub async fn create_raw_transaction_with(
+        &self,
+        inputs: Vec<CreateRawTransactionInputs>,
+        outputs: Vec<CreateRawTransactionOutputs>,
+        opts: CreateRawTransactionOptions,
+    ) -> Result<CreateRawTransaction> {
+        self.call_raw(
+            "createrawtransaction",
+            &[
+                json!(inputs),
+                json!(outputs),
+                json!(opts.locktime),
+                json!(opts.replaceable),
+                json!(opts.version),
+            ],
+        )
+        .await
     }
 
     /// `decodepsbt` with required arguments only.
@@ -599,7 +627,11 @@ impl Client {
     /// `decoderawtransaction` with all optional arguments via [`DecodeRawTransactionOptions`].
     ///
     /// Return a JSON object representing the serialized, hex-encoded transaction.
-    pub async fn decode_raw_transaction_with(&self, hexstring: String, opts: DecodeRawTransactionOptions) -> Result<DecodeRawTransaction> {
+    pub async fn decode_raw_transaction_with(
+        &self,
+        hexstring: String,
+        opts: DecodeRawTransactionOptions,
+    ) -> Result<DecodeRawTransaction> {
         self.call_raw("decoderawtransaction", &[json!(hexstring), json!(opts.is_witness)]).await
     }
 
@@ -612,18 +644,37 @@ impl Client {
 
     /// `descriptorprocesspsbt` with required arguments only.
     ///
-    /// Update all segwit inputs in a PSBT with information from output descriptors, the UTXO set or the mempool. 
+    /// Update all segwit inputs in a PSBT with information from output descriptors, the UTXO set or the mempool.
     /// Then, sign the inputs we are able to with information from the output descriptors.
-    pub async fn descriptor_process_psbt(&self, psbt: String, descriptors: Vec<DescriptorProcessPsbtDescriptors>) -> Result<DescriptorProcessPsbt> {
+    pub async fn descriptor_process_psbt(
+        &self,
+        psbt: String,
+        descriptors: Vec<DescriptorProcessPsbtDescriptors>,
+    ) -> Result<DescriptorProcessPsbt> {
         self.call_raw("descriptorprocesspsbt", &[json!(psbt), json!(descriptors)]).await
     }
 
     /// `descriptorprocesspsbt` with all optional arguments via [`DescriptorProcessPsbtOptions`].
     ///
-    /// Update all segwit inputs in a PSBT with information from output descriptors, the UTXO set or the mempool. 
+    /// Update all segwit inputs in a PSBT with information from output descriptors, the UTXO set or the mempool.
     /// Then, sign the inputs we are able to with information from the output descriptors.
-    pub async fn descriptor_process_psbt_with(&self, psbt: String, descriptors: Vec<DescriptorProcessPsbtDescriptors>, opts: DescriptorProcessPsbtOptions) -> Result<DescriptorProcessPsbt> {
-        self.call_raw("descriptorprocesspsbt", &[json!(psbt), json!(descriptors), json!(opts.sig_hash_type), json!(opts.bip32derivs), json!(opts.finalize)]).await
+    pub async fn descriptor_process_psbt_with(
+        &self,
+        psbt: String,
+        descriptors: Vec<DescriptorProcessPsbtDescriptors>,
+        opts: DescriptorProcessPsbtOptions,
+    ) -> Result<DescriptorProcessPsbt> {
+        self.call_raw(
+            "descriptorprocesspsbt",
+            &[
+                json!(psbt),
+                json!(descriptors),
+                json!(opts.sig_hash_type),
+                json!(opts.bip32derivs),
+                json!(opts.finalize),
+            ],
+        )
+        .await
     }
 
     /// `finalizepsbt` with required arguments only.
@@ -642,7 +693,11 @@ impl Client {
     /// network serialized transaction which can be broadcast with sendrawtransaction. Otherwise a PSBT will be
     /// created which has the final_scriptSig and final_scriptwitness fields filled for inputs that are complete.
     /// Implements the Finalizer and Extractor roles.
-    pub async fn finalize_psbt_with(&self, psbt: String, opts: FinalizePsbtOptions) -> Result<FinalizePsbt> {
+    pub async fn finalize_psbt_with(
+        &self,
+        psbt: String,
+        opts: FinalizePsbtOptions,
+    ) -> Result<FinalizePsbt> {
         self.call_raw("finalizepsbt", &[json!(psbt), json!(opts.extract)]).await
     }
 
@@ -682,8 +737,16 @@ impl Client {
     /// Note that if specifying an exact fee rate, the resulting transaction may have a higher fee rate
     /// if the transaction has unconfirmed inputs. This is because the wallet will attempt to make the
     /// entire package have the given fee rate, not the resulting transaction.
-    pub async fn fund_raw_transaction_with(&self, hexstring: String, opts: FundRawTransactionOptions) -> Result<FundRawTransaction> {
-        self.call_raw("fundrawtransaction", &[json!(hexstring), json!(opts.options), json!(opts.is_witness)]).await
+    pub async fn fund_raw_transaction_with(
+        &self,
+        hexstring: String,
+        opts: FundRawTransactionOptions,
+    ) -> Result<FundRawTransaction> {
+        self.call_raw(
+            "fundrawtransaction",
+            &[json!(hexstring), json!(opts.options), json!(opts.is_witness)],
+        )
+        .await
     }
 
     /// `getprivatebroadcastinfo` with required arguments only.
@@ -699,13 +762,16 @@ impl Client {
     /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
     /// If a blockhash argument is passed, it will return the transaction if
     /// the specified block is available and the transaction is in that block.
-    /// 
+    ///
     /// Hint: Use gettransaction for wallet transactions.
-    /// 
+    ///
     /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
     /// If verbosity is 1, returns a JSON Object with information about the transaction.
     /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
-    pub async fn get_raw_transaction_verbose_0(&self, txid: String) -> Result<GetRawTransactionVerbose0> {
+    pub async fn get_raw_transaction_verbose_0(
+        &self,
+        txid: String,
+    ) -> Result<GetRawTransactionVerbose0> {
         self.call_raw("getrawtransaction", &[json!(txid), json!(0), json!(null)]).await
     }
 
@@ -715,13 +781,17 @@ impl Client {
     /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
     /// If a blockhash argument is passed, it will return the transaction if
     /// the specified block is available and the transaction is in that block.
-    /// 
+    ///
     /// Hint: Use gettransaction for wallet transactions.
-    /// 
+    ///
     /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
     /// If verbosity is 1, returns a JSON Object with information about the transaction.
     /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
-    pub async fn get_raw_transaction_verbose_0_with(&self, txid: String, opts: GetRawTransactionOptions) -> Result<GetRawTransactionVerbose0> {
+    pub async fn get_raw_transaction_verbose_0_with(
+        &self,
+        txid: String,
+        opts: GetRawTransactionOptions,
+    ) -> Result<GetRawTransactionVerbose0> {
         self.call_raw("getrawtransaction", &[json!(txid), json!(0), json!(opts.block_hash)]).await
     }
 
@@ -731,13 +801,16 @@ impl Client {
     /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
     /// If a blockhash argument is passed, it will return the transaction if
     /// the specified block is available and the transaction is in that block.
-    /// 
+    ///
     /// Hint: Use gettransaction for wallet transactions.
-    /// 
+    ///
     /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
     /// If verbosity is 1, returns a JSON Object with information about the transaction.
     /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
-    pub async fn get_raw_transaction_verbose_1(&self, txid: String) -> Result<GetRawTransactionVerbose1> {
+    pub async fn get_raw_transaction_verbose_1(
+        &self,
+        txid: String,
+    ) -> Result<GetRawTransactionVerbose1> {
         self.call_raw("getrawtransaction", &[json!(txid), json!(1), json!(null)]).await
     }
 
@@ -747,13 +820,17 @@ impl Client {
     /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
     /// If a blockhash argument is passed, it will return the transaction if
     /// the specified block is available and the transaction is in that block.
-    /// 
+    ///
     /// Hint: Use gettransaction for wallet transactions.
-    /// 
+    ///
     /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
     /// If verbosity is 1, returns a JSON Object with information about the transaction.
     /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
-    pub async fn get_raw_transaction_verbose_1_with(&self, txid: String, opts: GetRawTransactionOptions) -> Result<GetRawTransactionVerbose1> {
+    pub async fn get_raw_transaction_verbose_1_with(
+        &self,
+        txid: String,
+        opts: GetRawTransactionOptions,
+    ) -> Result<GetRawTransactionVerbose1> {
         self.call_raw("getrawtransaction", &[json!(txid), json!(1), json!(opts.block_hash)]).await
     }
 
@@ -763,13 +840,16 @@ impl Client {
     /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
     /// If a blockhash argument is passed, it will return the transaction if
     /// the specified block is available and the transaction is in that block.
-    /// 
+    ///
     /// Hint: Use gettransaction for wallet transactions.
-    /// 
+    ///
     /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
     /// If verbosity is 1, returns a JSON Object with information about the transaction.
     /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
-    pub async fn get_raw_transaction_verbose_2(&self, txid: String) -> Result<GetRawTransactionVerbose2> {
+    pub async fn get_raw_transaction_verbose_2(
+        &self,
+        txid: String,
+    ) -> Result<GetRawTransactionVerbose2> {
         self.call_raw("getrawtransaction", &[json!(txid), json!(2), json!(null)]).await
     }
 
@@ -779,16 +859,19 @@ impl Client {
     /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
     /// If a blockhash argument is passed, it will return the transaction if
     /// the specified block is available and the transaction is in that block.
-    /// 
+    ///
     /// Hint: Use gettransaction for wallet transactions.
-    /// 
+    ///
     /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
     /// If verbosity is 1, returns a JSON Object with information about the transaction.
     /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
-    pub async fn get_raw_transaction_verbose_2_with(&self, txid: String, opts: GetRawTransactionOptions) -> Result<GetRawTransactionVerbose2> {
+    pub async fn get_raw_transaction_verbose_2_with(
+        &self,
+        txid: String,
+        opts: GetRawTransactionOptions,
+    ) -> Result<GetRawTransactionVerbose2> {
         self.call_raw("getrawtransaction", &[json!(txid), json!(2), json!(opts.block_hash)]).await
     }
-
 
     /// `joinpsbts` with required arguments only.
     ///
@@ -801,20 +884,20 @@ impl Client {
     /// `sendrawtransaction` with required arguments only.
     ///
     /// Submit a raw transaction (serialized, hex-encoded) to the network.
-    /// 
+    ///
     /// If -privatebroadcast is disabled, then the transaction will be put into the
     /// local mempool of the node and will be sent unconditionally to all currently
     /// connected peers, so using sendrawtransaction for manual rebroadcast will degrade
     /// privacy by leaking the transaction's origin, as nodes will normally not
     /// rebroadcast non-wallet transactions already in their mempool.
-    /// 
+    ///
     /// If -privatebroadcast is enabled, then the transaction will be sent only via
     /// dedicated, short-lived connections to Tor or I2P peers or IPv4/IPv6 peers
     /// via the Tor network. This conceals the transaction's origin. The transaction
     /// will only enter the local mempool when it is received back from the network.
-    /// 
+    ///
     /// A specific exception, RPC_TRANSACTION_ALREADY_IN_UTXO_SET, may throw if the transaction cannot be added to the mempool.
-    /// 
+    ///
     /// Related RPCs: createrawtransaction, signrawtransactionwithkey
     pub async fn send_raw_transaction(&self, hexstring: String) -> Result<SendRawTransaction> {
         self.call_raw("sendrawtransaction", &[json!(hexstring)]).await
@@ -823,23 +906,31 @@ impl Client {
     /// `sendrawtransaction` with all optional arguments via [`SendRawTransactionOptions`].
     ///
     /// Submit a raw transaction (serialized, hex-encoded) to the network.
-    /// 
+    ///
     /// If -privatebroadcast is disabled, then the transaction will be put into the
     /// local mempool of the node and will be sent unconditionally to all currently
     /// connected peers, so using sendrawtransaction for manual rebroadcast will degrade
     /// privacy by leaking the transaction's origin, as nodes will normally not
     /// rebroadcast non-wallet transactions already in their mempool.
-    /// 
+    ///
     /// If -privatebroadcast is enabled, then the transaction will be sent only via
     /// dedicated, short-lived connections to Tor or I2P peers or IPv4/IPv6 peers
     /// via the Tor network. This conceals the transaction's origin. The transaction
     /// will only enter the local mempool when it is received back from the network.
-    /// 
+    ///
     /// A specific exception, RPC_TRANSACTION_ALREADY_IN_UTXO_SET, may throw if the transaction cannot be added to the mempool.
-    /// 
+    ///
     /// Related RPCs: createrawtransaction, signrawtransactionwithkey
-    pub async fn send_raw_transaction_with(&self, hexstring: String, opts: SendRawTransactionOptions) -> Result<SendRawTransaction> {
-        self.call_raw("sendrawtransaction", &[json!(hexstring), json!(opts.max_fee_rate), json!(opts.max_burn_amount)]).await
+    pub async fn send_raw_transaction_with(
+        &self,
+        hexstring: String,
+        opts: SendRawTransactionOptions,
+    ) -> Result<SendRawTransaction> {
+        self.call_raw(
+            "sendrawtransaction",
+            &[json!(hexstring), json!(opts.max_fee_rate), json!(opts.max_burn_amount)],
+        )
+        .await
     }
 
     /// `signrawtransactionwithkey` with required arguments only.
@@ -849,7 +940,11 @@ impl Client {
     /// keys that will be the only keys used to sign the transaction.
     /// The third optional argument (may be null) is an array of previous transaction outputs that
     /// this transaction depends on but may not yet be in the block chain.
-    pub async fn sign_raw_transaction_with_key(&self, hexstring: String, priv_keys: Vec<String>) -> Result<SignRawTransactionWithKey> {
+    pub async fn sign_raw_transaction_with_key(
+        &self,
+        hexstring: String,
+        priv_keys: Vec<String>,
+    ) -> Result<SignRawTransactionWithKey> {
         self.call_raw("signrawtransactionwithkey", &[json!(hexstring), json!(priv_keys)]).await
     }
 
@@ -860,8 +955,17 @@ impl Client {
     /// keys that will be the only keys used to sign the transaction.
     /// The third optional argument (may be null) is an array of previous transaction outputs that
     /// this transaction depends on but may not yet be in the block chain.
-    pub async fn sign_raw_transaction_with_key_with(&self, hexstring: String, priv_keys: Vec<String>, opts: SignRawTransactionWithKeyOptions) -> Result<SignRawTransactionWithKey> {
-        self.call_raw("signrawtransactionwithkey", &[json!(hexstring), json!(priv_keys), json!(opts.prev_txs), json!(opts.sig_hash_type)]).await
+    pub async fn sign_raw_transaction_with_key_with(
+        &self,
+        hexstring: String,
+        priv_keys: Vec<String>,
+        opts: SignRawTransactionWithKeyOptions,
+    ) -> Result<SignRawTransactionWithKey> {
+        self.call_raw(
+            "signrawtransactionwithkey",
+            &[json!(hexstring), json!(priv_keys), json!(opts.prev_txs), json!(opts.sig_hash_type)],
+        )
+        .await
     }
 
     /// `submitpackage` with required arguments only.
@@ -880,22 +984,30 @@ impl Client {
     /// The package will be validated according to consensus and mempool policy rules. If any transaction passes, it will be accepted to mempool.
     /// This RPC is experimental and the interface may be unstable. Refer to doc/policy/packages.md for documentation on package policies.
     /// Warning: successful submission does not mean the transactions will propagate throughout the network.
-    pub async fn submit_package_with(&self, package: Vec<String>, opts: SubmitPackageOptions) -> Result<SubmitPackage> {
-        self.call_raw("submitpackage", &[json!(package), json!(opts.max_fee_rate), json!(opts.max_burn_amount)]).await
+    pub async fn submit_package_with(
+        &self,
+        package: Vec<String>,
+        opts: SubmitPackageOptions,
+    ) -> Result<SubmitPackage> {
+        self.call_raw(
+            "submitpackage",
+            &[json!(package), json!(opts.max_fee_rate), json!(opts.max_burn_amount)],
+        )
+        .await
     }
 
     /// `testmempoolaccept` with required arguments only.
     ///
     /// Returns result of mempool acceptance tests indicating if raw transaction(s) (serialized, hex-encoded) would be accepted by mempool.
-    /// 
+    ///
     /// If multiple transactions are passed in, parents must come before children and package policies apply: the transactions cannot conflict with any mempool transactions or each other.
-    /// 
+    ///
     /// If one transaction fails, other transactions may not be fully validated (the 'allowed' key will be blank).
-    /// 
+    ///
     /// The maximum number of transactions allowed is 25.
-    /// 
+    ///
     /// This checks if transactions violate the consensus or policy rules.
-    /// 
+    ///
     /// See sendrawtransaction call.
     pub async fn test_mempool_accept(&self, raw_txs: Vec<String>) -> Result<TestMempoolAccept> {
         self.call_raw("testmempoolaccept", &[json!(raw_txs)]).await
@@ -904,17 +1016,21 @@ impl Client {
     /// `testmempoolaccept` with all optional arguments via [`TestMempoolAcceptOptions`].
     ///
     /// Returns result of mempool acceptance tests indicating if raw transaction(s) (serialized, hex-encoded) would be accepted by mempool.
-    /// 
+    ///
     /// If multiple transactions are passed in, parents must come before children and package policies apply: the transactions cannot conflict with any mempool transactions or each other.
-    /// 
+    ///
     /// If one transaction fails, other transactions may not be fully validated (the 'allowed' key will be blank).
-    /// 
+    ///
     /// The maximum number of transactions allowed is 25.
-    /// 
+    ///
     /// This checks if transactions violate the consensus or policy rules.
-    /// 
+    ///
     /// See sendrawtransaction call.
-    pub async fn test_mempool_accept_with(&self, raw_txs: Vec<String>, opts: TestMempoolAcceptOptions) -> Result<TestMempoolAccept> {
+    pub async fn test_mempool_accept_with(
+        &self,
+        raw_txs: Vec<String>,
+        opts: TestMempoolAcceptOptions,
+    ) -> Result<TestMempoolAccept> {
         self.call_raw("testmempoolaccept", &[json!(raw_txs), json!(opts.max_fee_rate)]).await
     }
 
@@ -928,8 +1044,11 @@ impl Client {
     /// `utxoupdatepsbt` with all optional arguments via [`UtxoUpdatePsbtOptions`].
     ///
     /// Updates all segwit inputs and outputs in a PSBT with data from output descriptors, the UTXO set, txindex, or the mempool.
-    pub async fn utxo_update_psbt_with(&self, psbt: String, opts: UtxoUpdatePsbtOptions) -> Result<UtxoUpdatePsbt> {
+    pub async fn utxo_update_psbt_with(
+        &self,
+        psbt: String,
+        opts: UtxoUpdatePsbtOptions,
+    ) -> Result<UtxoUpdatePsbt> {
         self.call_raw("utxoupdatepsbt", &[json!(psbt), json!(opts.descriptors)]).await
     }
-
 }

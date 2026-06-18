@@ -11,51 +11,16 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-
 use types::v31::generated::{
-    DumpTxOutSet,
-    GetBestBlockHash,
-    GetBlockCount,
-    GetBlockFilter,
-    GetBlockFromPeer,
-    GetBlockHash,
-    GetBlockHeaderVerbose0,
-    GetBlockHeaderVerbose1,
-    GetBlockStats,
-    GetBlockVerbose0,
-    GetBlockVerbose1,
-    GetBlockVerbose2,
-    GetBlockVerbose3,
-    GetBlockchainInfo,
-    GetChainStates,
-    GetChainTips,
-    GetChainTxStats,
-    GetDeploymentInfo,
-    GetDescriptorActivity,
-    GetDifficulty,
-    GetMempoolAncestorsVerbose0,
-    GetMempoolAncestorsVerbose1,
-    GetMempoolCluster,
-    GetMempoolDescendantsVerbose0,
-    GetMempoolDescendantsVerbose1,
-    GetMempoolEntry,
-    GetMempoolInfo,
-    GetRawMempool,
-    GetTxOut,
-    GetTxOutProof,
-    GetTxOutSetInfo,
-    GetTxSpendingPrevout,
-    ImportMempool,
-    LoadTxOutSet,
-    PruneBlockchain,
-    SaveMempool,
-    ScanBlocks,
-    ScanTxOutSet,
-    VerifyChain,
-    VerifyTxOutProof,
-    WaitForBlock,
-    WaitForBlockHeight,
-    WaitForNewBlock,
+    DumpTxOutSet, GetBestBlockHash, GetBlockCount, GetBlockFilter, GetBlockFromPeer, GetBlockHash,
+    GetBlockHeaderVerbose0, GetBlockHeaderVerbose1, GetBlockStats, GetBlockVerbose0,
+    GetBlockVerbose1, GetBlockVerbose2, GetBlockVerbose3, GetBlockchainInfo, GetChainStates,
+    GetChainTips, GetChainTxStats, GetDeploymentInfo, GetDescriptorActivity, GetDifficulty,
+    GetMempoolAncestorsVerbose0, GetMempoolAncestorsVerbose1, GetMempoolCluster,
+    GetMempoolDescendantsVerbose0, GetMempoolDescendantsVerbose1, GetMempoolEntry, GetMempoolInfo,
+    GetRawMempool, GetTxOut, GetTxOutProof, GetTxOutSetInfo, GetTxSpendingPrevout, ImportMempool,
+    LoadTxOutSet, PruneBlockchain, SaveMempool, ScanBlocks, ScanTxOutSet, VerifyChain,
+    VerifyTxOutProof, WaitForBlock, WaitForBlockHeight, WaitForNewBlock,
 };
 
 use crate::client_async::error::Result;
@@ -346,9 +311,9 @@ impl Client {
     /// `dumptxoutset` with required arguments only.
     ///
     /// Write the serialized UTXO set to a file. This can be used in loadtxoutset afterwards if this snapshot height is supported in the chainparams as well.
-    /// 
+    ///
     /// Unless the "latest" type is requested, the node will roll back to the requested height and network activity will be suspended during this process. Because of this it is discouraged to interact with the node in any other way during the execution of this call to avoid inconsistent results and race conditions, particularly RPCs that interact with blockstorage.
-    /// 
+    ///
     /// This call may take several minutes. Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
     pub async fn dump_tx_out_set(&self, path: String) -> Result<DumpTxOutSet> {
         self.call_raw("dumptxoutset", &[json!(path)]).await
@@ -357,11 +322,15 @@ impl Client {
     /// `dumptxoutset` with all optional arguments via [`DumpTxOutSetOptions`].
     ///
     /// Write the serialized UTXO set to a file. This can be used in loadtxoutset afterwards if this snapshot height is supported in the chainparams as well.
-    /// 
+    ///
     /// Unless the "latest" type is requested, the node will roll back to the requested height and network activity will be suspended during this process. Because of this it is discouraged to interact with the node in any other way during the execution of this call to avoid inconsistent results and race conditions, particularly RPCs that interact with blockstorage.
-    /// 
+    ///
     /// This call may take several minutes. Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn dump_tx_out_set_with(&self, path: String, opts: DumpTxOutSetOptions) -> Result<DumpTxOutSet> {
+    pub async fn dump_tx_out_set_with(
+        &self,
+        path: String,
+        opts: DumpTxOutSetOptions,
+    ) -> Result<DumpTxOutSet> {
         self.call_raw("dumptxoutset", &[json!(path), json!(opts.type_), json!(opts.options)]).await
     }
 
@@ -412,7 +381,6 @@ impl Client {
         self.call_raw("getblock", &[json!(block_hash), json!(3)]).await
     }
 
-
     /// `getblockchaininfo` with required arguments only.
     ///
     /// Returns an object containing various state info regarding blockchain processing.
@@ -438,23 +406,31 @@ impl Client {
     /// `getblockfilter` with all optional arguments via [`GetBlockFilterOptions`].
     ///
     /// Retrieve a BIP 157 content filter for a particular block.
-    pub async fn get_block_filter_with(&self, block_hash: String, opts: GetBlockFilterOptions) -> Result<GetBlockFilter> {
+    pub async fn get_block_filter_with(
+        &self,
+        block_hash: String,
+        opts: GetBlockFilterOptions,
+    ) -> Result<GetBlockFilter> {
         self.call_raw("getblockfilter", &[json!(block_hash), json!(opts.filter_type)]).await
     }
 
     /// `getblockfrompeer` with required arguments only.
     ///
     /// Attempt to fetch block from a given peer.
-    /// 
+    ///
     /// We must have the header for this block, e.g. using submitheader.
     /// The block will not have any undo data which can limit the usage of the block data in a context where the undo data is needed.
     /// Subsequent calls for the same block may cause the response from the previous peer to be ignored.
     /// Peers generally ignore requests for a stale block that they never fully verified, or one that is more than a month old.
     /// When a peer does not respond with a block, we will disconnect.
     /// Note: The block could be re-pruned as soon as it is received.
-    /// 
+    ///
     /// Returns an empty JSON object if the request was successfully scheduled.
-    pub async fn get_block_from_peer(&self, block_hash: String, peer_id: f64) -> Result<GetBlockFromPeer> {
+    pub async fn get_block_from_peer(
+        &self,
+        block_hash: String,
+        peer_id: f64,
+    ) -> Result<GetBlockFromPeer> {
         self.call_raw("getblockfrompeer", &[json!(block_hash), json!(peer_id)]).await
     }
 
@@ -469,7 +445,10 @@ impl Client {
     ///
     /// If verbose is false, returns a string that is serialized, hex-encoded data for blockheader 'hash'.
     /// If verbose is true, returns an Object with information about blockheader \<hash\>.
-    pub async fn get_block_header_verbose_1(&self, block_hash: String) -> Result<GetBlockHeaderVerbose1> {
+    pub async fn get_block_header_verbose_1(
+        &self,
+        block_hash: String,
+    ) -> Result<GetBlockHeaderVerbose1> {
         self.call_raw("getblockheader", &[json!(block_hash), json!(true)]).await
     }
 
@@ -477,10 +456,12 @@ impl Client {
     ///
     /// If verbose is false, returns a string that is serialized, hex-encoded data for blockheader 'hash'.
     /// If verbose is true, returns an Object with information about blockheader \<hash\>.
-    pub async fn get_block_header_verbose_0(&self, block_hash: String) -> Result<GetBlockHeaderVerbose0> {
+    pub async fn get_block_header_verbose_0(
+        &self,
+        block_hash: String,
+    ) -> Result<GetBlockHeaderVerbose0> {
         self.call_raw("getblockheader", &[json!(block_hash), json!(false)]).await
     }
-
 
     /// `getblockstats` with required arguments only.
     ///
@@ -494,7 +475,11 @@ impl Client {
     ///
     /// Compute per block statistics for a given window. All amounts are in satoshis.
     /// It won't work for some heights with pruning.
-    pub async fn get_block_stats_with(&self, hash_or_height: f64, opts: GetBlockStatsOptions) -> Result<GetBlockStats> {
+    pub async fn get_block_stats_with(
+        &self,
+        hash_or_height: f64,
+        opts: GetBlockStatsOptions,
+    ) -> Result<GetBlockStats> {
         self.call_raw("getblockstats", &[json!(hash_or_height), json!(opts.stats)]).await
     }
 
@@ -522,7 +507,10 @@ impl Client {
     /// `getchaintxstats` with all optional arguments via [`GetChainTxStatsOptions`].
     ///
     /// Compute statistics about the total number and rate of transactions in the chain.
-    pub async fn get_chain_tx_stats_with(&self, opts: GetChainTxStatsOptions) -> Result<GetChainTxStats> {
+    pub async fn get_chain_tx_stats_with(
+        &self,
+        opts: GetChainTxStatsOptions,
+    ) -> Result<GetChainTxStats> {
         self.call_raw("getchaintxstats", &[json!(opts.n_blocks), json!(opts.block_hash)]).await
     }
 
@@ -538,7 +526,10 @@ impl Client {
     ///
     /// Returns an object containing various state info regarding deployments of consensus changes.
     /// Consensus changes for which the new rules are enforced from genesis are not listed in "deployments".
-    pub async fn get_deployment_info_with(&self, opts: GetDeploymentInfoOptions) -> Result<GetDeploymentInfo> {
+    pub async fn get_deployment_info_with(
+        &self,
+        opts: GetDeploymentInfoOptions,
+    ) -> Result<GetDeploymentInfo> {
         self.call_raw("getdeploymentinfo", &[json!(opts.block_hash)]).await
     }
 
@@ -546,7 +537,11 @@ impl Client {
     ///
     /// Get spend and receive activity associated with a set of descriptors for a set of blocks. This command pairs well with the `relevant_blocks` output of `scanblocks()`.
     /// This call may take several minutes. If you encounter timeouts, try specifying no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn get_descriptor_activity(&self, block_hashes: Vec<String>, scan_objects: Vec<GetDescriptorActivityScanObjects>) -> Result<GetDescriptorActivity> {
+    pub async fn get_descriptor_activity(
+        &self,
+        block_hashes: Vec<String>,
+        scan_objects: Vec<GetDescriptorActivityScanObjects>,
+    ) -> Result<GetDescriptorActivity> {
         self.call_raw("getdescriptoractivity", &[json!(block_hashes), json!(scan_objects)]).await
     }
 
@@ -554,8 +549,17 @@ impl Client {
     ///
     /// Get spend and receive activity associated with a set of descriptors for a set of blocks. This command pairs well with the `relevant_blocks` output of `scanblocks()`.
     /// This call may take several minutes. If you encounter timeouts, try specifying no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn get_descriptor_activity_with(&self, block_hashes: Vec<String>, scan_objects: Vec<GetDescriptorActivityScanObjects>, opts: GetDescriptorActivityOptions) -> Result<GetDescriptorActivity> {
-        self.call_raw("getdescriptoractivity", &[json!(block_hashes), json!(scan_objects), json!(opts.include_mempool)]).await
+    pub async fn get_descriptor_activity_with(
+        &self,
+        block_hashes: Vec<String>,
+        scan_objects: Vec<GetDescriptorActivityScanObjects>,
+        opts: GetDescriptorActivityOptions,
+    ) -> Result<GetDescriptorActivity> {
+        self.call_raw(
+            "getdescriptoractivity",
+            &[json!(block_hashes), json!(scan_objects), json!(opts.include_mempool)],
+        )
+        .await
     }
 
     /// `getdifficulty` with required arguments only.
@@ -568,17 +572,22 @@ impl Client {
     /// `getmempoolancestors` with the result selected for verbosity `false`.
     ///
     /// If txid is in the mempool, returns all in-mempool ancestors.
-    pub async fn get_mempool_ancestors_verbose_0(&self, txid: String) -> Result<GetMempoolAncestorsVerbose0> {
+    pub async fn get_mempool_ancestors_verbose_0(
+        &self,
+        txid: String,
+    ) -> Result<GetMempoolAncestorsVerbose0> {
         self.call_raw("getmempoolancestors", &[json!(txid), json!(false)]).await
     }
 
     /// `getmempoolancestors` with the result selected for verbosity `true`.
     ///
     /// If txid is in the mempool, returns all in-mempool ancestors.
-    pub async fn get_mempool_ancestors_verbose_1(&self, txid: String) -> Result<GetMempoolAncestorsVerbose1> {
+    pub async fn get_mempool_ancestors_verbose_1(
+        &self,
+        txid: String,
+    ) -> Result<GetMempoolAncestorsVerbose1> {
         self.call_raw("getmempoolancestors", &[json!(txid), json!(true)]).await
     }
-
 
     /// `getmempoolcluster` with required arguments only.
     ///
@@ -590,17 +599,22 @@ impl Client {
     /// `getmempooldescendants` with the result selected for verbosity `false`.
     ///
     /// If txid is in the mempool, returns all in-mempool descendants.
-    pub async fn get_mempool_descendants_verbose_0(&self, txid: String) -> Result<GetMempoolDescendantsVerbose0> {
+    pub async fn get_mempool_descendants_verbose_0(
+        &self,
+        txid: String,
+    ) -> Result<GetMempoolDescendantsVerbose0> {
         self.call_raw("getmempooldescendants", &[json!(txid), json!(false)]).await
     }
 
     /// `getmempooldescendants` with the result selected for verbosity `true`.
     ///
     /// If txid is in the mempool, returns all in-mempool descendants.
-    pub async fn get_mempool_descendants_verbose_1(&self, txid: String) -> Result<GetMempoolDescendantsVerbose1> {
+    pub async fn get_mempool_descendants_verbose_1(
+        &self,
+        txid: String,
+    ) -> Result<GetMempoolDescendantsVerbose1> {
         self.call_raw("getmempooldescendants", &[json!(txid), json!(true)]).await
     }
-
 
     /// `getmempoolentry` with required arguments only.
     ///
@@ -619,7 +633,7 @@ impl Client {
     /// `getrawmempool` with required arguments only.
     ///
     /// Returns all transaction ids in memory pool as a json array of string transaction ids.
-    /// 
+    ///
     /// Hint: use getmempoolentry to fetch a specific transaction from the mempool.
     pub async fn get_raw_mempool(&self) -> Result<GetRawMempool> {
         self.call_raw("getrawmempool", &[(); 0] as &[()]).await
@@ -628,7 +642,7 @@ impl Client {
     /// `getrawmempool` with all optional arguments via [`GetRawMempoolOptions`].
     ///
     /// Returns all transaction ids in memory pool as a json array of string transaction ids.
-    /// 
+    ///
     /// Hint: use getmempoolentry to fetch a specific transaction from the mempool.
     pub async fn get_raw_mempool_with(&self, opts: GetRawMempoolOptions) -> Result<GetRawMempool> {
         self.call_raw("getrawmempool", &[json!(opts.verbose), json!(opts.mempool_sequence)]).await
@@ -644,14 +658,19 @@ impl Client {
     /// `gettxout` with all optional arguments via [`GetTxOutOptions`].
     ///
     /// Returns details about an unspent transaction output.
-    pub async fn get_tx_out_with(&self, txid: String, n: i64, opts: GetTxOutOptions) -> Result<GetTxOut> {
+    pub async fn get_tx_out_with(
+        &self,
+        txid: String,
+        n: i64,
+        opts: GetTxOutOptions,
+    ) -> Result<GetTxOut> {
         self.call_raw("gettxout", &[json!(txid), json!(n), json!(opts.include_mempool)]).await
     }
 
     /// `gettxoutproof` with required arguments only.
     ///
     /// Returns a hex-encoded proof that "txid" was included in a block.
-    /// 
+    ///
     /// NOTE: By default this function only works sometimes. This is when there is an
     /// unspent output in the utxo for this transaction. To make it always work,
     /// you need to maintain a transaction index, using the -txindex command line option or
@@ -663,12 +682,16 @@ impl Client {
     /// `gettxoutproof` with all optional arguments via [`GetTxOutProofOptions`].
     ///
     /// Returns a hex-encoded proof that "txid" was included in a block.
-    /// 
+    ///
     /// NOTE: By default this function only works sometimes. This is when there is an
     /// unspent output in the utxo for this transaction. To make it always work,
     /// you need to maintain a transaction index, using the -txindex command line option or
     /// specify the block in which the transaction is included manually (by blockhash).
-    pub async fn get_tx_out_proof_with(&self, txids: Vec<String>, opts: GetTxOutProofOptions) -> Result<GetTxOutProof> {
+    pub async fn get_tx_out_proof_with(
+        &self,
+        txids: Vec<String>,
+        opts: GetTxOutProofOptions,
+    ) -> Result<GetTxOutProof> {
         self.call_raw("gettxoutproof", &[json!(txids), json!(opts.block_hash)]).await
     }
 
@@ -684,21 +707,35 @@ impl Client {
     ///
     /// Returns statistics about the unspent transaction output set.
     /// Note this call may take some time if you are not using coinstatsindex.
-    pub async fn get_tx_out_set_info_with(&self, opts: GetTxOutSetInfoOptions) -> Result<GetTxOutSetInfo> {
-        self.call_raw("gettxoutsetinfo", &[json!(opts.hash_type), json!(opts.hash_or_height), json!(opts.use_index)]).await
+    pub async fn get_tx_out_set_info_with(
+        &self,
+        opts: GetTxOutSetInfoOptions,
+    ) -> Result<GetTxOutSetInfo> {
+        self.call_raw(
+            "gettxoutsetinfo",
+            &[json!(opts.hash_type), json!(opts.hash_or_height), json!(opts.use_index)],
+        )
+        .await
     }
 
     /// `gettxspendingprevout` with required arguments only.
     ///
     /// Scans the mempool (and the txospenderindex, if available) to find transactions spending any of the given outputs
-    pub async fn get_tx_spending_prevout(&self, outputs: Vec<GetTxSpendingPrevoutOutputs>) -> Result<GetTxSpendingPrevout> {
+    pub async fn get_tx_spending_prevout(
+        &self,
+        outputs: Vec<GetTxSpendingPrevoutOutputs>,
+    ) -> Result<GetTxSpendingPrevout> {
         self.call_raw("gettxspendingprevout", &[json!(outputs)]).await
     }
 
     /// `gettxspendingprevout` with all optional arguments via [`GetTxSpendingPrevoutOptions`].
     ///
     /// Scans the mempool (and the txospenderindex, if available) to find transactions spending any of the given outputs
-    pub async fn get_tx_spending_prevout_with(&self, outputs: Vec<GetTxSpendingPrevoutOutputs>, opts: GetTxSpendingPrevoutOptions) -> Result<GetTxSpendingPrevout> {
+    pub async fn get_tx_spending_prevout_with(
+        &self,
+        outputs: Vec<GetTxSpendingPrevoutOutputs>,
+        opts: GetTxSpendingPrevoutOptions,
+    ) -> Result<GetTxSpendingPrevout> {
         self.call_raw("gettxspendingprevout", &[json!(outputs), json!(opts)]).await
     }
 
@@ -714,7 +751,11 @@ impl Client {
     ///
     /// Import a mempool.dat file and attempt to add its contents to the mempool.
     /// Warning: Importing untrusted files is dangerous, especially if metadata from the file is taken over.
-    pub async fn import_mempool_with(&self, file_path: String, opts: ImportMempoolOptions) -> Result<ImportMempool> {
+    pub async fn import_mempool_with(
+        &self,
+        file_path: String,
+        opts: ImportMempoolOptions,
+    ) -> Result<ImportMempool> {
         self.call_raw("importmempool", &[json!(file_path), json!(opts)]).await
     }
 
@@ -722,9 +763,9 @@ impl Client {
     ///
     /// Load the serialized UTXO set from a file.
     /// Once this snapshot is loaded, its contents will be deserialized into a second chainstate data structure, which is then used to sync to the network's tip. Meanwhile, the original chainstate will complete the initial block download process in the background, eventually validating up to the block that the snapshot is based upon.
-    /// 
+    ///
     /// The result is a usable bitcoind instance that is current with the network tip in a matter of minutes rather than hours. UTXO snapshot are typically obtained from third-party sources (HTTP, torrent, etc.) which is reasonable since their contents are always checked by hash.
-    /// 
+    ///
     /// You can find more information on this process in the `assumeutxo` design document (<https://github.com/bitcoin/bitcoin/blob/master/doc/design/assumeutxo.md>).
     pub async fn load_tx_out_set(&self, path: String) -> Result<LoadTxOutSet> {
         self.call_raw("loadtxoutset", &[json!(path)]).await
@@ -733,9 +774,9 @@ impl Client {
     /// `preciousblock` with required arguments only.
     ///
     /// Treats a block as if it were received before others with the same work.
-    /// 
+    ///
     /// A later preciousblock call can override the effect of an earlier one.
-    /// 
+    ///
     /// The effects of preciousblock are not retained across restarts.
     pub async fn precious_block(&self, block_hash: String) -> Result<()> {
         self.call_raw("preciousblock", &[json!(block_hash)]).await
@@ -768,8 +809,23 @@ impl Client {
     ///
     /// Return relevant blockhashes for given descriptors (requires blockfilterindex).
     /// This call may take several minutes. Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn scan_blocks_with(&self, action: String, opts: ScanBlocksOptions) -> Result<ScanBlocks> {
-        self.call_raw("scanblocks", &[json!(action), json!(opts.scan_objects), json!(opts.start_height), json!(opts.stop_height), json!(opts.filter_type), json!(opts.options)]).await
+    pub async fn scan_blocks_with(
+        &self,
+        action: String,
+        opts: ScanBlocksOptions,
+    ) -> Result<ScanBlocks> {
+        self.call_raw(
+            "scanblocks",
+            &[
+                json!(action),
+                json!(opts.scan_objects),
+                json!(opts.start_height),
+                json!(opts.stop_height),
+                json!(opts.filter_type),
+                json!(opts.options),
+            ],
+        )
+        .await
     }
 
     /// `scantxoutset` with required arguments only.
@@ -785,7 +841,7 @@ impl Client {
     ///     tr(\<pubkey\>,{pk(\<pubkey\>)})          P2TR with single fallback pubkey in tapscript
     ///     rawtr(\<pubkey\>)                      P2TR with the specified key as output key rather than inner
     ///     wsh(and_v(v:pk(\<pubkey\>),after(2)))  P2WSH miniscript with mandatory pubkey and a timelock
-    /// 
+    ///
     /// In the above, \<pubkey\> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one
     /// or more path elements separated by "/", and optionally ending in "/*" (unhardened), or "/*'" or "/*h" (hardened) to specify all
     /// unhardened or hardened child keys.
@@ -808,13 +864,17 @@ impl Client {
     ///     tr(\<pubkey\>,{pk(\<pubkey\>)})          P2TR with single fallback pubkey in tapscript
     ///     rawtr(\<pubkey\>)                      P2TR with the specified key as output key rather than inner
     ///     wsh(and_v(v:pk(\<pubkey\>),after(2)))  P2WSH miniscript with mandatory pubkey and a timelock
-    /// 
+    ///
     /// In the above, \<pubkey\> either refers to a fixed public key in hexadecimal notation, or to an xpub/xprv optionally followed by one
     /// or more path elements separated by "/", and optionally ending in "/*" (unhardened), or "/*'" or "/*h" (hardened) to specify all
     /// unhardened or hardened child keys.
     /// In the latter case, a range needs to be specified by below if different from 1000.
     /// For more information on output descriptors, see the documentation in the doc/descriptors.md file.
-    pub async fn scan_tx_out_set_with(&self, action: String, opts: ScanTxOutSetOptions) -> Result<ScanTxOutSet> {
+    pub async fn scan_tx_out_set_with(
+        &self,
+        action: String,
+        opts: ScanTxOutSetOptions,
+    ) -> Result<ScanTxOutSet> {
         self.call_raw("scantxoutset", &[json!(action), json!(opts.scan_objects)]).await
     }
 
@@ -843,9 +903,9 @@ impl Client {
     /// `waitforblock` with required arguments only.
     ///
     /// Waits for a specific new block and returns useful info about it.
-    /// 
+    ///
     /// Returns the current block on timeout or exit.
-    /// 
+    ///
     /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
     pub async fn wait_for_block(&self, block_hash: String) -> Result<WaitForBlock> {
         self.call_raw("waitforblock", &[json!(block_hash)]).await
@@ -854,11 +914,15 @@ impl Client {
     /// `waitforblock` with all optional arguments via [`WaitForBlockOptions`].
     ///
     /// Waits for a specific new block and returns useful info about it.
-    /// 
+    ///
     /// Returns the current block on timeout or exit.
-    /// 
+    ///
     /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn wait_for_block_with(&self, block_hash: String, opts: WaitForBlockOptions) -> Result<WaitForBlock> {
+    pub async fn wait_for_block_with(
+        &self,
+        block_hash: String,
+        opts: WaitForBlockOptions,
+    ) -> Result<WaitForBlock> {
         self.call_raw("waitforblock", &[json!(block_hash), json!(opts.time_out)]).await
     }
 
@@ -866,9 +930,9 @@ impl Client {
     ///
     /// Waits for (at least) block height and returns the height and hash
     /// of the current tip.
-    /// 
+    ///
     /// Returns the current block on timeout or exit.
-    /// 
+    ///
     /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
     pub async fn wait_for_block_height(&self, height: i64) -> Result<WaitForBlockHeight> {
         self.call_raw("waitforblockheight", &[json!(height)]).await
@@ -878,20 +942,24 @@ impl Client {
     ///
     /// Waits for (at least) block height and returns the height and hash
     /// of the current tip.
-    /// 
+    ///
     /// Returns the current block on timeout or exit.
-    /// 
+    ///
     /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn wait_for_block_height_with(&self, height: i64, opts: WaitForBlockHeightOptions) -> Result<WaitForBlockHeight> {
+    pub async fn wait_for_block_height_with(
+        &self,
+        height: i64,
+        opts: WaitForBlockHeightOptions,
+    ) -> Result<WaitForBlockHeight> {
         self.call_raw("waitforblockheight", &[json!(height), json!(opts.time_out)]).await
     }
 
     /// `waitfornewblock` with required arguments only.
     ///
     /// Waits for any new block and returns useful info about it.
-    /// 
+    ///
     /// Returns the current block on timeout or exit.
-    /// 
+    ///
     /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
     pub async fn wait_for_new_block(&self) -> Result<WaitForNewBlock> {
         self.call_raw("waitfornewblock", &[(); 0] as &[()]).await
@@ -900,12 +968,14 @@ impl Client {
     /// `waitfornewblock` with all optional arguments via [`WaitForNewBlockOptions`].
     ///
     /// Waits for any new block and returns useful info about it.
-    /// 
+    ///
     /// Returns the current block on timeout or exit.
-    /// 
+    ///
     /// Make sure to use no RPC timeout (bitcoin-cli -rpcclienttimeout=0)
-    pub async fn wait_for_new_block_with(&self, opts: WaitForNewBlockOptions) -> Result<WaitForNewBlock> {
+    pub async fn wait_for_new_block_with(
+        &self,
+        opts: WaitForNewBlockOptions,
+    ) -> Result<WaitForNewBlock> {
         self.call_raw("waitfornewblock", &[json!(opts.time_out), json!(opts.current_tip)]).await
     }
-
 }

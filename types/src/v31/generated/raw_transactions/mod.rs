@@ -10,9 +10,18 @@
 
 mod into;
 
-pub use self::into::{AbortPrivateBroadcastError, AnalyzePsbtError, AnalyzePsbtInputError, AnalyzePsbtInputMissingError, CombinePsbtError, CombineRawTransactionError, ConvertToPsbtError, CreatePsbtError, CreateRawTransactionError, DecodePsbtError, DecodeRawTransactionError, DecodeScriptError, DescriptorProcessPsbtError, FinalizePsbtError, FundRawTransactionError, GetPrivateBroadcastInfoError, GetRawTransactionError, GetRawTransactionVerboseError, JoinPsbtsError, MempoolAcceptanceError, MempoolAcceptanceFeesError, SendRawTransactionError, SignFailError, SignRawTransactionError, SubmitPackageError, SubmitPackageTxResultError, SubmitPackageTxResultFeesError, TestMempoolAcceptError, UtxoUpdatePsbtError};
-
 use serde::{Deserialize, Serialize};
+
+pub use self::into::{
+    AbortPrivateBroadcastError, AnalyzePsbtError, AnalyzePsbtInputError,
+    AnalyzePsbtInputMissingError, CombinePsbtError, CombineRawTransactionError, ConvertToPsbtError,
+    CreatePsbtError, CreateRawTransactionError, DecodePsbtError, DecodeRawTransactionError,
+    DecodeScriptError, DescriptorProcessPsbtError, FinalizePsbtError, FundRawTransactionError,
+    GetPrivateBroadcastInfoError, GetRawTransactionError, GetRawTransactionVerboseError,
+    JoinPsbtsError, MempoolAcceptanceError, MempoolAcceptanceFeesError, SendRawTransactionError,
+    SignFailError, SignRawTransactionError, SubmitPackageError, SubmitPackageTxResultError,
+    SubmitPackageTxResultFeesError, TestMempoolAcceptError, UtxoUpdatePsbtError,
+};
 
 /// Abort private broadcast attempts for a transaction currently being privately broadcast.
 /// The transaction will be removed from the private broadcast queue.
@@ -107,7 +116,7 @@ impl std::ops::Deref for CombinePsbt {
 /// > combinerawtransaction
 /// >
 /// > Combine multiple partially signed transactions into one transaction.
-/// > The combined transaction may be another partially signed transaction or a 
+/// > The combined transaction may be another partially signed transaction or a
 /// > fully signed transaction.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -824,7 +833,7 @@ pub struct DecodeScriptSegwit {
     pub type_: String,
 }
 
-/// Update all segwit inputs in a PSBT with information from output descriptors, the UTXO set or the mempool. 
+/// Update all segwit inputs in a PSBT with information from output descriptors, the UTXO set or the mempool.
 /// Then, sign the inputs we are able to with information from the output descriptors.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -916,9 +925,9 @@ pub struct GetPrivateBroadcastInfoTransactionsItemPeersItem {
 /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
 /// If a blockhash argument is passed, it will return the transaction if
 /// the specified block is available and the transaction is in that block.
-/// 
+///
 /// Hint: Use gettransaction for wallet transactions.
-/// 
+///
 /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
 /// If verbosity is 1, returns a JSON Object with information about the transaction.
 /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
@@ -935,9 +944,9 @@ impl std::ops::Deref for GetRawTransactionVerbose0 {
 /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
 /// If a blockhash argument is passed, it will return the transaction if
 /// the specified block is available and the transaction is in that block.
-/// 
+///
 /// Hint: Use gettransaction for wallet transactions.
-/// 
+///
 /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
 /// If verbosity is 1, returns a JSON Object with information about the transaction.
 /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
@@ -1042,9 +1051,9 @@ pub struct GetRawTransactionVerbose1VoutItemScriptPubKey {
 /// and no blockhash argument is passed, it will return the transaction if it is in the mempool or any block.
 /// If a blockhash argument is passed, it will return the transaction if
 /// the specified block is available and the transaction is in that block.
-/// 
+///
 /// Hint: Use gettransaction for wallet transactions.
-/// 
+///
 /// If verbosity is 0 or omitted, returns the serialized transaction as a hex-encoded string.
 /// If verbosity is 1, returns a JSON Object with information about the transaction.
 /// If verbosity is 2, returns a JSON Object with information about the transaction, including fee and prevout information.
@@ -1202,20 +1211,20 @@ impl std::ops::Deref for JoinPsbts {
 /// > sendrawtransaction
 /// >
 /// > Submit a raw transaction (serialized, hex-encoded) to the network.
-/// > 
+/// >
 /// > If -privatebroadcast is disabled, then the transaction will be put into the
 /// > local mempool of the node and will be sent unconditionally to all currently
 /// > connected peers, so using sendrawtransaction for manual rebroadcast will degrade
 /// > privacy by leaking the transaction's origin, as nodes will normally not
 /// > rebroadcast non-wallet transactions already in their mempool.
-/// > 
+/// >
 /// > If -privatebroadcast is enabled, then the transaction will be sent only via
 /// > dedicated, short-lived connections to Tor or I2P peers or IPv4/IPv6 peers
 /// > via the Tor network. This conceals the transaction's origin. The transaction
 /// > will only enter the local mempool when it is received back from the network.
-/// > 
+/// >
 /// > A specific exception, RPC_TRANSACTION_ALREADY_IN_UTXO_SET, may throw if the transaction cannot be added to the mempool.
-/// > 
+/// >
 /// > Related RPCs: createrawtransaction, signrawtransactionwithkey
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1315,15 +1324,15 @@ pub struct SubmitPackageTxResultsFees {
 /// > testmempoolaccept
 /// >
 /// > Returns result of mempool acceptance tests indicating if raw transaction(s) (serialized, hex-encoded) would be accepted by mempool.
-/// > 
+/// >
 /// > If multiple transactions are passed in, parents must come before children and package policies apply: the transactions cannot conflict with any mempool transactions or each other.
-/// > 
+/// >
 /// > If one transaction fails, other transactions may not be fully validated (the 'allowed' key will be blank).
-/// > 
+/// >
 /// > The maximum number of transactions allowed is 25.
-/// > 
+/// >
 /// > This checks if transactions violate the consensus or policy rules.
-/// > 
+/// >
 /// > See sendrawtransaction call.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
@@ -1383,4 +1392,3 @@ impl std::ops::Deref for UtxoUpdatePsbt {
     type Target = String;
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-

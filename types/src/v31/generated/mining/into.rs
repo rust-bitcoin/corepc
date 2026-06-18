@@ -21,8 +21,12 @@ use bitcoin::error::UnprefixedHexError;
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::hex::FromHex as _;
 use bitcoin::key::{self, PrivateKey, PublicKey};
-use bitcoin::sign_message;
-use bitcoin::{amount, block, hex, network, psbt, witness_program, witness_version, Address, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence, SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram, WitnessVersion, Work, Wtxid};
+use bitcoin::{
+    amount, block, hex, network, psbt, sign_message, witness_program, witness_version, Address,
+    Amount, Block, BlockHash, CompactTarget, FeeRate, Network, OutPoint, Psbt, ScriptBuf, Sequence,
+    SignedAmount, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, WitnessProgram,
+    WitnessVersion, Work, Wtxid,
+};
 
 use super::*;
 use crate::error::write_err;
@@ -42,7 +46,12 @@ impl GetMiningInfo {
             difficulty: self.difficulty,
             target: Some(Target::from_unprefixed_hex(&self.target).map_err(E::Target)?),
             network_hash_ps: self.network_hash_ps,
-            pooled_tx: i64::try_from(self.pooled_tx).map_err(|_| crate::NumericError::Overflow { value: self.pooled_tx as i64, field: "pooled_tx".to_owned() })?,
+            pooled_tx: i64::try_from(self.pooled_tx).map_err(|_| {
+                crate::NumericError::Overflow {
+                    value: self.pooled_tx as i64,
+                    field: "pooled_tx".to_owned(),
+                }
+            })?,
             block_min_tx_fee: crate::btc_per_kb(self.block_min_tx_fee).map_err(E::BlockMinTxFee)?,
             chain: self.chain,
             signet_challenge: self.signet_challenge,
@@ -72,7 +81,8 @@ impl fmt::Display for GetMiningInfoError {
         match *self {
             Self::Bits(ref e) => write_err!(f, "conversion of the `Bits` field failed"; e),
             Self::Target(ref e) => write_err!(f, "conversion of the `Target` field failed"; e),
-            Self::BlockMinTxFee(ref e) => write_err!(f, "conversion of the `BlockMinTxFee` field failed"; e),
+            Self::BlockMinTxFee(ref e) =>
+                write_err!(f, "conversion of the `BlockMinTxFee` field failed"; e),
             Self::Next(ref e) => write_err!(f, "conversion of the `Next` field failed"; e),
             Self::Numeric(ref e) => write_err!(f, "numeric conversion failed"; e),
         }
@@ -148,10 +158,22 @@ impl From<crate::NumericError> for NextBlockInfoError {
 
 impl GetPrioritisedTransactions {
     /// Converts the raw type into the version-nonspecific model type.
-    pub fn into_model(self) -> Result<model::GetPrioritisedTransactions, GetPrioritisedTransactionsError> {
+    pub fn into_model(
+        self,
+    ) -> Result<model::GetPrioritisedTransactions, GetPrioritisedTransactionsError> {
         use GetPrioritisedTransactionsError as E;
 
-        Ok(model::GetPrioritisedTransactions(self.0.into_iter().map(|(k, v)| Ok::<_, E>((k.parse::<Txid>().map_err(E::InnerKey)?, v.into_model().map_err(E::InnerValue)?))).collect::<Result<std::collections::BTreeMap<_, _>, _>>()?))
+        Ok(model::GetPrioritisedTransactions(
+            self.0
+                .into_iter()
+                .map(|(k, v)| {
+                    Ok::<_, E>((
+                        k.parse::<Txid>().map_err(E::InnerKey)?,
+                        v.into_model().map_err(E::InnerValue)?,
+                    ))
+                })
+                .collect::<Result<std::collections::BTreeMap<_, _>, _>>()?,
+        ))
     }
 }
 
@@ -168,7 +190,8 @@ impl fmt::Display for GetPrioritisedTransactionsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Self::InnerKey(ref e) => write_err!(f, "conversion of the `InnerKey` field failed"; e),
-            Self::InnerValue(ref e) => write_err!(f, "conversion of the `InnerValue` field failed"; e),
+            Self::InnerValue(ref e) =>
+                write_err!(f, "conversion of the `InnerValue` field failed"; e),
         }
     }
 }
@@ -198,21 +221,13 @@ impl GetPrioritisedTransactionsEntry {
 
 /// Error when converting a `PrioritisedTransaction` type into the model type.
 #[derive(Debug)]
-pub enum PrioritisedTransactionError {
-}
+pub enum PrioritisedTransactionError {}
 
 impl fmt::Display for PrioritisedTransactionError {
-    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-        }
-    }
+    fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result { match *self {} }
 }
 
 #[cfg(feature = "std")]
 impl std::error::Error for PrioritisedTransactionError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match *self {
-        }
-    }
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> { match *self {} }
 }
-
