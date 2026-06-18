@@ -51,7 +51,7 @@
 //! | gettxoutsetinfo                    | version + model |                                        |
 //! | gettxspendingprevout               | version + model |                                        |
 //! | importmempool                      | returns nothing |                                        |
-//! | loadtxoutset                       | version + model | UNTESTED                               |
+//! | loadtxoutset                       | version + model |                                        |
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
@@ -86,7 +86,7 @@
 //! | getnetworkhashps                   | returns numeric |                                        |
 //! | getprioritisedtransactions         | version + model |                                        |
 //! | prioritisetransaction              | returns boolean |                                        |
-//! | submitblock                        | returns nothing |                                        |
+//! | submitblock                        | returns nothing | UNTESTED                               |
 //! | submitheader                       | returns nothing |                                        |
 //!
 //! </details>
@@ -125,7 +125,7 @@
 //! | createpsbt                         | version + model |                                        |
 //! | createrawtransaction               | version + model |                                        |
 //! | decodepsbt                         | version + model |                                        |
-//! | descriptorprocesspsbt              | version + model |                                        |
+//! | descriptorprocesspsbt              | version + model | UNTESTED                               |
 //! | decoderawtransaction               | version + model |                                        |
 //! | decodescript                       | version + model |                                        |
 //! | finalizepsbt                       | version + model |                                        |
@@ -133,7 +133,7 @@
 //! | getrawtransaction                  | version + model | Includes additional 'verbose' type     |
 //! | joinpsbts                          | version + model |                                        |
 //! | sendrawtransaction                 | version + model |                                        |
-//! | signrawtransactionwithkey          | version + model |                                        |
+//! | signrawtransactionwithkey          | version + model | UNTESTED                               |
 //! | submitpackage                      | version + model |                                        |
 //! | testmempoolaccept                  | version + model |                                        |
 //! | utxoupdatepsbt                     | version + model |                                        |
@@ -222,7 +222,7 @@
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |
-//! | setlabel                           | returns nothing |                                        |
+//! | setlabel                           | returns nothing | UNTESTED                               |
 //! | settxfee                           | version         |                                        |
 //! | setwalletflag                      | version         |                                        |
 //! | signmessage                        | version + model |                                        |

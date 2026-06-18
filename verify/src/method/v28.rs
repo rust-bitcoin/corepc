@@ -54,7 +54,7 @@ pub const METHODS: &[Method] = &[
     // mining
     Method::new_modelled("getblocktemplate", "GetBlockTemplate", "get_block_template"),
     Method::new_modelled("getmininginfo", "GetMiningInfo", "get_mining_info"),
-    Method::new_no_type("getnetworkhashps", "get_network_hashes_per_second"),
+    Method::new_no_type("getnetworkhashps", "get_network_hash_ps"),
     Method::new_modelled(
         "getprioritisedtransactions",
         "GetPrioritisedTransactions",
@@ -161,14 +161,14 @@ pub const METHODS: &[Method] = &[
     Method::new_no_type("importprivkey", "import_priv_key"),
     Method::new_no_type("importprunedfunds", "import_pruned_funds"),
     Method::new_no_type("importpubkey", "import_pubkey"),
-    Method::new_no_type("importwallet", "import_walet"),
+    Method::new_no_type("importwallet", "import_wallet"),
     Method::new_no_type("keypoolrefill", "keypool_refill"),
     Method::new_modelled("listaddressgroupings", "ListAddressGroupings", "list_address_groupings"),
     Method::new_no_model("listdescriptors", "ListDescriptors", "list_descriptors"),
     Method::new_no_model("listlabels", "ListLabels", "list_labels"),
     Method::new_modelled("listlockunspent", "ListLockUnspent", "list_lock_unspent"),
     Method::new_no_model("migratewallet", "MigrateWallet", "migrate_wallet"),
-    Method::new_no_type("newkeypool", "new_key_pool"),
+    Method::new_no_type("newkeypool", "new_keypool"),
     Method::new_modelled("psbtbumpfee", "PsbtBumpFee", "psbt_bump_fee"),
     Method::new_modelled(
         "listreceivedbyaddress",

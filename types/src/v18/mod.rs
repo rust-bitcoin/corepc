@@ -86,7 +86,7 @@
 //! | getmininginfo                      | version + model |                                        |
 //! | getnetworkhashps                   | returns numeric |                                        |
 //! | prioritisetransaction              | returns boolean |                                        |
-//! | submitblock                        | returns nothing |                                        |
+//! | submitblock                        | returns nothing | UNTESTED                               |
 //! | submitheader                       | returns nothing |                                        |
 //!
 //! </details>
@@ -200,7 +200,7 @@
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |
-//! | setlabel                           | returns nothing |                                        |
+//! | setlabel                           | returns nothing | UNTESTED                               |
 //! | settxfee                           | version         |                                        |
 //! | signmessage                        | version + model |                                        |
 //! | signrawtransactionwithwallet       | version + model |                                        |

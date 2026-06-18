@@ -176,7 +176,7 @@ crate::impl_client_v17__get_transaction!();
 crate::impl_client_v17__get_wallet_info!();
 crate::impl_client_v21__import_descriptors!();
 crate::impl_client_v17__import_pruned_funds!();
-crate::impl_client_v17__key_pool_refill!();
+crate::impl_client_v17__keypool_refill!();
 crate::impl_client_v17__list_address_groupings!();
 crate::impl_client_v22__list_descriptors!();
 crate::impl_client_v18__list_received_by_label!();

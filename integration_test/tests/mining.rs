@@ -37,7 +37,7 @@ fn mining__get_block_template__modelled() {
 }
 
 #[test]
-fn mining__get_mining_info() {
+fn mining__get_mining_info__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
 
@@ -65,7 +65,7 @@ fn mining__get_network_hash_ps() {
 
 #[test]
 #[cfg(not(feature = "v25_and_below"))]
-fn mining__get_prioritised_transactions() {
+fn mining__get_prioritised_transactions__modelled() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
     node.fund_wallet();
     let (_address, txid) = node.create_mempool_transaction();

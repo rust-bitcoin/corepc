@@ -52,7 +52,7 @@
 //! | gettxoutsetinfo                    | version + model |                                        |
 //! | gettxspendingprevout               | version + model |                                        |
 //! | importmempool                      | returns nothing |                                        |
-//! | loadtxoutset                       | version + model | UNTESTED                               |
+//! | loadtxoutset                       | version + model |                                        |
 //! | preciousblock                      | returns nothing |                                        |
 //! | pruneblockchain                    | version         |                                        |
 //! | savemempool                        | version         |                                        |
@@ -90,7 +90,7 @@
 //! | getnetworkhashps                   | returns numeric |                                        |
 //! | getprioritisedtransactions         | version + model |                                        |
 //! | prioritisetransaction              | returns boolean |                                        |
-//! | submitblock                        | returns nothing |                                        |
+//! | submitblock                        | returns nothing | UNTESTED                               |
 //! | submitheader                       | returns nothing |                                        |
 //!
 //! </details>
@@ -129,7 +129,7 @@
 //! | createpsbt                         | version + model |                                        |
 //! | createrawtransaction               | version + model |                                        |
 //! | decodepsbt                         | version + model | Musig not modelled: not in rust-bitcoin|
-//! | descriptorprocesspsbt              | version + model |                                        |
+//! | descriptorprocesspsbt              | version + model | UNTESTED                               |
 //! | decoderawtransaction               | version + model |                                        |
 //! | decodescript                       | version + model |                                        |
 //! | finalizepsbt                       | version + model |                                        |
@@ -137,7 +137,7 @@
 //! | getrawtransaction                  | version + model | Includes additional 'verbose' type     |
 //! | joinpsbts                          | version + model |                                        |
 //! | sendrawtransaction                 | version + model |                                        |
-//! | signrawtransactionwithkey          | version + model |                                        |
+//! | signrawtransactionwithkey          | version + model | UNTESTED                               |
 //! | submitpackage                      | version + model |                                        |
 //! | testmempoolaccept                  | version + model |                                        |
 //! | utxoupdatepsbt                     | version + model |                                        |
@@ -199,7 +199,7 @@
 //! | listdescriptors                    | version         |                                        |
 //! | listlabels                         | version         |                                        |
 //! | listlockunspent                    | version + model |                                        |
-//! | migratewallet                      | version         | Untested in v30, unchanged from v29    |
+//! | migratewallet                      | version         | UNTESTED unchanged from v29            |
 //! | psbtbumpfee                        | version + model |                                        |
 //! | listreceivedbyaddress              | version + model |                                        |
 //! | listreceivedbylabel                | version + model |                                        |
@@ -217,7 +217,7 @@
 //! | sendall                            | version + model |                                        |
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
-//! | setlabel                           | returns nothing |                                        |
+//! | setlabel                           | returns nothing | UNTESTED                               |
 //! | settxfee                           | version         |                                        |
 //! | setwalletflag                      | version         |                                        |
 //! | signmessage                        | version + model |                                        |
