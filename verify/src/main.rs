@@ -41,13 +41,13 @@ fn main() -> Result<()> {
         arg!([version] "Verify specific version of Core (use \"all\" for all versions)")
             .required(true),
         arg!(-t --tests <TEST_OUTPUT> "Optionally check claimed status of tests").required(false),
-        arg!(-q --quiet ... "Run tests in quiet mode").required(false),
+        arg!(-q --quiet "Run tests in quiet mode").required(false),
     ]);
 
-    let matches = cmd.clone().get_matches();
+    let matches = cmd.get_matches();
     let version = matches.get_one::<String>("version").unwrap();
     let test_output = matches.get_one::<String>("tests");
-    let quiet = matches.get_one::<u8>("quiet") == Some(&1);
+    let quiet = matches.get_flag("quiet");
 
     if version == "all" {
         verify_all_versions(test_output, quiet)?;
