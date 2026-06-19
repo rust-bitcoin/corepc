@@ -18,7 +18,7 @@ latest = ["31_0"]
 # Run the unchanged integration tests against the async production client (via its blocking facade)
 # instead of the sync client. Use alongside the `30_2` version feature, e.g.
 # `cargo test -p integration-test --no-default-features --features 30_2,test-async,download`.
-test-async = ["bitcoind/client-async", "dep:tokio"]
+test-async = ["bitcoind/client-async"]
 
 # Enable the same feature in `bitcoind` and the version feature here.
 # All minor releases of the latest three versions.
@@ -69,7 +69,5 @@ bitcoind = { package = "bitcoind", version = "0.40.0", path = "../bitcoind", def
 rand = "0.8.5"
 # Just so we can enable the feature.
 types = { package = "corepc-types", version = "0.14.0", path = "../types", features = ["serde-deny-unknown-fields"] }
-# Drives the async test adapters (see `async_client` in lib.rs). Pulled in only by `test-async`.
-tokio = { version = "1", features = ["rt"], optional = true }
 
 [dev-dependencies]

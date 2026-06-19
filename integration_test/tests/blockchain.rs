@@ -4,6 +4,7 @@
 
 #![allow(non_snake_case)] // Test names intentionally use double underscore.
 
+use bitcoin::consensus::encode;
 use bitcoin::hex;
 use bitcoind::vtype::*; // All the version specific types.
 use bitcoind::{mtype, Input, Output};
@@ -140,37 +141,37 @@ fn blockchain__get_best_block_hash__modelled() {
 
 #[test]
 fn blockchain__get_block__modelled() {
-    // Runs against the sync client, or the async production client under `test-async`.
-    // See `integration_test::TestClient`. getblock / getbestblockhash are node-level RPCs, so the
-    // base (non-wallet) endpoint is used.
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
-    let client = integration_test::test_client(&node);
-    let block_hash = client.best_block_hash();
+    let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
 
-    // verbose=0 (just exercises the conversion).
-    let _ = client.get_block_verbose_zero(block_hash);
+    let json: GetBlockVerboseZero =
+        node.client.get_block_verbose_zero(block_hash).expect("getblock verbose=0");
+    let model: Result<mtype::GetBlockVerboseZero, encode::FromHexError> = json.into_model();
+    model.unwrap();
 
-    let block_v1 = client.get_block_verbose_one(block_hash);
+    let json: GetBlockVerboseOne =
+        node.client.get_block_verbose_one(block_hash).expect("getblock verbose=1");
+    let model: Result<mtype::GetBlockVerboseOne, GetBlockVerboseOneError> = json.into_model();
+    let block_v1 = model.unwrap();
     #[cfg(not(feature = "v30_and_below"))]
     assert!(block_v1.coinbase_tx.is_some());
     let _ = block_v1;
 
-    // verbose=2/3 go through the generated transaction reconstruct, which is broken on the
-    // async/generated client: `GetBlockVerbose2TxItem::into_model` rebuilds the inner tx from an
-    // empty `extra` and can't find `hash` (see corepc_bugs_backlog.md #7). The sync/curated client
-    // converts these correctly, so exercise them there until the codegen bug is fixed.
-    // TODO(bug #7): drop the `not(feature = "test-async")` once GetBlockVerbose2/3TxItem is fixed.
-    #[cfg(all(not(feature = "v28_and_below"), not(feature = "test-async")))]
+    #[cfg(not(feature = "v28_and_below"))]
     {
         let node = BitcoinD::with_wallet(Wallet::Default, &[]);
         node.fund_wallet();
         let (_address, mined_tx) = node.create_mined_transaction();
-        let client = integration_test::test_client(&node);
-        let block_hash = client.best_block_hash();
-        let mined_txid = mined_tx.compute_txid();
+        let block_hash = node.client.best_block_hash().expect("best_block_hash failed");
 
-        let block_v2 = client.get_block_verbose_two(block_hash);
+        let json: GetBlockVerboseTwo =
+            node.client.get_block_verbose_two(block_hash).expect("getblock verbose=2");
+        let model: Result<mtype::GetBlockVerboseTwo, GetBlockVerboseTwoError> = json.into_model();
+        let block_v2 = model.unwrap();
+
         assert_eq!(block_v2.tx.len(), block_v2.n_tx as usize);
+
+        let mined_txid = mined_tx.compute_txid();
         let mined_entry = block_v2
             .tx
             .iter()
@@ -180,8 +181,14 @@ fn blockchain__get_block__modelled() {
         assert!(!mined_entry.transaction.transaction.input.is_empty());
         assert!(!mined_entry.transaction.transaction.output.is_empty());
 
-        let block_v3 = client.get_block_verbose_three(block_hash);
+        let json: GetBlockVerboseThree =
+            node.client.get_block_verbose_three(block_hash).expect("getblock verbose=3");
+        let model: Result<mtype::GetBlockVerboseThree, GetBlockVerboseThreeError> =
+            json.into_model();
+        let block_v3 = model.unwrap();
+
         assert_eq!(block_v3.tx.len(), block_v3.n_tx as usize);
+
         let mined_entry = block_v3
             .tx
             .iter()

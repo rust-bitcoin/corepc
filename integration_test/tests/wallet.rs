@@ -250,29 +250,34 @@ fn wallet__get_addresses_by_label__modelled() {
 
 #[test]
 fn wallet__get_address_info__modelled() {
-    // Runs against the sync client, or the async production client under `test-async`.
-    // See `integration_test::TestClient`.
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
-    let client = integration_test::test_client_for_wallet(&node, "default");
 
     // Test an address with a label.
     let label_name = "test-label";
-    let addr = client.new_address_with_label(label_name);
-    let address_info = client.get_address_info(&addr);
+    let addr = node.client.new_address_with_label(label_name).unwrap().assume_checked();
+    let json: GetAddressInfo = node.client.get_address_info(&addr).expect("getaddressinfo legacy");
+    let model: Result<mtype::GetAddressInfo, GetAddressInfoError> = json.into_model();
+    let address_info = model.unwrap();
     assert_eq!(address_info.address.assume_checked(), addr);
     assert_eq!(address_info.labels[0], label_name);
 
     // Test a SegWit address with embedded information.
-    let addr_p2sh = client.new_address_with_type(AddressType::P2shSegwit);
-    let address_info = client.get_address_info(&addr_p2sh);
+    let addr_p2sh = node.client.new_address_with_type(AddressType::P2shSegwit).unwrap();
+    let json: GetAddressInfo =
+        node.client.get_address_info(&addr_p2sh).expect("getaddressinfo p2sh-segwit");
+    let model: Result<mtype::GetAddressInfo, GetAddressInfoError> = json.into_model();
+    let address_info = model.unwrap();
     let embedded = address_info.embedded.unwrap();
     assert_eq!(address_info.address.assume_checked(), addr_p2sh);
     assert_eq!(address_info.script.unwrap(), mtype::ScriptType::WitnessV0KeyHash);
     assert!(embedded.address.is_valid_for_network(Network::Regtest));
 
     // Test a Bech32 address.
-    let addr_bech32 = client.new_address_with_type(AddressType::Bech32);
-    let address_info = client.get_address_info(&addr_bech32);
+    let addr_bech32 = node.client.new_address_with_type(AddressType::Bech32).unwrap();
+    let json: GetAddressInfo =
+        node.client.get_address_info(&addr_bech32).expect("getaddressinfo bech32");
+    let model: Result<mtype::GetAddressInfo, GetAddressInfoError> = json.into_model();
+    let address_info = model.unwrap();
     assert_eq!(address_info.address.assume_checked(), addr_bech32);
 }
 

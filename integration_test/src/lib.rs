@@ -16,11 +16,6 @@ pub use bitcoind::BitcoinD; // Re-export this to make test imports more terse.
 #[allow(dead_code)] // Not all tests use this function.
 pub fn init_logger() { let _ = env_logger::try_init(); }
 
-// The dual sync/async test client. `TestClient` + the `test_client*` constructors let one test body
-// run against either client (select with `test-async`); see `client.rs`.
-pub mod client;
-pub use client::{test_client, test_client_for_wallet, TestClient};
-
 /// Controls the loaded wallet.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Wallet {

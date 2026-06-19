@@ -9,12 +9,80 @@
 //! (the sync client), the facade tracks it per version for free, and there is nothing to
 //! hand-maintain. The unchanged integration tests run against the async transport because
 //! `bitcoind` swaps `node.client` to this type under its `client-async` feature.
+//!
+//! One method is the exception: `getnewaddress` is routed through the GENERATED async wrapper (see
+//! [`BRIDGE_GET_NEW_ADDRESS`]) instead of the reused sync macro, so its argument encoding does not
+//! come from the sync client. That isolates the async path: a bug planted in the sync
+//! `getnewaddress` arg-encoding (an acceptance test for isolation) fails the sync client but leaves
+//! this async-backed facade green.
+
+/// The `getnewaddress` isolation bridge: reproduces the sync macro's four public methods, but the
+/// low-level call goes through the generated async wrapper (`inner.get_new_address_with`) instead of
+/// `self.call("getnewaddress", ...)`, so the sync client's argument encoding (and any bug in it)
+/// never reaches the async path. `{version}` is the only placeholder; it is filled in by
+/// [`emit_blocking`]. The sync `get_new_address` macro is skipped (see [`extract_macro_surface`]).
+const BRIDGE_GET_NEW_ADDRESS: &str = r#"// Isolation bridge: `getnewaddress` goes through the GENERATED async wrapper (its own argument
+// encoding), NOT the reused sync macro. A bug planted in the sync `getnewaddress` arg-encoding
+// therefore fails the sync client but not this async-backed facade.
+impl Client {
+    /// `getnewaddress` via the generated async wrapper, returning the generated raw type.
+    fn get_new_address_generated(
+        &self,
+        label: Option<&str>,
+        ty: Option<AddressType>,
+    ) -> Result<crate::types::v{version}::generated::GetNewAddress> {
+        let address_type = match ty {
+            Some(ty) => Some(serde_json::from_value::<String>(into_json(ty)?)?),
+            None => None,
+        };
+        let opts = crate::client_async::v{version}::wallet::GetNewAddressOptions {
+            label: label.map(str::to_owned),
+            address_type,
+        };
+        self.rt.block_on(self.inner.get_new_address_with(opts)).map_err(Self::map_err)
+    }
+
+    /// Low-level `getnewaddress` (matches the sync client's signature).
+    pub fn get_new_address(
+        &self,
+        label: Option<&str>,
+        ty: Option<AddressType>,
+    ) -> Result<crate::types::v{version}::generated::GetNewAddress> {
+        self.get_new_address_generated(label, ty)
+    }
+
+    /// Gets a new address and parses it assuming it is correct.
+    pub fn new_address(&self) -> Result<bitcoin::Address> {
+        let model = self.get_new_address_generated(None, None)?.into_model().unwrap();
+        Ok(model.0.assume_checked())
+    }
+
+    /// Gets a new address of the given type and parses it assuming it is correct.
+    pub fn new_address_with_type(&self, ty: AddressType) -> Result<bitcoin::Address> {
+        let model = self.get_new_address_generated(None, Some(ty))?.into_model().unwrap();
+        Ok(model.0.assume_checked())
+    }
+
+    /// Gets a new address with a label and parses it assuming it is correct (unchecked network).
+    pub fn new_address_with_label(
+        &self,
+        label: &str,
+    ) -> Result<bitcoin::Address<bitcoin::address::NetworkUnchecked>> {
+        let model = self.get_new_address_generated(Some(label), None)?.into_model().unwrap();
+        Ok(model.0)
+    }
+}
+
+"#;
 
 /// Emit `blocking.rs` for `version`, reusing the sync client's macro surface taken from
 /// `sync_mod_src` (the verbatim contents of `client_sync/v{N}/mod.rs`).
 pub(crate) fn emit_blocking(version: &str, sync_mod_src: &str) -> String {
     let reexports = extract_reexport_block(sync_mod_src);
     let macros = extract_macro_surface(sync_mod_src);
+    // `getnewaddress` routes through the generated async wrapper, not the reused sync macro, so a bug
+    // in the sync arg-encoding cannot leak into the async client. `{version}` is its only placeholder.
+    let bridge = BRIDGE_GET_NEW_ADDRESS.replace("{version}", version);
 
     format!(
         "// SPDX-License-Identifier: CC0-1.0\n\n\
@@ -102,6 +170,7 @@ pub(crate) fn emit_blocking(version: &str, sync_mod_src: &str) -> String {
                  self.rt.block_on(self.inner.call_raw(method, args)).map_err(Self::map_err)\n    \
              }}\n\
          }}\n\n\
+         {bridge}\
          {macros}\n"
     )
 }
@@ -140,6 +209,13 @@ fn extract_macro_surface(src: &str) -> String {
             out.push(String::new());
             out.push(line.to_owned());
         } else if t.starts_with("crate::impl_client_") {
+            // `get_new_address` is bridged to the generated async wrapper (see
+            // `BRIDGE_GET_NEW_ADDRESS`); drop the sync macro to avoid a duplicate definition.
+            if t.contains("__get_new_address!") {
+                out.push("// get_new_address: bridged to the generated async wrapper (see above)."
+                    .to_owned());
+                continue;
+            }
             out.push(line.to_owned());
         }
     }

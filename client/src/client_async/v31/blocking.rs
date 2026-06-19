@@ -108,6 +108,58 @@ impl Client {
     }
 }
 
+// Isolation bridge: `getnewaddress` goes through the GENERATED async wrapper (its own argument
+// encoding), NOT the reused sync macro. A bug planted in the sync `getnewaddress` arg-encoding
+// therefore fails the sync client but not this async-backed facade.
+impl Client {
+    /// `getnewaddress` via the generated async wrapper, returning the generated raw type.
+    fn get_new_address_generated(
+        &self,
+        label: Option<&str>,
+        ty: Option<AddressType>,
+    ) -> Result<crate::types::v31::generated::GetNewAddress> {
+        let address_type = match ty {
+            Some(ty) => Some(serde_json::from_value::<String>(into_json(ty)?)?),
+            None => None,
+        };
+        let opts = crate::client_async::v31::wallet::GetNewAddressOptions {
+            label: label.map(str::to_owned),
+            address_type,
+        };
+        self.rt.block_on(self.inner.get_new_address_with(opts)).map_err(Self::map_err)
+    }
+
+    /// Low-level `getnewaddress` (matches the sync client's signature).
+    pub fn get_new_address(
+        &self,
+        label: Option<&str>,
+        ty: Option<AddressType>,
+    ) -> Result<crate::types::v31::generated::GetNewAddress> {
+        self.get_new_address_generated(label, ty)
+    }
+
+    /// Gets a new address and parses it assuming it is correct.
+    pub fn new_address(&self) -> Result<bitcoin::Address> {
+        let model = self.get_new_address_generated(None, None)?.into_model().unwrap();
+        Ok(model.0.assume_checked())
+    }
+
+    /// Gets a new address of the given type and parses it assuming it is correct.
+    pub fn new_address_with_type(&self, ty: AddressType) -> Result<bitcoin::Address> {
+        let model = self.get_new_address_generated(None, Some(ty))?.into_model().unwrap();
+        Ok(model.0.assume_checked())
+    }
+
+    /// Gets a new address with a label and parses it assuming it is correct (unchecked network).
+    pub fn new_address_with_label(
+        &self,
+        label: &str,
+    ) -> Result<bitcoin::Address<bitcoin::address::NetworkUnchecked>> {
+        let model = self.get_new_address_generated(Some(label), None)?.into_model().unwrap();
+        Ok(model.0)
+    }
+}
+
 crate::impl_client_check_expected_server_version!({ [310000] });
 
 // == Blockchain ==
@@ -253,7 +305,7 @@ crate::impl_client_v17__get_balance!();
 crate::impl_client_v19__get_balances!();
 crate::impl_client_v28__get_hd_keys!();
 crate::impl_client_v18__get_received_by_label!();
-crate::impl_client_v17__get_new_address!();
+// get_new_address: bridged to the generated async wrapper (see above).
 crate::impl_client_v17__get_raw_change_address!();
 crate::impl_client_v17__get_received_by_address!();
 crate::impl_client_v17__get_transaction!();
