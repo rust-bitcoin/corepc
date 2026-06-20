@@ -20,11 +20,21 @@
 /// from `impl_async_bridges!` (see `client_async/blocking_bridges.rs`). Skipped from the reused
 /// surface so there is no duplicate definition. Keep in sync with that macro.
 const BRIDGED_METHODS: &[&str] = &[
+    // Wallet
     "get_new_address",
+    // Generating
     "generate_block",
     "generate_to_address",
     "generate_to_descriptor",
     "invalidate_block",
+    // Mining (note: `get_network_hashes_per_second` is the macro suffix for `get_network_hash_ps`)
+    "get_block_template",
+    "get_mining_info",
+    "get_network_hashes_per_second",
+    "get_prioritised_transactions",
+    "prioritise_transaction",
+    "submit_block",
+    "submit_header",
 ];
 
 /// Emit `blocking.rs` for `version`, reusing the sync client's macro surface taken from

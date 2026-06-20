@@ -181,13 +181,13 @@ crate::impl_client_v17__reconsider_block!();
 crate::impl_client_v17__sync_with_validation_interface_queue!();
 
 // == Mining ==
-crate::impl_client_v17__get_block_template!();
-crate::impl_client_v17__get_mining_info!();
-crate::impl_client_v17__get_network_hashes_per_second!();
-crate::impl_client_v26__get_prioritised_transactions!();
-crate::impl_client_v17__prioritise_transaction!();
-crate::impl_client_v17__submit_block!();
-crate::impl_client_v18__submit_header!();
+// get_block_template: bridged by `impl_async_bridges!` (see above).
+// get_mining_info: bridged by `impl_async_bridges!` (see above).
+// get_network_hashes_per_second: bridged by `impl_async_bridges!` (see above).
+// get_prioritised_transactions: bridged by `impl_async_bridges!` (see above).
+// prioritise_transaction: bridged by `impl_async_bridges!` (see above).
+// submit_block: bridged by `impl_async_bridges!` (see above).
+// submit_header: bridged by `impl_async_bridges!` (see above).
 
 // == Network ==
 crate::impl_client_v17__add_node!();

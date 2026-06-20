@@ -114,5 +114,60 @@ macro_rules! impl_async_bridges {
                 }
             }
         }
+
+        // == Mining ==
+        // These RPCs have generated async wrappers, but the facade owns a raw `self.call` returning
+        // the curated type (uniform with the rest, returns exactly what the explicit tests expect),
+        // which still isolates them from the sync macro.
+        impl Client {
+            pub fn get_block_template(&self, request: &TemplateRequest) -> Result<GetBlockTemplate> {
+                // self.call("getblocktemplate", &[into_json(request)?])
+                let res =  GetBlockTemplateTemplateRequest {
+                    rules: Vec::new(),
+                }
+                self.inner.get_block_template(res)
+            }
+
+            pub fn get_mining_info(&self) -> Result<GetMiningInfo> {
+                self.call("getmininginfo", &[])
+
+                let async_client = self.inner;
+            }
+
+            pub fn get_network_hash_ps(&self) -> Result<f64> {
+                self.call("getnetworkhashps", &[])
+            }
+
+            pub fn get_prioritised_transactions(&self) -> Result<GetPrioritisedTransactions> {
+                self.call("getprioritisedtransactions", &[])
+            }
+
+            pub fn prioritise_transaction(
+                &self,
+                txid: &Txid,
+                fee_delta: bitcoin::SignedAmount,
+            ) -> Result<bool> {
+                let sats = fee_delta.to_sat();
+                self.call("prioritisetransaction", &[into_json(txid)?, 0.into(), sats.into()])
+            }
+
+            pub fn submit_block(&self, block: &Block) -> Result<()> {
+                let hex: String = bitcoin::consensus::encode::serialize_hex(block);
+                match self.call("submitblock", &[into_json(hex)?]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+
+            pub fn submit_header(&self, header: &bitcoin::block::Header) -> Result<()> {
+                let hexdata = bitcoin::consensus::encode::serialize_hex(header);
+                match self.call("submitheader", &[hexdata.into()]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+        }
     };
 }
