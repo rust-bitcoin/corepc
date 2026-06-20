@@ -60,3 +60,15 @@ docsrs *flags:
 # Update the recent and minimal lock files.
 update-lock-files:
   contrib/update-lock-files.sh
+
+# Run all just recipes(commands)
+all:
+    just build
+    just check
+    just lint
+    just lint-verify
+    just lint-integration-tests
+    just fmt
+    just format
+    just docsrs
+    just update-lock-files
