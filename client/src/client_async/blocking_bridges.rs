@@ -116,30 +116,38 @@ macro_rules! impl_async_bridges {
         }
 
         // == Mining ==
-        // These RPCs have generated async wrappers, but the facade owns a raw `self.call` returning
-        // the curated type (uniform with the rest, returns exactly what the explicit tests expect),
-        // which still isolates them from the sync macro.
+        // Each method routes through the GENERATED async wrapper on `self.inner` (its own
+        // arg-encoding plus generated response type), NOT a raw `self.call`, so the generated call
+        // surface is exercised and stays isolated from the sync macro. Where the generated response
+        // type differs from the curated type the explicit tests consume, the response is converted
+        // back through JSON (both sides serialize to Core's shape).
         impl Client {
             pub fn get_block_template(&self, request: &TemplateRequest) -> Result<GetBlockTemplate> {
-                // self.call("getblocktemplate", &[into_json(request)?])
-                let res =  GetBlockTemplateTemplateRequest {
-                    rules: Vec::new(),
-                }
-                self.inner.get_block_template(res)
+                // Curated `TemplateRequest` -> the wrapper's own request struct (`rules` is
+                // `Vec<TemplateRules>` here, `Vec<String>` there; both serialize to Core's shape).
+                let req: $crate::client_async::$v::mining::GetBlockTemplateTemplateRequest =
+                    serde_json::from_value(into_json(request)?)?;
+                let res = self.rt.block_on(self.inner.get_block_template(req)).map_err(Self::map_err)?;
+                // Generated `GetBlockTemplate` is an untagged Null/Text/Object enum with no
+                // `into_model`; the test consumes the curated struct, so convert back through JSON.
+                Ok(serde_json::from_value(into_json(res)?)?)
             }
 
             pub fn get_mining_info(&self) -> Result<GetMiningInfo> {
-                self.call("getmininginfo", &[])
-
-                let async_client = self.inner;
+                let res = self.rt.block_on(self.inner.get_mining_info()).map_err(Self::map_err)?;
+                Ok(serde_json::from_value(into_json(res)?)?)
             }
 
             pub fn get_network_hash_ps(&self) -> Result<f64> {
-                self.call("getnetworkhashps", &[])
+                Ok(*self.rt.block_on(self.inner.get_network_hash_ps()).map_err(Self::map_err)?)
             }
 
             pub fn get_prioritised_transactions(&self) -> Result<GetPrioritisedTransactions> {
-                self.call("getprioritisedtransactions", &[])
+                let res = self
+                    .rt
+                    .block_on(self.inner.get_prioritised_transactions())
+                    .map_err(Self::map_err)?;
+                Ok(serde_json::from_value(into_json(res)?)?)
             }
 
             pub fn prioritise_transaction(
@@ -147,26 +155,25 @@ macro_rules! impl_async_bridges {
                 txid: &Txid,
                 fee_delta: bitcoin::SignedAmount,
             ) -> Result<bool> {
-                let sats = fee_delta.to_sat();
-                self.call("prioritisetransaction", &[into_json(txid)?, 0.into(), sats.into()])
+                let res = self
+                    .rt
+                    .block_on(self.inner.prioritise_transaction(txid.to_string(), fee_delta.to_sat()))
+                    .map_err(Self::map_err)?;
+                Ok(*res)
             }
 
             pub fn submit_block(&self, block: &Block) -> Result<()> {
-                let hex: String = bitcoin::consensus::encode::serialize_hex(block);
-                match self.call("submitblock", &[into_json(hex)?]) {
-                    Ok(serde_json::Value::Null) => Ok(()),
-                    Ok(res) => Err(Error::Returned(res.to_string())),
-                    Err(err) => Err(err.into()),
+                let hex = bitcoin::consensus::encode::serialize_hex(block);
+                match self.rt.block_on(self.inner.submit_block(hex)).map_err(Self::map_err)? {
+                    $crate::types::$v::generated::SubmitBlock::Null(()) => Ok(()),
+                    $crate::types::$v::generated::SubmitBlock::Text(reason) =>
+                        Err(Error::Returned(reason)),
                 }
             }
 
             pub fn submit_header(&self, header: &bitcoin::block::Header) -> Result<()> {
                 let hexdata = bitcoin::consensus::encode::serialize_hex(header);
-                match self.call("submitheader", &[hexdata.into()]) {
-                    Ok(serde_json::Value::Null) => Ok(()),
-                    Ok(res) => Err(Error::Returned(res.to_string())),
-                    Err(err) => Err(err.into()),
-                }
+                self.rt.block_on(self.inner.submit_header(hexdata)).map_err(Self::map_err)
             }
         }
     };
