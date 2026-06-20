@@ -46,8 +46,14 @@ fn into_json<T: Serialize>(val: T) -> Result<Value> { Ok(serde_json::to_value(va
 /// The version-specific response-type namespace the integration tests import under
 /// `test-async`. Mirrors `crate::types::v31` (the curated types the facade's macro
 /// methods return) so `bitcoind::vtype` resolves the same names whether `node.client` is
-/// the sync client or this facade.
+/// the sync client or this facade. The exception: methods bridged through the async client's
+/// GENERATED `into_model` re-export the generated response type for that name (an explicit
+/// `pub use` shadows the glob), so the unchanged test runs the generated `into_model`.
 pub mod vtype {
+    // `get_mining_info` is bridged through the async client's generated wrapper and returns
+    // the generated `GetMiningInfo`; expose it (and its error) here so the test's
+    // `into_model()` is the generated one.
+    pub use crate::types::v31::generated::{GetMiningInfo, GetMiningInfoError};
     pub use crate::types::v31::*;
 }
 

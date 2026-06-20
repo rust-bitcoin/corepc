@@ -133,9 +133,14 @@ macro_rules! impl_async_bridges {
                 Ok(serde_json::from_value(into_json(res)?)?)
             }
 
-            pub fn get_mining_info(&self) -> Result<GetMiningInfo> {
-                let res = self.rt.block_on(self.inner.get_mining_info()).map_err(Self::map_err)?;
-                Ok(serde_json::from_value(into_json(res)?)?)
+            // `get_mining_info` returns the GENERATED response type directly (no JSON round-trip):
+            // the facade's `vtype` shim re-exports the generated `GetMiningInfo`/`GetMiningInfoError`
+            // for these names, so the unchanged test's `json.into_model()` runs the GENERATED
+            // `into_model`, not the curated one. This is the explicit path; the other struct methods
+            // still round-trip to the curated type (their generated `into_model` is missing or their
+            // test pins the curated error type).
+            pub fn get_mining_info(&self) -> Result<$crate::types::$v::generated::GetMiningInfo> {
+                self.rt.block_on(self.inner.get_mining_info()).map_err(Self::map_err)
             }
 
             pub fn get_network_hash_ps(&self) -> Result<f64> {

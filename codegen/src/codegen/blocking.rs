@@ -73,9 +73,15 @@ pub(crate) fn emit_blocking(version: &str, sync_mod_src: &str) -> String {
          /// The version-specific response-type namespace the integration tests import under\n\
          /// `test-async`. Mirrors `crate::types::v{version}` (the curated types the facade's macro\n\
          /// methods return) so `bitcoind::vtype` resolves the same names whether `node.client` is\n\
-         /// the sync client or this facade.\n\
+         /// the sync client or this facade. The exception: methods bridged through the async client's\n\
+         /// GENERATED `into_model` re-export the generated response type for that name (an explicit\n\
+         /// `pub use` shadows the glob), so the unchanged test runs the generated `into_model`.\n\
          pub mod vtype {{\n    \
-             pub use crate::types::v{version}::*;\n\
+             pub use crate::types::v{version}::*;\n    \
+             // `get_mining_info` is bridged through the async client's generated wrapper and returns\n    \
+             // the generated `GetMiningInfo`; expose it (and its error) here so the test's\n    \
+             // `into_model()` is the generated one.\n    \
+             pub use crate::types::v{version}::generated::{{GetMiningInfo, GetMiningInfoError}};\n\
          }}\n\n\
          /// A blocking JSON-RPC client that drives the async `v{version}` production client.\n\
          pub struct Client {{\n    \
