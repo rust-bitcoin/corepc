@@ -362,5 +362,5 @@ pub use crate::{
         LastProcessedBlock, LastProcessedBlockError, LoadTxOutSet, LoadTxOutSetError, LoadWallet,
         PeerInfo, ScanBlocksStart, UnloadWallet, WalletProcessPsbt, WalletProcessPsbtError,
     },
-    v27::{GetPrioritisedTransactions, PrioritisedTransaction},
+    v27::{GetPrioritisedTransactions, GetPrioritisedTransactionsError, PrioritisedTransaction},
 };

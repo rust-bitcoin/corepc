@@ -251,7 +251,7 @@
 mod mining;
 
 #[doc(inline)]
-pub use self::mining::{GetPrioritisedTransactions, PrioritisedTransaction};
+pub use self::mining::{GetPrioritisedTransactions, GetPrioritisedTransactionsError, PrioritisedTransaction};
 #[doc(inline)]
 pub use crate::{
     v17::{

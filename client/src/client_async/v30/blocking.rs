@@ -50,10 +50,13 @@ fn into_json<T: Serialize>(val: T) -> Result<Value> { Ok(serde_json::to_value(va
 /// GENERATED `into_model` re-export the generated response type for that name (an explicit
 /// `pub use` shadows the glob), so the unchanged test runs the generated `into_model`.
 pub mod vtype {
-    // `get_mining_info` is bridged through the async client's generated wrapper and returns
-    // the generated `GetMiningInfo`; expose it (and its error) here so the test's
-    // `into_model()` is the generated one.
-    pub use crate::types::v30::generated::{GetMiningInfo, GetMiningInfoError};
+    // Methods bridged through the async client's generated wrapper return the generated
+    // response type; expose it (and its `into_model` error) here so the unchanged test's
+    // `into_model()` is the generated one. An explicit `pub use` shadows the glob above.
+    pub use crate::types::v30::generated::{
+        GetMiningInfo, GetMiningInfoError, GetPrioritisedTransactions,
+        GetPrioritisedTransactionsError,
+    };
     pub use crate::types::v30::*;
 }
 

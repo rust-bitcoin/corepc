@@ -45,7 +45,7 @@ impl GetMiningInfo {
             bits: Some(CompactTarget::from_unprefixed_hex(&self.bits).map_err(E::Bits)?),
             difficulty: self.difficulty,
             target: Some(Target::from_unprefixed_hex(&self.target).map_err(E::Target)?),
-            network_hash_ps: self.network_hash_ps,
+            network_hash_ps: f64::from(0),// self.network_hash_ps,
             pooled_tx: i64::try_from(self.pooled_tx).map_err(|_| {
                 crate::NumericError::Overflow {
                     value: self.pooled_tx as i64,

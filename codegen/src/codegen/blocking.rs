@@ -78,10 +78,13 @@ pub(crate) fn emit_blocking(version: &str, sync_mod_src: &str) -> String {
          /// `pub use` shadows the glob), so the unchanged test runs the generated `into_model`.\n\
          pub mod vtype {{\n    \
              pub use crate::types::v{version}::*;\n    \
-             // `get_mining_info` is bridged through the async client's generated wrapper and returns\n    \
-             // the generated `GetMiningInfo`; expose it (and its error) here so the test's\n    \
-             // `into_model()` is the generated one.\n    \
-             pub use crate::types::v{version}::generated::{{GetMiningInfo, GetMiningInfoError}};\n\
+             // Methods bridged through the async client's generated wrapper return the generated\n    \
+             // response type; expose it (and its `into_model` error) here so the unchanged test's\n    \
+             // `into_model()` is the generated one. An explicit `pub use` shadows the glob above.\n    \
+             pub use crate::types::v{version}::generated::{{\n        \
+                 GetMiningInfo, GetMiningInfoError, GetPrioritisedTransactions,\n        \
+                 GetPrioritisedTransactionsError,\n    \
+             }};\n\
          }}\n\n\
          /// A blocking JSON-RPC client that drives the async `v{version}` production client.\n\
          pub struct Client {{\n    \

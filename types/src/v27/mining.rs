@@ -23,6 +23,10 @@ pub struct GetPrioritisedTransactions(
     pub BTreeMap<String, PrioritisedTransaction>,
 );
 
+/// Error returned when converting [`GetPrioritisedTransactions`] into the model type (the only
+/// fallible step is parsing a map key as a [`Txid`]).
+pub type GetPrioritisedTransactionsError = hex::HexToArrayError;
+
 /// An individual prioritised transaction. Part of `getprioritisedtransactions`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]

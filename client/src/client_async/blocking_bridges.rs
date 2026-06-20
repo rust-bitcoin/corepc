@@ -147,12 +147,14 @@ macro_rules! impl_async_bridges {
                 Ok(*self.rt.block_on(self.inner.get_network_hash_ps()).map_err(Self::map_err)?)
             }
 
-            pub fn get_prioritised_transactions(&self) -> Result<GetPrioritisedTransactions> {
-                let res = self
-                    .rt
-                    .block_on(self.inner.get_prioritised_transactions())
-                    .map_err(Self::map_err)?;
-                Ok(serde_json::from_value(into_json(res)?)?)
+            // Like `get_mining_info`: returns the GENERATED response type, so the test's
+            // `into_model()` runs the generated conversion. The curated side exposes a
+            // `GetPrioritisedTransactionsError` alias (= `hex::HexToArrayError`) under the same name
+            // so the one shared test annotation resolves on both backends.
+            pub fn get_prioritised_transactions(
+                &self,
+            ) -> Result<$crate::types::$v::generated::GetPrioritisedTransactions> {
+                self.rt.block_on(self.inner.get_prioritised_transactions()).map_err(Self::map_err)
             }
 
             pub fn prioritise_transaction(
