@@ -1,3 +1,7 @@
+# Unreleased
+
+* Use `Duration` for `Request::with_timeout` [#642](https://github.com/rust-bitcoin/corepc/pull/642)
+
 # 0.3.7 - 2026-05-28
 
 * Some pipeline fixes in `bitreq` [#584](https://github.com/rust-bitcoin/corepc/pull/584)

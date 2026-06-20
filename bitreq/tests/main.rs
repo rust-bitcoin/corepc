@@ -4,6 +4,7 @@ extern crate bitreq;
 mod setup;
 
 use std::io;
+use std::time::Duration;
 
 use self::setup::*;
 
@@ -35,7 +36,8 @@ async fn test_json_using_serde() {
 #[tokio::test]
 async fn test_timeout_too_low() {
     setup();
-    let request = bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(1);
+    let request =
+        bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(Duration::from_secs(1));
     let result = maybe_make_request(request, true).await;
     assert!(result.is_err());
 }
@@ -43,7 +45,8 @@ async fn test_timeout_too_low() {
 #[tokio::test]
 async fn test_timeout_high_enough() {
     setup();
-    let request = bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(3);
+    let request =
+        bitreq::get(url("/slow_a")).with_body("Q".to_string()).with_timeout(Duration::from_secs(3));
     let result = maybe_make_request(request, true).await.unwrap();
     assert_eq!(result.as_str().unwrap(), "j: Q");
 }
@@ -178,8 +181,8 @@ async fn test_patch() {
 #[tokio::test]
 async fn tcp_connect_timeout() {
     let _listener = std::net::TcpListener::bind("127.0.0.1:32162").unwrap();
-    let request =
-        bitreq::Request::new(bitreq::Method::Get, "http://127.0.0.1:32162").with_timeout(1);
+    let request = bitreq::Request::new(bitreq::Method::Get, "http://127.0.0.1:32162")
+        .with_timeout(Duration::from_secs(1));
     let resp = maybe_make_request(request, true).await;
     assert!(resp.is_err());
     if let Some(bitreq::Error::IoError(err)) = resp.err() {
@@ -254,8 +257,9 @@ async fn test_future_drop_doesnt_hang() {
     // Here our cancellation detection should kick in, allowing the second request to open a fresh
     // connection and get a response immediately.
     let timesout = client.send_async(bitreq::get("http://example.com").with_pipelining());
-    let request =
-        client.send_async(bitreq::get("http://example.com").with_timeout(10).with_pipelining());
+    let request = client.send_async(
+        bitreq::get("http://example.com").with_timeout(Duration::from_secs(10)).with_pipelining(),
+    );
 
     let start = Instant::now();
     let (timedout, response) =
