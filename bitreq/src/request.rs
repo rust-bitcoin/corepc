@@ -89,7 +89,7 @@ pub struct Request {
     params: Vec<(String, String)>,
     headers: BTreeMap<String, String>,
     body: Option<Vec<u8>>,
-    timeout: Option<u64>,
+    timeout: Option<Duration>,
     pub(crate) pipelining: bool,
     pub(crate) max_headers_size: Option<usize>,
     pub(crate) max_status_line_len: Option<usize>,
@@ -185,8 +185,8 @@ impl Request {
         }
     }
 
-    /// Sets the request timeout in seconds.
-    pub fn with_timeout(mut self, timeout: u64) -> Request {
+    /// Sets the request timeout.
+    pub fn with_timeout(mut self, timeout: Duration) -> Request {
         self.timeout = Some(timeout);
         self
     }
@@ -403,10 +403,10 @@ impl ParsedRequest {
         }
 
         let timeout = config.timeout.or_else(|| match env::var("BITREQ_TIMEOUT") {
-            Ok(t) => t.parse::<u64>().ok(),
+            Ok(t) => t.parse::<u64>().ok().map(Duration::from_secs),
             Err(_) => None,
         });
-        let timeout_at = timeout.map(|t| Instant::now() + Duration::from_secs(t));
+        let timeout_at = timeout.map(|t| Instant::now() + t);
 
         Ok(ParsedRequest { url, redirects: Vec::new(), config, timeout_at })
     }
