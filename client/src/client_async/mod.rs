@@ -11,6 +11,12 @@ mod client;
 #[cfg(feature = "blocking")]
 pub mod blocking;
 
+// Defines `impl_async_bridges!`, the facade's hand-written isolation bridges (real Rust, not codegen
+// string templates). Only the blocking facade uses it.
+#[cfg(feature = "blocking")]
+#[macro_use]
+mod blocking_bridges;
+
 pub mod error;
 
 // Exactly one version module is compiled (its methods hang off the single `Client`). When several

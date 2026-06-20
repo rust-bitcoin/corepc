@@ -1,0 +1,118 @@
+// SPDX-License-Identifier: CC0-1.0
+
+//! Isolation bridges for the async blocking facade.
+//!
+//! These are the methods the facade implements *itself* instead of reusing the sync client's
+//! `impl_client_*` macros, so a bug in the sync argument-encoding cannot reach the async path. The
+//! generated `client_async/v{N}/blocking.rs` invokes [`impl_async_bridges!`] once and skips the
+//! matching sync macros.
+//!
+//! Unlike codegen string templates, this is real Rust: the compiler, `rustfmt` and `rust-analyzer`
+//! all check it. The version is passed as a token (`impl_async_bridges!(v31)`) so the
+//! version-specific paths (`$crate::types::v31::...`) resolve; the curated response types are
+//! resolved unqualified at the call site via the facade's `use crate::types::v{N}::*`.
+//!
+//! Adding a bridge: add the method here AND add its sync-macro suffix to `BRIDGED_METHODS` in
+//! `codegen/src/codegen/blocking.rs` so the reused sync macro is skipped (no duplicate definition).
+
+/// Emit the blocking facade's bridged methods for version `$v`, e.g. `impl_async_bridges!(v31)`.
+///
+/// Expanded inside `client_async/v{N}/blocking.rs`, where `Client`, `Result`, `Error`, `into_json`,
+/// `AddressType` and the curated response types are all in scope.
+#[macro_export]
+macro_rules! impl_async_bridges {
+    ($v:ident) => {
+        // == Wallet ==
+        // `getnewaddress` routes through the GENERATED async wrapper (its own argument encoding),
+        // NOT the reused sync macro, so the sync client's arg-encoding (and any bug in it) cannot
+        // reach the async path.
+        impl Client {
+            fn get_new_address_generated(
+                &self,
+                label: Option<&str>,
+                ty: Option<AddressType>,
+            ) -> Result<$crate::types::$v::generated::GetNewAddress> {
+                let address_type = match ty {
+                    Some(ty) => Some(serde_json::from_value::<String>(into_json(ty)?)?),
+                    None => None,
+                };
+                let opts = $crate::client_async::$v::wallet::GetNewAddressOptions {
+                    label: label.map(str::to_owned),
+                    address_type,
+                };
+                self.rt.block_on(self.inner.get_new_address_with(opts)).map_err(Self::map_err)
+            }
+
+            /// Low-level `getnewaddress` (matches the sync client's signature).
+            pub fn get_new_address(
+                &self,
+                label: Option<&str>,
+                ty: Option<AddressType>,
+            ) -> Result<$crate::types::$v::generated::GetNewAddress> {
+                self.get_new_address_generated(label, ty)
+            }
+
+            /// Gets a new address and parses it assuming it is correct.
+            pub fn new_address(&self) -> Result<bitcoin::Address> {
+                let model = self.get_new_address_generated(None, None)?.into_model().unwrap();
+                Ok(model.0.assume_checked())
+            }
+
+            /// Gets a new address of the given type and parses it assuming it is correct.
+            pub fn new_address_with_type(&self, ty: AddressType) -> Result<bitcoin::Address> {
+                let model = self.get_new_address_generated(None, Some(ty))?.into_model().unwrap();
+                Ok(model.0.assume_checked())
+            }
+
+            /// Gets a new address with a label and parses it assuming it is correct (unchecked).
+            pub fn new_address_with_label(
+                &self,
+                label: &str,
+            ) -> Result<bitcoin::Address<bitcoin::address::NetworkUnchecked>> {
+                let model = self.get_new_address_generated(Some(label), None)?.into_model().unwrap();
+                Ok(model.0)
+            }
+        }
+
+        // == Generating ==
+        // These RPCs are not in Core's OpenRPC, so there is no generated async wrapper to route
+        // through; the facade owns a raw `self.call`, which still isolates it from the sync macro.
+        impl Client {
+            pub fn generate_block(
+                &self,
+                output: &str,
+                transactions: &[String],
+                submit: bool,
+            ) -> Result<GenerateBlock> {
+                self.call(
+                    "generateblock",
+                    &[into_json(output)?, into_json(transactions)?, into_json(submit)?],
+                )
+            }
+
+            pub fn generate_to_address(
+                &self,
+                nblocks: usize,
+                address: &bitcoin::Address,
+            ) -> Result<GenerateToAddress> {
+                self.call("generatetoaddress", &[nblocks.into(), into_json(address)?])
+            }
+
+            pub fn generate_to_descriptor(
+                &self,
+                nblocks: usize,
+                descriptor: &str,
+            ) -> Result<GenerateToDescriptor> {
+                self.call("generatetodescriptor", &[nblocks.into(), descriptor.into()])
+            }
+
+            pub fn invalidate_block(&self, hash: BlockHash) -> Result<()> {
+                match self.call("invalidateblock", &[into_json(hash)?]) {
+                    Ok(serde_json::Value::Null) => Ok(()),
+                    Ok(res) => Err(Error::Returned(res.to_string())),
+                    Err(err) => Err(err.into()),
+                }
+            }
+        }
+    };
+}

@@ -22,7 +22,11 @@ pub extern crate bitcoin;
 /// Re-export the `corepc-types` crate.
 pub extern crate types;
 
-#[cfg(feature = "client-sync")]
+// `client_sync` holds the sync `Client` plus the shared `impl_client_*` macros and request types
+// the async blocking facade reuses. Compile it whenever either client is enabled, so `blocking`
+// (which does NOT turn on `client-sync`) still has the macros/types. The sync `Client` it also
+// defines is simply unused in an async-only build.
+#[cfg(any(feature = "client-sync", feature = "client-async"))]
 #[macro_use]
 pub mod client_sync;
 

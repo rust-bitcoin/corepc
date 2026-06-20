@@ -29,9 +29,10 @@ client-sync = ["jsonrpc"]
 # raw types for the active version feature (e.g. `30_0`, default).
 client-async = ["jsonrpc", "jsonrpc/bitreq_http_async", "30_0"]
 # A blocking, sync-API facade over the async client (drives it on a single-thread runtime). It
-# reuses the sync client's method macros, so the sync integration tests run unchanged against the
-# async transport.
-blocking = ["client-sync", "client-async", "dep:tokio"]
+# reuses the shared `impl_client_*` method macros and request types (which compile alongside under
+# `client-async`, see `lib.rs`), so the integration tests run unchanged against the async transport.
+# It deliberately does NOT enable `client-sync`: the async build does not depend on the sync client.
+blocking = ["client-async", "dep:tokio"]
 
 # Bitcoin Core version selection for the async client. Exactly one is active; when several are
 # enabled (e.g. docs.rs `all-features`) the highest wins via the `cfg` precedence in
