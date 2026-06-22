@@ -134,7 +134,7 @@
 //! | joinpsbts                          | version + model |                                        |
 //! | sendrawtransaction                 | version + model |                                        |
 //! | signrawtransactionwithkey          | version + model | UNTESTED                               |
-//! | submitpackage                      | version + model |                                        |
+//! | submitpackage                      | version + model | UNTESTED                               |
 //! | testmempoolaccept                  | version + model |                                        |
 //! | utxoupdatepsbt                     | version + model |                                        |
 //!
