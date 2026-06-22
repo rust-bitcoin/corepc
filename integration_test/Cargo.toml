@@ -59,6 +59,7 @@ TODO = []                       # This is a dirty hack while writing the tests.
 
 [dependencies]
 bitcoin = { version = "0.32.0", default-features = false, features = ["std", "serde"] }
+corepc-client = { version = "0.15.0", path = "../client", default-features = false, features = ["client-async"] }
 env_logger = "0.9.0"
 bitcoind = { package = "bitcoind", version = "0.41.0", path = "../bitcoind", default-features = false }
 rand = "0.8.5"
@@ -66,3 +67,4 @@ rand = "0.8.5"
 types = { package = "corepc-types", version = "0.15.0", path = "../types", features = ["serde-deny-unknown-fields"] }
 
 [dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
