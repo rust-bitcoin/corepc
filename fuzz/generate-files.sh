@@ -28,6 +28,9 @@ jsonrpc = { path = "../jsonrpc", features = ["bitreq_http"] }
 serde = { version = "1.0.103", features = [ "derive" ] }
 serde_json = "1.0"
 
+[target.'cfg(fuzzing_debug)'.dependencies]
+memmap2 = "0.9.11"
+
 [lints.rust]
 unexpected_cfgs = { level = "deny", check-cfg = ['cfg(fuzzing)', 'cfg(jsonrpc_fuzz)'] }
 EOF
