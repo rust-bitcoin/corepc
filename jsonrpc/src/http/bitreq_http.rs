@@ -19,16 +19,16 @@ use crate::{Request, Response};
 const DEFAULT_URL: &str = "http://localhost";
 const DEFAULT_PORT: u16 = 8332; // the default RPC port for bitcoind.
 #[cfg(not(jsonrpc_fuzz))]
-const DEFAULT_TIMEOUT_SECONDS: u64 = 15;
+const DEFAULT_TIMEOUT: Duration = Duration::from_secs(15);
 #[cfg(jsonrpc_fuzz)]
-const DEFAULT_TIMEOUT_SECONDS: u64 = 1;
+const DEFAULT_TIMEOUT: Duration = Duration::from_secs(1);
 
 /// An HTTP transport that uses [`bitreq`] and is useful for running a bitcoind RPC client.
 #[derive(Clone, Debug)]
 pub struct BitreqHttpTransport {
     /// URL of the RPC server.
     url: String,
-    /// Timeout only supports second granularity.
+    /// Timeout to use for HTTP requests.
     timeout: Duration,
     /// The value of the `Authorization` HTTP header, i.e., a base64 encoding of 'user:password'.
     basic_auth: Option<String>,
@@ -38,7 +38,7 @@ impl Default for BitreqHttpTransport {
     fn default() -> Self {
         BitreqHttpTransport {
             url: format!("{}:{}", DEFAULT_URL, DEFAULT_PORT),
-            timeout: Duration::from_secs(DEFAULT_TIMEOUT_SECONDS),
+            timeout: DEFAULT_TIMEOUT,
             basic_auth: None,
         }
     }
@@ -51,29 +51,17 @@ impl BitreqHttpTransport {
     /// Returns a builder for [`BitreqHttpTransport`].
     pub fn builder() -> Builder { Builder::new() }
 
-    /// Returns the timeout in whole seconds, rounding positive sub-second values up to one.
-    fn timeout_secs(&self) -> u64 {
-        let secs = self.timeout.as_secs();
-        if secs == 0 && self.timeout > Duration::from_secs(0) {
-            1
-        } else {
-            secs
-        }
-    }
-
     fn request<R>(&self, req: impl serde::Serialize) -> Result<R, Error>
     where
         R: for<'a> serde::de::Deserialize<'a>,
     {
-        let timeout_secs = self.timeout_secs();
-
         let req = match &self.basic_auth {
             Some(auth) => bitreq::Request::new(bitreq::Method::Post, &self.url)
-                .with_timeout(timeout_secs)
+                .with_timeout(self.timeout)
                 .with_header("Authorization", auth)
                 .with_json(&req)?,
             None => bitreq::Request::new(bitreq::Method::Post, &self.url)
-                .with_timeout(timeout_secs)
+                .with_timeout(self.timeout)
                 .with_json(&req)?,
         };
 
