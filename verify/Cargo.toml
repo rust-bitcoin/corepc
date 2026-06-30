@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.93"
+anyhow = "1.0.103"
 clap = { version = "4.5.23", features = ["cargo"] }
 regex = "1"
 syn = { version = "2.0", default-features = false, features = ["full", "parsing"] }
