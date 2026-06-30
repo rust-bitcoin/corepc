@@ -17,6 +17,10 @@ jobs:
       checks: write
     strategy:
       fail-fast: false
+      # rustsec/audit-check skips advisories that are already mentioned in an
+      # open issue, but when jobs run concurrently duplicate issues are created.
+      # Run one at a time so that issues created are seen by the next jobs.
+      max-parallel: 1
       matrix:
         lockfile: [Cargo.lock, Cargo-minimal.lock, Cargo-recent.lock]
     steps:
