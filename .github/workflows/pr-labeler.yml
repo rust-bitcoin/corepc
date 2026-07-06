@@ -26,6 +26,7 @@ jobs:
               }
             );
 
+            // Paths of all the managed labels
             const filePathsToLabels = {
               'bitcoind/': 'C-bitcoind',
               'bitreq/': 'C-bitreq',
@@ -49,6 +50,9 @@ jobs:
               }
             });
 
+            const allKnownLabels = new Set(Object.values(filePathsToLabels));
+
+            // Add new managed labels.
             if (labelsToAdd.size > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -56,4 +60,27 @@ jobs:
                 issue_number: context.issue.number,
                 labels: Array.from(labelsToAdd)
               });
+            }
+
+            // Remove any managed labels that no longer apply.
+            const currentLabels = (await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })).data.map(label => label.name);
+
+            for (const label of currentLabels) {
+              if (allKnownLabels.has(label) && !labelsToAdd.has(label)) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.issue.number,
+                    name: label,
+                  });
+                } catch (e) {
+                  // Ignore 404 in case the label was already removed externally.
+                  if (e.status !== 404) throw e;
+                }
+              }
             }
