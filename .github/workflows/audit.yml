@@ -17,6 +17,8 @@ jobs:
       checks: write
     strategy:
       fail-fast: false
+      # Run one at a time, otherwise parallel jobs create the same advisory issue twice.
+      max-parallel: 1
       matrix:
         lockfile: [Cargo.lock, Cargo-minimal.lock, Cargo-recent.lock]
     steps:
