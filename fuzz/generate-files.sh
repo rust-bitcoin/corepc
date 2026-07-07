@@ -23,13 +23,13 @@ cargo-fuzz = true
 
 [dependencies]
 honggfuzz = { version = "0.5.55", default-features = false }
-jsonrpc = { path = "..", features = ["bitreq_http"] }
+jsonrpc = { path = "../jsonrpc", features = ["bitreq_http"] }
 
 serde = { version = "1.0.103", features = [ "derive" ] }
 serde_json = "1.0"
 
 [lints.rust]
-unexpected_cfgs = { level = "deny", check-cfg = ['cfg(fuzzing)'] }
+unexpected_cfgs = { level = "deny", check-cfg = ['cfg(fuzzing)', 'cfg(jsonrpc_fuzz)'] }
 EOF
 
 for targetFile in $(listTargetFiles); do
@@ -80,7 +80,7 @@ $(for name in $(listTargetNames); do echo "          $name,"; done)
           key: cache-\${{ matrix.target }}-\${{ hashFiles('**/Cargo.toml','**/Cargo.lock') }}
       - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: '1.65.0'
+          toolchain: '1.75.0'
       - name: fuzz
         run: |
           if [[ "\${{ matrix.fuzz_target }}" =~ ^bitcoin ]]; then
