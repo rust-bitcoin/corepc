@@ -717,10 +717,26 @@ fn raw_transactions__get_private_broadcast_info__modelled() {
 
 #[test]
 #[cfg(not(feature = "v30_and_below"))]
-fn raw_transactions__abort_private_broadcast() {
-    let node = BitcoinD::with_wallet(Wallet::None, &[]);
+fn raw_transactions__abort_private_broadcast__modelled() {
+    let node =
+        BitcoinD::with_wallet(Wallet::Default, &["-privatebroadcast=1", "-proxy=127.0.0.1:1"]);
+    node.fund_wallet();
 
-    // Aborting a transaction that is not in the private broadcast queue returns an error in regtest.
-    let txid = "0000000000000000000000000000000000000000000000000000000000000001";
-    assert!(node.client.abort_private_broadcast(txid).is_err());
+    // Create a signed transaction and send it via private broadcast.
+    let tx = create_a_raw_transaction(&node);
+    let signed = node
+        .client
+        .sign_raw_transaction_with_wallet(&tx)
+        .expect("signrawtransactionwithwallet")
+        .into_model()
+        .expect("SignRawTransaction into model")
+        .tx;
+    let send = node.client.send_raw_transaction(&signed).expect("sendrawtransaction");
+
+    let json: AbortPrivateBroadcast =
+        node.client.abort_private_broadcast(&send.0).expect("abortprivatebroadcast");
+    let model: Result<mtype::AbortPrivateBroadcast, encode::FromHexError> = json.into_model();
+    let abort = model.unwrap();
+
+    assert_eq!(abort.removed_transactions, &[signed]);
 }
