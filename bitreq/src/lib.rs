@@ -99,6 +99,7 @@
 //! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 //! # use std::thread;
+//! # use std::time::Duration;
 //! # use tiny_http::{Response, Server};
 //! #
 //! # let server = Server::http("127.0.0.1:0")?;
@@ -109,8 +110,9 @@
 //! #     let _ = request.respond(response);
 //! # });
 //! #
+//! #
 //! # let url = format!("http://{addr}/");
-//! let response = bitreq::get(&url).with_timeout(10).send()?;
+//! let response = bitreq::get(&url).with_timeout(Duration::from_secs(10)).send()?;
 //! assert!(response.as_str()?.contains("</html>"));
 //! assert_eq!(200, response.status_code);
 //! assert_eq!("OK", response.reason_phrase);
@@ -178,15 +180,17 @@
 //! ## Timeouts
 //!
 //! To avoid timing out, or limit the request's response time, use
-//! `with_timeout(n)` before `send()`. The given value is in seconds.
+//! `with_timeout(duration)` before `send()`.
 //!
 //! NOTE: There is no timeout by default.
 //!
 //! ```no_run
 //! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! use std::time::Duration;
+//!
 //! let response = bitreq::post("http://example.com")
-//!     .with_timeout(10)
+//!     .with_timeout(Duration::from_secs(10))
 //!     .send()?;
 //! # Ok(()) }
 //! # #[cfg(not(feature = "std"))]
@@ -226,7 +230,7 @@
 //! - Use [`with_timeout`](struct.Request.html#method.with_timeout) on
 //!   your request to set the timeout per-request like so:
 //!   ```text,ignore
-//!   bitreq::get("/").with_timeout(8).send();
+//!   bitreq::get("/").with_timeout(Duration::from_secs(8)).send();
 //!   ```
 //! - Set the environment variable `BITREQ_TIMEOUT` to the desired
 //!   amount of seconds until timeout. Ie. if you have a program called
