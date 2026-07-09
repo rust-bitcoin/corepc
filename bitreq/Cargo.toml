@@ -20,6 +20,9 @@ serde_json = { version = "1.0.0", default-features = false, features = ["std"], 
 # For the proxy feature:
 base64 = { version = "0.22", default-features = false, features = ["alloc"], optional = true }
 
+log = { version = "0.4.0", default-features = false, optional = true }
+
+[target.'cfg(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))))'.dependencies]
 # For rustls-based TLS:
 rustls = { version = "0.23.38", default-features = false, features = ["ring", "std", "tls12"], optional = true }
 rustls-native-certs = { version = "0.8.3", default-features = false, optional = true }
@@ -34,9 +37,14 @@ tokio = { version = "1.0", default-features = false, features = ["rt", "net", "i
 tokio-rustls = { version = "0.26.4", default-features = false, optional = true }
 tokio-native-tls = { version = "0.3", default-features = false, optional = true }
 
-log = { version = "0.4.0", default-features = false, optional = true }
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+js-sys = { version = "0.3", default-features = false }
+# Keep the wasm-bindgen family compatible with this crate's MSRV.
+wasm-bindgen = { version = ">=0.2, <0.2.118", default-features = false }
+wasm-bindgen-futures = { version = "0.4", default-features = false }
+web-sys = { version = "0.3", default-features = false, features = ["AbortController", "AbortSignal", "Headers", "ReadableStream", "ReadableStreamDefaultReader", "RequestInit", "Response", "Request", "ServiceWorkerGlobalScope"] }
 
-[dev-dependencies]
+[target.'cfg(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))))'.dev-dependencies]
 tiny_http = "0.12"
 tokio = { version = "1.0", default-features = false, features = ["macros", "rt-multi-thread", "time"] }
 proptest = { version = "1", default-features = false, features = ["std"] }
@@ -86,6 +94,6 @@ uninlined_format_args = "allow"
 
 [lints.rust.unexpected_cfgs]
 level = "warn"
-check-cfg = ["cfg(fuzzing)"]
+check-cfg = ["cfg(fuzzing)", "cfg(bitreq_wasm)"]
 
 # vim: ft=conf

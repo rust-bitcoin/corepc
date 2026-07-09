@@ -1,20 +1,20 @@
 use alloc::collections::BTreeMap;
 use core::str;
-#[cfg(feature = "async")]
+#[cfg(all(feature = "async", not(bitreq_wasm)))]
 use std::future::Future;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 use std::io::{self, BufReader, Bytes, Read};
 
-#[cfg(feature = "async")]
+#[cfg(all(feature = "async", not(bitreq_wasm)))]
 use tokio::io::{AsyncRead, AsyncReadExt};
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 use crate::connection::HttpStream;
 use crate::Error;
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 const BACKING_READ_BUFFER_LENGTH: usize = 16 * 1024;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 const MAX_CONTENT_LENGTH: usize = 16 * 1024;
 
 /// An HTTP response.
@@ -24,13 +24,13 @@ const MAX_CONTENT_LENGTH: usize = 16 * 1024;
 /// # Example
 ///
 /// ```no_run
-/// # #[cfg(feature = "std")]
 /// # fn main() -> Result<(), bitreq::Error> {
+/// # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+/// # {
 /// let response = bitreq::get("http://example.com").send()?;
 /// println!("{}", response.as_str()?);
+/// # }
 /// # Ok(()) }
-/// # #[cfg(not(feature = "std"))]
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 /// ```
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Response {
@@ -50,6 +50,20 @@ pub struct Response {
     body: Vec<u8>,
 }
 
+#[cfg(bitreq_wasm)]
+impl Response {
+    pub(crate) fn from_parts(
+        status_code: i32,
+        reason_phrase: String,
+        headers: BTreeMap<String, String>,
+        url: String,
+        body: Vec<u8>,
+    ) -> Response {
+        Response { status_code, reason_phrase, headers, url, body }
+    }
+}
+
+#[cfg(not(bitreq_wasm))]
 impl Response {
     #[cfg(feature = "std")]
     pub(crate) fn create(
@@ -74,13 +88,13 @@ impl Response {
         Ok(Response { status_code, reason_phrase, headers, url, body })
     }
 
-    #[cfg(feature = "async")]
     /// Fully read a [`Response`] from an async stream.
     ///
     /// When this crate was originally made "async", it actually just spawned sync requests on
     /// background threads and waited on their completion rather than actually doing async reads.
     /// In order to avoid changing the API while fixing this, we read the full response but then
     /// return a "lazy" response that has the full contents pre-read.
+    #[cfg(feature = "async")]
     pub(crate) async fn create_async<R: AsyncRead + Unpin>(
         mut stream: R,
         is_head: bool,
@@ -150,7 +164,9 @@ impl Response {
 
         Ok(Response { status_code, reason_phrase, headers, url: String::new(), body })
     }
+}
 
+impl Response {
     /// Returns the body as an `&str`.
     ///
     /// # Errors
@@ -163,14 +179,14 @@ impl Response {
     /// # Example
     ///
     /// ```no_run
-    /// # #[cfg(feature = "std")]
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+    /// # {
     /// # let url = "http://example.org/";
     /// let response = bitreq::get(url).send()?;
     /// println!("{}", response.as_str()?);
+    /// # }
     /// # Ok(()) }
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
     /// ```
     pub fn as_str(&self) -> Result<&str, Error> {
         match str::from_utf8(&self.body) {
@@ -186,14 +202,14 @@ impl Response {
     /// # Example
     ///
     /// ```no_run
-    /// # #[cfg(feature = "std")]
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+    /// # {
     /// # let url = "http://example.org/";
     /// let response = bitreq::get(url).send()?;
     /// println!("{:?}", response.as_bytes());
+    /// # }
     /// # Ok(()) }
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
     /// ```
     pub fn as_bytes(&self) -> &[u8] { &self.body }
 
@@ -204,16 +220,16 @@ impl Response {
     /// # Example
     ///
     /// ```no_run
-    /// # #[cfg(feature = "std")]
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+    /// # {
     /// # let url = "http://example.org/";
     /// let response = bitreq::get(url).send()?;
     /// println!("{:?}", response.into_bytes());
     /// // This would error, as into_bytes consumes the Response:
     /// // let x = response.status_code;
+    /// # }
     /// # Ok(()) }
-    /// # #[cfg(not(feature = "std"))]
-    /// # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
     /// ```
     pub fn into_bytes(self) -> Vec<u8> { self.body }
 
@@ -234,10 +250,13 @@ impl Response {
     /// use serde_json::Value;
     ///
     /// # fn main() -> Result<(), bitreq::Error> {
+    /// # #[cfg(not(bitreq_wasm))]
+    /// # {
     /// # let url_to_json_resource = "http://example.org/resource.json";
     /// // Value could be any type that implements Deserialize!
     /// let user = bitreq::get(url_to_json_resource).send()?.json::<Value>()?;
     /// println!("User name is '{}'", user["name"]);
+    /// # }
     /// # Ok(())
     /// # }
     /// ```
@@ -291,7 +310,7 @@ impl Response {
 /// # #[cfg(not(feature = "std"))]
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 /// ```
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 pub struct ResponseLazy {
     /// The status code of the response, eg. 404.
     pub status_code: i32,
@@ -313,10 +332,10 @@ pub struct ResponseLazy {
     bytes_read: usize,
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 type HttpStreamBytes = Bytes<BufReader<HttpStream>>;
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 impl ResponseLazy {
     pub(crate) fn from_stream(
         stream: HttpStream,
@@ -364,7 +383,7 @@ impl ResponseLazy {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 impl Iterator for ResponseLazy {
     type Item = Result<(u8, usize), Error>;
 
@@ -396,7 +415,7 @@ impl Iterator for ResponseLazy {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 impl Read for ResponseLazy {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let mut index = 0;
@@ -422,7 +441,7 @@ impl Read for ResponseLazy {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 enum HttpStreamState {
     // No Content-Length, and Transfer-Encoding != chunked, so we just
     // read unti lthe server closes the connection (this should be the
@@ -442,7 +461,7 @@ enum HttpStreamState {
 // constructors, but not in their structs, for api-cleanliness
 // reasons. (Eg. response.status_code is much cleaner than
 // response.meta.status_code or similar.)
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 struct ResponseMetadata {
     status_code: i32,
     reason_phrase: String,
@@ -451,6 +470,7 @@ struct ResponseMetadata {
     max_trailing_headers_size: Option<usize>,
 }
 
+#[cfg(not(bitreq_wasm))]
 macro_rules! maybe_await {
     ($e: expr, await) => {
         $e.await
@@ -460,17 +480,18 @@ macro_rules! maybe_await {
     };
 }
 
-#[cfg(feature = "async")]
 /// We need to mungle [`AsyncRead`] to look like an iterator, which we do here.
+#[cfg(all(feature = "async", not(bitreq_wasm)))]
 trait AsyncIteratorReadExt {
     fn next(&mut self) -> impl Future<Output = Option<Result<u8, io::Error>>>;
 }
 
-#[cfg(feature = "async")]
+#[cfg(all(feature = "async", not(bitreq_wasm)))]
 impl<T: AsyncReadExt + Unpin> AsyncIteratorReadExt for T {
     async fn next(&mut self) -> Option<Result<u8, io::Error>> { Some(self.read_u8().await) }
 }
 
+#[cfg(not(bitreq_wasm))]
 macro_rules! define_read_methods {
     (($read_until_closed: ident, $read_with_content_length: ident, $read_trailers: ident, $read_chunked: ident, $read_metadata: ident, $read_line: ident)<$($arg: ident : $($argty: path $(|)?)*),*>, $stream_type: ident $(, $async: tt, $await: tt)?) => {
         $($async)? fn $read_until_closed<$($arg: $($argty +)*),*>(
@@ -697,12 +718,12 @@ macro_rules! define_read_methods {
     }
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 define_read_methods!((read_until_closed, read_with_content_length, read_trailers, read_chunked, read_metadata, read_line)<>, HttpStreamBytes);
-#[cfg(feature = "async")]
+#[cfg(all(feature = "async", not(bitreq_wasm)))]
 define_read_methods!((read_until_closed_async, read_with_content_length_async, read_trailers_async, read_chunked_async, read_metadata_async, read_line_async)<R: AsyncRead | Unpin>, R, async, await);
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 fn parse_status_line(line: &str) -> (i32, String) {
     // sample status line format
     // HTTP/1.1 200 OK
@@ -730,7 +751,7 @@ fn parse_status_line(line: &str) -> (i32, String) {
     (503, "Server did not provide a status line".to_string())
 }
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 fn parse_header(mut line: String) -> Option<(String, String)> {
     if let Some(location) = line.find(':') {
         // Trim the first character of the header if it is a space,

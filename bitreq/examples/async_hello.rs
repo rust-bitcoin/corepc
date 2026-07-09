@@ -1,5 +1,6 @@
 //! This example demonstrates the `async` feature.
 
+#[cfg(not(bitreq_wasm))]
 fn main() -> Result<(), bitreq::Error> {
     let runtime = tokio::runtime::Builder::new_current_thread()
         .build()
@@ -14,3 +15,6 @@ fn main() -> Result<(), bitreq::Error> {
         Ok(())
     })
 }
+
+#[cfg(bitreq_wasm)]
+fn main() {}

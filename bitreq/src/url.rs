@@ -382,37 +382,6 @@ impl Url {
     /// Returns the serialized URL as a string slice.
     pub fn as_str(&self) -> &str { &self.serialization }
 
-    /// Returns `true` if the URL scheme is "https" or "wss".
-    #[cfg(feature = "std")]
-    pub(crate) fn is_https(&self) -> bool { matches!(self.scheme(), "https" | "wss") }
-
-    /// Returns `true` if a non-default port was explicitly specified in the URL.
-    ///
-    /// This is useful for serialization purposes: ports that are the default for
-    /// their scheme (e.g., 80 for `http`) are typically omitted from the URL string.
-    #[cfg(feature = "std")]
-    pub(crate) fn has_explicit_non_default_port(&self) -> bool {
-        match self.port {
-            Some(port) => Some(port) != default_port_for_scheme(self.scheme()),
-            None => false,
-        }
-    }
-
-    /// Returns the combined path and query string.
-    ///
-    /// The returned string includes the leading `/` (if present) and the `?`
-    /// separator (if there's a query string). Returns "/" if the path is empty.
-    #[cfg(feature = "std")]
-    pub(crate) fn path_and_query(&self) -> String {
-        let path = self.path();
-        let path = if path.is_empty() { "/" } else { path };
-
-        match self.query() {
-            Some(query) => format!("{}?{}", path, query),
-            None => path.to_string(),
-        }
-    }
-
     /// Appends query parameters from an iterator to the URL.
     ///
     /// Keys and values are percent-encoded before being appended.
@@ -479,9 +448,39 @@ impl Url {
                 .expect("preserve_fragment_from produced invalid URL");
         }
     }
+}
+
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
+impl Url {
+    /// Returns `true` if the URL scheme is "https" or "wss".
+    pub(crate) fn is_https(&self) -> bool { matches!(self.scheme(), "https" | "wss") }
+
+    /// Returns `true` if a non-default port was explicitly specified in the URL.
+    ///
+    /// This is useful for serialization purposes: ports that are the default for
+    /// their scheme (e.g., 80 for `http`) are typically omitted from the URL string.
+    pub(crate) fn has_explicit_non_default_port(&self) -> bool {
+        match self.port {
+            Some(port) => Some(port) != default_port_for_scheme(self.scheme()),
+            None => false,
+        }
+    }
+
+    /// Returns the combined path and query string.
+    ///
+    /// The returned string includes the leading `/` (if present) and the `?`
+    /// separator (if there's a query string). Returns "/" if the path is empty.
+    pub(crate) fn path_and_query(&self) -> String {
+        let path = self.path();
+        let path = if path.is_empty() { "/" } else { path };
+
+        match self.query() {
+            Some(query) => format!("{}?{}", path, query),
+            None => path.to_string(),
+        }
+    }
 
     /// Writes the `scheme "://" host [ ":" port ]` part to the destination.
-    #[cfg(feature = "std")]
     pub(crate) fn write_base_url_to<W: std::fmt::Write>(&self, dst: &mut W) -> std::fmt::Result {
         write!(dst, "{}://{}", self.scheme(), self.base_url())?;
         if self.has_explicit_non_default_port() {
@@ -491,7 +490,6 @@ impl Url {
     }
 
     /// Writes the `path [ "?" query ] [ "#" fragment ]` part to the destination.
-    #[cfg(feature = "std")]
     pub(crate) fn write_resource_to<W: std::fmt::Write>(&self, dst: &mut W) -> std::fmt::Result {
         let path = self.path();
         let path = if path.is_empty() { "/" } else { path };

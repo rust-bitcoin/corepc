@@ -3,6 +3,7 @@
 
 #![cfg(feature = "std")]
 
+#[cfg(not(bitreq_wasm))]
 fn main() -> Result<(), bitreq::Error> {
     let mut buffer = Vec::new();
     for byte in bitreq::get("http://example.com").send_lazy()? {
@@ -35,14 +36,19 @@ fn main() -> Result<(), bitreq::Error> {
 
 // Helper functions
 
+#[cfg(not(bitreq_wasm))]
 fn flush() {
     use std::io::{stdout, Write};
     stdout().lock().flush().ok();
 }
 
+#[cfg(not(bitreq_wasm))]
 fn sleep() {
     use std::thread::sleep;
     use std::time::Duration;
 
     sleep(Duration::from_millis(2));
 }
+
+#[cfg(bitreq_wasm)]
+fn main() {}

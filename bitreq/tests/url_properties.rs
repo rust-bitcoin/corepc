@@ -1,5 +1,6 @@
 // Property-based tests for URL parsing based on WHATWG URL Standard
 // https://url.spec.whatwg.org/
+#![cfg(not(bitreq_wasm))]
 
 mod common;
 

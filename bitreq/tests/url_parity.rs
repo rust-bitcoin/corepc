@@ -4,6 +4,7 @@
 //
 // Note: We use "special" schemes (http, https, ws, wss, ftp) for parity testing
 // because the url crate treats non-special schemes differently (as opaque paths).
+#![cfg(not(bitreq_wasm))]
 
 mod common;
 

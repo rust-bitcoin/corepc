@@ -1,4 +1,4 @@
-#![cfg(feature = "std")]
+#![cfg(all(feature = "std", not(bitreq_wasm)))]
 
 extern crate bitreq;
 extern crate tiny_http;

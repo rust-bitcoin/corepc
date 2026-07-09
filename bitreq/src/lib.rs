@@ -59,7 +59,7 @@
 //! that return futures for non-blocking operation.
 //!
 //! It also enables [`Client`](struct.Client.html) to reuse TCP connections
-//! across requests.
+//! across requests on native targets.
 //!
 //! ## `async-https` or `async-https-rustls`
 //!
@@ -96,8 +96,9 @@
 //! the response.
 //!
 //! ```
-//! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+//! # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+//! # {
 //! # use std::thread;
 //! # use std::time::Duration;
 //! # use tiny_http::{Response, Server};
@@ -117,9 +118,8 @@
 //! assert_eq!(200, response.status_code);
 //! assert_eq!("OK", response.reason_phrase);
 //! # server_thread.join().expect("server thread join");
+//! # }
 //! # Ok(()) }
-//! # #[cfg(not(feature = "std"))]
-//! # fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> { Ok(()) }
 //! ```
 //!
 //! Note: you could change the `get` function to `head` or `put` or
@@ -132,14 +132,14 @@
 //! `send()`.
 //!
 //! ```
-//! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+//! # {
 //! let response = bitreq::post("http://example.com")
 //!     .with_body("Foobar")
 //!     .send()?;
+//! # }
 //! # Ok(()) }
-//! # #[cfg(not(feature = "std"))]
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 //! ```
 //!
 //! ## Headers (sending)
@@ -148,14 +148,14 @@
 //! `send()`.
 //!
 //! ```
-//! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+//! # {
 //! let response = bitreq::get("http://example.com")
 //!     .with_header("Accept", "text/html")
 //!     .send()?;
+//! # }
 //! # Ok(()) }
-//! # #[cfg(not(feature = "std"))]
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 //! ```
 //!
 //! ## Headers (receiving)
@@ -168,13 +168,13 @@
 //! this unifies the casings for easier `get()`ing.
 //!
 //! ```
-//! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+//! # {
 //! let response = bitreq::get("http://example.com").send()?;
 //! assert!(response.headers.get("content-type").unwrap().starts_with("text/html"));
+//! # }
 //! # Ok(()) }
-//! # #[cfg(not(feature = "std"))]
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 //! ```
 //!
 //! ## Timeouts
@@ -185,16 +185,16 @@
 //! NOTE: There is no timeout by default.
 //!
 //! ```no_run
-//! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+//! # {
 //! use std::time::Duration;
 //!
 //! let response = bitreq::post("http://example.com")
 //!     .with_timeout(Duration::from_secs(10))
 //!     .send()?;
+//! # }
 //! # Ok(()) }
-//! # #[cfg(not(feature = "std"))]
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 //! ```
 //!
 //! ## Proxy
@@ -207,8 +207,9 @@
 //! supported at this time.
 //!
 //! ```no_run
-//! # #[cfg(feature = "std")]
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! # #[cfg(all(feature = "std", not(bitreq_wasm)))]
+//! # {
 //! #[cfg(feature = "proxy")]
 //! {
 //!     let proxy = bitreq::Proxy::new_http("localhost:8080")?;
@@ -217,9 +218,8 @@
 //!         .send()?;
 //!     println!("{}", response.as_str()?);
 //! }
+//! # }
 //! # Ok(()) }
-//! # #[cfg(not(feature = "std"))]
-//! # fn main() -> Result<(), Box<dyn std::error::Error>> { Ok(()) }
 //! ```
 //!
 //! # Timeouts
@@ -254,26 +254,30 @@
 
 extern crate alloc;
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 mod client;
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
 mod connection;
 mod error;
-#[cfg(feature = "proxy")]
+#[cfg(all(feature = "proxy", not(bitreq_wasm)))]
 mod proxy;
 #[cfg(feature = "std")]
 mod request;
 #[cfg(feature = "std")]
 mod response;
 mod url;
+#[cfg(all(feature = "std", bitreq_wasm))]
+mod wasm;
 
-#[cfg(feature = "async")]
+#[cfg(all(feature = "async", not(bitreq_wasm)))]
 pub use client::{Client, RequestExt};
 pub use error::*;
-#[cfg(feature = "proxy")]
+#[cfg(all(feature = "proxy", not(bitreq_wasm)))]
 pub use proxy::*;
 #[cfg(feature = "std")]
 pub use request::*;
 #[cfg(feature = "std")]
-pub use response::{Response, ResponseLazy};
+pub use response::Response;
+#[cfg(all(feature = "std", not(bitreq_wasm)))]
+pub use response::ResponseLazy;
 pub use url::{ParseError as UrlParseError, Url};

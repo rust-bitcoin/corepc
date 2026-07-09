@@ -1,4 +1,4 @@
-#![cfg(all(feature = "std", feature = "async"))]
+#![cfg(all(feature = "std", feature = "async", not(bitreq_wasm)))]
 
 extern crate bitreq;
 
