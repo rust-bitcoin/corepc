@@ -13,6 +13,10 @@ use std::thread;
 use std::time::Duration;
 
 use bitreq::{Error, Method, Request, Response};
+#[cfg(feature = "async")]
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+#[cfg(feature = "async")]
+use tokio::net::{TcpListener as AsyncTcpListener, TcpStream as AsyncTcpStream};
 
 const EMPTY_RESPONSE: &[u8] = b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
 
@@ -586,4 +590,367 @@ fn section_8_incomplete_field_section_is_rejected() {
     // incomplete response rather than accepting truncated metadata.
     let response = b"HTTP/1.1 200 OK\r\nX-Test: yes\r\n";
     check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+// RFC 9112 Section 9: connection management, persistence, and pipelining.
+
+#[cfg(feature = "async")]
+async fn read_async_request(stream: &mut AsyncTcpStream) -> Vec<u8> {
+    let mut request = Vec::new();
+    let mut buf = [0u8; 1024];
+    loop {
+        let read = match stream.read(&mut buf).await {
+            Ok(read) => read,
+            Err(_) => return request,
+        };
+        if read == 0 {
+            return request;
+        }
+        request.extend_from_slice(&buf[..read]);
+        if let Some(end) = header_end(&request) {
+            if request.len() >= end + content_length(&request[..end]) {
+                return request;
+            }
+        }
+    }
+}
+
+#[cfg(feature = "async")]
+async fn two_request_reuse(
+    first_response: &[u8],
+) -> (Result<Response, Error>, Result<Response, Error>, bool) {
+    let listener = AsyncTcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let first_response = first_response.to_vec();
+    let server = tokio::spawn(async move {
+        let (mut first, _) = listener.accept().await.unwrap();
+        assert!(!read_async_request(&mut first).await.is_empty());
+        first.write_all(&first_response).await.unwrap();
+
+        let same_connection;
+        let mut second;
+        tokio::select! {
+            request = read_async_request(&mut first) => {
+                if request.is_empty() {
+                    second = listener.accept().await.unwrap().0;
+                    assert!(!read_async_request(&mut second).await.is_empty());
+                    same_connection = false;
+                } else {
+                    second = first;
+                    same_connection = true;
+                }
+            }
+            accepted = listener.accept() => {
+                second = accepted.unwrap().0;
+                assert!(!read_async_request(&mut second).await.is_empty());
+                same_connection = false;
+            }
+        }
+        second.write_all(EMPTY_RESPONSE).await.unwrap();
+        same_connection
+    });
+
+    let client = bitreq::Client::new(2);
+    let url = format!("http://{addr}/");
+    let first = client.send_async(bitreq::get(&url)).await;
+    let second = client.send_async(bitreq::get(&url)).await;
+    let same_connection = server.await.unwrap();
+    (first, second, same_connection)
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+#[ignore = "TODO: default HTTP/1.1 connections to persistent (RFC 9112 Section 9.3; corepc#659)"]
+async fn section_9_3_http_1_1_is_persistent_by_default() {
+    // RFC 9112 Section 9.3: HTTP/1.1 connections persist unless Connection: close is present.
+    let (first, second, same_connection) = two_request_reuse(EMPTY_RESPONSE).await;
+    first.unwrap();
+    second.unwrap();
+    assert!(same_connection, "HTTP/1.1 reuse must not require explicit keep-alive");
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+async fn section_9_3_explicit_http_1_1_keep_alive_is_persistent() {
+    // RFC 9112 Section 9.3: an HTTP/1.1 connection without close can carry another request.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n";
+    let (first, second, same_connection) = two_request_reuse(response).await;
+    first.unwrap();
+    second.unwrap();
+    assert!(same_connection);
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+async fn section_9_3_http_1_0_without_keep_alive_is_not_persistent() {
+    // RFC 9112 Section 9.3: HTTP/1.0 without keep-alive does not persist.
+    let response = b"HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\r\n";
+    let (first, second, same_connection) = two_request_reuse(response).await;
+    first.unwrap();
+    second.unwrap();
+    assert!(!same_connection);
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+#[ignore = "TODO: parse comma-separated Connection options (RFC 9112 Section 9.3)"]
+async fn section_9_3_http_1_0_keep_alive_option_is_tokenized() {
+    // RFC 9112 Section 9.3: HTTP/1.0 can persist when the case-insensitive keep-alive connection
+    // option is present among other options.
+    let response = b"HTTP/1.0 200 OK\r\nContent-Length: 0\r\n\
+                     Connection: custom, Keep-Alive\r\n\r\n";
+    let (first, second, same_connection) = two_request_reuse(response).await;
+    first.unwrap();
+    second.unwrap();
+    assert!(same_connection);
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+async fn section_9_3_response_close_option_prevents_reuse() {
+    // RFC 9112 Sections 9.3 and 9.6: a received close option makes the connection non-persistent.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\
+                     Connection: custom, Close\r\n\r\n";
+    let (first, second, same_connection) = two_request_reuse(response).await;
+    first.unwrap();
+    second.unwrap();
+    assert!(!same_connection);
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+#[ignore = "TODO: honor close sent by the client (RFC 9112 Section 9.6)"]
+async fn section_9_6_sent_close_option_prevents_reuse() {
+    // RFC 9112 Section 9.6: after sending close, a client MUST NOT send another request on that
+    // connection and MUST close it after the final response.
+    let listener = AsyncTcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = tokio::spawn(async move {
+        let (mut first, _) = listener.accept().await.unwrap();
+        let request = read_async_request(&mut first).await;
+        assert!(request_text(&request)
+            .lines()
+            .any(|line| line.eq_ignore_ascii_case("Connection: close")));
+        first
+            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
+            .await
+            .unwrap();
+        tokio::select! {
+            request = read_async_request(&mut first) => {
+                let reused = !request.is_empty();
+                if reused {
+                    first.write_all(EMPTY_RESPONSE).await.unwrap();
+                }
+                reused
+            },
+            accepted = listener.accept() => {
+                let mut second = accepted.unwrap().0;
+                assert!(!read_async_request(&mut second).await.is_empty());
+                second.write_all(EMPTY_RESPONSE).await.unwrap();
+                false
+            }
+        }
+    });
+
+    let client = bitreq::Client::new(2);
+    let url = format!("http://{addr}/");
+    client.send_async(bitreq::get(&url).with_header("Connection", "close")).await.unwrap();
+    client.send_async(bitreq::get(&url)).await.unwrap();
+    assert!(!server.await.unwrap(), "the second request reused a closing connection");
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+async fn section_9_3_reads_complete_body_before_reuse() {
+    // RFC 9112 Section 9.3: a client intending reuse MUST read the complete response body first.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\
+                     Connection: keep-alive\r\n\r\nhello";
+    let (first, second, same_connection) = two_request_reuse(response).await;
+    assert_eq!(first.unwrap().as_bytes(), b"hello");
+    second.unwrap();
+    assert!(same_connection);
+}
+
+#[cfg(feature = "async")]
+#[tokio::test]
+#[ignore = "TODO: reject unsolicited response bytes (RFC 9112 Sections 6.3 and 9.2)"]
+async fn section_9_2_unsolicited_data_is_not_a_response() {
+    // RFC 9112 Sections 6.3 and 9.2: extra data after the final response MUST NOT be treated as a
+    // separate response and data without an outstanding request is not valid response data.
+    let listener = AsyncTcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = tokio::spawn(async move {
+        let (mut first, _) = listener.accept().await.unwrap();
+        assert!(!read_async_request(&mut first).await.is_empty());
+        first
+            .write_all(
+                b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n\
+                  HTTP/1.1 299 Poisoned\r\nContent-Length: 0\r\n\r\n",
+            )
+            .await
+            .unwrap();
+        tokio::select! {
+            request = read_async_request(&mut first) => {
+                if !request.is_empty() {
+                    let _ = first.write_all(EMPTY_RESPONSE).await;
+                }
+            }
+            accepted = listener.accept() => {
+                let mut second = accepted.unwrap().0;
+                assert!(!read_async_request(&mut second).await.is_empty());
+                second.write_all(EMPTY_RESPONSE).await.unwrap();
+            }
+        }
+    });
+
+    let client = bitreq::Client::new(2);
+    let url = format!("http://{addr}/");
+    assert_eq!(client.send_async(bitreq::get(&url)).await.unwrap().status_code, 200);
+    let second = client.send_async(bitreq::get(&url)).await.unwrap();
+    assert_eq!(second.status_code, 200, "unsolicited bytes were accepted as a response");
+    server.await.unwrap();
+}
+
+#[cfg(feature = "async")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn section_9_2_pipelined_responses_follow_request_order() {
+    // RFC 9112 Section 9.2: outstanding requests are ordered and each response is associated with
+    // the first request that has not received a final response.
+    let listener = AsyncTcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let (first_seen_tx, first_seen_rx) = tokio::sync::oneshot::channel();
+    let server = tokio::spawn(async move {
+        let (mut stream, _) = listener.accept().await.unwrap();
+        assert!(!read_async_request(&mut stream).await.is_empty());
+        stream
+            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
+            .await
+            .unwrap();
+        let first = read_async_request(&mut stream).await;
+        first_seen_tx.send(()).unwrap();
+        let second = read_async_request(&mut stream).await;
+        assert!(request_text(&first).starts_with("GET /first HTTP/1.1"));
+        assert!(request_text(&second).starts_with("GET /second HTTP/1.1"));
+        stream
+            .write_all(
+                b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\nConnection: keep-alive\r\n\r\nfirst\
+                  HTTP/1.1 200 OK\r\nContent-Length: 6\r\nConnection: keep-alive\r\n\r\nsecond",
+            )
+            .await
+            .unwrap();
+    });
+
+    let client = bitreq::Client::new(2);
+    let base = format!("http://{addr}");
+    client.send_async(bitreq::get(format!("{base}/prime"))).await.unwrap();
+    let first_client = client.clone();
+    let first_url = format!("{base}/first");
+    let first = tokio::spawn(async move {
+        first_client.send_async(bitreq::get(first_url).with_pipelining()).await
+    });
+    first_seen_rx.await.unwrap();
+    let second = client.send_async(bitreq::get(format!("{base}/second")).with_pipelining());
+    let (first, second) = tokio::join!(first, second);
+    assert_eq!(first.unwrap().unwrap().as_bytes(), b"first");
+    assert_eq!(second.unwrap().as_bytes(), b"second");
+    server.await.unwrap();
+}
+
+#[cfg(feature = "async")]
+async fn serve_retried_connection(
+    mut stream: AsyncTcpStream,
+    immediately_pipelined: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    retried_requests: std::sync::Arc<std::sync::atomic::AtomicUsize>,
+) {
+    use std::sync::atomic::Ordering;
+
+    let first = read_async_request(&mut stream).await;
+    if first.is_empty() {
+        return;
+    }
+    retried_requests.fetch_add(1, Ordering::AcqRel);
+    let second = tokio::time::timeout(Duration::from_millis(100), read_async_request(&mut stream))
+        .await
+        .ok()
+        .filter(|request| !request.is_empty());
+    if second.is_some() {
+        immediately_pipelined.store(true, Ordering::Release);
+        retried_requests.fetch_add(1, Ordering::AcqRel);
+    }
+    let _ = stream
+        .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
+        .await;
+    if second.is_some() {
+        let _ = stream
+            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
+            .await;
+    }
+    loop {
+        let request = read_async_request(&mut stream).await;
+        if request.is_empty() {
+            return;
+        }
+        retried_requests.fetch_add(1, Ordering::AcqRel);
+        if stream.write_all(EMPTY_RESPONSE).await.is_err() {
+            return;
+        }
+    }
+}
+
+#[cfg(feature = "async")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+#[ignore = "TODO: retry unanswered requests, then serialize the first retry (RFC 9112 Section 9.3.2)"]
+async fn section_9_3_2_retry_does_not_immediately_pipeline() {
+    // RFC 9112 Section 9.3.2: after an unannounced pipeline failure, a client MUST NOT pipeline
+    // immediately on a newly established connection.
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+    use std::sync::Arc;
+
+    let listener = AsyncTcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let immediately_pipelined = Arc::new(AtomicBool::new(false));
+    let retried_requests = Arc::new(AtomicUsize::new(0));
+    let server_flag = Arc::clone(&immediately_pipelined);
+    let server_retried_requests = Arc::clone(&retried_requests);
+    let server = tokio::spawn(async move {
+        let (mut original, _) = listener.accept().await.unwrap();
+        assert!(!read_async_request(&mut original).await.is_empty());
+        original
+            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
+            .await
+            .unwrap();
+        for _ in 0..3 {
+            assert!(!read_async_request(&mut original).await.is_empty());
+        }
+        drop(original);
+
+        loop {
+            let (stream, _) = listener.accept().await.unwrap();
+            let flag = Arc::clone(&server_flag);
+            let retried_requests = Arc::clone(&server_retried_requests);
+            tokio::spawn(serve_retried_connection(stream, flag, retried_requests));
+        }
+    });
+
+    let client = bitreq::Client::new(4);
+    let url = format!("http://{addr}/");
+    client.send_async(bitreq::get(&url)).await.unwrap();
+    let mut requests = Vec::new();
+    for _ in 0..3 {
+        let client = client.clone();
+        let url = url.clone();
+        requests.push(tokio::spawn(async move {
+            client.send_async(bitreq::get(url).with_pipelining()).await
+        }));
+    }
+    tokio::time::sleep(Duration::from_millis(500)).await;
+    assert!(
+        retried_requests.load(Ordering::Acquire) >= 2,
+        "the fixture did not observe multiple retried requests"
+    );
+    assert!(!immediately_pipelined.load(Ordering::Acquire));
+    for request in requests {
+        request.abort();
+    }
+    server.abort();
 }
