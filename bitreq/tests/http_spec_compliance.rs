@@ -320,3 +320,270 @@ fn section_2_2_response_is_parsed_as_octets() {
         assert!(result.is_ok(), "an obs-text field value must not invalidate message framing");
     });
 }
+
+fn response_lazy(response: &[u8]) -> Result<Vec<u8>, Error> {
+    let (url, server) = spawn_server(response.to_vec());
+    let result = bitreq::get(url).send_lazy().and_then(|mut response| {
+        let mut body = Vec::new();
+        response.read_to_end(&mut body).map_err(Error::IoError)?;
+        Ok(body)
+    });
+    server.join().unwrap();
+    result
+}
+
+fn check_body_paths(response: &[u8], check: impl Fn(Result<Vec<u8>, Error>)) {
+    check(response_sync(response).map(Response::into_bytes));
+    check(response_lazy(response));
+    #[cfg(feature = "async")]
+    check(response_async(response).map(Response::into_bytes));
+}
+
+fn response_for_method(method: Method, response: &[u8]) -> Result<Response, Error> {
+    let (url, server) = spawn_server(response.to_vec());
+    let result = Request::new(method, url).send();
+    server.join().unwrap();
+    result
+}
+
+// RFC 9112 Sections 6-8: message bodies, transfer codings, and incomplete messages.
+
+#[test]
+fn section_6_3_request_body_has_content_length() {
+    // RFC 9112 Section 6.3: a user agent sending a body MUST send a valid Content-Length or use
+    // chunked transfer coding.
+    let (response, request) =
+        capture_request(|base| bitreq::delete(base).with_body(b"five!".to_vec()));
+    response.unwrap();
+    assert!(request_text(&request).contains("\r\nContent-Length: 5\r\n"));
+    assert!(request.ends_with(b"five!"));
+}
+
+#[test]
+#[ignore = "TODO: reject Content-Length with Transfer-Encoding (RFC 9112 Section 6.2)"]
+fn section_6_2_sender_rejects_content_length_with_transfer_encoding() {
+    // RFC 9112 Section 6.2: a sender MUST NOT send Content-Length in a message containing
+    // Transfer-Encoding.
+    let (response, request) = capture_request(|base| {
+        bitreq::post(base).with_body("hello").with_header("Transfer-Encoding", "chunked")
+    });
+    assert!(response.is_err(), "ambiguous request framing must be rejected");
+    let text = request_text(&request).to_ascii_lowercase();
+    assert!(!(text.contains("content-length:") && text.contains("transfer-encoding:")));
+}
+
+#[test]
+#[ignore = "TODO: reject repeated chunked transfer coding (RFC 9112 Section 6.1)"]
+fn section_6_1_sender_rejects_repeated_chunked_coding() {
+    // RFC 9112 Section 6.1: a sender MUST NOT apply chunked transfer coding more than once.
+    let (response, request) = capture_request(|base| {
+        bitreq::post(base).with_header("Transfer-Encoding", "chunked, chunked")
+    });
+    assert!(response.is_err(), "repeated chunked coding must be rejected");
+    assert!(!request_text(&request).to_ascii_lowercase().contains("chunked, chunked"));
+}
+
+#[test]
+#[ignore = "TODO: exclude chunked from TE requests (RFC 9112 Section 7.4)"]
+fn section_7_4_te_does_not_list_chunked() {
+    // RFC 9112 Section 7.4: a client MUST NOT send the chunked coding name in TE.
+    let (response, request) =
+        capture_request(|base| bitreq::get(base).with_header("TE", "trailers, chunked"));
+    assert!(response.is_err(), "TE must not advertise chunked");
+    assert!(!request_text(&request).to_ascii_lowercase().contains("te: trailers, chunked"));
+}
+
+#[test]
+#[ignore = "TODO: add the TE connection option when sending TE (RFC 9112 Section 7.4)"]
+fn section_7_4_te_has_connection_option() {
+    // RFC 9112 Section 7.4: a sender of TE MUST also send a TE connection option.
+    let (response, request) =
+        capture_request(|base| bitreq::get(base).with_header("TE", "trailers"));
+    response.unwrap();
+    assert!(request_text(&request).lines().any(|line| line.eq_ignore_ascii_case("Connection: TE")));
+}
+
+#[test]
+fn section_6_3_head_204_and_304_have_no_message_body() {
+    // RFC 9112 Section 6.3: HEAD responses and 204/304 responses end after the field section.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello";
+    assert!(response_for_method(Method::Head, response).unwrap().as_bytes().is_empty());
+    for status in ["204 No Content", "304 Not Modified"] {
+        let response = format!("HTTP/1.1 {status}\r\nContent-Length: 5\r\n\r\nhello");
+        assert!(response_sync(response.as_bytes()).unwrap().as_bytes().is_empty());
+    }
+}
+
+#[test]
+#[ignore = "TODO: consume informational responses before the final response (RFC 9112 Section 6.3)"]
+fn section_6_3_informational_response_precedes_final_response() {
+    // RFC 9112 Sections 6.3 and 9.2: 1xx responses have no body and precede the final response for
+    // the same request.
+    let response = b"HTTP/1.1 100 Continue\r\n\r\n\
+                     HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello";
+    check_body_paths(response, |result| assert_eq!(result.unwrap(), b"hello"));
+}
+
+#[test]
+#[ignore = "TODO: treat successful CONNECT responses as tunnels (RFC 9112 Section 6.3)"]
+fn section_6_3_successful_connect_ignores_framing_fields() {
+    // RFC 9112 Section 6.3: a client receiving a successful CONNECT response MUST ignore
+    // Content-Length and Transfer-Encoding because the connection becomes a tunnel.
+    let response = b"HTTP/1.1 200 Connection Established\r\nContent-Length: 5\r\n\r\nhello";
+    let response = response_for_method(Method::Connect, response).unwrap();
+    assert!(response.as_bytes().is_empty());
+}
+
+#[test]
+fn section_6_3_chunked_takes_precedence_over_content_length() {
+    // RFC 9112 Section 6.3: Transfer-Encoding overrides Content-Length when both are received.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\
+                     Content-Length: 999\r\n\r\n5\r\nhello\r\n0\r\n\r\n";
+    check_body_paths(response, |result| assert_eq!(result.unwrap(), b"hello"));
+}
+
+#[test]
+#[ignore = "TODO: recognize chunked in transfer-coding lists (RFC 9112 Section 6.3)"]
+fn section_6_3_final_chunked_coding_frames_response() {
+    // RFC 9112 Sections 6.1 and 6.3: when chunked is the final transfer coding, it determines the
+    // response body length even when another coding precedes it.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: gzip, chunked\r\n\r\n\
+                     5\r\nhello\r\n0\r\n\r\n";
+    check_response_paths(response, |result| {
+        let response = result.unwrap();
+        assert_eq!(response.as_bytes(), b"hello");
+        assert_eq!(response.headers.get("transfer-encoding").map(String::as_str), Some("gzip"));
+    });
+}
+
+#[test]
+#[ignore = "TODO: let non-chunked Transfer-Encoding override Content-Length (RFC 9112 Section 6.3)"]
+fn section_6_3_nonchunked_transfer_encoding_is_close_delimited() {
+    // RFC 9112 Section 6.3: a response whose final transfer coding is not chunked is delimited by
+    // connection close, regardless of Content-Length.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: gzip\r\nContent-Length: 2\r\n\r\nhello";
+    check_body_paths(response, |result| assert_eq!(result.unwrap(), b"hello"));
+}
+
+#[test]
+#[ignore = "TODO: reject Transfer-Encoding in HTTP/1.0 responses (RFC 9112 Section 6.1)"]
+fn section_6_1_http_1_0_transfer_encoding_is_faulty() {
+    // RFC 9112 Section 6.1: a client receiving Transfer-Encoding in HTTP/1.0 MUST treat framing as
+    // faulty and close the connection.
+    let response = b"HTTP/1.0 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+fn section_6_3_malformed_content_length_is_rejected() {
+    // RFC 9112 Section 6.3: invalid Content-Length framing is an unrecoverable response error.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: nope\r\n\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+#[ignore = "TODO: accept identical Content-Length lists (RFC 9112 Section 6.3)"]
+fn section_6_3_identical_content_length_list_is_accepted() {
+    // RFC 9112 Section 6.3: a comma-separated Content-Length list is valid when every value is
+    // valid and identical.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 5, 5\r\n\r\nhello";
+    check_body_paths(response, |result| assert_eq!(result.unwrap(), b"hello"));
+}
+
+#[test]
+#[ignore = "TODO: reject conflicting Content-Length fields (RFC 9112 Section 6.3)"]
+fn section_6_3_conflicting_content_lengths_are_rejected() {
+    // RFC 9112 Section 6.3: differing Content-Length values make response framing invalid and the
+    // user agent MUST discard the response.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\nContent-Length: 6\r\n\r\nhello!";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+#[ignore = "TODO: detect premature EOF in Content-Length bodies (RFC 9112 Sections 6.3 and 8)"]
+fn section_6_3_content_length_response_requires_all_octets() {
+    // RFC 9112 Sections 6.3 and 8: EOF before Content-Length octets are received makes the response
+    // incomplete and MUST close the connection.
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nshort";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+#[ignore = "TODO: treat clean async EOF as close-delimited completion (RFC 9112 Section 8)"]
+fn section_6_3_close_delimited_response_is_complete() {
+    // RFC 9112 Sections 6.3 and 8: a response without length fields is complete when a clean
+    // connection close follows an intact field section.
+    let response = b"HTTP/1.1 200 OK\r\nX-Test: yes\r\n\r\nclose-delimited";
+    check_body_paths(response, |result| assert_eq!(result.unwrap(), b"close-delimited"));
+}
+
+#[test]
+fn section_7_1_chunked_is_decoded_and_extensions_are_ignored() {
+    // RFC 9112 Sections 7.1 and 7.1.1: recipients MUST decode chunked and ignore unrecognized
+    // chunk extensions.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\
+                     5;unknown=value\r\nhello\r\n0\r\n\r\n";
+    check_response_paths(response, |result| {
+        let response = result.unwrap();
+        assert_eq!(response.as_bytes(), b"hello");
+        assert_eq!(response.headers.get("content-length").map(String::as_str), Some("5"));
+        assert!(!response.headers.contains_key("transfer-encoding"));
+    });
+}
+
+#[test]
+fn section_7_1_chunk_size_overflow_is_rejected() {
+    // RFC 9112 Section 7.1: recipients MUST anticipate large hexadecimal chunk sizes and prevent
+    // integer overflow or precision loss.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\
+                     FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+#[ignore = "TODO: reject empty chunk-size lines (RFC 9112 Section 7.1)"]
+fn section_7_1_empty_chunk_size_is_rejected() {
+    // RFC 9112 Section 7.1: chunk-size is one or more hexadecimal digits; an empty line is not a
+    // terminating zero chunk.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+fn section_7_1_chunk_data_requires_crlf() {
+    // RFC 9112 Section 7.1: every chunk's data MUST be followed by CRLF.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\
+                     5\r\nhelloX\r\n0\r\n\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+#[ignore = "TODO: require the terminal zero chunk (RFC 9112 Section 8)"]
+fn section_8_chunked_response_requires_terminal_zero_chunk() {
+    // RFC 9112 Section 8: a chunked response is incomplete until its terminating zero-sized chunk
+    // has been received.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
+
+#[test]
+#[ignore = "TODO: do not merge unmergeable trailers into headers (RFC 9112 Section 7.1.2)"]
+fn section_7_1_2_unmergeable_trailer_is_discarded() {
+    // RFC 9112 Section 7.1.2: a recipient MUST NOT merge a trailer into headers unless that field's
+    // definition explicitly permits and defines safe merging.
+    let response = b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n\
+                     5\r\nhello\r\n0\r\nX-Unknown: trailer\r\n\r\n";
+    check_response_paths(response, |result| {
+        let response = result.unwrap();
+        assert!(!response.headers.contains_key("x-unknown"));
+    });
+}
+
+#[test]
+#[ignore = "TODO: reject response metadata truncated before the empty line (RFC 9112 Section 8)"]
+fn section_8_incomplete_field_section_is_rejected() {
+    // RFC 9112 Section 8: EOF before the empty line terminating the field section records an
+    // incomplete response rather than accepting truncated metadata.
+    let response = b"HTTP/1.1 200 OK\r\nX-Test: yes\r\n";
+    check_body_paths(response, |result| assert!(result.is_err()));
+}
