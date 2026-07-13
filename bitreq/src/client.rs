@@ -66,10 +66,13 @@ impl Client {
 
         // Try to get cached connection
         let conn_opt = {
-            let state = self.r#async.lock().unwrap();
+            let mut state = self.r#async.lock().unwrap();
 
             if let Some(conn) = state.connections.get(&owned_key) {
-                Some(Arc::clone(conn))
+                let conn = Arc::clone(conn);
+                state.lru_order.retain(|key| key != &owned_key);
+                state.lru_order.push_back(owned_key.clone());
+                Some(conn)
             } else {
                 None
             }
