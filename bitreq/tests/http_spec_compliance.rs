@@ -660,7 +660,6 @@ async fn two_request_reuse(
 
 #[cfg(feature = "async")]
 #[tokio::test]
-#[ignore = "TODO: default HTTP/1.1 connections to persistent (RFC 9112 Section 9.3; corepc#659)"]
 async fn section_9_3_http_1_1_is_persistent_by_default() {
     // RFC 9112 Section 9.3: HTTP/1.1 connections persist unless Connection: close is present.
     let (first, second, same_connection) = two_request_reuse(EMPTY_RESPONSE).await;
@@ -693,7 +692,6 @@ async fn section_9_3_http_1_0_without_keep_alive_is_not_persistent() {
 
 #[cfg(feature = "async")]
 #[tokio::test]
-#[ignore = "TODO: parse comma-separated Connection options (RFC 9112 Section 9.3)"]
 async fn section_9_3_http_1_0_keep_alive_option_is_tokenized() {
     // RFC 9112 Section 9.3: HTTP/1.0 can persist when the case-insensitive keep-alive connection
     // option is present among other options.
@@ -719,7 +717,6 @@ async fn section_9_3_response_close_option_prevents_reuse() {
 
 #[cfg(feature = "async")]
 #[tokio::test]
-#[ignore = "TODO: honor close sent by the client (RFC 9112 Section 9.6)"]
 async fn section_9_6_sent_close_option_prevents_reuse() {
     // RFC 9112 Section 9.6: after sending close, a client MUST NOT send another request on that
     // connection and MUST close it after the final response.
@@ -728,9 +725,13 @@ async fn section_9_6_sent_close_option_prevents_reuse() {
     let server = tokio::spawn(async move {
         let (mut first, _) = listener.accept().await.unwrap();
         let request = read_async_request(&mut first).await;
-        assert!(request_text(&request)
-            .lines()
-            .any(|line| line.eq_ignore_ascii_case("Connection: close")));
+        assert!(request_text(&request).lines().any(|line| {
+            let Some((name, value)) = line.split_once(':') else {
+                return false;
+            };
+            name.eq_ignore_ascii_case("connection")
+                && value.split(',').any(|value| value.trim().eq_ignore_ascii_case("close"))
+        }));
         first
             .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
             .await
@@ -754,7 +755,7 @@ async fn section_9_6_sent_close_option_prevents_reuse() {
 
     let client = bitreq::Client::new(2);
     let url = format!("http://{addr}/");
-    client.send_async(bitreq::get(&url).with_header("Connection", "close")).await.unwrap();
+    client.send_async(bitreq::get(&url).with_header("cOnNeCtIoN", "custom, Close")).await.unwrap();
     client.send_async(bitreq::get(&url)).await.unwrap();
     assert!(!server.await.unwrap(), "the second request reused a closing connection");
 }
@@ -763,8 +764,7 @@ async fn section_9_6_sent_close_option_prevents_reuse() {
 #[tokio::test]
 async fn section_9_3_reads_complete_body_before_reuse() {
     // RFC 9112 Section 9.3: a client intending reuse MUST read the complete response body first.
-    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\
-                     Connection: keep-alive\r\n\r\nhello";
+    let response = b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello";
     let (first, second, same_connection) = two_request_reuse(response).await;
     assert_eq!(first.unwrap().as_bytes(), b"hello");
     second.unwrap();
@@ -784,7 +784,7 @@ async fn section_9_2_unsolicited_data_is_not_a_response() {
         assert!(!read_async_request(&mut first).await.is_empty());
         first
             .write_all(
-                b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n\
+                b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n\
                   HTTP/1.1 299 Poisoned\r\nContent-Length: 0\r\n\r\n",
             )
             .await
@@ -822,10 +822,7 @@ async fn section_9_2_pipelined_responses_follow_request_order() {
     let server = tokio::spawn(async move {
         let (mut stream, _) = listener.accept().await.unwrap();
         assert!(!read_async_request(&mut stream).await.is_empty());
-        stream
-            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
-            .await
-            .unwrap();
+        stream.write_all(EMPTY_RESPONSE).await.unwrap();
         let first = read_async_request(&mut stream).await;
         first_seen_tx.send(()).unwrap();
         let second = read_async_request(&mut stream).await;
@@ -833,8 +830,8 @@ async fn section_9_2_pipelined_responses_follow_request_order() {
         assert!(request_text(&second).starts_with("GET /second HTTP/1.1"));
         stream
             .write_all(
-                b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\nConnection: keep-alive\r\n\r\nfirst\
-                  HTTP/1.1 200 OK\r\nContent-Length: 6\r\nConnection: keep-alive\r\n\r\nsecond",
+                b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nfirst\
+                  HTTP/1.1 200 OK\r\nContent-Length: 6\r\n\r\nsecond",
             )
             .await
             .unwrap();
@@ -877,13 +874,9 @@ async fn serve_retried_connection(
         immediately_pipelined.store(true, Ordering::Release);
         retried_requests.fetch_add(1, Ordering::AcqRel);
     }
-    let _ = stream
-        .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
-        .await;
+    let _ = stream.write_all(EMPTY_RESPONSE).await;
     if second.is_some() {
-        let _ = stream
-            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
-            .await;
+        let _ = stream.write_all(EMPTY_RESPONSE).await;
     }
     loop {
         let request = read_async_request(&mut stream).await;
@@ -915,10 +908,7 @@ async fn section_9_3_2_retry_does_not_immediately_pipeline() {
     let server = tokio::spawn(async move {
         let (mut original, _) = listener.accept().await.unwrap();
         assert!(!read_async_request(&mut original).await.is_empty());
-        original
-            .write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\nConnection: keep-alive\r\n\r\n")
-            .await
-            .unwrap();
+        original.write_all(EMPTY_RESPONSE).await.unwrap();
         for _ in 0..3 {
             assert!(!read_async_request(&mut original).await.is_empty());
         }

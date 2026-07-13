@@ -17,6 +17,14 @@ const BACKING_READ_BUFFER_LENGTH: usize = 16 * 1024;
 #[cfg(feature = "std")]
 const MAX_CONTENT_LENGTH: usize = 16 * 1024;
 
+#[cfg(feature = "async")]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum HttpVersion {
+    Http10,
+    Http11,
+    Other,
+}
+
 /// An HTTP response.
 ///
 /// Returned by [`Request::send`](struct.Request.html#method.send).
@@ -87,10 +95,11 @@ impl Response {
         max_headers_size: Option<usize>,
         max_status_line_len: Option<usize>,
         max_body_size: Option<usize>,
-    ) -> Result<Response, Error> {
+    ) -> Result<(Response, HttpVersion), Error> {
         use HttpStreamState::*;
 
         let ResponseMetadata {
+            http_version,
             status_code,
             reason_phrase,
             mut headers,
@@ -148,7 +157,10 @@ impl Response {
             }
         }
 
-        Ok(Response { status_code, reason_phrase, headers, url: String::new(), body })
+        Ok((
+            Response { status_code, reason_phrase, headers, url: String::new(), body },
+            http_version,
+        ))
     }
 
     /// Returns the body as an `&str`.
@@ -331,6 +343,7 @@ impl ResponseLazy {
             headers,
             state,
             max_trailing_headers_size,
+            ..
         } = read_metadata(&mut stream, max_headers_size, max_status_line_len)?;
 
         Ok(ResponseLazy {
@@ -444,6 +457,8 @@ enum HttpStreamState {
 // response.meta.status_code or similar.)
 #[cfg(feature = "std")]
 struct ResponseMetadata {
+    #[cfg(feature = "async")]
+    http_version: HttpVersion,
     status_code: i32,
     reason_phrase: String,
     headers: BTreeMap<String, String>,
@@ -612,6 +627,8 @@ macro_rules! define_read_methods {
             max_status_line_len: Option<usize>,
         ) -> Result<ResponseMetadata, Error> {
             let line = maybe_await!($read_line(stream, max_status_line_len, Error::StatusLineOverflow), $($await)?)?;
+            #[cfg(feature = "async")]
+            let http_version = parse_http_version(&line);
             let (status_code, reason_phrase) = parse_status_line(&line);
 
             let mut headers = BTreeMap::new();
@@ -657,6 +674,8 @@ macro_rules! define_read_methods {
             };
 
             Ok(ResponseMetadata {
+                #[cfg(feature = "async")]
+                http_version,
                 status_code,
                 reason_phrase,
                 headers,
@@ -701,6 +720,15 @@ macro_rules! define_read_methods {
 define_read_methods!((read_until_closed, read_with_content_length, read_trailers, read_chunked, read_metadata, read_line)<>, HttpStreamBytes);
 #[cfg(feature = "async")]
 define_read_methods!((read_until_closed_async, read_with_content_length_async, read_trailers_async, read_chunked_async, read_metadata_async, read_line_async)<R: AsyncRead | Unpin>, R, async, await);
+
+#[cfg(feature = "async")]
+fn parse_http_version(line: &str) -> HttpVersion {
+    match line.split_once(' ').map(|(version, _)| version) {
+        Some("HTTP/1.0") => HttpVersion::Http10,
+        Some("HTTP/1.1") => HttpVersion::Http11,
+        _ => HttpVersion::Other,
+    }
+}
 
 #[cfg(feature = "std")]
 fn parse_status_line(line: &str) -> (i32, String) {

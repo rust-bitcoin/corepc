@@ -527,6 +527,14 @@ impl ParsedRequest {
     pub(crate) fn connection_params(&self) -> ConnectionParams<'_> {
         ConnectionParams::from_request(self)
     }
+
+    #[cfg(feature = "async")]
+    pub(crate) fn has_connection_option(&self, option: &str) -> bool {
+        self.config.headers.iter().any(|(name, value)| {
+            name.eq_ignore_ascii_case("connection")
+                && value.split(',').any(|value| value.trim().eq_ignore_ascii_case(option))
+        })
+    }
 }
 
 /// A key which determines whether an existing connection can be reused

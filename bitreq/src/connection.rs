@@ -24,11 +24,18 @@ use tokio::sync::Mutex as AsyncMutex;
 
 use crate::request::{ConnectionParams, OwnedConnectionParams, ParsedRequest};
 #[cfg(feature = "async")]
+use crate::response::HttpVersion;
+#[cfg(feature = "async")]
 use crate::Response;
 use crate::{Error, Method, ResponseLazy};
 
 #[cfg(feature = "async")]
 const BACKING_READ_BUFFER_LENGTH: usize = 16 * 1024;
+
+#[cfg(feature = "async")]
+fn has_connection_option(value: &str, option: &str) -> bool {
+    value.split(',').any(|value| value.trim().eq_ignore_ascii_case(option))
+}
 
 type UnsecuredStream = TcpStream;
 
@@ -407,6 +414,7 @@ impl AsyncConnection {
     ) -> Pin<Box<dyn Future<Output = Result<Response, Error>> + Send + 'a>> {
         Box::pin(async move {
             let conn = Arc::clone(&*self.0.lock().unwrap());
+            let sent_close = request.has_connection_option("close");
             #[cfg(debug_assertions)]
             {
                 let next_read = conn.readable_request_id.load(Ordering::Acquire);
@@ -495,6 +503,9 @@ impl AsyncConnection {
                     // need to resend the request on a new connection.
                     retry_new_connection!(CONNECTION_STILL_READABLE, write);
                 }
+                if sent_close {
+                    conn.permits.store(0, Ordering::Release);
+                }
                 request_id = conn.next_request_id.fetch_add(1, Ordering::Relaxed);
                 #[cfg(feature = "log")]
                 log::trace!(
@@ -566,7 +577,7 @@ impl AsyncConnection {
                     request.connection_params(),
                 );
 
-                let response = Response::create_async(
+                let (response, http_version) = Response::create_async(
                     &mut *read,
                     request.config.method == Method::Head,
                     request.config.max_headers_size,
@@ -575,13 +586,19 @@ impl AsyncConnection {
                 )
                 .await?;
 
-                let mut found_keep_alive = false;
-                if let Some(header) = response.headers.get("connection") {
-                    if header.eq_ignore_ascii_case("keep-alive") {
-                        found_keep_alive = true;
-                    }
-                }
-                if !found_keep_alive {
+                let connection = response.headers.get("connection");
+                let received_close =
+                    connection.is_some_and(|value| has_connection_option(value, "close"));
+                let received_keep_alive =
+                    connection.is_some_and(|value| has_connection_option(value, "keep-alive"));
+                let persistent = !sent_close
+                    && !received_close
+                    && match http_version {
+                        HttpVersion::Http11 => true,
+                        HttpVersion::Http10 => received_keep_alive,
+                        HttpVersion::Other => false,
+                    };
+                if !persistent {
                     conn.permits.store(0, Ordering::Release);
                     conn.readable_request_id.store(usize::MAX, Ordering::Release);
                 } else {
