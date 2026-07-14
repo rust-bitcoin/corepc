@@ -47,7 +47,7 @@ all-features = true
 
 [package.metadata.rbmt.lint]
 # Unavoidable TLS/crypto dep-graph version conflicts.
-allowed_duplicates = ["base64", "core-foundation", "getrandom", "openssl-probe", "security-framework", "windows-sys"]
+allowed_duplicates = ["core-foundation", "openssl-probe", "security-framework", "windows-sys"]
 
 [features]
 default = ["std"]
