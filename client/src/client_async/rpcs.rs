@@ -25,6 +25,7 @@ use crate::into_json;
 impl Client {
     /// Gets a block by blockhash.
     pub async fn get_block(&self, hash: &BlockHash) -> Result<Block, GetBlockError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetBlockVerboseZero =
             self.call("getblock", &[into_json(hash)?, into_json(0)?]).await?;
         Ok(json.into_model().map_err(GetBlockError::Model)?.0)
@@ -32,6 +33,7 @@ impl Client {
 
     /// Gets the block count.
     pub async fn get_block_count(&self) -> Result<u64, GetBlockCountError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetBlockCount = self.call("getblockcount", &[]).await?;
         Ok(json.into_model().0)
     }
@@ -41,6 +43,7 @@ impl Client {
         &self,
         height: u32,
     ) -> Result<BlockHash, GetBlockHashError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetBlockHash =
             self.call("getblockhash", &[into_json(height)?]).await?;
         Ok(json.into_model().map_err(GetBlockHashError::Model)?.0)
@@ -50,6 +53,7 @@ impl Client {
     pub async fn get_best_block_hash(
         &self,
     ) -> Result<BlockHash, GetBestBlockHashError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetBestBlockHash = self.call("getbestblockhash", &[]).await?;
         Ok(json.into_model().map_err(GetBestBlockHashError::Model)?.0)
     }
@@ -59,6 +63,7 @@ impl Client {
         &self,
         hash: &BlockHash,
     ) -> Result<block::Header, GetBlockHeaderError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetBlockHeader =
             self.call("getblockheader", &[into_json(hash)?, into_json(false)?]).await?;
         Ok(json.into_model().map_err(GetBlockHeaderError::Model)?.0)
@@ -108,6 +113,7 @@ impl Client {
         &self,
         hash: &BlockHash,
     ) -> Result<model::GetBlockFilter, GetBlockFilterError> {
+        // This type hasnt' changed between Core v19 and v31.
         let json: types::v25::GetBlockFilter =
             self.call("getblockfilter", &[into_json(hash)?]).await?;
         json.into_model().map_err(GetBlockFilterError::Model)
@@ -134,6 +140,7 @@ impl Client {
 
     /// Gets the transaction IDs currently in the mempool.
     pub async fn get_raw_mempool(&self) -> Result<Vec<Txid>, GetRawMempoolError> {
+        // This type hasnt' changed between Core v23 and v31.
         let json: types::v25::GetRawMempool = self.call("getrawmempool", &[]).await?;
         Ok(json.into_model().map_err(GetRawMempoolError::Model)?.0)
     }
@@ -143,6 +150,7 @@ impl Client {
         &self,
         txid: &Txid,
     ) -> Result<Transaction, GetRawTransactionError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetRawTransaction =
             self.call("getrawtransaction", &[into_json(txid)?]).await?;
         Ok(json.into_model().map_err(GetRawTransactionError::Model)?.0)
@@ -154,6 +162,7 @@ impl Client {
         txid: &Txid,
         vout: u64,
     ) -> Result<model::GetTxOut, GetTxOutError> {
+        // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetTxOut =
             self.call("gettxout", &[into_json(txid)?, into_json(vout)?]).await?;
         json.into_model().map_err(GetTxOutError::Model)
