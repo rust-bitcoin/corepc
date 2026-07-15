@@ -19,20 +19,20 @@ use crate::client_async::error::{
     ServerVersionError,
 };
 use crate::client_async::Client;
-use crate::types::model;
+use crate::types::{self, model};
 use crate::into_json;
 
 impl Client {
     /// Gets a block by blockhash.
     pub async fn get_block(&self, hash: &BlockHash) -> Result<Block, GetBlockError> {
-        let json: crate::types::v25::GetBlockVerboseZero =
+        let json: types::v25::GetBlockVerboseZero =
             self.call("getblock", &[into_json(hash)?, into_json(0)?]).await?;
         Ok(json.into_model().map_err(GetBlockError::Model)?.0)
     }
 
     /// Gets the block count.
     pub async fn get_block_count(&self) -> Result<u64, GetBlockCountError> {
-        let json: crate::types::v25::GetBlockCount = self.call("getblockcount", &[]).await?;
+        let json: types::v25::GetBlockCount = self.call("getblockcount", &[]).await?;
         Ok(json.into_model().0)
     }
 
@@ -41,7 +41,7 @@ impl Client {
         &self,
         height: u32,
     ) -> Result<BlockHash, GetBlockHashError> {
-        let json: crate::types::v25::GetBlockHash =
+        let json: types::v25::GetBlockHash =
             self.call("getblockhash", &[into_json(height)?]).await?;
         Ok(json.into_model().map_err(GetBlockHashError::Model)?.0)
     }
@@ -50,7 +50,7 @@ impl Client {
     pub async fn get_best_block_hash(
         &self,
     ) -> Result<BlockHash, GetBestBlockHashError> {
-        let json: crate::types::v25::GetBestBlockHash = self.call("getbestblockhash", &[]).await?;
+        let json: types::v25::GetBestBlockHash = self.call("getbestblockhash", &[]).await?;
         Ok(json.into_model().map_err(GetBestBlockHashError::Model)?.0)
     }
 
@@ -59,7 +59,7 @@ impl Client {
         &self,
         hash: &BlockHash,
     ) -> Result<block::Header, GetBlockHeaderError> {
-        let json: crate::types::v25::GetBlockHeader =
+        let json: types::v25::GetBlockHeader =
             self.call("getblockheader", &[into_json(hash)?, into_json(false)?]).await?;
         Ok(json.into_model().map_err(GetBlockHeaderError::Model)?.0)
     }
@@ -74,11 +74,11 @@ impl Client {
         let raw: Box<RawValue> =
             self.call("getblockheader", &[into_json(hash)?, into_json(true)?]).await?;
         if let Ok(json) =
-            serde_json::from_str::<crate::types::v29::GetBlockHeaderVerbose>(raw.get())
+            serde_json::from_str::<types::v29::GetBlockHeaderVerbose>(raw.get())
         {
             Ok(json.into_model().map_err(|e| GetBlockHeaderVerboseError::Model(Box::new(e)))?)
         } else {
-            let json: crate::types::v25::GetBlockHeaderVerbose = serde_json::from_str(raw.get())?;
+            let json: types::v25::GetBlockHeaderVerbose = serde_json::from_str(raw.get())?;
             Ok(json.into_model().map_err(|e| GetBlockHeaderVerboseError::Model(Box::new(e)))?)
         }
     }
@@ -91,14 +91,14 @@ impl Client {
         hash: &BlockHash,
     ) -> Result<model::GetBlockVerboseOne, GetBlockVerboseError> {
         let raw: Box<RawValue> = self.call("getblock", &[into_json(hash)?, into_json(1)?]).await?;
-        if let Ok(json) = serde_json::from_str::<crate::types::v31::GetBlockVerboseOne>(raw.get()) {
+        if let Ok(json) = serde_json::from_str::<types::v31::GetBlockVerboseOne>(raw.get()) {
             Ok(json.into_model().map_err(|e| GetBlockVerboseError::Model(Box::new(e)))?)
         } else if let Ok(json) =
-            serde_json::from_str::<crate::types::v29::GetBlockVerboseOne>(raw.get())
+            serde_json::from_str::<types::v29::GetBlockVerboseOne>(raw.get())
         {
             Ok(json.into_model().map_err(|e| GetBlockVerboseError::Model(Box::new(e)))?)
         } else {
-            let json: crate::types::v25::GetBlockVerboseOne = serde_json::from_str(raw.get())?;
+            let json: types::v25::GetBlockVerboseOne = serde_json::from_str(raw.get())?;
             Ok(json.into_model().map_err(|e| GetBlockVerboseError::Model(Box::new(e)))?)
         }
     }
@@ -108,7 +108,7 @@ impl Client {
         &self,
         hash: &BlockHash,
     ) -> Result<model::GetBlockFilter, GetBlockFilterError> {
-        let json: crate::types::v25::GetBlockFilter =
+        let json: types::v25::GetBlockFilter =
             self.call("getblockfilter", &[into_json(hash)?]).await?;
         json.into_model().map_err(GetBlockFilterError::Model)
     }
@@ -120,21 +120,21 @@ impl Client {
         &self,
     ) -> Result<model::GetBlockchainInfo, GetBlockchainInfoError> {
         let raw: Box<RawValue> = self.call("getblockchaininfo", &[]).await?;
-        if let Ok(json) = serde_json::from_str::<crate::types::v29::GetBlockchainInfo>(raw.get()) {
+        if let Ok(json) = serde_json::from_str::<types::v29::GetBlockchainInfo>(raw.get()) {
             Ok(json.into_model().map_err(|e| GetBlockchainInfoError::Model(Box::new(e)))?)
         } else if let Ok(json) =
-            serde_json::from_str::<crate::types::v28::GetBlockchainInfo>(raw.get())
+            serde_json::from_str::<types::v28::GetBlockchainInfo>(raw.get())
         {
             Ok(json.into_model().map_err(|e| GetBlockchainInfoError::Model(Box::new(e)))?)
         } else {
-            let json: crate::types::v25::GetBlockchainInfo = serde_json::from_str(raw.get())?;
+            let json: types::v25::GetBlockchainInfo = serde_json::from_str(raw.get())?;
             Ok(json.into_model().map_err(|e| GetBlockchainInfoError::Model(Box::new(e)))?)
         }
     }
 
     /// Gets the transaction IDs currently in the mempool.
     pub async fn get_raw_mempool(&self) -> Result<Vec<Txid>, GetRawMempoolError> {
-        let json: crate::types::v25::GetRawMempool = self.call("getrawmempool", &[]).await?;
+        let json: types::v25::GetRawMempool = self.call("getrawmempool", &[]).await?;
         Ok(json.into_model().map_err(GetRawMempoolError::Model)?.0)
     }
 
@@ -143,7 +143,7 @@ impl Client {
         &self,
         txid: &Txid,
     ) -> Result<Transaction, GetRawTransactionError> {
-        let json: crate::types::v25::GetRawTransaction =
+        let json: types::v25::GetRawTransaction =
             self.call("getrawtransaction", &[into_json(txid)?]).await?;
         Ok(json.into_model().map_err(GetRawTransactionError::Model)?.0)
     }
@@ -154,7 +154,7 @@ impl Client {
         txid: &Txid,
         vout: u64,
     ) -> Result<model::GetTxOut, GetTxOutError> {
-        let json: crate::types::v25::GetTxOut =
+        let json: types::v25::GetTxOut =
             self.call("gettxout", &[into_json(txid)?, into_json(vout)?]).await?;
         json.into_model().map_err(GetTxOutError::Model)
     }
