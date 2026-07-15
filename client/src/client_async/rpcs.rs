@@ -35,7 +35,7 @@ impl Client {
     pub async fn get_block_count(&self) -> Result<u64, GetBlockCountError> {
         // This type hasnt' changed between Core v17 and v31.
         let json: types::v25::GetBlockCount = self.call("getblockcount", &[]).await?;
-        Ok(json.into_model().0)
+        Ok(json.0)
     }
 
     /// Gets the block hash for a height.
