@@ -76,16 +76,17 @@ impl Client {
         &self,
         hash: &BlockHash,
     ) -> Result<model::GetBlockHeaderVerbose, GetBlockHeaderVerboseError> {
-        let raw: Box<RawValue> =
-            self.call("getblockheader", &[into_json(hash)?, into_json(true)?]).await?;
-        if let Ok(json) =
-            serde_json::from_str::<types::v29::GetBlockHeaderVerbose>(raw.get())
-        {
-            Ok(json.into_model().map_err(|e| GetBlockHeaderVerboseError::Model(Box::new(e)))?)
-        } else {
-            let json: types::v25::GetBlockHeaderVerbose = serde_json::from_str(raw.get())?;
-            Ok(json.into_model().map_err(|e| GetBlockHeaderVerboseError::Model(Box::new(e)))?)
+        // This type changed in Core v29; assume node is up to date.
+        let res: Result<types::v29::GetBlockHeaderVerbose, _> =
+            self.call("getblockheader", &[into_json(hash)?, into_json(true)?]).await;
+        if let Ok(json) = res {
+            return json.into_model().map_err(GetBlockHeaderVerboseError::ModelV29);
         }
+
+        // Fall back to v25 (same sine Core v17).
+        let json: types::v25::GetBlockHeaderVerbose =
+            self.call("getblockheader", &[into_json(hash)?, into_json(true)?]).await?;
+        json.into_model().map_err(GetBlockHeaderVerboseError::ModelV25)
     }
 
     /// Gets a block by blockhash with verbose set to 1.

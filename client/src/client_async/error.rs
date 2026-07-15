@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
+use core::convert::Infallible;
 use std::{error, fmt, io};
 
 /// The general error type for the async client.
@@ -61,6 +62,48 @@ impl error::Error for Error {
             InvalidCookieFile | MissingUserPassword => None,
         }
     }
+}
+
+#[derive(Debug)]
+pub enum GetBlockHeaderVerboseError {
+    /// Making the JSON-RPC call failed.
+    Rpc(Error),
+    /// Converting the returned v29 JSON into the model type failed.
+    ModelV29(types::v29::GetBlockHeaderVerboseError),
+    /// Converting the returned v25 JSON into the model type failed.
+    ModelV25(types::v25::GetBlockHeaderVerboseError),
+}
+
+impl fmt::Display for GetBlockHeaderVerboseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match *self {
+            Self::Rpc(ref e) => write!(f, "JSON-RPC call failed: {}", e),
+            Self::ModelV29(ref e) => write!(f, "conversion to the model type from v29 type failed: {}", e),
+            Self::ModelV25(ref e) => write!(f, "conversion to the model type from v25 type failed: {}", e),
+        }
+    }
+}
+
+impl std::error::Error for GetBlockHeaderVerboseError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match *self {
+            Self::Rpc(ref e) => Some(e),
+            Self::ModelV29(ref e) => Some(e),
+            Self::ModelV25(ref e) => Some(e),
+        }
+    }
+}
+
+impl From<Infallible> for GetBlockHeaderVerboseError {
+    fn from(never: Infallible) -> Self { match never {} }
+}
+
+impl From<Error> for GetBlockHeaderVerboseError {
+    fn from(e: Error) -> Self { Self::Rpc(e) }
+}
+
+impl From<serde_json::error::Error> for GetBlockHeaderVerboseError {
+    fn from(e: serde_json::error::Error) -> Self { Self::Rpc(Error::Json(e)) }
 }
 
 /// Defines the error type returned by a single RPC method on the async `Client`.
@@ -212,12 +255,6 @@ define_method_error! {
 define_method_error! {
     /// Error returned by [`Client::get_block_header`](crate::client_async::Client::get_block_header).
     GetBlockHeaderError => types::v17::GetBlockHeaderError
-}
-
-define_method_error! {
-    /// Error returned by
-    /// [`Client::get_block_header_verbose`](crate::client_async::Client::get_block_header_verbose).
-    GetBlockHeaderVerboseError => boxed
 }
 
 define_method_error! {
