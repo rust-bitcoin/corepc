@@ -16,47 +16,13 @@ use crate::client_async::error::{
     GetBestBlockHashError, GetBlockCountError, GetBlockError, GetBlockFilterError,
     GetBlockHashError, GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseError,
     GetBlockchainInfoError, GetRawMempoolError, GetRawTransactionError, GetTxOutError,
-    ServerVersionError, Error,
+    ServerVersionError,
 };
 use crate::client_async::Client;
 use crate::types::model::{
     GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne, GetBlockchainInfo, GetTxOut,
 };
 use crate::into_json;
-
-/// Template trait for implementing custom async RPC method sets.
-///
-/// This intentionally includes one method so downstream users can copy this pattern
-/// and define their own trait with just the RPCs they need.
-pub trait RpcApi: Sized {
-    /// Call an RPC `method` with given `args` list.
-    fn call<T: for<'a> serde::de::Deserialize<'a>>(
-        &self,
-        method: &str,
-        args: &[serde_json::Value],
-    ) -> impl std::future::Future<Output = Result<T, Error>> + Send;
-
-    /// Gets the block count.
-    fn get_block_count(&self) -> impl std::future::Future<Output = Result<u64, Error>> + Send
-    where
-        Self: Sync,
-    {
-        async move {
-            let json: crate::types::v25::GetBlockCount = self.call("getblockcount", &[]).await?;
-            Ok(json.into_model().0)
-        }
-    }
-}
-
-impl RpcApi for Client {
-    fn call<T: for<'a> serde::de::Deserialize<'a>>(
-        &self,
-        method: &str,
-        args: &[serde_json::Value],
-    ) -> impl std::future::Future<Output = Result<T, Error>> + Send {
-        Client::call(self, method, args)
-    }
-}
 
 impl Client {
     /// Gets a block by blockhash.

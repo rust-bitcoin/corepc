@@ -16,7 +16,6 @@ pub use crate::client_async::error::{
     GetBlockchainInfoError, GetRawMempoolError, GetRawTransactionError, GetTxOutError,
     ServerVersionError, UnexpectedServerVersionError,
 };
-pub use crate::client_async::rpcs::RpcApi;
 
 /// The different authentication methods for the client.
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
