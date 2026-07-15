@@ -19,9 +19,7 @@ use crate::client_async::error::{
     ServerVersionError,
 };
 use crate::client_async::Client;
-use crate::types::model::{
-    GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne, GetBlockchainInfo, GetTxOut,
-};
+use crate::types::model;
 use crate::into_json;
 
 impl Client {
@@ -72,7 +70,7 @@ impl Client {
     pub async fn get_block_header_verbose(
         &self,
         hash: &BlockHash,
-    ) -> Result<GetBlockHeaderVerbose, GetBlockHeaderVerboseError> {
+    ) -> Result<model::GetBlockHeaderVerbose, GetBlockHeaderVerboseError> {
         let raw: Box<RawValue> =
             self.call("getblockheader", &[into_json(hash)?, into_json(true)?]).await?;
         if let Ok(json) =
@@ -91,7 +89,7 @@ impl Client {
     pub async fn get_block_verbose(
         &self,
         hash: &BlockHash,
-    ) -> Result<GetBlockVerboseOne, GetBlockVerboseError> {
+    ) -> Result<model::GetBlockVerboseOne, GetBlockVerboseError> {
         let raw: Box<RawValue> = self.call("getblock", &[into_json(hash)?, into_json(1)?]).await?;
         if let Ok(json) = serde_json::from_str::<crate::types::v31::GetBlockVerboseOne>(raw.get()) {
             Ok(json.into_model().map_err(|e| GetBlockVerboseError::Model(Box::new(e)))?)
@@ -109,7 +107,7 @@ impl Client {
     pub async fn get_block_filter(
         &self,
         hash: &BlockHash,
-    ) -> Result<GetBlockFilter, GetBlockFilterError> {
+    ) -> Result<model::GetBlockFilter, GetBlockFilterError> {
         let json: crate::types::v25::GetBlockFilter =
             self.call("getblockfilter", &[into_json(hash)?]).await?;
         json.into_model().map_err(GetBlockFilterError::Model)
@@ -120,7 +118,7 @@ impl Client {
     /// The version specific type is detected from the response shape.
     pub async fn get_blockchain_info(
         &self,
-    ) -> Result<GetBlockchainInfo, GetBlockchainInfoError> {
+    ) -> Result<model::GetBlockchainInfo, GetBlockchainInfoError> {
         let raw: Box<RawValue> = self.call("getblockchaininfo", &[]).await?;
         if let Ok(json) = serde_json::from_str::<crate::types::v29::GetBlockchainInfo>(raw.get()) {
             Ok(json.into_model().map_err(|e| GetBlockchainInfoError::Model(Box::new(e)))?)
@@ -155,7 +153,7 @@ impl Client {
         &self,
         txid: &Txid,
         vout: u64,
-    ) -> Result<GetTxOut, GetTxOutError> {
+    ) -> Result<model::GetTxOut, GetTxOutError> {
         let json: crate::types::v25::GetTxOut =
             self.call("gettxout", &[into_json(txid)?, into_json(vout)?]).await?;
         json.into_model().map_err(GetTxOutError::Model)
