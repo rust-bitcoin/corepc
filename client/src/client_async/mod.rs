@@ -17,7 +17,6 @@ pub use crate::client_async::error::{
     ServerVersionError, UnexpectedServerVersionError,
 };
 pub use crate::client_async::rpcs::RpcApi;
-pub(crate) use crate::{into_json, log_response};
 
 /// The different authentication methods for the client.
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
@@ -100,7 +99,7 @@ impl Client {
         }
 
         let resp = self.inner.send_request(req).await.map_err(Error::from);
-        log_response(method, &resp);
+        crate::log_response(method, &resp);
         Ok(resp?.result()?)
     }
 }

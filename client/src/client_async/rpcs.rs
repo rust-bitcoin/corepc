@@ -18,10 +18,11 @@ use crate::client_async::error::{
     GetBlockchainInfoError, GetRawMempoolError, GetRawTransactionError, GetTxOutError,
     ServerVersionError, Error,
 };
-use crate::client_async::{into_json, Client};
+use crate::client_async::Client;
 use crate::types::model::{
     GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne, GetBlockchainInfo, GetTxOut,
 };
+use crate::into_json;
 
 /// Template trait for implementing custom async RPC method sets.
 ///
