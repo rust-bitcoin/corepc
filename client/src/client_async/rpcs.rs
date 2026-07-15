@@ -16,9 +16,9 @@ use crate::client_async::error::{
     GetBestBlockHashError, GetBlockCountError, GetBlockError, GetBlockFilterError,
     GetBlockHashError, GetBlockHeaderError, GetBlockHeaderVerboseError, GetBlockVerboseError,
     GetBlockchainInfoError, GetRawMempoolError, GetRawTransactionError, GetTxOutError,
-    ServerVersionError,
+    ServerVersionError, Error,
 };
-use crate::client_async::{into_json, Client, Result};
+use crate::client_async::{into_json, Client};
 use crate::types::model::{
     GetBlockFilter, GetBlockHeaderVerbose, GetBlockVerboseOne, GetBlockchainInfo, GetTxOut,
 };
@@ -33,10 +33,10 @@ pub trait RpcApi: Sized {
         &self,
         method: &str,
         args: &[serde_json::Value],
-    ) -> impl std::future::Future<Output = Result<T>> + Send;
+    ) -> impl std::future::Future<Output = Result<T, Error>> + Send;
 
     /// Gets the block count.
-    fn get_block_count(&self) -> impl std::future::Future<Output = Result<u64>> + Send
+    fn get_block_count(&self) -> impl std::future::Future<Output = Result<u64, Error>> + Send
     where
         Self: Sync,
     {
@@ -52,7 +52,7 @@ impl RpcApi for Client {
         &self,
         method: &str,
         args: &[serde_json::Value],
-    ) -> impl std::future::Future<Output = Result<T>> + Send {
+    ) -> impl std::future::Future<Output = Result<T, Error>> + Send {
         Client::call(self, method, args)
     }
 }

@@ -19,11 +19,6 @@ pub use crate::client_async::error::{
 pub use crate::client_async::rpcs::RpcApi;
 pub(crate) use crate::{into_json, log_response};
 
-/// Crate-specific Result type.
-///
-/// Shorthand for `std::result::Result` with our crate-specific [`Error`] type.
-pub type Result<T> = std::result::Result<T, Error>;
-
 /// The different authentication methods for the client.
 #[derive(Clone, Debug, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum Auth {
@@ -34,7 +29,7 @@ pub enum Auth {
 
 impl Auth {
     /// Convert into the arguments that jsonrpc::Client needs.
-    pub fn get_user_pass(self) -> Result<(Option<String>, Option<String>)> {
+    pub fn get_user_pass(self) -> Result<(Option<String>, Option<String>), Error> {
         match self {
             Auth::None => Ok((None, None)),
             Auth::UserPass(u, p) => Ok((Some(u), Some(p))),
@@ -75,7 +70,7 @@ impl Client {
     }
 
     /// Creates a client to a bitcoind JSON-RPC server with authentication.
-    pub fn new_with_auth(url: &str, auth: Auth) -> Result<Self> {
+    pub fn new_with_auth(url: &str, auth: Auth) -> Result<Self, Error> {
         if matches!(auth, Auth::None) {
             return Err(Error::MissingUserPassword);
         }
@@ -97,7 +92,7 @@ impl Client {
         &self,
         method: &str,
         args: &[serde_json::Value],
-    ) -> Result<T> {
+    ) -> Result<T, Error> {
         let raw = serde_json::value::to_raw_value(args)?;
         let req = self.inner.build_request(method, Some(&*raw));
         if log::log_enabled!(log::Level::Debug) {
