@@ -349,10 +349,6 @@ pub struct Bip9SoftforkStatistics {
     pub possible: Option<bool>,
 }
 
-/// Models the result of JSON-RPC method `getblockcount`.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct GetBlockCount(pub u64);
-
 /// Models the result of JSON-RPC method `getblockfilter`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetBlockFilter {

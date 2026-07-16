@@ -29,7 +29,7 @@
 //! | getbestblockhash                   | version + model |                                        |
 //! | getblock                           | version + model | Includes additional 'verbose' type     |
 //! | getblockchaininfo                  | version + model |                                        |
-//! | getblockcount                      | version + model |                                        |
+//! | getblockcount                      | version         |                                        |
 //! | getblockhash                       | version + model |                                        |
 //! | getblockheader                     | version + model | Includes additional 'verbose' type     |
 //! | getblockstats                      | version + model |                                        |

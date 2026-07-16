@@ -30,7 +30,7 @@
 //! | getbestblockhash                   | version + model |                                        |
 //! | getblock                           | version + model | Includes additional 'verbose' type     |
 //! | getblockchaininfo                  | version + model |                                        |
-//! | getblockcount                      | version + model |                                        |
+//! | getblockcount                      | version         |                                        |
 //! | getblockfilter                     | version + model |                                        |
 //! | getblockfrompeer                   | returns nothing |                                        |
 //! | getblockhash                       | version + model |                                        |

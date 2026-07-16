@@ -217,11 +217,9 @@ fn blockchain__get_blockchain_info__modelled() {
 }
 
 #[test]
-fn blockchain__get_block_count__modelled() {
+fn blockchain__get_block_count() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
-
-    let json: GetBlockCount = node.client.get_block_count().unwrap();
-    let _: mtype::GetBlockCount = json.into_model();
+    let _: GetBlockCount = node.client.get_block_count().unwrap();
 }
 
 #[test]
