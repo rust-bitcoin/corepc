@@ -31,3 +31,7 @@ versions = [
     "0_18_1",
     "0_17_2",
 ]
+
+[patch.crates-io]
+# The compat layer branch: https://github.com/rust-bitcoin/rust-bitcoin/pull/6259
+bitcoin = { git = "https://github.com/tcharding/rust-bitcoin", branch = "push-pwqxwuswpnsz" }

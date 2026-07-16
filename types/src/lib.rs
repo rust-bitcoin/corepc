@@ -40,6 +40,7 @@ use core::fmt;
 
 use bitcoin::address::{self, Address, NetworkUnchecked};
 use bitcoin::amount::ParseAmountError;
+use bitcoin::compat::{Amount as StableAmount, Sequence as StableSequence};
 use bitcoin::hex::{self, FromHex as _};
 use bitcoin::{Amount, FeeRate, ScriptBuf, Witness};
 use serde::{Deserialize, Serialize};
@@ -97,9 +98,21 @@ impl std::error::Error for NumericError {}
 /// Converts `fee_rate` in BTC/kB to `FeeRate`.
 fn btc_per_kb(btc_per_kb: f64) -> Result<Option<FeeRate>, ParseAmountError> {
     // TODO: After upgrade to bitcoin `v0.33` use `FeeRate::from_sat_per_kvb()`.
-    let per_kb = Amount::from_btc(btc_per_kb)?;
+    let per_kb = bitcoin::Amount::from_btc(btc_per_kb)?;
     Ok(FeeRate::from_sat_per_vb(per_kb.to_sat()).and_then(|fee_rate| fee_rate.checked_div(1000)))
 }
+
+fn stable_amount(amount: Amount) -> StableAmount {
+    amount.to_stable().expect("Bitcoin Core amounts are within MAX_MONEY")
+}
+
+fn stable_amount_from_sat(sats: u64) -> StableAmount { stable_amount(Amount::from_sat(sats)) }
+
+fn stable_amount_from_btc(btc: f64) -> Result<StableAmount, ParseAmountError> {
+    Ok(stable_amount(Amount::from_btc(btc)?))
+}
+
+fn stable_sequence(sequence: bitcoin::Sequence) -> StableSequence { sequence.to_stable() }
 
 // TODO: Remove this function if a new `Witness` constructor gets added.
 // https://github.com/rust-bitcoin/rust-bitcoin/issues/4350

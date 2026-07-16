@@ -6,8 +6,8 @@ use std::collections::{BTreeMap, HashMap};
 
 use bitcoin::hex::{self, FromHex as _};
 use bitcoin::{
-    absolute, bip32, ecdsa, psbt, secp256k1, transaction, Amount, OutPoint, PublicKey, ScriptBuf,
-    Sequence, Transaction, TxIn, TxOut, Txid, Witness,
+    absolute, bip32, ecdsa, psbt, secp256k1, transaction, OutPoint, PublicKey, ScriptBuf,
+    Transaction, TxIn, TxOut, Txid, Witness,
 };
 use serde::{Deserialize, Serialize};
 
@@ -129,7 +129,7 @@ impl RawTransactionInput {
         Ok(TxIn {
             previous_output,
             script_sig,
-            sequence: Sequence::from_consensus(self.sequence),
+            sequence: bitcoin::Sequence::from_consensus(self.sequence),
             witness,
         })
     }
@@ -155,7 +155,7 @@ impl RawTransactionOutput {
     pub fn to_output(&self) -> Result<TxOut, RawTransactionOutputError> {
         use RawTransactionOutputError as E;
 
-        let value = Amount::from_btc(self.value).map_err(E::Value)?;
+        let value = bitcoin::Amount::from_btc(self.value).map_err(E::Value)?;
         let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubKey)?;
 
         Ok(TxOut { value, script_pubkey })
@@ -179,7 +179,7 @@ impl WitnessUtxo {
     pub fn to_tx_out(&self) -> Result<TxOut, WitnessUtxoError> {
         use WitnessUtxoError as E;
 
-        let value = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let value = bitcoin::Amount::from_btc(self.amount).map_err(E::Amount)?;
         let script_pubkey = self.script_pubkey.script_buf().map_err(E::ScriptPubKey)?;
 
         Ok(TxOut { value, script_pubkey })

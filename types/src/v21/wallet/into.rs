@@ -21,8 +21,9 @@ impl PsbtBumpFee {
         use PsbtBumpFeeError as E;
 
         let psbt = self.psbt.parse().map_err(E::Psbt)?;
-        let original_fee = bitcoin::Amount::from_btc(self.original_fee).map_err(E::OriginalFee)?;
-        let fee = bitcoin::Amount::from_btc(self.fee).map_err(E::Fee)?;
+        let original_fee =
+            crate::stable_amount_from_btc(self.original_fee).map_err(E::OriginalFee)?;
+        let fee = crate::stable_amount_from_btc(self.fee).map_err(E::Fee)?;
         let errors = self.errors;
         Ok(model::PsbtBumpFee { psbt, original_fee, fee, errors })
     }
@@ -70,11 +71,11 @@ impl GetWalletInfo {
         use GetWalletInfoError as E;
 
         let wallet_version = crate::to_u32(self.wallet_version, "wallet_version")?;
-        let balance = bitcoin::Amount::from_btc(self.balance).map_err(E::Balance)?;
-        let unconfirmed_balance =
-            bitcoin::Amount::from_btc(self.unconfirmed_balance).map_err(E::UnconfirmedBalance)?;
+        let balance = crate::stable_amount_from_btc(self.balance).map_err(E::Balance)?;
+        let unconfirmed_balance = crate::stable_amount_from_btc(self.unconfirmed_balance)
+            .map_err(E::UnconfirmedBalance)?;
         let immature_balance =
-            bitcoin::Amount::from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
+            crate::stable_amount_from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
         let tx_count = crate::to_u32(self.tx_count, "tx_count")?;
         let keypool_oldest = crate::to_u32(self.keypool_oldest, "keypool_oldest")?;
         let keypool_size = crate::to_u32(self.keypool_size, "keypool_size")?;

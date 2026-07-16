@@ -127,7 +127,7 @@ fn blockchain__load_tx_out_set__modelled() {
 
     assert_eq!(model.base_height, snapshot_height as u32);
     assert_eq!(model.tip_hash, hash_at_height);
-    assert_eq!(model.coins_loaded, bitcoin::Amount::from_btc(110.0).unwrap());
+    assert_eq!(model.coins_loaded, bitcoin::compat::Amount::from_btc(110.0).unwrap());
 }
 
 #[test]

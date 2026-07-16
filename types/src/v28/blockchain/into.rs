@@ -2,7 +2,7 @@
 
 use alloc::collections::BTreeMap;
 
-use bitcoin::{Amount, BlockHash, Network, ScriptBuf, Txid, Work};
+use bitcoin::{BlockHash, Network, ScriptBuf, Txid, Work};
 
 use super::{
     GetBlockchainInfo, GetBlockchainInfoError, ScanTxOutSetError, ScanTxOutSetStart,
@@ -61,7 +61,8 @@ impl ScanTxOutSetStart {
         let unspents =
             self.unspents.into_iter().map(|u| u.into_model()).collect::<Result<Vec<_>, _>>()?;
 
-        let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
+        let total_amount =
+            crate::stable_amount_from_btc(self.total_amount).map_err(E::TotalAmount)?;
 
         Ok(model::ScanTxOutSetStart {
             success: self.success,
@@ -80,7 +81,7 @@ impl ScanTxOutSetUnspent {
         use ScanTxOutSetError as E;
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = crate::stable_amount_from_btc(self.amount).map_err(E::Amount)?;
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
         let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
 

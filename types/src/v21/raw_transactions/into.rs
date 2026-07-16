@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::{Amount, Txid};
+use bitcoin::Txid;
 
 use super::{MempoolAcceptance, MempoolAcceptanceError, TestMempoolAccept, TestMempoolAcceptError};
 use crate::model;
@@ -23,7 +23,7 @@ impl MempoolAcceptance {
         let vsize = self.vsize.map(|s| crate::to_u32(s, "vsize")).transpose()?;
         let fees = match self.fees {
             Some(s) => {
-                let base = Amount::from_btc(s.base).map_err(E::Base)?;
+                let base = crate::stable_amount_from_btc(s.base).map_err(E::Base)?;
                 Some(model::MempoolAcceptanceFees {
                     base,
                     effective_fee_rate: None, // v25 and later only.

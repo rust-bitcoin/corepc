@@ -4,8 +4,8 @@ use alloc::collections::BTreeMap;
 
 use bitcoin::consensus::encode;
 use bitcoin::{
-    absolute, block, transaction, Amount, BlockHash, CompactTarget, OutPoint, ScriptBuf, Sequence,
-    Target, Transaction, TxMerkleNode, Txid, Weight, Work, Wtxid,
+    absolute, block, transaction, BlockHash, CompactTarget, OutPoint, ScriptBuf, Target,
+    Transaction, TxMerkleNode, Txid, Weight, Work, Wtxid,
 };
 
 use super::{
@@ -34,7 +34,7 @@ impl GetMempoolCluster {
                 .map(|txid| txid.parse::<Txid>())
                 .collect::<Result<Vec<_>, _>>()
                 .map_err(E::Txid)?;
-            let chunk_fee = Amount::from_btc(chunk.chunk_fee).map_err(E::ChunkFee)?;
+            let chunk_fee = crate::stable_amount_from_btc(chunk.chunk_fee).map_err(E::ChunkFee)?;
             chunks.push(model::Chunk { chunk_fee, chunk_weight: chunk.chunk_weight, txs })
         }
 
@@ -109,11 +109,11 @@ impl MempoolEntryFees {
     pub fn into_model(self) -> Result<model::MempoolEntryFees, MempoolEntryFeesError> {
         use MempoolEntryFeesError as E;
 
-        let base = Amount::from_btc(self.base).map_err(E::Base)?;
-        let modified = Amount::from_btc(self.modified).map_err(E::Modified)?;
-        let ancestor = Amount::from_btc(self.ancestor).map_err(E::Ancestor)?;
-        let descendant = Amount::from_btc(self.descendant).map_err(E::Descendant)?;
-        let chunk = Some(Amount::from_btc(self.chunk).map_err(E::Chunk)?);
+        let base = crate::stable_amount_from_btc(self.base).map_err(E::Base)?;
+        let modified = crate::stable_amount_from_btc(self.modified).map_err(E::Modified)?;
+        let ancestor = crate::stable_amount_from_btc(self.ancestor).map_err(E::Ancestor)?;
+        let descendant = crate::stable_amount_from_btc(self.descendant).map_err(E::Descendant)?;
+        let chunk = Some(crate::stable_amount_from_btc(self.chunk).map_err(E::Chunk)?);
 
         Ok(model::MempoolEntryFees { base, modified, ancestor, descendant, chunk })
     }
@@ -211,7 +211,7 @@ impl GetMempoolFeerateDiagram {
         let mut entries = vec![];
         for entry in self.0 {
             let weight = crate::to_u64(entry.weight, "weight")?;
-            let fee = Amount::from_btc(entry.fee).map_err(E::Fee)?;
+            let fee = crate::stable_amount_from_btc(entry.fee).map_err(E::Fee)?;
             entries.push(model::FeerateDiagramEntry { weight, fee });
         }
         Ok(model::GetMempoolFeerateDiagram(entries))
@@ -281,7 +281,7 @@ impl CoinbaseTransaction {
             .map_err(E::Witness)?;
         let version = transaction::Version::non_standard(self.version);
         let locktime = absolute::LockTime::from_consensus(self.locktime);
-        let sequence = Sequence::from_consensus(self.sequence);
+        let sequence = crate::stable_sequence(bitcoin::Sequence::from_consensus(self.sequence));
 
         Ok(model::CoinbaseTransaction { version, locktime, sequence, coinbase, witness })
     }
@@ -365,7 +365,8 @@ impl GetBlockVerboseTwo {
             .into_iter()
             .map(|entry| {
                 let transaction = entry.transaction.into_model().map_err(E::Transaction)?;
-                let fee = entry.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+                let fee =
+                    entry.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
                 Ok(model::GetBlockVerboseTwoTransaction { transaction, fee })
             })
             .collect::<Result<Vec<_>, E>>()?;
@@ -432,7 +433,8 @@ impl GetBlockVerboseThree {
             .map(|entry| {
                 let (transaction, prevouts) =
                     entry.transaction.into_model_with_prevouts().map_err(E::Transaction)?;
-                let fee = entry.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+                let fee =
+                    entry.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
                 Ok(model::GetBlockVerboseThreeTransaction { transaction, prevouts, fee })
             })
             .collect::<Result<Vec<_>, E>>()?;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::{Amount, Txid, Wtxid};
+use bitcoin::{Txid, Wtxid};
 
 use super::{MempoolAcceptance, MempoolAcceptanceError, TestMempoolAccept, TestMempoolAcceptError};
 use crate::model;
@@ -43,7 +43,7 @@ impl MempoolAcceptance {
                     .flatten();
 
                 Ok::<_, MempoolAcceptanceError>(model::MempoolAcceptanceFees {
-                    base: Amount::from_btc(s.base).map_err(E::Base)?,
+                    base: crate::stable_amount_from_btc(s.base).map_err(E::Base)?,
                     effective_fee_rate,
                     effective_includes,
                 })

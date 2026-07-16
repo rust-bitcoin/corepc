@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::hashes::sha256;
-use bitcoin::{Amount, BlockHash};
+use bitcoin::BlockHash;
 
 use super::{
     DumpTxOutSet, DumpTxOutSetError, GetChainStates, GetChainStatesError, GetTxOutSetInfo,
@@ -47,7 +47,8 @@ impl DumpTxOutSet {
     pub fn into_model(self) -> Result<model::DumpTxOutSet, DumpTxOutSetError> {
         use DumpTxOutSetError as E;
 
-        let coins_written = Amount::from_btc(self.coins_written).map_err(E::CoinsWritten)?;
+        let coins_written =
+            crate::stable_amount_from_btc(self.coins_written).map_err(E::CoinsWritten)?;
         let base_hash = self.base_hash.parse::<BlockHash>().map_err(E::BaseHash)?;
         let base_height = crate::to_u32(self.base_height, "base_height")?;
         let tx_out_set_hash =
@@ -77,26 +78,33 @@ impl GetTxOutSetInfo {
         let tx_outs = crate::to_u32(self.tx_outs, "tx_outs")?;
         let bogo_size = crate::to_u32(self.bogo_size, "bogo_size")?;
         let disk_size = self.disk_size.map(|v| crate::to_u32(v, "disk_size")).transpose()?;
-        let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
+        let total_amount =
+            crate::stable_amount_from_btc(self.total_amount).map_err(E::TotalAmount)?;
         let total_unspendable_amount = self
             .total_unspendable_amount
-            .map(|v| Amount::from_btc(v).map_err(E::TotalUnspendableAmount))
+            .map(|v| crate::stable_amount_from_btc(v).map_err(E::TotalUnspendableAmount))
             .transpose()?;
         let block_info = match self.block_info {
             Some(b) => {
-                let prevout_spent = Amount::from_btc(b.prevout_spent).map_err(E::PrevoutSpent)?;
-                let coinbase = Amount::from_btc(b.coinbase).map_err(E::Coinbase)?;
+                let prevout_spent =
+                    crate::stable_amount_from_btc(b.prevout_spent).map_err(E::PrevoutSpent)?;
+                let coinbase = crate::stable_amount_from_btc(b.coinbase).map_err(E::Coinbase)?;
                 let new_outputs_ex_coinbase =
-                    Amount::from_btc(b.new_outputs_ex_coinbase).map_err(E::NewOutputsExCoinbase)?;
-                let unspendable = Amount::from_btc(b.unspendable).map_err(E::Unspendable)?;
+                    crate::stable_amount_from_btc(b.new_outputs_ex_coinbase)
+                        .map_err(E::NewOutputsExCoinbase)?;
+                let unspendable =
+                    crate::stable_amount_from_btc(b.unspendable).map_err(E::Unspendable)?;
                 let unspendables = model::GetTxOutSetInfoUnspendables {
-                    genesis_block: Amount::from_btc(b.unspendables.genesis_block)
+                    genesis_block: crate::stable_amount_from_btc(b.unspendables.genesis_block)
                         .map_err(E::UnspendablesGenesisBlock)?,
-                    bip30: Amount::from_btc(b.unspendables.bip30).map_err(E::UnspendablesBip30)?,
-                    scripts: Amount::from_btc(b.unspendables.scripts)
+                    bip30: crate::stable_amount_from_btc(b.unspendables.bip30)
+                        .map_err(E::UnspendablesBip30)?,
+                    scripts: crate::stable_amount_from_btc(b.unspendables.scripts)
                         .map_err(E::UnspendablesScripts)?,
-                    unclaimed_rewards: Amount::from_btc(b.unspendables.unclaimed_rewards)
-                        .map_err(E::UnspendablesUnclaimedRewards)?,
+                    unclaimed_rewards: crate::stable_amount_from_btc(
+                        b.unspendables.unclaimed_rewards,
+                    )
+                    .map_err(E::UnspendablesUnclaimedRewards)?,
                 };
 
                 Some(model::GetTxOutSetInfoBlockInfo {
@@ -134,7 +142,8 @@ impl LoadTxOutSet {
 
         let tip_hash = self.tip_hash.parse::<BlockHash>().map_err(E::TipHash)?;
         let base_height = crate::to_u32(self.base_height, "base_height")?;
-        let coins_loaded = Amount::from_btc(self.coins_loaded).map_err(E::CoinsLoaded)?;
+        let coins_loaded =
+            crate::stable_amount_from_btc(self.coins_loaded).map_err(E::CoinsLoaded)?;
 
         Ok(model::LoadTxOutSet { coins_loaded, tip_hash, base_height, path: self.path })
     }

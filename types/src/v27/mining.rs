@@ -6,7 +6,7 @@
 
 use std::collections::BTreeMap;
 
-use bitcoin::{hex, SignedAmount, Txid};
+use bitcoin::{hex, Txid};
 use serde::{Deserialize, Serialize};
 
 use crate::model;
@@ -51,9 +51,9 @@ impl PrioritisedTransaction {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> model::PrioritisedTransaction {
         model::PrioritisedTransaction {
-            fee_delta: SignedAmount::from_sat(self.fee_delta),
+            fee_delta: bitcoin::SignedAmount::from_sat(self.fee_delta),
             in_mempool: self.in_mempool,
-            modified_fee: self.modified_fee.map(SignedAmount::from_sat),
+            modified_fee: self.modified_fee.map(bitcoin::SignedAmount::from_sat),
         }
     }
 }

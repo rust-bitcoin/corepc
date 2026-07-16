@@ -8,8 +8,9 @@
 use alloc::collections::BTreeMap;
 
 use bitcoin::address::{Address, NetworkUnchecked};
+use bitcoin::compat::{Amount, Sequence};
 use bitcoin::hashes::{hash160, sha256};
-use bitcoin::{Amount, BlockHash, FeeRate, Psbt, ScriptBuf, Sequence, Transaction, Txid, Wtxid};
+use bitcoin::{BlockHash, FeeRate, Psbt, ScriptBuf, Transaction, Txid, Wtxid};
 use serde::{Deserialize, Serialize};
 
 /// Models the result of JSON-RPC method `abortprivatebroadcast`.
@@ -31,6 +32,7 @@ pub struct AnalyzePsbt {
     /// Shown only if all UTXO slots in the PSBT have been filled.
     pub estimated_fee_rate: Option<FeeRate>,
     /// The transaction fee paid. Shown only if all UTXO slots in the PSBT have been filled.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub fee: Option<Amount>,
     /// Role of the next person that this psbt needs to go to.
     pub next: String,
@@ -88,6 +90,7 @@ pub struct DecodePsbt {
     /// The decoded PSBT.
     pub psbt: Psbt,
     /// The transaction fee paid if all UTXOs slots in the PSBT have been filled.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub fee: Option<Amount>,
 }
 
@@ -144,6 +147,7 @@ pub struct FundRawTransaction {
     /// The resulting raw transaction.
     pub tx: Transaction,
     /// Fee the resulting transaction pays.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub fee: Amount,
     /// The position of the added change output, or -1.
     pub change_position: i64,
@@ -251,6 +255,7 @@ pub struct SubmitPackageTxResult {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct SubmitPackageTxResultFees {
     /// Transaction fee.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub base_fee: Amount,
     /// The effective feerate.
     ///
@@ -292,6 +297,7 @@ pub struct MempoolAcceptance {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct MempoolAcceptanceFees {
     /// Transaction fee in BTC.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub base: Amount,
     /// The effective feerate in BTC per KvB. May differ from the base feerate if, for example, there
     /// are modified fees from `prioritisetransaction` or a package feerate was used.

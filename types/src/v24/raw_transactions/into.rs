@@ -9,7 +9,7 @@ use bitcoin::psbt::{self, raw, PsbtSighashType};
 use bitcoin::taproot::{
     ControlBlock, LeafVersion, TapLeafHash, TapNodeHash, TapTree, TaprootBuilder,
 };
-use bitcoin::{Amount, ScriptBuf, XOnlyPublicKey};
+use bitcoin::{ScriptBuf, XOnlyPublicKey};
 
 use super::{
     taproot, ControlBlocksError, DecodePsbt, DecodePsbtError, GlobalXpub, GlobalXpubError,
@@ -72,7 +72,7 @@ impl DecodePsbt {
             inputs,
             outputs,
         };
-        let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+        let fee = self.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::DecodePsbt { psbt, fee })
     }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
 use bitcoin::consensus::encode;
-use bitcoin::{BlockHash, Psbt, SignedAmount, Transaction, Txid};
+use bitcoin::{BlockHash, Psbt, Transaction, Txid};
 
 use super::{
     CreateWallet, GetBalances, GetBalancesError, GetTransaction, GetTransactionError,
@@ -46,8 +46,9 @@ impl GetTransaction {
     pub fn into_model(self) -> Result<model::GetTransaction, GetTransactionError> {
         use GetTransactionError as E;
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let fee =
+            self.fee.map(|fee| bitcoin::SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
         let block_hash =
             self.block_hash.map(|s| s.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_index =
@@ -119,11 +120,11 @@ impl GetWalletInfo {
         use GetWalletInfoError as E;
 
         let wallet_version = crate::to_u32(self.wallet_version, "wallet_version")?;
-        let balance = bitcoin::Amount::from_btc(self.balance).map_err(E::Balance)?;
-        let unconfirmed_balance =
-            bitcoin::Amount::from_btc(self.unconfirmed_balance).map_err(E::UnconfirmedBalance)?;
+        let balance = crate::stable_amount_from_btc(self.balance).map_err(E::Balance)?;
+        let unconfirmed_balance = crate::stable_amount_from_btc(self.unconfirmed_balance)
+            .map_err(E::UnconfirmedBalance)?;
         let immature_balance =
-            bitcoin::Amount::from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
+            crate::stable_amount_from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
         let tx_count = crate::to_u32(self.tx_count, "tx_count")?;
         let keypool_oldest =
             self.keypool_oldest.map(|v| crate::to_u32(v, "keypool_oldest")).transpose()?;

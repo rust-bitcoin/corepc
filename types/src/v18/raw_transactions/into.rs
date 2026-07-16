@@ -2,7 +2,6 @@
 
 use bitcoin::hashes::{hash160, sha256};
 use bitcoin::psbt::{Psbt, PsbtParseError};
-use bitcoin::Amount;
 
 use super::{
     AnalyzePsbt, AnalyzePsbtError, AnalyzePsbtInput, AnalyzePsbtInputMissing,
@@ -27,7 +26,7 @@ impl AnalyzePsbt {
             .transpose()
             .map_err(E::EstimatedFeeRate)?
             .flatten();
-        let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+        let fee = self.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::AnalyzePsbt {
             inputs,

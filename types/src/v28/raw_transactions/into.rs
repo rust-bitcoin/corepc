@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-use bitcoin::{Amount, Txid, Wtxid};
+use bitcoin::{Txid, Wtxid};
 
 // TODO: Use explicit imports?
 use super::*;
@@ -53,7 +53,7 @@ impl SubmitPackageTxResultFees {
     ) -> Result<model::SubmitPackageTxResultFees, SubmitPackageTxResultFeesError> {
         use SubmitPackageTxResultFeesError as E;
 
-        let base_fee = Amount::from_btc(self.base_fee).map_err(E::BaseFee)?;
+        let base_fee = crate::stable_amount_from_btc(self.base_fee).map_err(E::BaseFee)?;
         let effective_fee_rate = self
             .effective_fee_rate
             .map(|f| crate::btc_per_kb(f).map_err(E::EffectiveFeeRate))

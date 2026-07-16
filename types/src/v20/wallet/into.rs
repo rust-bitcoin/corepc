@@ -4,8 +4,7 @@ use bitcoin::hashes::hash160;
 use bitcoin::hex::FromHex;
 use bitcoin::key::PublicKey;
 use bitcoin::{
-    bip32, Address, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid, WitnessProgram,
-    WitnessVersion,
+    bip32, Address, BlockHash, ScriptBuf, Transaction, Txid, WitnessProgram, WitnessVersion,
 };
 
 use super::{
@@ -178,8 +177,9 @@ impl GetTransaction {
     pub fn into_model(self) -> Result<model::GetTransaction, GetTransactionError> {
         use GetTransactionError as E;
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let fee =
+            self.fee.map(|fee| bitcoin::SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
         let block_hash =
             self.block_hash.map(|s| s.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_index =
@@ -239,8 +239,9 @@ impl GetTransactionDetail {
         use GetTransactionDetailError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let fee =
+            self.fee.map(|fee| bitcoin::SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
 
         Ok(model::GetTransactionDetail {
             involves_watch_only: self.involves_watch_only,
@@ -287,13 +288,13 @@ impl TransactionItem {
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let category = self.category.into_model();
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
         let vout = crate::to_u32(self.vout, "vout")?;
         let fee = self
             .fee
-            .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
+            .map(|f| bitcoin::SignedAmount::from_btc(f).map_err(E::Fee))
             .transpose()? // optional historically
-            .unwrap_or_else(|| SignedAmount::from_sat(0));
+            .unwrap_or_else(|| bitcoin::SignedAmount::from_sat(0));
         let block_hash = self.block_hash.parse::<BlockHash>().map_err(E::BlockHash)?;
         let block_height = crate::to_u32(self.block_height, "block_height")?;
         let block_index = crate::to_u32(self.block_index, "block_index")?;

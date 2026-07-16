@@ -3,8 +3,8 @@
 use bitcoin::consensus::encode;
 use bitcoin::hex::FromHex;
 use bitcoin::{
-    block, hex, Amount, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptBuf, TxMerkleNode,
-    TxOut, Txid, Weight, Work, Wtxid,
+    block, hex, Block, BlockHash, CompactTarget, FeeRate, Network, ScriptBuf, TxMerkleNode, TxOut,
+    Txid, Weight, Work, Wtxid,
 };
 
 // TODO: Use explicit imports?
@@ -237,7 +237,7 @@ impl GetBlockStats {
         let total_weight = self.total_weight.and_then(Weight::from_vb);
 
         Ok(model::GetBlockStats {
-            average_fee: self.average_fee.map(Amount::from_sat),
+            average_fee: self.average_fee.map(crate::stable_amount_from_sat),
             average_fee_rate,
             average_tx_size: self
                 .average_tx_size
@@ -247,23 +247,23 @@ impl GetBlockStats {
             fee_rate_percentiles,
             height: self.height.map(|v| crate::to_u32(v, "height")).transpose()?,
             inputs: self.inputs.map(|v| crate::to_u32(v, "inputs")).transpose()?,
-            max_fee: self.max_fee.map(Amount::from_sat),
+            max_fee: self.max_fee.map(crate::stable_amount_from_sat),
             max_fee_rate,
             max_tx_size: self.max_tx_size.map(|v| crate::to_u32(v, "max_tx_size")).transpose()?,
-            median_fee: self.median_fee.map(Amount::from_sat),
+            median_fee: self.median_fee.map(crate::stable_amount_from_sat),
             median_time: self.median_time.map(|v| crate::to_u32(v, "median_time")).transpose()?,
             median_tx_size: self
                 .median_tx_size
                 .map(|v| crate::to_u32(v, "median_tx_size"))
                 .transpose()?,
-            minimum_fee: self.minimum_fee.map(Amount::from_sat),
+            minimum_fee: self.minimum_fee.map(crate::stable_amount_from_sat),
             minimum_fee_rate,
             minimum_tx_size: self
                 .minimum_tx_size
                 .map(|v| crate::to_u32(v, "minimum_tx_size"))
                 .transpose()?,
             outputs: self.outputs.map(|v| crate::to_u32(v, "outputs")).transpose()?,
-            subsidy: self.subsidy.map(Amount::from_sat),
+            subsidy: self.subsidy.map(crate::stable_amount_from_sat),
             segwit_total_size: self
                 .segwit_total_size
                 .map(|v| crate::to_u32(v, "segwit_total_size"))
@@ -271,10 +271,10 @@ impl GetBlockStats {
             segwit_total_weight,
             segwit_txs: self.segwit_txs.map(|v| crate::to_u32(v, "segwit_txs")).transpose()?,
             time: self.time.map(|v| crate::to_u32(v, "time")).transpose()?,
-            total_out: self.total_out.map(Amount::from_sat),
+            total_out: self.total_out.map(crate::stable_amount_from_sat),
             total_size: self.total_size.map(|v| crate::to_u32(v, "total_size")).transpose()?,
             total_weight,
-            total_fee: self.total_fee.map(Amount::from_sat),
+            total_fee: self.total_fee.map(crate::stable_amount_from_sat),
             txs: self.txs.map(|v| crate::to_u32(v, "txs")).transpose()?,
             utxo_increase: self.utxo_increase,
             utxo_size_increase: self.utxo_size_increase,
@@ -459,10 +459,10 @@ impl MempoolEntryFees {
         use MempoolEntryFeesError as E;
 
         Ok(model::MempoolEntryFees {
-            base: Amount::from_btc(self.base).map_err(E::Base)?,
-            modified: Amount::from_btc(self.modified).map_err(E::Modified)?,
-            ancestor: Amount::from_btc(self.ancestor).map_err(E::Ancestor)?,
-            descendant: Amount::from_btc(self.descendant).map_err(E::Descendant)?,
+            base: crate::stable_amount_from_btc(self.base).map_err(E::Base)?,
+            modified: crate::stable_amount_from_btc(self.modified).map_err(E::Modified)?,
+            ancestor: crate::stable_amount_from_btc(self.ancestor).map_err(E::Ancestor)?,
+            descendant: crate::stable_amount_from_btc(self.descendant).map_err(E::Descendant)?,
             chunk: None,
         })
     }
@@ -529,7 +529,7 @@ impl GetTxOut {
 
         let best_block = self.best_block.parse::<BlockHash>().map_err(E::BestBlock)?;
         let tx_out = TxOut {
-            value: Amount::from_btc(self.value).map_err(E::Value)?,
+            value: bitcoin::Amount::from_btc(self.value).map_err(E::Value)?,
             script_pubkey: self.script_pubkey.script_buf().map_err(E::ScriptBuf)?,
         };
 
@@ -557,7 +557,8 @@ impl GetTxOutSetInfo {
         let bogo_size = crate::to_u32(self.bogo_size, "bogo_size")?;
         let hash_serialized_2 = Some(self.hash_serialized_2); // TODO: Convert this to a hash type.
         let disk_size = Some(crate::to_u32(self.disk_size, "disk_size")?);
-        let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
+        let total_amount =
+            crate::stable_amount_from_btc(self.total_amount).map_err(E::TotalAmount)?;
 
         Ok(model::GetTxOutSetInfo {
             height,
@@ -584,7 +585,8 @@ impl ScanTxOutSetStart {
         let unspents =
             self.unspents.into_iter().map(|u| u.into_model()).collect::<Result<Vec<_>, _>>()?;
 
-        let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
+        let total_amount =
+            crate::stable_amount_from_btc(self.total_amount).map_err(E::TotalAmount)?;
 
         Ok(model::ScanTxOutSetStart {
             success: self.success,
@@ -603,7 +605,7 @@ impl ScanTxOutSetUnspent {
         use ScanTxOutSetError as E;
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = crate::stable_amount_from_btc(self.amount).map_err(E::Amount)?;
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
 
         Ok(model::ScanTxOutSetUnspent {

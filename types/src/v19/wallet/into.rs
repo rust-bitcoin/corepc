@@ -2,7 +2,7 @@
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::consensus::encode;
-use bitcoin::{Amount, BlockHash, SignedAmount, Transaction, Txid};
+use bitcoin::{BlockHash, Transaction, Txid};
 
 use super::{
     GetBalances, GetBalancesError, GetBalancesMine, GetBalancesWatchOnly, GetTransaction,
@@ -30,10 +30,10 @@ impl GetBalances {
 impl GetBalancesMine {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::GetBalancesMine, ParseAmountError> {
-        let trusted = Amount::from_btc(self.trusted)?;
-        let untrusted_pending = Amount::from_btc(self.untrusted_pending)?;
-        let immature = Amount::from_btc(self.immature)?;
-        let used = self.used.map(Amount::from_btc).transpose()?;
+        let trusted = crate::stable_amount_from_btc(self.trusted)?;
+        let untrusted_pending = crate::stable_amount_from_btc(self.untrusted_pending)?;
+        let immature = crate::stable_amount_from_btc(self.immature)?;
+        let used = self.used.map(crate::stable_amount_from_btc).transpose()?;
 
         Ok(model::GetBalancesMine { trusted, untrusted_pending, immature, used })
     }
@@ -42,9 +42,9 @@ impl GetBalancesMine {
 impl GetBalancesWatchOnly {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::GetBalancesWatchOnly, ParseAmountError> {
-        let trusted = Amount::from_btc(self.trusted)?;
-        let untrusted_pending = Amount::from_btc(self.untrusted_pending)?;
-        let immature = Amount::from_btc(self.immature)?;
+        let trusted = crate::stable_amount_from_btc(self.trusted)?;
+        let untrusted_pending = crate::stable_amount_from_btc(self.untrusted_pending)?;
+        let immature = crate::stable_amount_from_btc(self.immature)?;
 
         Ok(model::GetBalancesWatchOnly { trusted, untrusted_pending, immature })
     }
@@ -55,8 +55,9 @@ impl GetTransaction {
     pub fn into_model(self) -> Result<model::GetTransaction, GetTransactionError> {
         use GetTransactionError as E;
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let fee =
+            self.fee.map(|fee| bitcoin::SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
         let block_hash =
             self.block_hash.map(|s| s.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_index =
@@ -114,11 +115,11 @@ impl GetWalletInfo {
         use GetWalletInfoError as E;
 
         let wallet_version = crate::to_u32(self.wallet_version, "wallet_version")?;
-        let balance = Amount::from_btc(self.balance).map_err(E::Balance)?;
-        let unconfirmed_balance =
-            Amount::from_btc(self.unconfirmed_balance).map_err(E::UnconfirmedBalance)?;
+        let balance = crate::stable_amount_from_btc(self.balance).map_err(E::Balance)?;
+        let unconfirmed_balance = crate::stable_amount_from_btc(self.unconfirmed_balance)
+            .map_err(E::UnconfirmedBalance)?;
         let immature_balance =
-            Amount::from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
+            crate::stable_amount_from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
         let tx_count = crate::to_u32(self.tx_count, "tx_count")?;
         let keypool_oldest = crate::to_u32(self.keypool_oldest, "keypoo_oldest")?;
         let keypool_size = crate::to_u32(self.keypool_size, "keypoo_size")?;

@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use bitcoin::hex::{self, FromHex as _};
-use bitcoin::{bip158, Amount, BlockHash, Network, Txid, Work, Wtxid};
+use bitcoin::{bip158, BlockHash, Network, Txid, Work, Wtxid};
 
 use super::error::{
     GetBlockFilterError, GetBlockchainInfoError, MapMempoolEntryError, MempoolEntryError,
@@ -204,10 +204,10 @@ impl MempoolEntryFees {
         use MempoolEntryFeesError as E;
 
         Ok(model::MempoolEntryFees {
-            base: Amount::from_btc(self.base).map_err(E::Base)?,
-            modified: Amount::from_btc(self.modified).map_err(E::Modified)?,
-            ancestor: Amount::from_btc(self.ancestor).map_err(E::MempoolEntry)?,
-            descendant: Amount::from_btc(self.descendant).map_err(E::Descendant)?,
+            base: crate::stable_amount_from_btc(self.base).map_err(E::Base)?,
+            modified: crate::stable_amount_from_btc(self.modified).map_err(E::Modified)?,
+            ancestor: crate::stable_amount_from_btc(self.ancestor).map_err(E::MempoolEntry)?,
+            descendant: crate::stable_amount_from_btc(self.descendant).map_err(E::Descendant)?,
             chunk: None,
         })
     }
@@ -277,7 +277,8 @@ impl ScanTxOutSetStart {
         let unspents =
             self.unspents.into_iter().map(|u| u.into_model()).collect::<Result<Vec<_>, _>>()?;
 
-        let total_amount = Amount::from_btc(self.total_amount).map_err(E::TotalAmount)?;
+        let total_amount =
+            crate::stable_amount_from_btc(self.total_amount).map_err(E::TotalAmount)?;
 
         Ok(model::ScanTxOutSetStart {
             success: self.success,

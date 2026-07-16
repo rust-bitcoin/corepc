@@ -9,10 +9,11 @@ use alloc::collections::BTreeMap;
 
 use bitcoin::address::NetworkUnchecked;
 use bitcoin::bip32::{Xpriv, Xpub};
+use bitcoin::compat::Amount;
 use bitcoin::hashes::hash160;
 use bitcoin::{
-    bip32, sign_message, Address, Amount, BlockHash, FeeRate, PrivateKey, Psbt, PublicKey,
-    ScriptBuf, SignedAmount, Transaction, Txid, WitnessProgram, WitnessVersion,
+    bip32, sign_message, Address, BlockHash, FeeRate, PrivateKey, Psbt, PublicKey, ScriptBuf,
+    SignedAmount, Transaction, Txid, WitnessProgram, WitnessVersion,
 };
 use serde::{Deserialize, Serialize};
 
@@ -73,8 +74,10 @@ pub struct BumpFee {
     /// The id of the new transaction.
     pub txid: Txid,
     /// Fee of the replaced transaction.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub original_fee: Amount,
     /// Fee of the new transaction.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub fee: Amount,
     /// Errors encountered during processing (may be empty).
     pub errors: Vec<String>,
@@ -240,7 +243,7 @@ pub struct GetAddressInfoEmbedded {
 
 /// Models the result of JSON-RPC method `getbalance`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetBalance(pub Amount);
+pub struct GetBalance(#[serde(with = "bitcoin::compat::amount::serde::as_btc")] pub Amount);
 
 /// Models the result of JSON-RPC method `getbalances`.
 ///
@@ -260,14 +263,18 @@ pub struct GetBalances {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetBalancesMine {
     /// Trusted balance (outputs created by the wallet or confirmed outputs).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub trusted: Amount,
     /// Untrusted pending balance (outputs created by others that are in the mempool).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub untrusted_pending: Amount,
     /// Balance from immature coinbase outputs.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub immature: Amount,
     /// Balance from coins sent to addresses that were previously spent from (potentially privacy violating).
     ///
     /// Only present if `avoid_reuse` is set.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub used: Option<Amount>,
 }
 
@@ -275,10 +282,13 @@ pub struct GetBalancesMine {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetBalancesWatchOnly {
     /// Trusted balance (outputs created by the wallet or confirmed outputs).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub trusted: Amount,
     /// Untrusted pending balance (outputs created by others that are in the mempool).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub untrusted_pending: Amount,
     /// Balance from immature coinbase outputs.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub immature: Amount,
 }
 
@@ -318,11 +328,13 @@ pub struct GetRawChangeAddress(pub Address<NetworkUnchecked>);
 
 /// Models the result of JSON-RPC method `getreceivedbyaddress`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetReceivedByAddress(pub Amount);
+pub struct GetReceivedByAddress(
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")] pub Amount,
+);
 
 /// Models the result of JSON-RPC method `getreceivedbylabel`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetReceivedByLabel(pub Amount);
+pub struct GetReceivedByLabel(#[serde(with = "bitcoin::compat::amount::serde::as_btc")] pub Amount);
 
 /// Models the result of JSON-RPC method `gettransaction`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -427,7 +439,9 @@ pub struct LastProcessedBlock {
 
 /// Models the result of JSON-RPC method `getunconfirmedbalance`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetUnconfirmedBalance(pub Amount);
+pub struct GetUnconfirmedBalance(
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")] pub Amount,
+);
 
 /// Models the result of JSON-RPC method `getwalletinfo`.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -439,10 +453,13 @@ pub struct GetWalletInfo {
     /// Database format. v21 and later only.
     pub format: Option<String>,
     /// The total confirmed balance of the wallet in BTC. v17 to v29 only.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub balance: Option<Amount>,
     /// The total unconfirmed balance of the wallet in BTC. v17 to v29 only.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub unconfirmed_balance: Option<Amount>,
     /// The total immature balance of the wallet in BTC. v17 to v29 only.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub immature_balance: Option<Amount>,
     /// The total number of transactions in the wallet.
     pub tx_count: u32,
@@ -505,6 +522,7 @@ pub struct ListAddressGroupingsItem {
     /// The bitcoin address.
     pub address: Address<NetworkUnchecked>,
     /// The amount.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// The label.
     pub label: Option<String>,
@@ -535,6 +553,7 @@ pub struct ListReceivedByAddressItem {
     /// The receiving address.
     pub address: Address<NetworkUnchecked>,
     /// The total amount received by the address.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// The number of confirmations of the most recent transaction included.
     pub confirmations: i64, // Docs do not indicate what negative value means?
@@ -554,6 +573,7 @@ pub struct ListReceivedByLabelItem {
     /// Only returned if imported addresses were involved in transaction.
     pub involves_watch_only: Option<bool>,
     /// The total amount received by addresses with this label.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// The number of confirmations of the most recent transaction included.
     pub confirmations: u32,
@@ -682,6 +702,7 @@ pub struct ListUnspentItem {
     /// The script key.
     pub script_pubkey: ScriptBuf,
     /// The transaction amount.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// The number of confirmations.
     pub confirmations: u32, // Docs do not indicate what negative value means?
@@ -721,8 +742,10 @@ pub struct PsbtBumpFee {
     /// The base64-encoded unsigned PSBT of the new transaction.
     pub psbt: Psbt,
     /// The fee of the replaced transaction.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub original_fee: Amount,
     /// The fee of the new transaction.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub fee: Amount,
     /// Errors encountered during processing (may be empty).
     pub errors: Vec<String>,

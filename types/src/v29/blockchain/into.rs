@@ -5,8 +5,8 @@ use alloc::collections::BTreeMap;
 use bitcoin::consensus::encode;
 use bitcoin::hashes::hex::FromHex;
 use bitcoin::{
-    absolute, block, hex, transaction, Amount, BlockHash, CompactTarget, Network, ScriptBuf,
-    Target, Transaction, TxMerkleNode, Txid, Weight, Work,
+    absolute, block, hex, transaction, BlockHash, CompactTarget, Network, ScriptBuf, Target,
+    Transaction, TxMerkleNode, Txid, Weight, Work,
 };
 
 // TODO: Use explicit imports?
@@ -84,7 +84,8 @@ impl GetBlockVerboseTwo {
             .into_iter()
             .map(|entry| {
                 let transaction = entry.transaction.into_model().map_err(E::Transaction)?;
-                let fee = entry.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+                let fee =
+                    entry.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
                 Ok(model::GetBlockVerboseTwoTransaction { transaction, fee })
             })
             .collect::<Result<Vec<_>, E>>()?;
@@ -149,7 +150,8 @@ impl GetRawTransactionVerboseWithPrevout {
                 .map(|prevout| {
                     let height = crate::to_u32(prevout.height, "prevout.height")
                         .map_err(E::PrevoutHeight)?;
-                    let value = Amount::from_btc(prevout.value).map_err(E::PrevoutValue)?;
+                    let value =
+                        crate::stable_amount_from_btc(prevout.value).map_err(E::PrevoutValue)?;
                     let script_pubkey =
                         prevout.script_pubkey.into_model().map_err(E::PrevoutScriptPubKey)?;
                     Ok::<model::GetBlockVerboseThreePrevout, GetBlockVerboseThreeError>(
@@ -212,7 +214,8 @@ impl GetBlockVerboseThree {
             .into_iter()
             .map(|entry| {
                 let (transaction, prevouts) = entry.transaction.into_model_with_prevouts()?;
-                let fee = entry.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+                let fee =
+                    entry.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
                 Ok(model::GetBlockVerboseThreeTransaction { transaction, prevouts, fee })
             })
             .collect::<Result<Vec<_>, E>>()?;
@@ -405,7 +408,8 @@ impl GetDescriptorActivity {
             .map(|entry| -> Result<model::ActivityEntry, GetDescriptorActivityError> {
                 match entry {
                     ActivityEntry::Spend(spend) => {
-                        let amount = Amount::from_btc(spend.amount).map_err(E::Amount)?;
+                        let amount =
+                            crate::stable_amount_from_btc(spend.amount).map_err(E::Amount)?;
                         let block_hash = spend
                             .block_hash
                             .map(|s| s.parse::<BlockHash>())
@@ -430,7 +434,8 @@ impl GetDescriptorActivity {
                         }))
                     }
                     ActivityEntry::Receive(receive) => {
-                        let amount = Amount::from_btc(receive.amount).map_err(E::Amount)?;
+                        let amount =
+                            crate::stable_amount_from_btc(receive.amount).map_err(E::Amount)?;
                         let block_hash = receive
                             .block_hash
                             .map(|s| s.parse::<BlockHash>())

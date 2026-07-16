@@ -18,7 +18,7 @@ std = ["bitcoin/std"]
 serde-deny-unknown-fields = []
 
 [dependencies]
-bitcoin = { version = "0.32.0", default-features = false, features = ["serde", "base64", "secp-recovery"] }
+bitcoin = { version = "0.32.101", default-features = false, features = ["serde", "base64", "secp-recovery", "compat"] }
 serde = { version = "1.0.103", default-features = false, features = [ "derive", "alloc" ] }
 serde_json = { version = "1.0.117" }
 

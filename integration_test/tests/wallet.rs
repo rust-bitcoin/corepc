@@ -359,7 +359,7 @@ fn wallet__get_received_by_address__modelled() {
     let model: Result<mtype::GetReceivedByAddress, amount::ParseAmountError> = json.into_model();
     let received_by_address = model.unwrap();
 
-    assert_eq!(received_by_address.0, amount);
+    assert_eq!(received_by_address.0, amount.to_stable().unwrap());
 }
 
 #[test]
@@ -379,7 +379,7 @@ fn wallet__get_received_by_label__modelled() {
         node.client.get_received_by_label(label).expect("getreceivedbylabel");
     let model: Result<mtype::GetReceivedByLabel, amount::ParseAmountError> = json.into_model();
     let received = model.unwrap();
-    assert_eq!(received.0, amount);
+    assert_eq!(received.0, amount.to_stable().unwrap());
 }
 
 #[test]
@@ -1021,7 +1021,7 @@ fn wallet__set_tx_fee() {
     #[cfg(not(feature = "v29_and_below"))]
     let node = BitcoinD::with_wallet(Wallet::Default, &["-deprecatedrpc=settxfee"]);
 
-    let fee_rate = FeeRate::from_sat_per_vb(2).expect("2 sat/vb is valid");
+    let fee_rate = FeeRate::from_sat_per_vb_u32(2);
 
     let json: SetTxFee = node.client.set_tx_fee(fee_rate).expect("settxfee");
     assert!(json.0);

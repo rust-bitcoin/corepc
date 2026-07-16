@@ -357,7 +357,7 @@ impl GetBalance {
     /// Converts json straight to a `bitcoin::Amount`.
     pub fn balance(self) -> Result<Amount, ParseAmountError> {
         let model = self.into_model()?;
-        Ok(model.0)
+        Ok(Amount::from_stable(model.0))
     }
 }
 

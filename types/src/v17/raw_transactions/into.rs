@@ -4,8 +4,7 @@ use std::collections::BTreeMap;
 
 use bitcoin::psbt::{self, Psbt, PsbtParseError, PsbtSighashType};
 use bitcoin::{
-    absolute, consensus, hex, transaction, Address, Amount, BlockHash, ScriptBuf, Sequence,
-    Transaction, Txid,
+    absolute, consensus, hex, transaction, Address, BlockHash, ScriptBuf, Transaction, Txid,
 };
 
 use super::{
@@ -124,7 +123,7 @@ impl DecodePsbt {
 
         let psbt =
             bitcoin::Psbt { unsigned_tx, version, xpub, proprietary, unknown, inputs, outputs };
-        let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+        let fee = self.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::DecodePsbt { psbt, fee })
     }
@@ -335,7 +334,7 @@ impl FundRawTransaction {
         use FundRawTransactionError as E;
 
         let tx: Transaction = consensus::encode::deserialize_hex(&self.hex).map_err(E::Hex)?;
-        let fee = Amount::from_btc(self.fee).map_err(E::Fee)?;
+        let fee = crate::stable_amount_from_btc(self.fee).map_err(E::Fee)?;
 
         Ok(model::FundRawTransaction { tx, fee, change_position: self.change_position })
     }
@@ -440,7 +439,7 @@ impl SignFail {
 
         let txid = self.txid.parse::<Txid>().map_err(E::Txid)?;
         let script_sig = ScriptBuf::from_hex(&self.script_sig).map_err(E::ScriptSig)?;
-        let sequence = Sequence::from_consensus(self.sequence);
+        let sequence = crate::stable_sequence(bitcoin::Sequence::from_consensus(self.sequence));
 
         Ok(model::SignFail { txid, vout: self.vout, script_sig, sequence, error: self.error })
     }

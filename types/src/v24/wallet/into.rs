@@ -2,7 +2,7 @@
 
 use bitcoin::amount::ParseAmountError;
 use bitcoin::consensus::encode;
-use bitcoin::{Address, Amount, BlockHash, ScriptBuf, SignedAmount, Transaction, Txid};
+use bitcoin::{Address, BlockHash, ScriptBuf, Transaction, Txid};
 
 use super::{
     GetTransaction, GetTransactionDetail, GetTransactionDetailError, GetTransactionError,
@@ -17,8 +17,9 @@ impl GetTransaction {
     pub fn into_model(self) -> Result<model::GetTransaction, GetTransactionError> {
         use GetTransactionError as E;
 
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let fee =
+            self.fee.map(|fee| bitcoin::SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
         let block_hash =
             self.block_hash.map(|s| s.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_index =
@@ -85,8 +86,9 @@ impl GetTransactionDetail {
         use GetTransactionDetailError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
-        let fee = self.fee.map(|fee| SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let fee =
+            self.fee.map(|fee| bitcoin::SignedAmount::from_btc(fee).map_err(E::Fee)).transpose()?;
 
         Ok(model::GetTransactionDetail {
             involves_watch_only: self.involves_watch_only,
@@ -132,13 +134,13 @@ impl TransactionItem {
         let address =
             self.address.map(|a| a.parse::<Address<_>>().map_err(E::Address)).transpose()?;
         let category = self.category.into_model();
-        let amount = SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = bitcoin::SignedAmount::from_btc(self.amount).map_err(E::Amount)?;
         let vout = crate::to_u32(self.vout, "vout")?;
         let fee = self
             .fee
-            .map(|f| SignedAmount::from_btc(f).map_err(E::Fee))
+            .map(|f| bitcoin::SignedAmount::from_btc(f).map_err(E::Fee))
             .transpose()? // optional historically
-            .unwrap_or_else(|| SignedAmount::from_sat(0));
+            .unwrap_or_else(|| bitcoin::SignedAmount::from_sat(0));
         let block_hash =
             self.block_hash.map(|h| h.parse::<BlockHash>().map_err(E::BlockHash)).transpose()?;
         let block_height =
@@ -222,7 +224,7 @@ impl ListUnspentItem {
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
         let label = self.label.unwrap_or_default();
 
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = crate::stable_amount_from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script
@@ -266,7 +268,7 @@ impl SendAll {
 impl SimulateRawTransaction {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::SimulateRawTransaction, ParseAmountError> {
-        let balance_change = SignedAmount::from_btc(self.balance_change)?;
+        let balance_change = bitcoin::SignedAmount::from_btc(self.balance_change)?;
         Ok(model::SimulateRawTransaction { balance_change })
     }
 }

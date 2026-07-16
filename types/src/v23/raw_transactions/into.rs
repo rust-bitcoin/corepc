@@ -6,7 +6,7 @@ use bitcoin::bip32::{DerivationPath, Fingerprint, KeySource, Xpub};
 use bitcoin::hashes::{hash160, ripemd160, sha256, sha256d};
 use bitcoin::hex::{self, FromHex as _};
 use bitcoin::psbt::{self, raw, PsbtSighashType};
-use bitcoin::{Address, Amount};
+use bitcoin::Address;
 
 use super::{
     DecodePsbt, DecodePsbtError, DecodeScript, DecodeScriptError, GlobalXpub, GlobalXpubError,
@@ -67,7 +67,7 @@ impl DecodePsbt {
             inputs,
             outputs,
         };
-        let fee = self.fee.map(Amount::from_btc).transpose().map_err(E::Fee)?;
+        let fee = self.fee.map(crate::stable_amount_from_btc).transpose().map_err(E::Fee)?;
 
         Ok(model::DecodePsbt { psbt, fee })
     }

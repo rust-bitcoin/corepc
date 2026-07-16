@@ -8,11 +8,12 @@
 use alloc::collections::BTreeMap;
 
 use bitcoin::address::NetworkUnchecked;
+use bitcoin::compat::{Amount, Sequence};
 use bitcoin::hashes::sha256;
 use bitcoin::{
-    absolute, block, transaction, Address, Amount, Block, BlockHash, CompactTarget, FeeRate,
-    Network, OutPoint, ScriptBuf, Sequence, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight,
-    Witness, Work, Wtxid,
+    absolute, block, transaction, Address, Block, BlockHash, CompactTarget, FeeRate, Network,
+    OutPoint, ScriptBuf, Target, Transaction, TxMerkleNode, TxOut, Txid, Weight, Witness, Work,
+    Wtxid,
 };
 use serde::{Deserialize, Serialize};
 
@@ -22,6 +23,7 @@ use super::{GetRawTransactionVerbose, ScriptPubKey};
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct DumpTxOutSet {
     /// The number of coins written in the snapshot.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub coins_written: Amount,
     /// The hash of the base of the snapshot.
     pub base_hash: BlockHash,
@@ -139,6 +141,7 @@ pub struct GetBlockVerboseTwoTransaction {
     /// The transaction data (same as `getrawtransaction` verbose output).
     pub transaction: GetRawTransactionVerbose,
     /// The transaction fee in BTC (omitted if block undo data is not available).
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub fee: Option<Amount>,
 }
 
@@ -210,6 +213,7 @@ pub struct GetBlockVerboseThreeTransaction {
     /// The prevout data aligned with the transaction input order.
     pub prevouts: Vec<Option<GetBlockVerboseThreePrevout>>,
     /// The transaction fee in BTC, omitted if block undo data is not available.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub fee: Option<Amount>,
 }
 
@@ -222,6 +226,7 @@ pub struct GetBlockVerboseThreePrevout {
     /// The height of the prevout.
     pub height: u32,
     /// The value in BTC.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub value: Amount,
     /// The script pubkey.
     pub script_pubkey: ScriptPubKey,
@@ -411,6 +416,7 @@ pub struct GetBlockHeaderVerbose {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetBlockStats {
     /// Average fee in the block.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub average_fee: Option<Amount>,
     /// Average feerate.
     pub average_fee_rate: Option<FeeRate>,
@@ -425,18 +431,21 @@ pub struct GetBlockStats {
     /// The number of inputs (excluding coinbase).
     pub inputs: Option<u32>,
     /// Maximum fee in the block.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub max_fee: Option<Amount>,
     /// Maximum feerate (in satoshis per virtual byte).
     pub max_fee_rate: Option<FeeRate>,
     /// Maximum transaction size.
     pub max_tx_size: Option<u32>,
     /// Truncated median fee in the block.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub median_fee: Option<Amount>,
     /// The block median time past.
     pub median_time: Option<u32>,
     /// Truncated median transaction size
     pub median_tx_size: Option<u32>,
     /// Minimum fee in the block.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub minimum_fee: Option<Amount>,
     /// Minimum feerate (in satoshis per virtual byte).
     pub minimum_fee_rate: Option<FeeRate>,
@@ -445,6 +454,7 @@ pub struct GetBlockStats {
     /// The number of outputs.
     pub outputs: Option<u32>,
     /// The block subsidy.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub subsidy: Option<Amount>,
     /// Total size of all segwit transactions.
     pub segwit_total_size: Option<u32>,
@@ -455,12 +465,14 @@ pub struct GetBlockStats {
     /// The block time.
     pub time: Option<u32>,
     /// Total amount in all outputs (excluding coinbase and thus reward [ie subsidy + totalfee]).
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub total_out: Option<Amount>,
     /// Total size of all non-coinbase transactions.
     pub total_size: Option<u32>,
     /// Total weight of all non-coinbase transactions divided by segwit scale factor (4).
     pub total_weight: Option<Weight>,
     /// The fee total.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub total_fee: Option<Amount>,
     /// The number of transactions (excluding coinbase).
     pub txs: Option<u32>,
@@ -648,6 +660,7 @@ pub enum ActivityEntry {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct SpendActivity {
     /// The total amount of the spent output.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// The blockhash (omitted if unconfirmed).
     pub block_hash: Option<BlockHash>,
@@ -669,6 +682,7 @@ pub struct SpendActivity {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct ReceiveActivity {
     /// The total amount in BTC of the new output.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// The block that this receive is in (omitted if unconfirmed).
     pub block_hash: Option<BlockHash>,
@@ -705,6 +719,7 @@ pub struct GetMempoolCluster {
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Chunk {
     /// Fees of the transactions in this chunk.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub chunk_fee: Amount,
     /// Sigops-adjusted weight of all transactions in this chunk.
     pub chunk_weight: u64,
@@ -778,16 +793,21 @@ pub struct MempoolEntry {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct MempoolEntryFees {
     /// Transaction fee in BTC.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub base: Amount,
     /// Transaction fee with fee deltas used for mining priority.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub modified: Amount,
     /// Modified fees (see above) of in-mempool ancestors (including this one).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub ancestor: Amount,
     /// Modified fees (see above) of in-mempool descendants (including this one).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub descendant: Amount,
     /// Transaction fees of chunk.
     ///
     /// This was introduced with Bitcoin Core v31 and will hence be `None` for previous versions.
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub chunk: Option<Amount>,
 }
 
@@ -861,6 +881,7 @@ pub struct FeerateDiagramEntry {
     /// Cumulative sigops-adjusted weight.
     pub weight: u64,
     /// Cumulative fee.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub fee: Amount,
 }
 
@@ -904,10 +925,12 @@ pub struct GetTxOutSetInfo {
     /// The estimated size of the chainstate on disk (not available when coinstatsindex is used).
     pub disk_size: Option<u32>,
     /// The total amount.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub total_amount: Amount,
     /// The serialized hash (only present if 'muhash' hash_type is chosen).
     pub muhash: Option<String>, // FIXME: What sort of hash is this?
     /// The total amount of coins permanently excluded from the UTXO set (only available if coinstatsindex is used).
+    #[serde(default, with = "bitcoin::compat::amount::serde::as_btc::opt")]
     pub total_unspendable_amount: Option<Amount>,
     /// Info on amounts in the block at this block height (only available if coinstatsindex is used).
     pub block_info: Option<GetTxOutSetInfoBlockInfo>,
@@ -917,12 +940,16 @@ pub struct GetTxOutSetInfo {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetTxOutSetInfoBlockInfo {
     /// Total amount of all prevouts spent in this block.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub prevout_spent: Amount,
     /// Coinbase subsidy amount of this block.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub coinbase: Amount,
     /// Total amount of new outputs created by this block.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub new_outputs_ex_coinbase: Amount,
     /// Total amount of unspendable outputs created in this block.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub unspendable: Amount,
     /// Detailed view of unspendable categories.
     pub unspendables: GetTxOutSetInfoUnspendables,
@@ -932,12 +959,16 @@ pub struct GetTxOutSetInfoBlockInfo {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetTxOutSetInfoUnspendables {
     /// The unspendable amount of the Genesis block subsidy.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub genesis_block: Amount,
     /// Transactions overridden by duplicates (no longer possible with BIP30).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub bip30: Amount,
     /// Amounts sent to scripts that are unspendable (for example OP_RETURN outputs).
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub scripts: Amount,
     /// Fee rewards that miners did not claim in their coinbase transaction.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub unclaimed_rewards: Amount,
 }
 
@@ -964,6 +995,7 @@ pub struct GetTxSpendingPrevoutItem {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct LoadTxOutSet {
     /// The number of coins loaded from the snapshot.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub coins_loaded: Amount,
     /// The hash of the base of the snapshot.
     pub tip_hash: BlockHash,
@@ -1031,6 +1063,7 @@ pub struct ScanTxOutSetStart {
     /// The unspents.
     pub unspents: Vec<ScanTxOutSetUnspent>,
     /// The total amount of all found unspent outputs in BTC.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub total_amount: Amount,
 }
 
@@ -1046,6 +1079,7 @@ pub struct ScanTxOutSetUnspent {
     /// A specialized descriptor for the matched output script. For v18 onwards.
     pub descriptor: Option<String>,
     /// The total amount in BTC of the unspent output.
+    #[serde(with = "bitcoin::compat::amount::serde::as_btc")]
     pub amount: Amount,
     /// Whether this is a coinbase output. For v25 onwards.
     pub coinbase: Option<bool>,

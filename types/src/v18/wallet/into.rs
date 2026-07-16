@@ -4,7 +4,7 @@ use bitcoin::amount::ParseAmountError;
 use bitcoin::hashes::hash160;
 use bitcoin::hex::FromHex;
 use bitcoin::key::PublicKey;
-use bitcoin::{bip32, Address, Amount, ScriptBuf, Txid, WitnessProgram, WitnessVersion};
+use bitcoin::{bip32, Address, ScriptBuf, Txid, WitnessProgram, WitnessVersion};
 
 use super::{
     GetAddressInfo, GetAddressInfoEmbedded, GetAddressInfoEmbeddedError, GetAddressInfoError,
@@ -160,7 +160,7 @@ impl GetAddressInfoEmbedded {
 impl GetReceivedByLabel {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::GetReceivedByLabel, ParseAmountError> {
-        let amount = bitcoin::Amount::from_btc(self.0)?;
+        let amount = crate::stable_amount_from_btc(self.0)?;
         Ok(model::GetReceivedByLabel(amount))
     }
 }
@@ -171,11 +171,11 @@ impl GetWalletInfo {
         use GetWalletInfoError as E;
 
         let wallet_version = crate::to_u32(self.wallet_version, "wallet_version")?;
-        let balance = Amount::from_btc(self.balance).map_err(E::Balance)?;
-        let unconfirmed_balance =
-            Amount::from_btc(self.unconfirmed_balance).map_err(E::UnconfirmedBalance)?;
+        let balance = crate::stable_amount_from_btc(self.balance).map_err(E::Balance)?;
+        let unconfirmed_balance = crate::stable_amount_from_btc(self.unconfirmed_balance)
+            .map_err(E::UnconfirmedBalance)?;
         let immature_balance =
-            Amount::from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
+            crate::stable_amount_from_btc(self.immature_balance).map_err(E::ImmatureBalance)?;
         let tx_count = crate::to_u32(self.tx_count, "tx_count")?;
         let keypool_oldest = crate::to_u32(self.keypool_oldest, "keypoo_oldest")?;
         let keypool_size = crate::to_u32(self.keypool_size, "keypoo_size")?;
@@ -232,7 +232,7 @@ impl ListReceivedByAddressItem {
         use ListReceivedByAddressError as E;
 
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = crate::stable_amount_from_btc(self.amount).map_err(E::Amount)?;
         let txids = self
             .txids
             .iter()
@@ -269,7 +269,7 @@ impl ListReceivedByLabelItem {
     pub fn into_model(self) -> Result<model::ListReceivedByLabelItem, ListReceivedByLabelError> {
         use ListReceivedByLabelError as E;
 
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = crate::stable_amount_from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
 
         Ok(model::ListReceivedByLabelItem {
@@ -302,7 +302,7 @@ impl ListUnspentItem {
         let address = self.address.parse::<Address<_>>().map_err(E::Address)?;
         let script_pubkey = ScriptBuf::from_hex(&self.script_pubkey).map_err(E::ScriptPubKey)?;
 
-        let amount = Amount::from_btc(self.amount).map_err(E::Amount)?;
+        let amount = crate::stable_amount_from_btc(self.amount).map_err(E::Amount)?;
         let confirmations = crate::to_u32(self.confirmations, "confirmations")?;
         let redeem_script = self
             .redeem_script
