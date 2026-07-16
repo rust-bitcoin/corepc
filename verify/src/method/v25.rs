@@ -19,7 +19,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getchaintips", "GetChainTips", "get_chain_tips"),
     Method::new_modelled("getchaintxstats", "GetChainTxStats", "get_chain_tx_stats"),
     Method::new_modelled("getdeploymentinfo", "GetDeploymentInfo", "get_deployment_info"),
-    Method::new_modelled("getdifficulty", "GetDifficulty", "get_difficulty"),
+    Method::new_no_model("getdifficulty", "GetDifficulty", "get_difficulty"),
     Method::new_modelled("getmempoolancestors", "GetMempoolAncestors", "get_mempool_ancestors"),
     Method::new_modelled(
         "getmempooldescendants",

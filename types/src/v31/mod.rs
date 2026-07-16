@@ -41,7 +41,7 @@
 //! | getchaintxstats                    | version + model |                                        |
 //! | getdeploymentinfo                  | version + model |                                        |
 //! | getdescriptoractivity              | version + model |                                        |
-//! | getdifficulty                      | version + model |                                        |
+//! | getdifficulty                      | version         |                                        |
 //! | getmempoolancestors                | version + model |                                        |
 //! | getmempoolcluster                  | version + model | New in v31                             |
 //! | getmempooldescendants              | version + model |                                        |

@@ -440,11 +440,9 @@ fn blockchain__get_descriptor_activity__modelled() {
 }
 
 #[test]
-fn blockchain__get_difficulty__modelled() {
+fn blockchain__get_difficulty() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
-
-    let json: GetDifficulty = node.client.get_difficulty().expect("getdifficulty");
-    let _: mtype::GetDifficulty = json.into_model();
+    let _: GetDifficulty = node.client.get_difficulty().expect("getdifficulty");
 }
 
 #[test]

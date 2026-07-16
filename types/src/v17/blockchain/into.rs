@@ -341,11 +341,6 @@ impl GetChainTxStats {
     }
 }
 
-impl GetDifficulty {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> model::GetDifficulty { model::GetDifficulty(self.0) }
-}
-
 impl GetMempoolAncestors {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::GetMempoolAncestors, hex::HexToArrayError> {

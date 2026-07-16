@@ -26,7 +26,7 @@ pub const METHODS: &[Method] = &[
         "GetDescriptorActivity",
         "get_descriptor_activity",
     ),
-    Method::new_modelled("getdifficulty", "GetDifficulty", "get_difficulty"),
+    Method::new_no_model("getdifficulty", "GetDifficulty", "get_difficulty"),
     Method::new_modelled("getmempoolancestors", "GetMempoolAncestors", "get_mempool_ancestors"),
     Method::new_modelled("getmempoolcluster", "GetMempoolCluster", "get_mempool_cluster"),
     Method::new_modelled(

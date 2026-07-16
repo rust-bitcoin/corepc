@@ -678,10 +678,6 @@ pub struct ReceiveActivity {
     pub output_spk: ScriptPubKey,
 }
 
-/// Models the result of JSON-RPC method `getdifficulty`.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetDifficulty(pub f64);
-
 /// Models the result of JSON-RPC method `getmempoolancestors` with verbose set to false.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct GetMempoolAncestors(pub Vec<Txid>);
