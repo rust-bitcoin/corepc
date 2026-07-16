@@ -49,6 +49,18 @@ all-features = true
 # Unavoidable TLS/crypto dep-graph version conflicts.
 allowed_duplicates = ["core-foundation", "openssl-probe", "security-framework", "windows-sys"]
 
+[package.metadata.rbmt.test]
+# Bare `rustls` has no trust roots, so it fails `test_https`.
+exclude_features = ["rustls"]
+exact_features = [
+    ["https-rustls", "std"],
+    ["https-rustls-probe", "std"],
+    ["https-native-tls", "std"],
+    ["async-https-rustls"],
+    ["async-https-rustls-probe"],
+    ["async-https-native-tls"],
+]
+
 [features]
 default = ["std"]
 std = []
