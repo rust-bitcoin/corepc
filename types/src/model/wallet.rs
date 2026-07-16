@@ -728,15 +728,6 @@ pub struct PsbtBumpFee {
     pub errors: Vec<String>,
 }
 
-/// Models the result of JSON-RPC method `rescanblockchain`.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct RescanBlockchain {
-    /// The block height where the rescan has started.
-    pub start_height: u32,
-    /// The height of the last rescanned block.
-    pub stop_height: u32,
-}
-
 /// Models the result of JSON-RPC method `send`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Send {

@@ -193,7 +193,7 @@
 //! | lockunspent                        | version         |                                        |
 //! | move                               | returns boolean | UNTESTED (deprecated)                  |
 //! | removeprunedfunds                  | returns nothing |                                        |
-//! | rescanblockchain                   | version + model |                                        |
+//! | rescanblockchain                   | version         |                                        |
 //! | sendfrom                           | returns nothing | UNTESTED (deprecated)                  |
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
