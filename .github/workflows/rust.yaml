@@ -24,7 +24,7 @@ jobs:
       - uses: rust-bitcoin/rust-bitcoin-maintainer-tools/.github/actions/setup-rbmt@6560b728ae6a81af9d92713b630ba26772fbd970 # v0.1.0
       - name: "Run ${{ matrix.toolchain }} tests"
         run: |
-          cargo rbmt --lock-file ${{ matrix.dep }} test --toolchain ${{ matrix.toolchain }} \
+          cargo rbmt test --lockfile ${{ matrix.dep }} --toolchain ${{ matrix.toolchain }} \
             -p bitreq \
             -p corepc-client \
             -p jsonrpc-fuzz \
@@ -48,7 +48,7 @@ jobs:
       - uses: rust-bitcoin/rust-bitcoin-maintainer-tools/.github/actions/setup-rbmt@6560b728ae6a81af9d92713b630ba26772fbd970 # v0.1.0
       - name: "Run lints"
         run: |
-          cargo rbmt --lock-file ${{ matrix.dep }} lint \
+          cargo rbmt lint --lockfile ${{ matrix.dep }} \
             -p bitreq \
             -p corepc-client \
             -p jsonrpc-fuzz \
@@ -73,7 +73,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: rust-bitcoin/rust-bitcoin-maintainer-tools/.github/actions/setup-rbmt@6560b728ae6a81af9d92713b630ba26772fbd970 # v0.1.0
       - name: "Run doc tests"
-        run: cargo rbmt --lock-file ${{ matrix.dep }} docs
+        run: cargo rbmt docs --lockfile ${{ matrix.dep }} --no-docsrs
 
   Docsrs:
     name: Docs - nightly toolchain
@@ -91,7 +91,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: rust-bitcoin/rust-bitcoin-maintainer-tools/.github/actions/setup-rbmt@6560b728ae6a81af9d92713b630ba26772fbd970 # v0.1.0
       - name: "Run docsrs tests"
-        run: cargo rbmt --lock-file ${{ matrix.dep }} docsrs
+        run: cargo rbmt docs --lockfile ${{ matrix.dep }}
 
   Format:                       #  1 job, run cargo fmt directly.
     name: Format - nightly toolchain
