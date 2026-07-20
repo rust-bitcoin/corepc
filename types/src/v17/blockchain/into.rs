@@ -142,11 +142,6 @@ impl Bip9SoftforkStatus {
     }
 }
 
-impl GetBlockCount {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> model::GetBlockCount { model::GetBlockCount(self.0) }
-}
-
 impl GetBlockHash {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> Result<model::GetBlockHash, hex::HexToArrayError> {
@@ -344,11 +339,6 @@ impl GetChainTxStats {
             tx_rate: self.tx_rate,
         })
     }
-}
-
-impl GetDifficulty {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> model::GetDifficulty { model::GetDifficulty(self.0) }
 }
 
 impl GetMempoolAncestors {

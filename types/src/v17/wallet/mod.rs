@@ -887,9 +887,9 @@ pub struct LockUnspent(pub bool);
 #[cfg_attr(feature = "serde-deny-unknown-fields", serde(deny_unknown_fields))]
 pub struct RescanBlockchain {
     /// The block height where the rescan has started.
-    pub start_height: i64,
+    pub start_height: u32,
     /// The height of the last rescanned block.
-    pub stop_height: i64,
+    pub stop_height: u32,
 }
 
 /// Result of the JSON-RPC method `sendmany`.

@@ -11,7 +11,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getbestblockhash", "GetBestBlockHash", "get_best_block_hash"),
     Method::new_modelled("getblock", "GetBlockVerboseZero", "get_block"), // We only check one of the types.
     Method::new_modelled("getblockchaininfo", "GetBlockchainInfo", "get_blockchain_info"),
-    Method::new_modelled("getblockcount", "GetBlockCount", "get_block_count"),
+    Method::new_no_model("getblockcount", "GetBlockCount", "get_block_count"),
     Method::new_modelled("getblockfilter", "GetBlockFilter", "get_block_filter"),
     Method::new_no_type("getblockfrompeer", "get_block_from_peer"),
     Method::new_modelled("getblockhash", "GetBlockHash", "get_block_hash"),
@@ -21,7 +21,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("getchaintips", "GetChainTips", "get_chain_tips"),
     Method::new_modelled("getchaintxstats", "GetChainTxStats", "get_chain_tx_stats"),
     Method::new_modelled("getdeploymentinfo", "GetDeploymentInfo", "get_deployment_info"),
-    Method::new_modelled("getdifficulty", "GetDifficulty", "get_difficulty"),
+    Method::new_no_model("getdifficulty", "GetDifficulty", "get_difficulty"),
     Method::new_modelled("getmempoolancestors", "GetMempoolAncestors", "get_mempool_ancestors"),
     Method::new_modelled(
         "getmempooldescendants",
@@ -184,7 +184,7 @@ pub const METHODS: &[Method] = &[
     Method::new_modelled("loadwallet", "LoadWallet", "load_wallet"),
     Method::new_no_model("lockunspent", "LockUnspent", "lock_unspent"),
     Method::new_no_type("removeprunedfunds", "remove_pruned_funds"),
-    Method::new_modelled("rescanblockchain", "RescanBlockchain", "rescan_blockchain"),
+    Method::new_no_model("rescanblockchain", "RescanBlockchain", "rescan_blockchain"),
     Method::new_no_model("restorewallet", "RestoreWallet", "restore_wallet"),
     Method::new_modelled("send", "Send", "send"),
     Method::new_modelled("sendall", "SendAll", "send_all"),

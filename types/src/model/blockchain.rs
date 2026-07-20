@@ -349,10 +349,6 @@ pub struct Bip9SoftforkStatistics {
     pub possible: Option<bool>,
 }
 
-/// Models the result of JSON-RPC method `getblockcount`.
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub struct GetBlockCount(pub u64);
-
 /// Models the result of JSON-RPC method `getblockfilter`.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct GetBlockFilter {
@@ -681,10 +677,6 @@ pub struct ReceiveActivity {
     /// The ScriptPubKey.
     pub output_spk: ScriptPubKey,
 }
-
-/// Models the result of JSON-RPC method `getdifficulty`.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct GetDifficulty(pub f64);
 
 /// Models the result of JSON-RPC method `getmempoolancestors` with verbose set to false.
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]

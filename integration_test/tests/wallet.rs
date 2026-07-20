@@ -921,17 +921,15 @@ fn wallet__remove_pruned_funds() {
 }
 
 #[test]
-fn wallet__rescan_blockchain__modelled() {
+fn wallet__rescan_blockchain() {
     let node = BitcoinD::with_wallet(Wallet::Default, &[]);
 
     let mining_addr = node.client.new_address().expect("newaddress");
     let _ = node.client.generate_to_address(3, &mining_addr).expect("generatetoaddress");
 
     let json: RescanBlockchain = node.client.rescan_blockchain().expect("rescanblockchain");
-    let model: Result<mtype::RescanBlockchain, NumericError> = json.into_model();
-    let rescan = model.unwrap();
 
-    assert!(rescan.stop_height >= rescan.start_height);
+    assert!(json.stop_height >= json.start_height);
 }
 
 // This is tested in `backup_and_restore_wallet()`, called by wallet__backup_wallet()

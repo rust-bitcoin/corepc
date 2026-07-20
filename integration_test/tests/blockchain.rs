@@ -217,11 +217,9 @@ fn blockchain__get_blockchain_info__modelled() {
 }
 
 #[test]
-fn blockchain__get_block_count__modelled() {
+fn blockchain__get_block_count() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
-
-    let json: GetBlockCount = node.client.get_block_count().unwrap();
-    let _: mtype::GetBlockCount = json.into_model();
+    let _: GetBlockCount = node.client.get_block_count().unwrap();
 }
 
 #[test]
@@ -442,11 +440,9 @@ fn blockchain__get_descriptor_activity__modelled() {
 }
 
 #[test]
-fn blockchain__get_difficulty__modelled() {
+fn blockchain__get_difficulty() {
     let node = BitcoinD::with_wallet(Wallet::None, &[]);
-
-    let json: GetDifficulty = node.client.get_difficulty().expect("getdifficulty");
-    let _: mtype::GetDifficulty = json.into_model();
+    let _: GetDifficulty = node.client.get_difficulty().expect("getdifficulty");
 }
 
 #[test]

@@ -29,14 +29,14 @@
 //! | getbestblockhash                   | version + model |                                        |
 //! | getblock                           | version + model | Includes additional 'verbose' type     |
 //! | getblockchaininfo                  | version + model |                                        |
-//! | getblockcount                      | version + model |                                        |
+//! | getblockcount                      | version         |                                        |
 //! | getblockfilter                     | version + model |                                        |
 //! | getblockhash                       | version + model |                                        |
 //! | getblockheader                     | version + model | Includes additional 'verbose' type     |
 //! | getblockstats                      | version + model |                                        |
 //! | getchaintips                       | version + model |                                        |
 //! | getchaintxstats                    | version + model |                                        |
-//! | getdifficulty                      | version + model |                                        |
+//! | getdifficulty                      | version         |                                        |
 //! | getmempoolancestors                | version + model |                                        |
 //! | getmempooldescendants              | version + model |                                        |
 //! | getmempoolentry                    | version + model |                                        |
@@ -197,7 +197,7 @@
 //! | loadwallet                         | version + model |                                        |
 //! | lockunspent                        | version         |                                        |
 //! | removeprunedfunds                  | returns nothing |                                        |
-//! | rescanblockchain                   | version + model |                                        |
+//! | rescanblockchain                   | version         |                                        |
 //! | sendmany                           | version + model |                                        |
 //! | sendtoaddress                      | version + model |                                        |
 //! | sethdseed                          | returns nothing |                                        |

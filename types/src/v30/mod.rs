@@ -30,7 +30,7 @@
 //! | getbestblockhash                   | version + model |                                        |
 //! | getblock                           | version + model | Includes additional 'verbose' type     |
 //! | getblockchaininfo                  | version + model |                                        |
-//! | getblockcount                      | version + model |                                        |
+//! | getblockcount                      | version         |                                        |
 //! | getblockfilter                     | version + model |                                        |
 //! | getblockfrompeer                   | returns nothing |                                        |
 //! | getblockhash                       | version + model |                                        |
@@ -41,7 +41,7 @@
 //! | getchaintxstats                    | version + model |                                        |
 //! | getdeploymentinfo                  | version + model |                                        |
 //! | getdescriptoractivity              | version + model |                                        |
-//! | getdifficulty                      | version + model |                                        |
+//! | getdifficulty                      | version         |                                        |
 //! | getmempoolancestors                | version + model |                                        |
 //! | getmempooldescendants              | version + model |                                        |
 //! | getmempoolentry                    | version + model |                                        |
@@ -211,7 +211,7 @@
 //! | loadwallet                         | version + model |                                        |
 //! | lockunspent                        | version         |                                        |
 //! | removeprunedfunds                  | returns nothing |                                        |
-//! | rescanblockchain                   | version + model |                                        |
+//! | rescanblockchain                   | version         |                                        |
 //! | restorewallet                      | version         |                                        |
 //! | send                               | version + model |                                        |
 //! | sendall                            | version + model |                                        |

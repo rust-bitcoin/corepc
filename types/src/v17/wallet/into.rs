@@ -14,7 +14,7 @@ use bitcoin::{
 
 // TODO: Use explicit imports?
 use super::*;
-use crate::{model, NumericError};
+use crate::model;
 
 impl AddressPurpose {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
@@ -694,16 +694,6 @@ impl LoadWallet {
     /// Converts version specific type to a version nonspecific, more strongly typed type.
     pub fn into_model(self) -> model::LoadWallet {
         model::LoadWallet { name: self.name, warnings: vec![self.warning] }
-    }
-}
-
-impl RescanBlockchain {
-    /// Converts version specific type to a version nonspecific, more strongly typed type.
-    pub fn into_model(self) -> Result<model::RescanBlockchain, NumericError> {
-        let start_height = crate::to_u32(self.start_height, "start_height")?;
-        let stop_height = crate::to_u32(self.stop_height, "stop_height")?;
-
-        Ok(model::RescanBlockchain { start_height, stop_height })
     }
 }
 
