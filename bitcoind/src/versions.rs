@@ -3,7 +3,11 @@
 #[cfg(not(feature = "0_17_2"))] // Remember: later version features enable earlier ones.
 compile_error!("enable a feature in order to select the version of Bitcoin Core to use");
 
-#[cfg(feature = "31_0")]
+#[cfg(feature = "31_1")]
+#[allow(dead_code)] // Triggers in --all-features builds.
+pub const VERSION: &str = "31.1";
+
+#[cfg(all(feature = "31_0", not(feature = "31_1")))]
 #[allow(dead_code)] // Triggers in --all-features builds.
 pub const VERSION: &str = "31.0";
 

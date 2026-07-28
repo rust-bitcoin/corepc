@@ -42,11 +42,12 @@ zip = { version = "0.6.6", default-features = false, features = ["bzip2", "defla
 # - `cargo test --no-default-features` does not build, you MUST enable a version feature.
 [features]
 default = ["0_17_2"]
-latest = ["31_0"]
+latest = ["31_1"]
 
 download = ["anyhow", "bitcoin_hashes", "flate2", "tar", "bitreq", "zip"]
 
 # We support all minor releases of the latest three versions.
+31_1 = ["31_0"]
 31_0 = ["30_2"]
 30_2 = ["29_0"]
 # No `30_0` or `30_1` because of wallet migration bug.

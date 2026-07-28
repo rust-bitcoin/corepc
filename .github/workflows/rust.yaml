@@ -130,6 +130,7 @@ jobs:
       matrix:
         version:
           [
+            "31_1",
             "31_0",
             "30_2",
             # No `30_0` or `30_1` because of wallet migration bug.

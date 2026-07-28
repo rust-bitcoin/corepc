@@ -13,10 +13,11 @@ edition = "2021"
 [features]
 download = ["bitcoind/download"]
 
-latest = ["31_0"]
+latest = ["31_1"]
 
 # Enable the same feature in `bitcoind` and the version feature here.
 # All minor releases of the latest three versions.
+31_1 = ["v31_and_below", "bitcoind/31_1"]
 31_0 = ["v31_and_below", "bitcoind/31_0"]
 30_2 = ["v30_and_below", "bitcoind/30_2"]
 # No `30_0` or `30_1` because of wallet migration bug.
