@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **This repository has moved.** Active development is now on rust-bitcoin Forgejo:
+>
+> ### [git.rust-bitcoin.org/rust-bitcoin/corepc](https://git.rust-bitcoin.org/rust-bitcoin/corepc)
+>
+> This GitHub repository is **no longer maintained here**.
+> Please open all issues and pull requests on the new site.
+
 # bitreq - forked from minreq
 [![Crates.io](https://img.shields.io/crates/d/bitreq.svg)](https://crates.io/crates/bitreq)
 [![Documentation](https://docs.rs/bitreq/badge.svg)](https://docs.rs/bitreq)

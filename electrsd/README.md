@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **This repository has moved.** Active development is now on rust-bitcoin Forgejo:
+>
+> ### [git.rust-bitcoin.org/rust-bitcoin/corepc](https://git.rust-bitcoin.org/rust-bitcoin/corepc)
+>
+> This GitHub repository is **no longer maintained here**.
+> Please open all issues and pull requests on the new site.
+
 [![MIT license](https://img.shields.io/github/license/RCasatta/electrsd)](https://github.com/RCasatta/electrsd/blob/master/LICENSE)
 [![Crates](https://img.shields.io/crates/v/electrsd.svg)](https://crates.io/crates/electrsd)
 

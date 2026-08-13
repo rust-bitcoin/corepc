@@ -1,3 +1,11 @@
+> [!IMPORTANT]
+> **This repository has moved.** Active development is now on rust-bitcoin Forgejo:
+>
+> ### [git.rust-bitcoin.org/rust-bitcoin/corepc](https://git.rust-bitcoin.org/rust-bitcoin/corepc)
+>
+> This GitHub repository is **no longer maintained here**.
+> Please open all issues and pull requests on the new site.
+
 # Bitcoin Core JSON-RPC types
 
 This crate provides data types returned by Bitcoin Core's JSON-RPC API. Each type is specific to the
